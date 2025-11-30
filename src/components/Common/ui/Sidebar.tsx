@@ -2,6 +2,7 @@ import * as React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuthStore } from "components/Layout/App/auth";
 import { createRun, type RunSummary } from "api/runs";
+import { PokemonEditor } from "components/Editors/PokemonEditor/PokemonEditor";
 
 interface NavItemProps {
     to: string;
@@ -146,6 +147,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ runs, isAuthenticated, onRunsC
                         </button>
                     </div>
                 )}
+
+                <PokemonEditor />
 
                 {/* Auth status section */}
                 <div className="mt-8 pt-4 border-t border-gray-200">
