@@ -2,6 +2,7 @@ import * as React from "react";
 import { injectGlobal } from "emotion";
 import { RouterProvider } from "react-router-dom";
 import { ErrorBoundary } from "components";
+import { DarkModeProvider } from "./hooks/useDarkMode";
 import { router } from "./router";
 import "./index.css";
 
@@ -25,7 +26,9 @@ async function createRender() {
     const root = createRoot(mountNode!);
     root.render(
         <ErrorBoundary>
-            <RouterProvider router={router} />
+            <DarkModeProvider>
+                <RouterProvider router={router} />
+            </DarkModeProvider>
         </ErrorBoundary>
     );
 }

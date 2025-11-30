@@ -50,8 +50,8 @@ export const HomePage: React.FC = () => {
     if (isAuthenticated) {
         return (
             <div className="p-6">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">Dashboard</h1>
-                <p className="text-gray-600">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Dashboard</h1>
+                <p className="text-gray-600 dark:text-gray-400">
                     Welcome! You are logged in. Use the sidebar to navigate.
                 </p>
             </div>
@@ -60,12 +60,12 @@ export const HomePage: React.FC = () => {
 
     return (
         <div className="p-6 max-w-md">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">Nuzlocke Generator</h1>
-            <div className="bg-white rounded-lg shadow p-6 space-y-4">
-                <h2 className="text-xl font-semibold text-gray-800">Sign In or Register</h2>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Nuzlocke Generator</h1>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-900/50 p-6 space-y-4">
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Sign In or Register</h2>
 
                 {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-md text-sm">
+                    <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-3 py-2 rounded-md text-sm">
                         {error}
                     </div>
                 )}
@@ -77,7 +77,7 @@ export const HomePage: React.FC = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={isSubmitting}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-600"
                     />
                     <input
                         type="password"
@@ -86,7 +86,7 @@ export const HomePage: React.FC = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         disabled={isSubmitting}
                         onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-600"
                     />
                 </div>
                 <div className="flex gap-3">
@@ -109,4 +109,3 @@ export const HomePage: React.FC = () => {
         </div>
     );
 };
-
