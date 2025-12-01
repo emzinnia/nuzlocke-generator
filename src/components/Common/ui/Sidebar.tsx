@@ -1,5 +1,5 @@
 import * as React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "components/Layout/App/auth";
 import { createRun, type RunSummary } from "api/runs";
 import { PokemonEditor } from "components/Editors/PokemonEditor/PokemonEditor";
@@ -55,6 +55,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ runs, isAuthenticated, onRunsChange }) => {
     const navigate = useNavigate();
+    const { id: runId } = useParams<{ id: string }>();
     const [isCreating, setIsCreating] = React.useState(false);
     const [width, setWidth] = React.useState(() => {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -194,7 +195,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ runs, isAuthenticated, onRunsC
                     </div>
                 )}
 
-                <PokemonEditor />
+                {runId && <PokemonEditor runId={runId} onPokemonAdded={onRunsChange} />}
 
                 {/* Auth status section */}
                 <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">

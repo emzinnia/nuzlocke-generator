@@ -88,3 +88,36 @@ export async function deleteRun(id: string): Promise<void> {
   await api.delete(`/api/runs/${id}`);
 }
 
+/**
+ * Pokemon data for adding to a run.
+ */
+export interface NewPokemon {
+  nickname: string;
+  species: string;
+}
+
+/**
+ * Add a Pokemon to a run.
+ * Fetches current run data, appends the new pokemon, and patches the run.
+ */
+export async function addPokemonToRun(
+  runId: string,
+  pokemon: NewPokemon
+): Promise<{ id: string; revision: number }> {
+  // Fetch current run to get existing pokemon
+  const run = await getRun(runId);
+  const currentPokemon = run.data.pokemon || [];
+
+  // Create new pokemon with a unique ID
+  const newPokemon = {
+    id: crypto.randomUUID(),
+    nickname: pokemon.nickname,
+    species: pokemon.species,
+  };
+
+  // Patch the run with the updated pokemon array
+  return patchRun(runId, {
+    pokemon: [...currentPokemon, newPokemon],
+  });
+}
+
