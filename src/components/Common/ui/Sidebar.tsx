@@ -3,6 +3,7 @@ import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "components/Layout/App/auth";
 import { createRun, type RunSummary } from "api/runs";
 import { PokemonEditor } from "components/Editors/PokemonEditor/PokemonEditor";
+import { TrainerEditor } from "components/Editors/TrainerEditor/TrainerEditor";
 
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 500;
@@ -194,6 +195,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ runs, isAuthenticated, onRunsC
                         </button>
                     </div>
                 )}
+
+                {runId && <TrainerEditor runId={runId} onTrainerUpdated={onRunsChange} />}
 
                 {runId && <PokemonEditor runId={runId} onPokemonAdded={onRunsChange} />}
 
