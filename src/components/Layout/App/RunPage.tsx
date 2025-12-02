@@ -3,6 +3,7 @@ import { useLoaderData } from "react-router-dom";
 import deepmerge from "deepmerge";
 import type { Run } from "api/runs";
 import { useRunChannel } from "api/useRunChannel";
+import { RunInfographic } from "./RunInfographic";
 
 interface RunLoaderData {
     run: Run;
@@ -82,6 +83,7 @@ export const RunPage: React.FC = () => {
                     {isConnected ? "Live" : "..."}
                 </span>
             </div>
+            <RunInfographic data={runData.data} />
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-900/50 p-4">
                 <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
                     <span>Revision: {runData.revision}</span>

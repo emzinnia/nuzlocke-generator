@@ -3,7 +3,9 @@ import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "components/Layout/App/auth";
 import { createRun, type RunSummary } from "api/runs";
 import { PokemonEditor } from "components/Editors/PokemonEditor/PokemonEditor";
+import { PokemonBoxes } from "components/Editors/PokemonEditor/PokemonBoxes";
 import { TrainerEditor } from "components/Editors/TrainerEditor/TrainerEditor";
+import { GameSelector } from "components/Editors/GameEditor/GameSelector";
 
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 500;
@@ -119,10 +121,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ runs, isAuthenticated, onRunsC
 
     return (
         <aside
-            className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 min-h-screen relative flex-shrink-0 transition-colors"
+            className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-screen relative flex-shrink-0 transition-colors flex flex-col group/sidebar"
             style={{ width }}
         >
-            <div className="p-4 overflow-x-hidden">
+            <div className="p-4 overflow-x-hidden overflow-y-auto flex-1 scrollbar-gutter-stable sidebar-scroll">
                 <nav className="space-y-1">
                     <NavItem
                         to="/"
@@ -206,7 +208,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ runs, isAuthenticated, onRunsC
                     </div>
                 )}
 
+                {runId && <GameSelector runId={runId} onGameUpdated={onRunsChange} />}
+
                 {runId && <TrainerEditor runId={runId} onTrainerUpdated={onRunsChange} />}
+
+                {runId && <PokemonBoxes runId={runId} onRefresh={onRunsChange} />}
 
                 {runId && <PokemonEditor runId={runId} onPokemonAdded={onRunsChange} />}
 
