@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Field, Select, MultiSelect } from 'components/Common/ui';
+import { Button, Field, Select, MultiSelect, Collapsible } from 'components/Common/ui';
 import { listOfPokemon } from 'utils/data/listOfPokemon';
 import { listOfNatures } from 'utils/data/listOfNatures';
 import { listOfAbilities } from 'utils/data/listOfAbilities';
@@ -95,11 +95,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
     };
 
     return (
-        <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="text-xs text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wide mb-2">
-                Add Pokemon
-            </div>
-
+        <Collapsible title="Add Pokemon" defaultOpen={false}>
             {error && (
                 <div className="mb-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded">
                     {error}
@@ -184,7 +180,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                     <Select
                         value={nature}
                         onChange={(e) => setNature(e.target.value)}
-                        disabled={isAdding}
+                    disabled={isAdding}
                         options={[{ value: '', label: 'Select...' }, ...listOfNatures.map(n => ({ value: n, label: n }))]}
                         className="flex-1 ml-2"
                     />
@@ -241,6 +237,6 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                     {isAdding ? 'Adding...' : 'Add Pokemon'}
                 </Button>
             </div>
-        </div>
+        </Collapsible>
     );
 };

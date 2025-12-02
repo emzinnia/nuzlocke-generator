@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Field } from "components/Common/ui/Field";
+import { Field, Collapsible } from "components/Common/ui";
 import { getRun, patchRun } from "api/runs";
 import type { Trainer } from "models/Trainer";
 import { debounce } from "utils/debounce";
@@ -56,32 +56,20 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUp
         saveTrainer(updatedTrainer);
     };
 
+    const title = isSaving ? "Trainer (Saving...)" : "Trainer";
+
     if (isLoading) {
-        return (
-            <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="text-xs text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wide mb-2">
-                    Trainer
-                </div>
+    return (
+            <Collapsible title="Trainer" defaultOpen={false}>
                 <div className="text-sm text-gray-500 dark:text-gray-400 animate-pulse">
                     Loading...
-                </div>
-            </div>
-        );
-    }
+        </div>
+            </Collapsible>
+    );  
+}
 
     return (
-        <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-2">
-                <div className="text-xs text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wide">
-                    Trainer
-                </div>
-                {isSaving && (
-                    <div className="text-xs text-blue-500 dark:text-blue-400">
-                        Saving...
-                    </div>
-                )}
-            </div>
-
+        <Collapsible title={title} defaultOpen={false}>
             {error && (
                 <div className="mb-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded">
                     {error}
@@ -153,6 +141,6 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUp
                     }}
                 />
             </div>
-        </div>
+        </Collapsible>
     );
 };

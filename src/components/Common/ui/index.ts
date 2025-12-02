@@ -5,3 +5,4 @@ export * from "./Field";
 export * from "./Input";
 export * from "./Select";
 export * from "./MultiSelect";
+export * from "./Collapsible";

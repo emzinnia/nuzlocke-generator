@@ -20,6 +20,9 @@ const ApiExplorerPage = React.lazy(() =>
 const RunPage = React.lazy(() =>
     import("./components/Layout/App/RunPage").then((m) => ({ default: m.RunPage }))
 );
+const DataPage = React.lazy(() =>
+    import("./components/Layout/App/DataPage").then((m) => ({ default: m.DataPage }))
+);
 
 // Auth check helper
 function requireAuth() {
@@ -125,6 +128,14 @@ export const router = createBrowserRouter([
                     requireAuth();
                     return null;
                 },
+            },
+            {
+                path: "data",
+                element: (
+                    <React.Suspense fallback={<RouteLoading />}>
+                        <DataPage />
+                    </React.Suspense>
+                ),
             },
             {
                 path: "runs/:id",
