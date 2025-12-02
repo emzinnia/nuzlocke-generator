@@ -94,6 +94,7 @@ export async function deleteRun(id: string): Promise<void> {
 export interface NewPokemon {
   nickname: string;
   species: string;
+  status?: string;
   level?: number;
   met?: string;
   metLevel?: number;
@@ -121,6 +122,7 @@ export async function addPokemonToRun(
     id: crypto.randomUUID(),
     nickname: pokemon.nickname,
     species: pokemon.species,
+    status: pokemon.status,
     level: pokemon.level,
     met: pokemon.met,
     metLevel: pokemon.metLevel,

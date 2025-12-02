@@ -60,7 +60,7 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUp
 
     if (isLoading) {
     return (
-            <Collapsible title="Trainer" defaultOpen={false}>
+            <Collapsible title="Trainer" defaultOpen={true}>
                 <div className="text-sm text-gray-500 dark:text-gray-400 animate-pulse">
                     Loading...
         </div>
@@ -69,7 +69,7 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUp
 }
 
     return (
-        <Collapsible title={title} defaultOpen={false}>
+        <Collapsible title={title} defaultOpen={true}>
             {error && (
                 <div className="mb-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded">
                     {error}
