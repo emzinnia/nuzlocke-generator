@@ -94,6 +94,14 @@ export async function deleteRun(id: string): Promise<void> {
 export interface NewPokemon {
   nickname: string;
   species: string;
+  level?: number;
+  met?: string;
+  metLevel?: number;
+  gender?: 'Male' | 'Female' | 'Neutral';
+  nature?: string;
+  ability?: string;
+  moves?: string[];
+  types?: string[];
 }
 
 /**
@@ -113,6 +121,14 @@ export async function addPokemonToRun(
     id: crypto.randomUUID(),
     nickname: pokemon.nickname,
     species: pokemon.species,
+    level: pokemon.level,
+    met: pokemon.met,
+    metLevel: pokemon.metLevel,
+    gender: pokemon.gender,
+    nature: pokemon.nature,
+    ability: pokemon.ability,
+    moves: pokemon.moves,
+    types: pokemon.types,
   };
 
   // Patch the run with the updated pokemon array

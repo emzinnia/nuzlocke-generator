@@ -1,7 +1,40 @@
 import React from 'react';
-import { Button } from 'components/Common/ui';
+import { Button, Field, Select, MultiSelect } from 'components/Common/ui';
 import { listOfPokemon } from 'utils/data/listOfPokemon';
+import { listOfNatures } from 'utils/data/listOfNatures';
+import { listOfAbilities } from 'utils/data/listOfAbilities';
+import { movesByType } from 'utils/data/movesByType';
+import { Types } from 'utils/Types';
 import { addPokemonToRun } from 'api/runs';
+
+// Flatten all moves from movesByType into a single sorted array
+const allMoves = Array.from(
+    new Set(Object.values(movesByType).flat())
+).sort();
+
+// Get Pokemon types (excluding TemTem types)
+const pokemonTypes = [
+    Types.Normal,
+    Types.Fire,
+    Types.Water,
+    Types.Electric,
+    Types.Grass,
+    Types.Ice,
+    Types.Fighting,
+    Types.Poison,
+    Types.Ground,
+    Types.Flying,
+    Types.Psychic,
+    Types.Bug,
+    Types.Rock,
+    Types.Ghost,
+    Types.Dragon,
+    Types.Dark,
+    Types.Steel,
+    Types.Fairy,
+];
+
+const genderOptions = ['Male', 'Female', 'Neutral'];
 
 interface PokemonEditorProps {
     runId: string;
@@ -11,15 +44,27 @@ interface PokemonEditorProps {
 export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAdded }) => {
     const [selectedPokemon, setSelectedPokemon] = React.useState('Bulbasaur');
     const [nickname, setNickname] = React.useState('');
+    const [level, setLevel] = React.useState<number | ''>('');
+    const [metLocation, setMetLocation] = React.useState('');
+    const [metLevel, setMetLevel] = React.useState<number | ''>('');
+    const [gender, setGender] = React.useState('');
+    const [nature, setNature] = React.useState('');
+    const [ability, setAbility] = React.useState('');
+    const [moves, setMoves] = React.useState<string[]>([]);
+    const [types, setTypes] = React.useState<string[]>([]);
     const [isAdding, setIsAdding] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
 
-    const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedPokemon(e.target.value);
-    };
-
-    const onNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNickname(e.target.value);
+    const resetForm = () => {
+        setNickname('');
+        setLevel('');
+        setMetLocation('');
+        setMetLevel('');
+        setGender('');
+        setNature('');
+        setAbility('');
+        setMoves([]);
+        setTypes([]);
     };
 
     const handleAddPokemon = async () => {
@@ -30,12 +75,17 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
             await addPokemonToRun(runId, {
                 species: selectedPokemon,
                 nickname: nickname || selectedPokemon,
+                level: level || undefined,
+                met: metLocation || undefined,
+                metLevel: metLevel || undefined,
+                gender: gender as 'Male' | 'Female' | 'Neutral' | undefined,
+                nature: nature || undefined,
+                ability: ability || undefined,
+                moves: moves.length > 0 ? moves : undefined,
+                types: types.length > 0 ? types : undefined,
             });
 
-            // Reset form
-            setNickname('');
-
-            // Notify parent to refresh data
+            resetForm();
             onPokemonAdded?.();
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to add Pokemon');
@@ -57,27 +107,130 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
             )}
 
             <div className="space-y-2">
-                <select
+                {/* Species */}
+                <Select
                     value={selectedPokemon}
-                    onChange={onChange}
+                    onChange={(e) => setSelectedPokemon(e.target.value)}
                     disabled={isAdding}
-                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                >
-                    {listOfPokemon.map((pokemon) => (
-                        <option key={pokemon} value={pokemon}>
-                            {pokemon}
-                        </option>
-                    ))}
-                </select>
-
-                <input
-                    type="text"
-                    value={nickname}
-                    onChange={onNicknameChange}
-                    disabled={isAdding}
-                    placeholder="Nickname (optional)"
-                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                    options={listOfPokemon}
+                    className="w-full"
                 />
+
+                {/* Nickname */}
+                <Field
+                    label="Nickname"
+                    inputProps={{
+                        type: "text",
+                        value: nickname,
+                        onChange: (e) => setNickname(e.target.value),
+                        placeholder: "Nickname (optional)",
+                        disabled: isAdding,
+                    }}
+                />
+
+                {/* Level */}
+                <Field
+                    label="Level"
+                    inputProps={{
+                        type: "number",
+                        min: 1,
+                        value: level,
+                        onChange: (e) => setLevel(e.target.value ? parseInt(e.target.value) : ''),
+                        placeholder: "1-100",
+                        disabled: isAdding,
+                    }}
+                />
+
+                {/* Met Location */}
+                <Field
+                    label="Met Location"
+                    inputProps={{
+                        type: "text",
+                        value: metLocation,
+                        onChange: (e) => setMetLocation(e.target.value),
+                        placeholder: "Where caught",
+                        disabled: isAdding,
+                    }}
+                />
+
+                {/* Met Level */}
+                <Field
+                    label="Met Level"
+                    inputProps={{
+                        type: "number",
+                        min: 1,
+                        value: metLevel,
+                        onChange: (e) => setMetLevel(e.target.value ? parseInt(e.target.value) : ''),
+                        placeholder: "1-100",
+                        disabled: isAdding,
+                    }}
+                />
+
+                {/* Gender */}
+                <div className="flex gap-1 w-full justify-between items-center">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
+                    <Select
+                        value={gender}
+                        onChange={(e) => setGender(e.target.value)}
+                        disabled={isAdding}
+                        options={[{ value: '', label: 'Select...' }, ...genderOptions.map(g => ({ value: g, label: g }))]}
+                        className="flex-1 ml-2"
+                    />
+                </div>
+
+                {/* Nature */}
+                <div className="flex gap-1 w-full justify-between items-center">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Nature</label>
+                    <Select
+                        value={nature}
+                        onChange={(e) => setNature(e.target.value)}
+                        disabled={isAdding}
+                        options={[{ value: '', label: 'Select...' }, ...listOfNatures.map(n => ({ value: n, label: n }))]}
+                        className="flex-1 ml-2"
+                    />
+                </div>
+
+                {/* Ability */}
+                <div className="flex gap-1 w-full justify-between items-center">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Ability</label>
+                    <Select
+                        value={ability}
+                        onChange={(e) => setAbility(e.target.value)}
+                        disabled={isAdding}
+                        options={[{ value: '', label: 'Select...' }, ...listOfAbilities.map(a => ({ value: a, label: a }))]}
+                        className="flex-1 ml-2"
+                    />
+                </div>
+
+                {/* Moves */}
+                <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
+                        Moves (max 4)
+                    </label>
+                    <MultiSelect
+                        options={allMoves}
+                        value={moves}
+                        onChange={setMoves}
+                        max={4}
+                        placeholder="Add move..."
+                        disabled={isAdding}
+                    />
+                </div>
+
+                {/* Types */}
+                <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
+                        Types (max 2)
+                    </label>
+                    <MultiSelect
+                        options={pokemonTypes}
+                        value={types}
+                        onChange={setTypes}
+                        max={2}
+                        placeholder="Add type..."
+                        disabled={isAdding}
+                    />
+                </div>
 
                 <Button
                     onClick={handleAddPokemon}
