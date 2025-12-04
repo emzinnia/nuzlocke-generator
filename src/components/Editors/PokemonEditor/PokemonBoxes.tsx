@@ -6,6 +6,9 @@ import type { Pokemon } from 'models/Pokemon';
 interface PokemonBoxesProps {
     runId: string;
     onRefresh?: () => void;
+    selectedPokemonId?: string | null;
+    onSelectPokemon?: (id: string | null) => void;
+    onPokemonLoaded?: (pokemon: Pokemon[]) => void;
 }
 
 // Normalize species name for icon URL (simplified version)
@@ -30,13 +33,22 @@ const getIconURL = (species: string, shiny?: boolean): string => {
 };
 
 // Pokemon icon component for the boxes display
-const PokemonIconSmall: React.FC<{ pokemon: Pokemon }> = ({ pokemon }) => {
+const PokemonIconSmall: React.FC<{
+    pokemon: Pokemon;
+    isSelected?: boolean;
+    onClick?: () => void;
+}> = ({ pokemon, isSelected, onClick }) => {
     const [imageError, setImageError] = React.useState(false);
 
     return (
         <div
-            className="w-8 h-8 flex items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
+            className={`w-8 h-8 flex items-center justify-center cursor-pointer rounded transition-colors ${
+                isSelected
+                    ? 'bg-blue-200 dark:bg-blue-700 ring-2 ring-blue-500'
+                    : 'hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
             title={pokemon.nickname || pokemon.species}
+            onClick={onClick}
         >
             {!imageError ? (
                 <img
@@ -56,7 +68,12 @@ const PokemonIconSmall: React.FC<{ pokemon: Pokemon }> = ({ pokemon }) => {
 };
 
 // Status group component
-const StatusGroup: React.FC<{ status: string; pokemon: Pokemon[] }> = ({ status, pokemon }) => {
+const StatusGroup: React.FC<{
+    status: string;
+    pokemon: Pokemon[];
+    selectedPokemonId?: string | null;
+    onSelectPokemon?: (id: string | null) => void;
+}> = ({ status, pokemon, selectedPokemonId, onSelectPokemon }) => {
     if (pokemon.length === 0) return null;
 
     const statusColors: Record<string, string> = {
@@ -75,14 +92,19 @@ const StatusGroup: React.FC<{ status: string; pokemon: Pokemon[] }> = ({ status,
             </div>
             <div className="flex flex-wrap gap-0.5 bg-gray-100 dark:bg-gray-700/50 rounded p-1">
                 {pokemon.map((p) => (
-                    <PokemonIconSmall key={p.id} pokemon={p} />
+                    <PokemonIconSmall
+                        key={p.id}
+                        pokemon={p}
+                        isSelected={selectedPokemonId === p.id}
+                        onClick={() => onSelectPokemon?.(selectedPokemonId === p.id ? null : p.id)}
+                    />
                 ))}
             </div>
         </div>
     );
 };
 
-export const PokemonBoxes: React.FC<PokemonBoxesProps> = ({ runId, onRefresh }) => {
+export const PokemonBoxes: React.FC<PokemonBoxesProps> = ({ runId, onRefresh, selectedPokemonId, onSelectPokemon, onPokemonLoaded }) => {
     const [pokemon, setPokemon] = React.useState<Pokemon[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
     const [error, setError] = React.useState<string | null>(null);
@@ -92,13 +114,15 @@ export const PokemonBoxes: React.FC<PokemonBoxesProps> = ({ runId, onRefresh }) 
         setError(null);
         try {
             const run = await getRun(runId);
-            setPokemon((run.data.pokemon as Pokemon[]) || []);
+            const loadedPokemon = (run.data.pokemon as Pokemon[]) || [];
+            setPokemon(loadedPokemon);
+            onPokemonLoaded?.(loadedPokemon);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to load Pokemon');
         } finally {
             setIsLoading(false);
         }
-    }, [runId]);
+    }, [runId, onPokemonLoaded]);
 
     React.useEffect(() => {
         fetchPokemon();
@@ -184,7 +208,13 @@ export const PokemonBoxes: React.FC<PokemonBoxesProps> = ({ runId, onRefresh }) 
     return (
         <Collapsible title={`Boxes (${pokemon.length})`} defaultOpen={true}>
             {groupedPokemon.map(({ status, pokemon: groupPokemon }) => (
-                <StatusGroup key={status} status={status} pokemon={groupPokemon} />
+                <StatusGroup
+                    key={status}
+                    status={status}
+                    pokemon={groupPokemon}
+                    selectedPokemonId={selectedPokemonId}
+                    onSelectPokemon={onSelectPokemon}
+                />
             ))}
         </Collapsible>
     );

@@ -6,6 +6,7 @@ import { PokemonEditor } from "components/Editors/PokemonEditor/PokemonEditor";
 import { PokemonBoxes } from "components/Editors/PokemonEditor/PokemonBoxes";
 import { TrainerEditor } from "components/Editors/TrainerEditor/TrainerEditor";
 import { GameSelector } from "components/Editors/GameEditor/GameSelector";
+import type { Pokemon } from "models/Pokemon";
 
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 500;
@@ -65,6 +66,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ runs, isAuthenticated, onRunsC
         return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
     });
     const [isResizing, setIsResizing] = React.useState(false);
+    const [selectedPokemonId, setSelectedPokemonId] = React.useState<string | null>(null);
+    const [pokemonList, setPokemonList] = React.useState<Pokemon[]>([]);
+
+    // Clear selection when changing runs
+    React.useEffect(() => {
+        setSelectedPokemonId(null);
+        setPokemonList([]);
+    }, [runId]);
 
     const logout = () => {
         localStorage.removeItem("auth_token");
@@ -212,9 +221,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ runs, isAuthenticated, onRunsC
 
                 {runId && <TrainerEditor runId={runId} onTrainerUpdated={onRunsChange} />}
 
-                {runId && <PokemonBoxes runId={runId} onRefresh={onRunsChange} />}
+                {runId && (
+                    <PokemonBoxes
+                        runId={runId}
+                        onRefresh={onRunsChange}
+                        selectedPokemonId={selectedPokemonId}
+                        onSelectPokemon={setSelectedPokemonId}
+                        onPokemonLoaded={setPokemonList}
+                    />
+                )}
 
-                {runId && <PokemonEditor runId={runId} onPokemonAdded={onRunsChange} />}
+                {runId && (
+                    <PokemonEditor
+                        runId={runId}
+                        onPokemonAdded={() => {
+                            onRunsChange();
+                            // Trigger a refresh of the pokemon list
+                        }}
+                        selectedPokemonId={selectedPokemonId}
+                        pokemonList={pokemonList}
+                        onClearSelection={() => setSelectedPokemonId(null)}
+                    />
+                )}
 
                 {/* Auth status section */}
                 <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">

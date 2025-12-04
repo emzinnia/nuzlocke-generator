@@ -5,7 +5,9 @@ import { listOfNatures } from 'utils/data/listOfNatures';
 import { listOfAbilities } from 'utils/data/listOfAbilities';
 import { movesByType } from 'utils/data/movesByType';
 import { Types } from 'utils/Types';
-import { addPokemonToRun } from 'api/runs';
+import { addPokemonToRun, patchRun, getRun } from 'api/runs';
+import type { Pokemon } from 'models/Pokemon';
+import { debounce } from 'utils/debounce';
 
 // Flatten all moves from movesByType into a single sorted array
 const allMoves = Array.from(
@@ -41,9 +43,13 @@ const defaultStatusOptions = ['Team', 'Dead', 'Boxed', 'Champs'];
 interface PokemonEditorProps {
     runId: string;
     onPokemonAdded?: () => void;
+    selectedPokemonId?: string | null;
+    pokemonList?: Pokemon[];
+    onClearSelection?: () => void;
 }
 
-export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAdded }) => {
+export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAdded, selectedPokemonId, pokemonList, onClearSelection }) => {
+    // Form state for both add and edit modes
     const [selectedPokemon, setSelectedPokemon] = React.useState('Bulbasaur');
     const [nickname, setNickname] = React.useState('');
     const [status, setStatus] = React.useState('');
@@ -59,7 +65,57 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
     const [moves, setMoves] = React.useState<string[]>([]);
     const [types, setTypes] = React.useState<string[]>([]);
     const [isAdding, setIsAdding] = React.useState(false);
+    const [isSaving, setIsSaving] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
+
+    // Determine if we're in edit mode
+    const isEditMode = Boolean(selectedPokemonId);
+    const currentPokemon = pokemonList?.find(p => p.id === selectedPokemonId);
+
+    // Load selected pokemon data into form when selection changes
+    React.useEffect(() => {
+        if (currentPokemon) {
+            setSelectedPokemon(currentPokemon.species || 'Bulbasaur');
+            setNickname(currentPokemon.nickname || '');
+            setStatus(currentPokemon.status || '');
+            setLevel(currentPokemon.level ?? '');
+            setMetLocation(currentPokemon.met || '');
+            setMetLevel(currentPokemon.metLevel ?? '');
+            setGender(currentPokemon.gender || '');
+            setNature(currentPokemon.nature || '');
+            setAbility(currentPokemon.ability || '');
+            setMoves(currentPokemon.moves || []);
+            setTypes((currentPokemon.types as string[]) || []);
+        }
+    }, [currentPokemon]);
+
+    // Debounced save function for edit mode
+    const saveEditedPokemon = React.useMemo(
+        () =>
+            debounce(async (updatedPokemon: Partial<Pokemon>) => {
+                if (!selectedPokemonId || !pokemonList) return;
+                setIsSaving(true);
+                try {
+                    const updatedList = pokemonList.map(p =>
+                        p.id === selectedPokemonId ? { ...p, ...updatedPokemon } : p
+                    );
+                    await patchRun(runId, { pokemon: updatedList });
+                    onPokemonAdded?.();
+                } catch (err) {
+                    setError(err instanceof Error ? err.message : 'Failed to save Pokemon');
+                } finally {
+                    setIsSaving(false);
+                }
+            }, 500),
+        [runId, selectedPokemonId, pokemonList, onPokemonAdded]
+    );
+
+    // Update a field and save if in edit mode
+    const updateField = (field: keyof Pokemon, value: unknown) => {
+        if (isEditMode && currentPokemon) {
+            saveEditedPokemon({ [field]: value });
+        }
+    };
 
     const allStatusOptions = [...defaultStatusOptions, ...customStatuses];
 
@@ -121,20 +177,44 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
         }
     };
 
+    const title = isEditMode
+        ? isSaving
+            ? `Editing ${currentPokemon?.nickname || currentPokemon?.species} (Saving...)`
+            : `Editing ${currentPokemon?.nickname || currentPokemon?.species}`
+        : "Add Pokemon";
+
+    const isDisabled = isEditMode ? isSaving : isAdding;
+
     return (
-        <Collapsible title="Add Pokemon" defaultOpen={true}>
+        <Collapsible title={title} defaultOpen={true}>
             {error && (
                 <div className="mb-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded">
                     {error}
                 </div>
             )}
 
+            {isEditMode && (
+                <button
+                    type="button"
+                    onClick={onClearSelection}
+                    className="mb-3 w-full text-left px-2 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors flex items-center gap-2"
+                >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Add Pokemon
+                </button>
+            )}
+
             <div className="space-y-2">
                 {/* Species */}
                 <Select
                     value={selectedPokemon}
-                    onChange={(e) => setSelectedPokemon(e.target.value)}
-                    disabled={isAdding}
+                    onChange={(e) => {
+                        setSelectedPokemon(e.target.value);
+                        updateField('species', e.target.value);
+                    }}
+                    disabled={isDisabled}
                     options={listOfPokemon}
                     className="w-full"
                 />
@@ -145,9 +225,12 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                     inputProps={{
                         type: "text",
                         value: nickname,
-                        onChange: (e) => setNickname(e.target.value),
+                        onChange: (e) => {
+                            setNickname(e.target.value);
+                            updateField('nickname', e.target.value);
+                        },
                         placeholder: "Nickname (optional)",
-                        disabled: isAdding,
+                        disabled: isDisabled,
                     }}
                 />
 
@@ -183,8 +266,13 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                     ) : (
                         <Select
                             value={status}
-                            onChange={(e) => handleStatusChange(e.target.value)}
-                            disabled={isAdding}
+                            onChange={(e) => {
+                                handleStatusChange(e.target.value);
+                                if (e.target.value !== '__add_custom__') {
+                                    updateField('status', e.target.value);
+                                }
+                            }}
+                            disabled={isDisabled}
                             options={[
                                 { value: '', label: 'Select...' },
                                 ...allStatusOptions.map(s => ({ value: s, label: s })),
@@ -202,9 +290,13 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                         type: "number",
                         min: 1,
                         value: level,
-                        onChange: (e) => setLevel(e.target.value ? parseInt(e.target.value) : ''),
+                        onChange: (e) => {
+                            const val = e.target.value ? parseInt(e.target.value) : '';
+                            setLevel(val);
+                            updateField('level', val || undefined);
+                        },
                         placeholder: "1-100",
-                        disabled: isAdding,
+                        disabled: isDisabled,
                     }}
                 />
 
@@ -214,9 +306,12 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                     inputProps={{
                         type: "text",
                         value: metLocation,
-                        onChange: (e) => setMetLocation(e.target.value),
+                        onChange: (e) => {
+                            setMetLocation(e.target.value);
+                            updateField('met', e.target.value);
+                        },
                         placeholder: "Where caught",
-                        disabled: isAdding,
+                        disabled: isDisabled,
                     }}
                 />
 
@@ -227,9 +322,13 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                         type: "number",
                         min: 1,
                         value: metLevel,
-                        onChange: (e) => setMetLevel(e.target.value ? parseInt(e.target.value) : ''),
+                        onChange: (e) => {
+                            const val = e.target.value ? parseInt(e.target.value) : '';
+                            setMetLevel(val);
+                            updateField('metLevel', val || undefined);
+                        },
                         placeholder: "1-100",
-                        disabled: isAdding,
+                        disabled: isDisabled,
                     }}
                 />
 
@@ -238,8 +337,11 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
                     <Select
                         value={gender}
-                        onChange={(e) => setGender(e.target.value)}
-                        disabled={isAdding}
+                        onChange={(e) => {
+                            setGender(e.target.value);
+                            updateField('gender', e.target.value || undefined);
+                        }}
+                        disabled={isDisabled}
                         options={[{ value: '', label: 'Select...' }, ...genderOptions.map(g => ({ value: g, label: g }))]}
                         className="flex-1 ml-2"
                     />
@@ -250,8 +352,11 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Nature</label>
                     <Select
                         value={nature}
-                        onChange={(e) => setNature(e.target.value)}
-                    disabled={isAdding}
+                        onChange={(e) => {
+                            setNature(e.target.value);
+                            updateField('nature', e.target.value || undefined);
+                        }}
+                        disabled={isDisabled}
                         options={[{ value: '', label: 'Select...' }, ...listOfNatures.map(n => ({ value: n, label: n }))]}
                         className="flex-1 ml-2"
                     />
@@ -262,8 +367,11 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Ability</label>
                     <Select
                         value={ability}
-                        onChange={(e) => setAbility(e.target.value)}
-                        disabled={isAdding}
+                        onChange={(e) => {
+                            setAbility(e.target.value);
+                            updateField('ability', e.target.value || undefined);
+                        }}
+                        disabled={isDisabled}
                         options={[{ value: '', label: 'Select...' }, ...listOfAbilities.map(a => ({ value: a, label: a }))]}
                         className="flex-1 ml-2"
                     />
@@ -277,10 +385,13 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                     <MultiSelect
                         options={allMoves}
                         value={moves}
-                        onChange={setMoves}
+                        onChange={(newMoves) => {
+                            setMoves(newMoves);
+                            updateField('moves', newMoves.length > 0 ? newMoves : undefined);
+                        }}
                         max={4}
                         placeholder="Add move..."
-                        disabled={isAdding}
+                        disabled={isDisabled}
                     />
                 </div>
 
@@ -292,21 +403,26 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                     <MultiSelect
                         options={pokemonTypes}
                         value={types}
-                        onChange={setTypes}
+                        onChange={(newTypes) => {
+                            setTypes(newTypes);
+                            updateField('types', newTypes.length > 0 ? newTypes : undefined);
+                        }}
                         max={2}
                         placeholder="Add type..."
-                        disabled={isAdding}
+                        disabled={isDisabled}
                     />
                 </div>
 
-                <Button
-                    onClick={handleAddPokemon}
-                    variant="primary"
-                    disabled={isAdding}
-                    className="w-full"
-                >
-                    {isAdding ? 'Adding...' : 'Add Pokemon'}
-                </Button>
+                {!isEditMode && (
+                    <Button
+                        onClick={handleAddPokemon}
+                        variant="primary"
+                        disabled={isAdding}
+                        className="w-full"
+                    >
+                        {isAdding ? 'Adding...' : 'Add Pokemon'}
+                    </Button>
+                )}
             </div>
         </Collapsible>
     );

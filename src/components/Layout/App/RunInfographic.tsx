@@ -3,7 +3,7 @@ import type { State } from "state";
 import type { Pokemon } from "models";
 import { getIconURL } from "components/Pokemon/PokemonIcon/PokemonIcon";
 import { Status } from "utils/Status";
-import { addForme, Forme } from "utils";
+import { speciesToNumber, Species } from "utils";
 
 interface RunInfographicProps {
     data: Partial<State>;
@@ -34,7 +34,7 @@ const filterByStatus = (pokemon: Pokemon[] = [], status: string): Pokemon[] => {
     return pokemon.filter((p) => p.status?.toLowerCase() === status);
 };
 
-// Get large Pokemon image URL (from img/ folder)
+// Get large Pokemon image URL from Serebii (Black/White sprites)
 const getLargeImageUrl = (pokemon: Pokemon): string => {
     if (pokemon.customImage) {
         return pokemon.customImage;
@@ -42,12 +42,10 @@ const getLargeImageUrl = (pokemon: Pokemon): string => {
     if (pokemon.egg) {
         return "img/egg.jpg";
     }
-    const species = pokemon.species || "missingno";
-    const normalized = addForme(
-        species.trim().replace(/\s/g, "-").replace(/'/g, "").replace(/:/g, "-"),
-        pokemon.forme as keyof typeof Forme
-    ) || "missingno";
-    return `img/${normalized.toLowerCase()}.jpg`;
+    const species = pokemon.species || "Ditto";
+    const pokedexNumber = speciesToNumber(species as Species) || 132; // Default to Ditto (#132)
+    const paddedNumber = pokedexNumber.toString().padStart(3, "0");
+    return `https://www.serebii.net/blackwhite/pokemon/${paddedNumber}.png`;
 };
 
 interface PokemonSpriteProps {
@@ -114,7 +112,8 @@ const TeamPokemonCard: React.FC<{ pokemon: Pokemon }> = ({ pokemon }) => {
                     style={styles.teamCardImage}
                     onError={({ currentTarget }) => {
                         currentTarget.onerror = null;
-                        currentTarget.src = "img/missingno.jpg";
+                        // Fallback to Ditto sprite if image fails to load
+                        currentTarget.src = "https://www.serebii.net/blackwhite/pokemon/132.png";
                     }}
                 />
                 {pokemon.shiny && (
