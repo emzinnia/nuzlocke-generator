@@ -1,0 +1,183 @@
+---
+alwaysApply: true
+---
+Here are **guidelines rewritten specifically for the Nuzlocke Generator**, matching the format and tone of your Gatsby example — but tailored to your **actual stack: React + TypeScript + Tailwind**, the generator’s architecture, and the type of work you do on it (data transforms, battle logic, UI state, settings, storage, etc.).
+
+---
+
+# **Nuzlocke Generator — Engineering Guidelines**
+
+You are an expert in **TypeScript, React, Vite, Zustand, and Tailwind**, building a performant, maintainable single-page application for running and tracking Nuzlockes.
+
+---
+
+## **Code Style and Structure**
+
+* Write concise, technical **TypeScript-first** React code.
+* Favor **pure functions** for all transformations, generators, validators, and rule logic.
+* Centralize game-related logic (**encounters, rules, team state, box storage**) in standalone modules under `/lib`.
+* Avoid classes; use **functional and declarative patterns**.
+* Prefer **composition over duplication** — small utilities, minimal side effects.
+* Maintain consistent file structure:
+
+  * `index.tsx` → exported component
+  * `hooks/` → custom hooks
+  * `lib/` → data transforms, rules, logic
+  * `data/` → static datasets (routes, Pokémon, forms, types)
+  * `types/` → domain types (Encounter, Pokémon, RuleSet, RunState)
+  * `components/` → small UI units
+  * `features/` → self-contained feature areas (Party, Box, Rules, Editor)
+
+---
+
+## **Naming Conventions**
+
+* Use **named exports** for components, utilities, hooks, and stores.
+* Use descriptive variable names using verbs:
+
+  * `getEncounterName`, `generateRunState`, `isFainted`, `hasDupeClauseViolation`
+* Custom hooks **must** start with `use`:
+
+  * `useRunState`, `useEncounterEditor`, `useLocalStorageSync`
+* State slices should reflect domain nouns:
+
+  * `party`, `box`, `encounters`, `rules`, `settings`
+
+---
+
+## **TypeScript Usage**
+
+* Use **interfaces for objects**, `type` for unions and discriminated unions.
+* Avoid `enum`; prefer object literal maps or union string types:
+
+  ```ts
+  type GameVersion = 'Scarlet' | 'Violet';
+  ```
+* Never use `any`; prefer narrow unions, generics, or inference.
+* Avoid non-null assertions (`!`) unless unavoidable in React refs.
+* Prefer **type guards** for parsing and restoring saved runs.
+
+---
+
+## **Syntax and Formatting**
+
+* Use `function` declarations for pure utilities.
+* Keep conditions **terse**; use early returns to reduce nesting.
+* Minimize JSX complexity; extract small components when JSX becomes dense.
+* Keep components **stateless** unless truly UI-related.
+* Keep files focused; avoid exporting more than 2–3 things per module.
+
+---
+
+## **State Management & Data Flow**
+
+* All app-level state (run, encounters, party, rules) should be managed in **Zustand** stores.
+* Stores must be:
+
+  * serializable
+  * restorable via hydration
+  * isolated by feature
+* State mutations must be **atomic** and encapsulated in store actions.
+* Derivations (alive Pokémon, dupes, badge count) should be **selectors**, never recomputed in components.
+
+---
+
+## **UI and Tailwind Styling**
+
+* Use Tailwind for all UI — no CSS files unless absolutely needed.
+* Prefer composable utility classes; extract UI primitives when patterns repeat.
+* Adopt mobile-first layout.
+* Keep visual components **presentational**; logic belongs in hooks or lib modules.
+* Use Headless UI or Radix components for accessibility (dialogs, popovers, lists).
+
+---
+
+## **Domain Logic & Architecture**
+
+* Game logic (encounters, dupes, fainting, rulesets) belongs in `/lib/game/`.
+* Never mix domain logic with React components.
+* All rule evaluation should run through a **single rules engine** API:
+
+  ```ts
+  evaluateRuleSet(run, rules);
+  ```
+* Maintain strict separation:
+
+  * **UI** (React)
+  * **State** (Zustand)
+  * **Logic** (lib/)
+  * **Serialization** (localStorage, exports/imports)
+  * **Data** (Pokémon, routes, maps, types)
+
+---
+
+## **Persistence and Storage**
+
+* Use `localStorage` for run persistence.
+* Hydrate on startup with validation + fallback defaults.
+* Support JSON export/import using a stable schema.
+* Never store derived values; recompute on load.
+
+---
+
+## **Testing & Reliability**
+
+* Core logic modules must be unit-tested (generateEncounter, applyFaint, rule evaluation).
+* Use snapshot tests for run exports.
+* Avoid testing UI unless necessary; test hooks + logic instead.
+
+---
+
+## **Performance Guidelines**
+
+* Avoid unnecessary re-renders:
+
+  * Use Zustand selectors (`useStore(state => state.party)`).
+  * Extract memoized UI chunks.
+* Avoid storing large Pokémon datasets inside React state; load them as static imports.
+* Use dynamic imports for heavy feature panels when possible.
+
+---
+
+## **Build & Bundling**
+
+* Use **Vite** for lightweight bundling and dev environment.
+* Keep dependencies lean; avoid complex UI libraries that bloat bundle size.
+* Use `import.meta.env` for environment variables (if needed later for API support).
+* Prefer ESM everywhere.
+
+---
+
+## **Theming & Customization**
+
+* Keep all colors in a Tailwind config theme.
+* Allow users to toggle theme variants (light, dark, custom).
+* Never inline style values that should come from a theme token.
+
+---
+
+## **Documentation & Comments**
+
+* Keep comments minimal — only explain domain-specific mechanics.
+* Document:
+
+  * run schema
+  * rule evaluation algorithm
+  * encounter generation process
+* Provide docblocks for complex functions:
+
+  ```ts
+  /**
+   * Returns true if the encounter violates the dupes clause.
+   */
+  ```
+
+---
+
+## **When in Doubt**
+
+* Keep logic functional
+* Keep UI dumb
+* Keep state centralized
+* Keep data pure
+* Keep code small and predictable
