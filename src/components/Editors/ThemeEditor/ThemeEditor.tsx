@@ -24,7 +24,7 @@ import {
     TextArea,
     Intent,
 } from "@blueprintjs/core";
-import { ColorEdit, ThemeSelect } from "components/Common/Shared";
+import { ColorInput } from "components/Common/ui";
 import { ChampsPokemon, PokemonIcon, ErrorBoundary } from "components";
 import {} from "themes";
 import { BoxedPokemon } from "components/Pokemon/BoxedPokemon/BoxedPokemon";

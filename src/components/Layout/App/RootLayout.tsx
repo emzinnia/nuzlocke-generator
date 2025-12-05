@@ -2,6 +2,7 @@ import * as React from "react";
 import { Outlet, useLoaderData, useNavigation, useRevalidator } from "react-router-dom";
 import { Header } from "components/Common/ui/Header";
 import { Sidebar } from "components/Common/ui/Sidebar";
+import { RightSidebar } from "components/Common/ui/RightSidebar";
 import type { RunSummary } from "api/runs";
 
 export interface RootLoaderData {
@@ -33,6 +34,7 @@ export const RootLayout: React.FC = () => {
                     )}
                     <Outlet />
                 </div>
+                <RightSidebar />
             </main>
         </div>
     );

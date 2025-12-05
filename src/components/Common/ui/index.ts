@@ -7,6 +7,8 @@ export * from "./Header";
 export * from "./Icon";
 export * from "./Input";
 export * from "./MultiSelect";
+export * from "./Popover";
 export * from "./Select";
 export * from "./Sidebar";
 export * from "./Tooltip";
+export * from "./ColorInput";

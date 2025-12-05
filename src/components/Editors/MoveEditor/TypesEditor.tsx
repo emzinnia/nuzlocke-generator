@@ -2,7 +2,7 @@ import * as React from "react";
 import { State } from "state";
 import { getListOfTypes, typeToColor, Types, getContrastColor } from "utils";
 import { createCustomType, deleteCustomType, editCustomType } from "actions";
-import { ColorEdit, rgbaOrHex } from "components/Common/Shared";
+import { ColorInput } from "components/Common/ui";
 import { Classes, Button, Icon } from "@blueprintjs/core";
 
 export interface TypesEditorProps {
@@ -41,7 +41,7 @@ export class TypesEditor extends React.Component<
                         type="text"
                         placeholder="Type Name"
                     />
-                    <ColorEdit
+                    <ColorInput
                         onChange={(e) => {
                             if (e?.target.value) {
                                 this.setState({ color: e.target.value });

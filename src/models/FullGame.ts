@@ -1,3 +1,4 @@
+import { Badge } from "./Badge";
 import { Pokemon } from "./Pokemon";
 
 enum EncounterMethod {
@@ -26,5 +27,13 @@ export interface FullGame {
             Pokemon: Pokemon & { levelRange: [number, number] },
             method: EncounterMethod;
         }[];
-    }
+    }[];
+    keyTrainers: {
+        name: string;
+        id: string;
+        time: string;
+        badge: Badge;
+        pokemon: Pokemon[];
+    }[];
+    trainerRoutesOrders: string[];
 }

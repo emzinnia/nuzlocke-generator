@@ -26,7 +26,7 @@ import {
 } from "@blueprintjs/core";
 import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
-import { ColorEdit, rgbaOrHex } from "components/Common/Shared";
+import { ColorInput } from "components/Common/ui";
 import { cx } from "emotion";
 import * as Styles from "./styles";
 import { ThemeEditor } from "components/Editors/ThemeEditor/ThemeEditor";
@@ -434,7 +434,7 @@ export class StyleEditorBase extends React.Component<
                     <label className={cx(Classes.LABEL, Classes.INLINE)}>
                         Background color
                     </label>
-                    <ColorEdit
+                    <ColorInput
                         onChange={(e) => editEvent(e, props)}
                         name={"bgColor"}
                         value={rgbaOrHex(props.style.bgColor)}
@@ -452,7 +452,7 @@ export class StyleEditorBase extends React.Component<
                     <label className={cx(Classes.LABEL, Classes.INLINE)}>
                         Accent color
                     </label>
-                    <ColorEdit
+                    <ColorInput
                         onChange={(e) => editEvent(e, props)}
                         name={"accentColor"}
                         value={props.style.accentColor}
@@ -470,7 +470,7 @@ export class StyleEditorBase extends React.Component<
                     <label className={cx(Classes.LABEL, Classes.INLINE)}>
                         Header color
                     </label>
-                    <ColorEdit
+                    <ColorInput
                         name="topHeaderColor"
                         onChange={(e) => editEvent(e, props)}
                         value={props.style.topHeaderColor}
