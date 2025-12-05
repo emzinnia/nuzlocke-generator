@@ -9,7 +9,7 @@ import {
     JSONFormat,
 } from "@blueprintjs/table";
 import { State } from "state";
-import { sortPokes, generateEmptyPokemon } from "utils";
+import { sortPokes, generateEmptyPokemon, normalizeSpeciesName } from "utils";
 import { PokemonKeys, Pokemon } from "models";
 import { editPokemon as editPokemonType } from "actions";
 import { AddPokemonButton } from "components/Pokemon/AddPokemonButton/AddPokemonButton";
@@ -67,7 +67,7 @@ const cellRenderer: (
     };
 
 export function renderColumns(pokemon, editPokemon) {
-    return Object.keys(PokemonKeys).map((key) => {
+    const standardColumns = Object.keys(PokemonKeys).map((key) => {
         return (
             // @ts-expect-error react return type nonsense
             <Column
@@ -81,6 +81,20 @@ export function renderColumns(pokemon, editPokemon) {
             />
         );
     });
+
+    const normalizedNameColumn = (
+        <Column
+            key="normalizedName"
+            name="normalizedName"
+            cellRenderer={(rowIndex: number) => {
+                const species = pokemon[rowIndex]?.species;
+                const normalized = species ? normalizeSpeciesName(species as any) : "";
+                return <Cell>{normalized}</Cell>;
+            }}
+        />
+    );
+
+    return [...standardColumns, normalizedNameColumn];
 }
 
 const downloadCSV = (pokemon: Pokemon[]) => {

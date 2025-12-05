@@ -30,11 +30,6 @@ const TrainerEditor = React.lazy(() =>
         default: res.TrainerEditor,
     })),
 );
-const HotkeysEditor = React.lazy(() =>
-    import("components/Editors/HotkeysEditor").then((res) => ({
-        default: res.HotkeysEditor,
-    })),
-);
 const BugReporter = React.lazy(() =>
     import("components/Features/BugReporter").then((res) => ({
         default: res.BugReporter,
@@ -127,11 +122,6 @@ export function Editor() {
             <ErrorBoundary key={8}>
                 <React.Suspense fallback={Skeleton}>
                     <StatsEditor />
-                </React.Suspense>
-            </ErrorBoundary>
-            <ErrorBoundary key={9}>
-                <React.Suspense fallback={Skeleton}>
-                    <HotkeysEditor />
                 </React.Suspense>
             </ErrorBoundary>
             <ErrorBoundary key={10}>

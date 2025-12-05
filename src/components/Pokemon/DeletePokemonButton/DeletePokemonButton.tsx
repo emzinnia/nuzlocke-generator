@@ -1,36 +1,69 @@
 import * as React from "react";
 import { Trash2 } from "lucide-react";
 
-import { deletePokemon, modifyDeletionConfirmation } from "actions";
 import { accentedE } from "utils";
 import { Alert, Checkbox, Icon, Tooltip } from "components/Common/ui";
+import { deletePokemonFromRun } from "api/runs";
 
 export interface DeletePokemonButtonProps {
-    id?: string;
-    confirmation: boolean;
-    modifyDeletionConfirmation: modifyDeletionConfirmation;
-    deletePokemon: deletePokemon;
+    pokemonId?: string;
+    runId?: string;
+    pokemonList?: { id: string }[];
+    onDeleted?: () => void;
+    confirmation?: boolean;
 }
 
-export function DeletePokemonButton(props: DeletePokemonButtonProps) {
+export function DeletePokemonButton({
+    pokemonId,
+    runId,
+    pokemonList,
+    onDeleted,
+    confirmation = true,
+}: DeletePokemonButtonProps) {
     const [dialogOn, setDialogOn] = React.useState(false);
+    const [skipConfirmation, setSkipConfirmation] = React.useState(false);
+    const [isDeleting, setIsDeleting] = React.useState(false);
+
+    const shouldConfirm = confirmation && !skipConfirmation;
 
     const toggleDialog = React.useCallback(() => {
         setDialogOn((prev) => !prev);
     }, []);
 
+    const handleDelete = React.useCallback(async () => {
+        if (!pokemonId || !runId || !pokemonList) return;
+
+        setIsDeleting(true);
+        try {
+            await deletePokemonFromRun(runId, pokemonId, pokemonList);
+            onDeleted?.();
+        } catch (error) {
+            console.error("Failed to delete pokemon:", error);
+        } finally {
+            setIsDeleting(false);
+            setDialogOn(false);
+        }
+    }, [pokemonId, runId, pokemonList, onDeleted]);
+
+    const handleClick = React.useCallback(() => {
+        if (!pokemonId || !runId || !pokemonList) return;
+
+        if (shouldConfirm) {
+            toggleDialog();
+        } else {
+            handleDelete();
+        }
+    }, [pokemonId, runId, pokemonList, shouldConfirm, toggleDialog, handleDelete]);
+
+    if (!pokemonId || !runId || !pokemonList) return null;
+
     return (
         <div className="text-red-500 cursor-pointer">
             <Alert
-                isOpen={dialogOn && props.confirmation}
+                isOpen={dialogOn}
                 onCancel={toggleDialog}
-                onConfirm={() => {
-                    if (props.id) {
-                        props.deletePokemon(props.id);
-                    }
-                    toggleDialog();
-                }}
-                confirmButtonText="Delete Pokemon"
+                onConfirm={handleDelete}
+                confirmButtonText={isDeleting ? "Deleting..." : "Delete Pokemon"}
                 cancelButtonText="Cancel"
                 intent="danger"
             >
@@ -41,22 +74,13 @@ export function DeletePokemonButton(props: DeletePokemonButtonProps) {
 
                 <Checkbox
                     label="Don't Ask Me For Confirmation Again"
-                    onChange={(checked) =>
-                        props.modifyDeletionConfirmation &&
-                        props.modifyDeletionConfirmation(!checked)
-                    }
+                    onChange={(checked) => setSkipConfirmation(checked)}
                 />
             </Alert>
             <Tooltip content={`Delete Pok${accentedE}mon`} position="top">
                 <Icon
                     icon={Trash2}
-                    onClick={() => {
-                        if (props.confirmation) {
-                            toggleDialog();
-                        } else if (props.deletePokemon && props.id) {
-                            props.deletePokemon(props.id);
-                        }
-                    }}
+                    onClick={handleClick}
                     title="Delete Pokemon"
                 />
             </Tooltip>

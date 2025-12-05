@@ -549,7 +549,7 @@ export class CurrentPokemonEditBase extends React.Component<
                             onEvolve={this.evolvePokemon}
                         />
                         <CopyPokemonButton onClick={this.copyPokemon} />
-                        <DeletePokemonButton id={this.state.selectedId} />
+                        <DeletePokemonButton pokemonId={this.state.selectedId} />
                     </div>
                 </span>
                 <CurrentPokemonLayoutItem>

@@ -10,6 +10,7 @@ import { addPokemonToRun, patchRunWithHistory } from 'api/runs';
 import type { Pokemon } from 'models/Pokemon';
 import { debounce } from 'utils/debounce';
 import { PokemonIconPlain } from 'components/Pokemon/PokemonIcon/PokemonIcon';
+import { DeletePokemonButton } from 'components/Pokemon/DeletePokemonButton/DeletePokemonButton';
 
 // Flatten all moves from movesByType into a single sorted array
 const allMoves = Array.from(
@@ -186,7 +187,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                 </button>
             )}
 
-            <div className="space-y-2 grid grid-cols-3 gap-2">
+            <div className="space-2 grid grid-cols-3 gap-2">
                 {/* Species */}
                 <div className="flex items-center gap-2 col-span-2">
                     <PokemonIconPlain
@@ -212,6 +213,15 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                         disabled={isDisabled}
                         options={listOfPokemon}
                         className="flex-1"
+                    />
+                    <DeletePokemonButton
+                        pokemonId={selectedPokemonId ?? undefined}
+                        runId={runId}
+                        pokemonList={pokemonList ?? []}
+                        onDeleted={() => {
+                            onClearSelection?.();
+                            onPokemonAdded?.();
+                        }}
                     />
                 </div>
 

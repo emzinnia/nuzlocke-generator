@@ -173,3 +173,16 @@ export async function addPokemonToRun(
   });
 }
 
+/**
+ * Delete a Pokemon from a run.
+ * Filters out the pokemon and patches the run with history.
+ */
+export async function deletePokemonFromRun(
+  runId: string,
+  pokemonId: string,
+  currentPokemonList: { id: string }[]
+): Promise<{ id: string; revision: number }> {
+  const filteredPokemon = currentPokemonList.filter(p => p.id !== pokemonId);
+  return patchRunWithHistory(runId, { pokemon: filteredPokemon });
+}
+

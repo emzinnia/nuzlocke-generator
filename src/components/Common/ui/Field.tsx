@@ -9,8 +9,8 @@ export interface FieldProps {
 
 export const Field: React.FC<FieldProps> = ({ label, inputProps, className }) => {
     return (
-        <div className={`flex gap-1 w-full justify-between items-center ${className || ''}`}>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</label>
+        <div className={`flex gap-1 w-full justify-between ${className || ''}`}>
+            <label className="text-xs text-left font-medium text-gray-700 dark:text-gray-300">{label}</label>
             <Input {...inputProps} />
         </div>
     );

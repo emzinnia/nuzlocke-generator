@@ -4,6 +4,7 @@ import { speciesToNumber } from "utils/getters/speciesToNumber";
 import { matchSpeciesToTypes } from "utils/formatters/matchSpeciesToTypes";
 import { Types } from "utils/Types";
 import { Select } from "components/Common/ui";
+import { normalizeSpeciesName } from "utils";
 
 // Type colors for badges
 const typeColors: Record<string, string> = {
@@ -106,6 +107,9 @@ const PokemonCard: React.FC<{ species: string; dexNumber: number; types: [Types,
             </div>
             <div className="text-sm font-medium text-gray-900 dark:text-white text-center truncate w-full">
                 {species}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                {normalizeSpeciesName(species as Species)}
             </div>
             <div className="flex gap-1 mt-1 flex-wrap justify-center">
                 <TypeBadge type={types[0]} />

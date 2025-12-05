@@ -25,7 +25,6 @@ export * from "./Editors/BaseEditor";
 export * from "./Editors/DataEditor";
 export * from "./Editors/Editor";
 export * from "./Editors/GameEditor";
-export * from "./Editors/HotkeysEditor";
 export * from "./Editors/MoveEditor";
 export * from "./Editors/PokemonEditor";
 export * from "./Editors/RulesEditor";
