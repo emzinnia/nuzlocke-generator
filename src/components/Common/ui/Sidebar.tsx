@@ -1,12 +1,14 @@
 import * as React from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "components/Layout/App/auth";
-import { createRun, type RunSummary } from "api/runs";
+import { createRun, getRun, restoreRunState, type RunSummary } from "api/runs";
 import { PokemonEditor } from "components/Editors/PokemonEditor/PokemonEditor";
 import { PokemonBoxes } from "components/Editors/PokemonEditor/PokemonBoxes";
 import { TrainerEditor } from "components/Editors/TrainerEditor/TrainerEditor";
 import { GameSelector } from "components/Editors/GameEditor/GameSelector";
+import { ErrorBoundary } from "components/Common/Shared/ErrorBoundary";
 import type { Pokemon } from "models/Pokemon";
+import { useUndoRedoStore } from "hooks/useUndoRedo";
 
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 500;
@@ -68,12 +70,85 @@ export const Sidebar: React.FC<SidebarProps> = ({ runs, isAuthenticated, onRunsC
     const [isResizing, setIsResizing] = React.useState(false);
     const [selectedPokemonId, setSelectedPokemonId] = React.useState<string | null>(null);
     const [pokemonList, setPokemonList] = React.useState<Pokemon[]>([]);
+    const [isUndoing, setIsUndoing] = React.useState(false);
+    const [isAtMaxHeight, setIsAtMaxHeight] = React.useState(false);
+    const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+    // Undo/Redo store
+    const undoRedoStore = useUndoRedoStore();
+    const canUndo = runId ? undoRedoStore.canUndo(runId) : false;
+    const canRedo = runId ? undoRedoStore.canRedo(runId) : false;
 
     // Clear selection when changing runs
     React.useEffect(() => {
         setSelectedPokemonId(null);
         setPokemonList([]);
     }, [runId]);
+
+    // Handle undo
+    const handleUndo = React.useCallback(async () => {
+        if (!runId || !canUndo || isUndoing) return;
+        
+        setIsUndoing(true);
+        try {
+            const currentRun = await getRun(runId);
+            const previousState = undoRedoStore.undo(runId, currentRun.data);
+            
+            if (previousState) {
+                await restoreRunState(runId, previousState);
+                onRunsChange();
+            }
+        } catch (err) {
+            console.error('Undo failed:', err);
+        } finally {
+            setIsUndoing(false);
+        }
+    }, [runId, canUndo, isUndoing, undoRedoStore, onRunsChange]);
+
+    // Handle redo
+    const handleRedo = React.useCallback(async () => {
+        if (!runId || !canRedo || isUndoing) return;
+        
+        setIsUndoing(true);
+        try {
+            const currentRun = await getRun(runId);
+            const nextState = undoRedoStore.redo(runId, currentRun.data);
+            
+            if (nextState) {
+                await restoreRunState(runId, nextState);
+                onRunsChange();
+            }
+        } catch (err) {
+            console.error('Redo failed:', err);
+        } finally {
+            setIsUndoing(false);
+        }
+    }, [runId, canRedo, isUndoing, undoRedoStore, onRunsChange]);
+
+    // Keyboard shortcuts for undo/redo
+    React.useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (!runId) return;
+            
+            // Check for Ctrl/Cmd + Z (undo) or Ctrl/Cmd + Shift + Z (redo)
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    handleRedo();
+                } else {
+                    handleUndo();
+                }
+            }
+            // Also support Ctrl/Cmd + Y for redo
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+                e.preventDefault();
+                handleRedo();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [runId, handleUndo, handleRedo]);
 
     const logout = () => {
         localStorage.removeItem("auth_token");
@@ -128,12 +203,45 @@ export const Sidebar: React.FC<SidebarProps> = ({ runs, isAuthenticated, onRunsC
         };
     }, [isResizing, width]);
 
+    // Check if sidebar is at max height (when scrolling is needed)
+    React.useEffect(() => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+
+        const checkMaxHeight = () => {
+            const hasScrollbar = container.scrollHeight > container.clientHeight;
+            setIsAtMaxHeight(hasScrollbar);
+        };
+
+        checkMaxHeight();
+
+        const resizeObserver = new ResizeObserver(() => {
+            checkMaxHeight();
+        });
+
+        resizeObserver.observe(container);
+
+        const mutationObserver = new MutationObserver(() => {
+            checkMaxHeight();
+        });
+
+        mutationObserver.observe(container, {
+            childList: true,
+            subtree: true,
+        });
+
+        return () => {
+            resizeObserver.disconnect();
+            mutationObserver.disconnect();
+        };
+    }, [runId, width]);
+
     return (
         <aside
             className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-screen relative flex-shrink-0 transition-colors flex flex-col group/sidebar"
             style={{ width }}
         >
-            <div className="p-4 overflow-x-hidden overflow-y-auto flex-1 scrollbar-gutter-stable sidebar-scroll">
+            <div ref={scrollContainerRef} className="p-4 overflow-x-hidden overflow-y-auto flex-1 scrollbar-gutter-stable sidebar-scroll">
                 <nav className="space-y-1">
                     <NavItem
                         to="/"
@@ -217,38 +325,80 @@ export const Sidebar: React.FC<SidebarProps> = ({ runs, isAuthenticated, onRunsC
                     </div>
                 )}
 
-                {runId && <GameSelector runId={runId} onGameUpdated={onRunsChange} />}
-
-                {runId && <TrainerEditor runId={runId} onTrainerUpdated={onRunsChange} />}
-
+                {/* Undo/Redo buttons */}
                 {runId && (
-                    <PokemonBoxes
-                        runId={runId}
-                        onRefresh={onRunsChange}
-                        selectedPokemonId={selectedPokemonId}
-                        onSelectPokemon={setSelectedPokemonId}
-                        onPokemonLoaded={setPokemonList}
-                    />
+                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={handleUndo}
+                                disabled={!canUndo || isUndoing}
+                                title="Undo (Ctrl+Z)"
+                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a5 5 0 015 5v2M3 10l4-4m-4 4l4 4" />
+                                </svg>
+                                <span>Undo</span>
+                            </button>
+                            <button
+                                onClick={handleRedo}
+                                disabled={!canRedo || isUndoing}
+                                title="Redo (Ctrl+Shift+Z)"
+                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a5 5 0 00-5 5v2M21 10l-4-4m4 4l-4 4" />
+                                </svg>
+                                <span>Redo</span>
+                            </button>
+                        </div>
+                    </div>
                 )}
 
                 {runId && (
-                    <PokemonEditor
-                        runId={runId}
-                        onPokemonAdded={() => {
-                            onRunsChange();
-                            // Trigger a refresh of the pokemon list
-                        }}
-                        selectedPokemonId={selectedPokemonId}
-                        pokemonList={pokemonList}
-                        onClearSelection={() => setSelectedPokemonId(null)}
-                    />
+                    <div className={`mt-4 grid gap-4 ${isAtMaxHeight ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                        <div className={isAtMaxHeight ? 'col-span-2' : ''}>
+                            <ErrorBoundary errorMessage="Ooops. Something failed...">
+                                <GameSelector runId={runId} onGameUpdated={onRunsChange} />
+                            </ErrorBoundary>
+                        </div>
+                        <div>
+                            <ErrorBoundary errorMessage="Ooops. Something failed...">
+                                <TrainerEditor runId={runId} onTrainerUpdated={onRunsChange} />
+                            </ErrorBoundary>
+                        </div>
+                        <div>
+                            <ErrorBoundary errorMessage="Ooops. Something failed...">
+                                <PokemonBoxes
+                                    runId={runId}
+                                    onRefresh={onRunsChange}
+                                    selectedPokemonId={selectedPokemonId}
+                                    onSelectPokemon={setSelectedPokemonId}
+                                    onPokemonLoaded={setPokemonList}
+                                />
+                            </ErrorBoundary>
+                        </div>
+                        <div className={isAtMaxHeight ? 'col-span-2' : ''}>
+                            <ErrorBoundary errorMessage="Ooops. Something failed...">
+                                <PokemonEditor
+                                    runId={runId}
+                                    onPokemonAdded={() => {
+                                        onRunsChange();
+                                    }}
+                                    selectedPokemonId={selectedPokemonId}
+                                    pokemonList={pokemonList}
+                                    onClearSelection={() => setSelectedPokemonId(null)}
+                                />
+                            </ErrorBoundary>
+                        </div>
+                    </div>
                 )}
 
                 {/* Auth status section */}
                 <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
                     {isAuthenticated ? (
                         <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                            <div className="flex items-center gap-2 px-3 text-sm text-green-600 dark:text-green-400">
                                 <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
@@ -265,7 +415,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ runs, isAuthenticated, onRunsC
                             </button>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                        <div className="flex items-center gap-2 px-3 text-sm text-gray-500 dark:text-gray-400">
                             <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>

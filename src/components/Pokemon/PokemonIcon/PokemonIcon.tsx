@@ -17,13 +17,12 @@ import { useDrag, useDrop } from "react-dnd";
 import { State } from "state";
 import { Omit } from "ramda";
 import { normalizeSpeciesName } from "utils/getters/normalizeSpeciesName";
-import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { Pokemon } from "models";
 
 export interface PokemonIconProps {
     /** The id of the Pokemon, used for selection **/
     id?: Pokemon["id"];
-    /** The id of the Pokemon **/
+    /** The species of the Pokemon **/
     species: Pokemon["species"];
     /** The forme of the Pokemon **/
     forme?: Pokemon["forme"];
@@ -33,8 +32,8 @@ export interface PokemonIconProps {
     hidden?: Pokemon["hidden"];
     egg?: Pokemon["egg"];
     position?: Pokemon["position"];
-    onClick: () => void;
-    selectedId: string | null;
+    onClick?: (e?: React.MouseEvent) => void;
+    selectedId?: string | null;
     /** Renders its shiny version if true **/
     shiny?: Pokemon["shiny"];
     status?: Pokemon["status"];
@@ -42,6 +41,7 @@ export interface PokemonIconProps {
     style?: React.CSSProperties;
     styles?: State["style"];
     includeTitle?: boolean;
+    imageStyle?: React.CSSProperties;
 
     connectDragSource?: ConnectDragSource;
     connectDropTarget?: ConnectDropTarget;
@@ -49,7 +49,7 @@ export interface PokemonIconProps {
     isDragging?: boolean;
 }
 
-type BasePokemonIconProps = Omit<PokemonIconProps, "onClick" | "selectedId">;
+type BasePokemonIconProps = Omit<PokemonIconProps, "onClick" | "selectedId" | "imageStyle">;
 
 type IconURLArgs = Pick<
     Pokemon,
@@ -160,73 +160,75 @@ export function PokemonIconPlain({
     customIcon,
     includeTitle,
     imageStyle,
-}: PokemonIconProps & { imageStyle: any }) {
-    // className={`${isDragging ? 'opacity-medium' : ''} ${canDrop ? 'droppable' : ''}`}
+}: PokemonIconProps) {
+    const defaultImageStyle: React.CSSProperties = {
+        height: "32px",
+        maxWidth: "auto",
+    };
+
     return (
         <div
             role="presentation"
             onClick={(e) => {
                 e.preventDefault();
-                if (onClick) {
-                    onClick();
-                }
+                onClick?.(e);
             }}
             id={id}
             title={includeTitle ? species : undefined}
             style={style}
             className={`${id === selectedId ? "pokemon-icon selected" : "pokemon-icon"} ${className || ""} ${isDragging ? "opacity-medium" : ""} ${canDrop ? "droppable" : ""}`}
         >
-            {customIcon ? (
-                <PokemonImage url={customIcon} />
-            ) : (
                 <img
-                    style={imageStyle}
-                    alt={species}
-                    onError={({ currentTarget }) => {
-                        currentTarget.onerror = null; // prevents looping
-                        currentTarget.src = "icons/pokemon/unknown.png";
-                    }}
-                    src={getIconURL({
-                        id,
-                        species,
-                        forme,
-                        shiny,
-                        gender,
-                        egg,
-                        customIcon,
-                    } as IconURLArgs)}
-                />
-            )}
+                style={imageStyle ?? defaultImageStyle}
+                alt={species}
+                onError={({ currentTarget }) => {
+                    currentTarget.onerror = null;
+                    currentTarget.src = "icons/pokemon/unknown.png";
+                }}
+                src={customIcon ?? getIconURL({
+                    id,
+                    species,
+                    forme,
+                    shiny,
+                    gender,
+                    egg,
+                    customIcon,
+                } as IconURLArgs)}
+            />
         </div>
     );
 }
 
 export const PokemonIcon = (props: BasePokemonIconProps) => {
-    const { selectedId, style } = useSelector<
+    const { selectedId, appStyle } = useSelector<
         State,
-        Pick<State, "selectedId" | "style">
-    >((state) => ({ selectedId: state.selectedId, style: state.style }));
+        { selectedId: State["selectedId"]; appStyle: State["style"] }
+    >((state) => ({ selectedId: state.selectedId, appStyle: state.style }));
     const dispatch = useDispatch();
 
-    const { styles, hidden } = props;
+    const { styles } = props;
     const dragRef = usePokemonDrag(props);
     const dropRef = usePokemonDrop(props);
     const onClick = () => {
         dispatch(selectPokemon(props.id!));
     };
-    const imageStyle = {
+    const imageStyle: React.CSSProperties = {
         height: "32px",
         maxWidth: "auto",
-        imageRendering: styles?.iconRendering,
+        imageRendering: (styles ?? appStyle)?.iconRendering as React.CSSProperties["imageRendering"],
+    };
+
+    const combinedRef = (node: HTMLDivElement | null) => {
+        dragRef(node);
+        dropRef(node);
     };
 
     return (
-        <div ref={(node) => dragRef(dropRef(node))}>
+        <div ref={combinedRef}>
             <PokemonIconPlain
                 onClick={onClick}
                 imageStyle={imageStyle}
                 selectedId={selectedId}
-                style={style}
                 {...props}
             />
         </div>

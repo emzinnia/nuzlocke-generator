@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Collapsible, Select } from "components/Common/ui";
-import { getRun, patchRun } from "api/runs";
+import { getRun, patchRunWithHistory } from "api/runs";
 import { listOfGames, Game } from "utils";
 import { debounce } from "utils/debounce";
 
@@ -39,7 +39,7 @@ export const GameSelector: React.FC<GameSelectorProps> = ({ runId, onGameUpdated
             debounce(async (updatedGame: { name: Game; customName: string }) => {
                 setIsSaving(true);
                 try {
-                    await patchRun(runId, { game: updatedGame });
+                    await patchRunWithHistory(runId, { game: updatedGame });
                     onGameUpdated?.();
                 } catch (err) {
                     setError(err instanceof Error ? err.message : 'Failed to save game');

@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { State } from "state";
 import type { Pokemon } from "models";
-import { getIconURL } from "components/Pokemon/PokemonIcon/PokemonIcon";
+import { PokemonIconPlain } from "components/Pokemon/PokemonIcon/PokemonIcon";
 import { Status } from "utils/Status";
 import { speciesToNumber, Species } from "utils";
 
@@ -48,43 +48,37 @@ const getLargeImageUrl = (pokemon: Pokemon): string => {
     return `https://www.serebii.net/blackwhite/pokemon/${paddedNumber}.png`;
 };
 
-interface PokemonSpriteProps {
+interface PokemonIconWrapperProps {
     pokemon: Pokemon;
     size?: number;
     grayscale?: boolean;
 }
 
-const PokemonSprite: React.FC<PokemonSpriteProps> = ({
+const PokemonIconWrapper: React.FC<PokemonIconWrapperProps> = ({
     pokemon,
     size = 32,
     grayscale = false,
 }) => {
-    const iconUrl = getIconURL({
-        id: pokemon.id,
-        species: pokemon.species,
-        forme: pokemon.forme,
-        shiny: pokemon.shiny,
-        gender: pokemon.gender,
-        customIcon: pokemon.customIcon,
-        egg: pokemon.egg,
-    });
+    const imageStyle = {
+        height: `${size}px`,
+        maxWidth: "auto",
+        filter: grayscale ? "grayscale(100%)" : undefined,
+        opacity: grayscale ? 0.7 : 1,
+    };
 
     return (
-        <img
-            src={iconUrl}
-            alt={pokemon.nickname || pokemon.species}
-            title={pokemon.nickname || pokemon.species}
-            style={{
-                width: size,
-                height: size,
-                objectFit: "contain",
-                filter: grayscale ? "grayscale(100%)" : undefined,
-                opacity: grayscale ? 0.7 : 1,
-            }}
-            onError={({ currentTarget }) => {
-                currentTarget.onerror = null;
-                currentTarget.src = "icons/pokemon/unknown.png";
-            }}
+        <PokemonIconPlain
+            id={pokemon.id}
+            species={pokemon.species}
+            forme={pokemon.forme}
+            shiny={pokemon.shiny}
+            gender={pokemon.gender}
+            customIcon={pokemon.customIcon}
+            egg={pokemon.egg}
+            onClick={() => {}}
+            selectedId={null}
+            imageStyle={imageStyle}
+            includeTitle
         />
     );
 };
@@ -240,8 +234,8 @@ const styles: Record<string, React.CSSProperties> = {
     },
     pokemonGrid: {
         display: "flex",
-        flexWrap: "wrap" as const,
-        gap: "4px",
+        flexDirection: "column" as const,
+        gap: "8px",
         backgroundColor: "#0f172a",
         padding: "12px",
         borderRadius: "8px",
@@ -254,8 +248,8 @@ const styles: Record<string, React.CSSProperties> = {
     },
     // Team Pokemon Card styles
     teamCardsGrid: {
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+        display: "flex",
+        flexDirection: "column" as const,
         gap: "12px",
     },
     teamCard: {
@@ -355,6 +349,24 @@ const styles: Record<string, React.CSSProperties> = {
         padding: "2px 6px",
         borderRadius: "3px",
     },
+    listItem: {
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        padding: "8px 12px",
+        backgroundColor: "#1e293b",
+        borderRadius: "6px",
+    },
+    listItemName: {
+        fontSize: "14px",
+        fontWeight: 500,
+        color: "#f1f5f9",
+        flex: 1,
+    },
+    listItemLevel: {
+        fontSize: "12px",
+        color: "#64748b",
+    },
 };
 
 export const RunInfographic: React.FC<RunInfographicProps> = ({ data }) => {
@@ -434,7 +446,11 @@ export const RunInfographic: React.FC<RunInfographicProps> = ({ data }) => {
                     <div style={styles.sectionTitle}>Boxed</div>
                     <div style={styles.pokemonGrid}>
                         {boxedPokemon.map((p) => (
-                            <PokemonSprite key={p.id} pokemon={p} size={32} />
+                            <div key={p.id} style={styles.listItem}>
+                                <PokemonIconWrapper pokemon={p} size={32} />
+                                <span style={styles.listItemName}>{p.nickname || p.species}</span>
+                                {p.level && <span style={styles.listItemLevel}>Lv. {p.level}</span>}
+                            </div>
                         ))}
                     </div>
                 </div>
@@ -446,7 +462,11 @@ export const RunInfographic: React.FC<RunInfographicProps> = ({ data }) => {
                     <div style={styles.sectionTitle}>Fallen</div>
                     <div style={styles.pokemonGrid}>
                         {deadPokemon.map((p) => (
-                            <PokemonSprite key={p.id} pokemon={p} size={32} grayscale />
+                            <div key={p.id} style={styles.listItem}>
+                                <PokemonIconWrapper pokemon={p} size={32} grayscale />
+                                <span style={{ ...styles.listItemName, color: "#64748b" }}>{p.nickname || p.species}</span>
+                                {p.level && <span style={{ ...styles.listItemLevel, color: "#475569" }}>Lv. {p.level}</span>}
+                            </div>
                         ))}
                     </div>
                 </div>
@@ -458,7 +478,11 @@ export const RunInfographic: React.FC<RunInfographicProps> = ({ data }) => {
                     <div style={styles.sectionTitle}>Hall of Fame</div>
                     <div style={styles.pokemonGrid}>
                         {champsPokemon.map((p) => (
-                            <PokemonSprite key={p.id} pokemon={p} size={40} />
+                            <div key={p.id} style={styles.listItem}>
+                                <PokemonIconWrapper pokemon={p} size={40} />
+                                <span style={{ ...styles.listItemName, color: "#fbbf24" }}>{p.nickname || p.species}</span>
+                                {p.level && <span style={styles.listItemLevel}>Lv. {p.level}</span>}
+                            </div>
                         ))}
                     </div>
                 </div>

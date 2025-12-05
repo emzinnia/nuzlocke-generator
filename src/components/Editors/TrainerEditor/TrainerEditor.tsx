@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Field, Collapsible } from "components/Common/ui";
-import { getRun, patchRun } from "api/runs";
+import { getRun, patchRunWithHistory } from "api/runs";
 import type { Trainer } from "models/Trainer";
 import { debounce } from "utils/debounce";
 
@@ -9,7 +9,10 @@ interface TrainerEditorProps {
     onTrainerUpdated?: (trainer: Trainer) => void;
 }
 
-export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUpdated }) => {
+export const TrainerEditor: React.FC<TrainerEditorProps> = ({
+    runId,
+    onTrainerUpdated,
+}) => {
     const [trainer, setTrainer] = React.useState<Trainer>({});
     const [isLoading, setIsLoading] = React.useState(true);
     const [isSaving, setIsSaving] = React.useState(false);
@@ -24,7 +27,11 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUp
                 const run = await getRun(runId);
                 setTrainer(run.data.trainer || {});
             } catch (err) {
-                setError(err instanceof Error ? err.message : 'Failed to load trainer');
+                setError(
+                    err instanceof Error
+                        ? err.message
+                        : "Failed to load trainer"
+                );
             } finally {
                 setIsLoading(false);
             }
@@ -39,10 +46,16 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUp
             debounce(async (updatedTrainer: Trainer) => {
                 setIsSaving(true);
                 try {
-                    await patchRun(runId, { trainer: updatedTrainer });
+                    await patchRunWithHistory(runId, {
+                        trainer: updatedTrainer,
+                    });
                     onTrainerUpdated?.(updatedTrainer);
                 } catch (err) {
-                    setError(err instanceof Error ? err.message : 'Failed to save trainer');
+                    setError(
+                        err instanceof Error
+                            ? err.message
+                            : "Failed to save trainer"
+                    );
                 } finally {
                     setIsSaving(false);
                 }
@@ -59,14 +72,14 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUp
     const title = isSaving ? "Trainer (Saving...)" : "Trainer";
 
     if (isLoading) {
-    return (
+        return (
             <Collapsible title="Trainer" defaultOpen={true}>
                 <div className="text-sm text-gray-500 dark:text-gray-400 animate-pulse">
                     Loading...
-        </div>
+                </div>
             </Collapsible>
-    );  
-}
+        );
+    }
 
     return (
         <Collapsible title={title} defaultOpen={true}>
@@ -81,8 +94,8 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUp
                     label="Name"
                     inputProps={{
                         type: "text",
-                        value: trainer.name || '',
-                        onChange: (e) => updateField('name', e.target.value),
+                        value: trainer.name || "",
+                        onChange: (e) => updateField("name", e.target.value),
                         placeholder: "Trainer Name",
                     }}
                 />
@@ -90,8 +103,8 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUp
                     label="ID"
                     inputProps={{
                         type: "text",
-                        value: trainer.id?.toString() || '',
-                        onChange: (e) => updateField('id', e.target.value),
+                        value: trainer.id?.toString() || "",
+                        onChange: (e) => updateField("id", e.target.value),
                         placeholder: "Trainer ID",
                     }}
                 />
@@ -99,8 +112,8 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUp
                     label="Time"
                     inputProps={{
                         type: "text",
-                        value: trainer.time || '',
-                        onChange: (e) => updateField('time', e.target.value),
+                        value: trainer.time || "",
+                        onChange: (e) => updateField("time", e.target.value),
                         placeholder: "0:00",
                     }}
                 />
@@ -108,8 +121,8 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUp
                     label="Money"
                     inputProps={{
                         type: "text",
-                        value: trainer.money || '',
-                        onChange: (e) => updateField('money', e.target.value),
+                        value: trainer.money || "",
+                        onChange: (e) => updateField("money", e.target.value),
                         placeholder: "$0",
                     }}
                 />
@@ -117,8 +130,8 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUp
                     label="Title"
                     inputProps={{
                         type: "text",
-                        value: trainer.title || '',
-                        onChange: (e) => updateField('title', e.target.value),
+                        value: trainer.title || "",
+                        onChange: (e) => updateField("title", e.target.value),
                         placeholder: "Title",
                     }}
                 />
@@ -126,8 +139,8 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUp
                     label="Image"
                     inputProps={{
                         type: "text",
-                        value: trainer.image || '',
-                        onChange: (e) => updateField('image', e.target.value),
+                        value: trainer.image || "",
+                        onChange: (e) => updateField("image", e.target.value),
                         placeholder: "http://...",
                     }}
                 />
@@ -135,8 +148,8 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({ runId, onTrainerUp
                     label="Notes"
                     inputProps={{
                         type: "text",
-                        value: trainer.notes || '',
-                        onChange: (e) => updateField('notes', e.target.value),
+                        value: trainer.notes || "",
+                        onChange: (e) => updateField("notes", e.target.value),
                         placeholder: "Notes",
                     }}
                 />

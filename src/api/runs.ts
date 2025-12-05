@@ -4,6 +4,7 @@
 
 import { api } from './client';
 import type { State } from '../state';
+import { useUndoRedoStore } from '../hooks/useUndoRedo';
 
 export interface RunSummary {
   id: string;
@@ -82,6 +83,36 @@ export async function patchRun(
 }
 
 /**
+ * Apply a patch to a run's data with undo history support.
+ * Saves the current state before applying the patch.
+ */
+export async function patchRunWithHistory(
+  id: string,
+  patch: Partial<State>
+): Promise<{ id: string; revision: number }> {
+  // Get current state before making the change
+  const run = await getRun(id);
+  
+  // Push current state to undo stack
+  useUndoRedoStore.getState().pushState(id, run.data);
+  
+  // Apply the patch
+  return patchRun(id, patch);
+}
+
+/**
+ * Restore a run to a previous state (used by undo/redo).
+ * Does NOT add to history stack - the undo/redo functions handle that.
+ */
+export async function restoreRunState(
+  id: string,
+  state: Partial<State>
+): Promise<{ id: string; revision: number }> {
+  const response = await api.put<RunResponse>(`/api/runs/${id}`, { data: state });
+  return { id: response.run.id, revision: response.run.revision };
+}
+
+/**
  * Delete a run.
  */
 export async function deleteRun(id: string): Promise<void> {
@@ -107,7 +138,7 @@ export interface NewPokemon {
 
 /**
  * Add a Pokemon to a run.
- * Fetches current run data, appends the new pokemon, and patches the run.
+ * Fetches current run data, appends the new pokemon, and patches the run with history.
  */
 export async function addPokemonToRun(
   runId: string,
@@ -116,6 +147,9 @@ export async function addPokemonToRun(
   // Fetch current run to get existing pokemon
   const run = await getRun(runId);
   const currentPokemon = run.data.pokemon || [];
+
+  // Push current state to undo stack before making the change
+  useUndoRedoStore.getState().pushState(runId, run.data);
 
   // Create new pokemon with a unique ID
   const newPokemon = {

@@ -5,7 +5,7 @@ import { listOfNatures } from 'utils/data/listOfNatures';
 import { listOfAbilities } from 'utils/data/listOfAbilities';
 import { movesByType } from 'utils/data/movesByType';
 import { Types } from 'utils/Types';
-import { addPokemonToRun, patchRun, getRun } from 'api/runs';
+import { addPokemonToRun, patchRunWithHistory } from 'api/runs';
 import type { Pokemon } from 'models/Pokemon';
 import { debounce } from 'utils/debounce';
 
@@ -99,7 +99,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                     const updatedList = pokemonList.map(p =>
                         p.id === selectedPokemonId ? { ...p, ...updatedPokemon } : p
                     );
-                    await patchRun(runId, { pokemon: updatedList });
+                    await patchRunWithHistory(runId, { pokemon: updatedList });
                     onPokemonAdded?.();
                 } catch (err) {
                     setError(err instanceof Error ? err.message : 'Failed to save Pokemon');
