@@ -1,19 +1,9 @@
 import * as React from "react";
-import {
-    Alert,
-    Intent,
-    Icon,
-    Popover,
-    Position,
-    PopoverInteractionKind,
-    Classes,
-} from "@blueprintjs/core";
-import { cx, css } from "emotion";
+import { Trash2 } from "lucide-react";
 
 import { deletePokemon, modifyDeletionConfirmation } from "actions";
-import { connect } from "react-redux";
 import { accentedE } from "utils";
-import { State } from "state";
+import { Alert, Checkbox, Icon, Tooltip } from "components/Common/ui";
 
 export interface DeletePokemonButtonProps {
     id?: string;
@@ -22,26 +12,19 @@ export interface DeletePokemonButtonProps {
     deletePokemon: deletePokemon;
 }
 
-export const DeletePokemonButtonContainer = css`
-    color: red;
-    cursor: pointer;
-`;
-
-export function DeletePokemonButtonBase(props: DeletePokemonButtonProps) {
+export function DeletePokemonButton(props: DeletePokemonButtonProps) {
     const [dialogOn, setDialogOn] = React.useState(false);
 
     const toggleDialog = React.useCallback(() => {
         setDialogOn((prev) => !prev);
     }, []);
 
-    console.log(props.id);
     return (
-        <div className={DeletePokemonButtonContainer}>
+        <div className="text-red-500 cursor-pointer">
             <Alert
-                icon="trash"
                 isOpen={dialogOn && props.confirmation}
                 onCancel={toggleDialog}
-                onConfirm={(_e) => {
+                onConfirm={() => {
                     if (props.id) {
                         props.deletePokemon(props.id);
                     }
@@ -49,60 +32,34 @@ export function DeletePokemonButtonBase(props: DeletePokemonButtonProps) {
                 }}
                 confirmButtonText="Delete Pokemon"
                 cancelButtonText="Cancel"
-                intent={Intent.DANGER}
+                intent="danger"
             >
                 <p>
                     This will delete the currently selected Pokemon. Are you
                     sure you want to do that?
                 </p>
 
-                <label className={cx(Classes.CONTROL, Classes.CHECKBOX)}>
-                    <input
-                        onChange={(event) =>
-                            props.modifyDeletionConfirmation &&
-                            props.modifyDeletionConfirmation(
-                                !event.target.checked,
-                            )
-                        }
-                        type="checkbox"
-                    />
-                    <span className={Classes.CONTROL_INDICATOR} />
-                    Don&apos;t Ask Me For Confirmation Again
-                </label>
+                <Checkbox
+                    label="Don't Ask Me For Confirmation Again"
+                    onChange={(checked) =>
+                        props.modifyDeletionConfirmation &&
+                        props.modifyDeletionConfirmation(!checked)
+                    }
+                />
             </Alert>
-            <Popover
-                interactionKind={PopoverInteractionKind.HOVER}
-                position={Position.TOP}
-                content={
-                    <div
-                        style={{ padding: "1rem" }}
-                    >{`Delete Pok${accentedE}mon`}</div>
-                }
-            >
+            <Tooltip content={`Delete Pok${accentedE}mon`} position="top">
                 <Icon
-                    onClick={(_e) => {
+                    icon={Trash2}
+                    onClick={() => {
                         if (props.confirmation) {
                             toggleDialog();
-                        } else {
-                            if (props.deletePokemon && props.id) {
-                                props.deletePokemon(props.id);
-                            }
+                        } else if (props.deletePokemon && props.id) {
+                            props.deletePokemon(props.id);
                         }
                     }}
-                    icon="trash"
                     title="Delete Pokemon"
                 />
-            </Popover>
+            </Tooltip>
         </div>
     );
 }
-
-export const DeletePokemonButton = connect(
-    (state: Pick<State, keyof State>) => ({
-        confirmation: state.confirmation,
-    }),
-    {
-        deletePokemon,
-        modifyDeletionConfirmation,
-    },
-)(DeletePokemonButtonBase);

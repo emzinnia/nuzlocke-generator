@@ -5,6 +5,7 @@ import { listOfNatures } from 'utils/data/listOfNatures';
 import { listOfAbilities } from 'utils/data/listOfAbilities';
 import { movesByType } from 'utils/data/movesByType';
 import { Types } from 'utils/Types';
+import { getListOfTypes } from 'utils/Types';
 import { addPokemonToRun, patchRunWithHistory } from 'api/runs';
 import type { Pokemon } from 'models/Pokemon';
 import { debounce } from 'utils/debounce';
@@ -14,28 +15,6 @@ import { PokemonIconPlain } from 'components/Pokemon/PokemonIcon/PokemonIcon';
 const allMoves = Array.from(
     new Set(Object.values(movesByType).flat())
 ).sort();
-
-// Get Pokemon types (excluding TemTem types)
-const pokemonTypes = [
-    Types.Normal,
-    Types.Fire,
-    Types.Water,
-    Types.Electric,
-    Types.Grass,
-    Types.Ice,
-    Types.Fighting,
-    Types.Poison,
-    Types.Ground,
-    Types.Flying,
-    Types.Psychic,
-    Types.Bug,
-    Types.Rock,
-    Types.Ghost,
-    Types.Dragon,
-    Types.Dark,
-    Types.Steel,
-    Types.Fairy,
-];
 
 const genderOptions = ['Male', 'Female', 'Neutral'];
 
@@ -207,9 +186,9 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                 </button>
             )}
 
-            <div className="space-y-2">
+            <div className="space-y-2 grid grid-cols-3 gap-2">
                 {/* Species */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 col-span-2">
                     <PokemonIconPlain
                         species={selectedPokemon}
                         forme={currentPokemon?.forme}
@@ -239,6 +218,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                 {/* Nickname */}
                 <Field
                     label="Nickname"
+                    className="flex flex-col gap-1 text-left"
                     inputProps={{
                         type: "text",
                         value: nickname,
@@ -252,7 +232,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                 />
 
                 {/* Status */}
-                <div className="flex gap-1 w-full justify-between items-center">
+                <div className="flex gap-1 w-full justify-between items-center flex-col">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
                     {isAddingCustomStatus ? (
                         <div className="flex-1 ml-2 flex gap-1">
@@ -302,6 +282,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
 
                 {/* Level */}
                 <Field
+                    className="flex flex-col gap-1 text-left"
                     label="Level"
                     inputProps={{
                         type: "number",
@@ -319,6 +300,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
 
                 {/* Met Location */}
                 <Field
+                    className="flex flex-col gap-1 text-left"
                     label="Met Location"
                     inputProps={{
                         type: "text",
@@ -334,6 +316,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
 
                 {/* Met Level */}
                 <Field
+                    className="flex flex-col gap-1 text-left"
                     label="Met Level"
                     inputProps={{
                         type: "number",
@@ -350,7 +333,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                 />
 
                 {/* Gender */}
-                <div className="flex gap-1 w-full justify-between items-center">
+                <div className="flex gap-1 w-full justify-between items-center flex-col">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
                     <Select
                         value={gender}
@@ -365,7 +348,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                 </div>
 
                 {/* Nature */}
-                <div className="flex gap-1 w-full justify-between items-center">
+                <div className="flex gap-1 w-full justify-between items-center flex-col">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Nature</label>
                     <Select
                         value={nature}
@@ -380,7 +363,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                 </div>
 
                 {/* Ability */}
-                <div className="flex gap-1 w-full justify-between items-center">
+                <div className="flex gap-1 w-full justify-between items-center flex-col">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Ability</label>
                     <Select
                         value={ability}
@@ -395,12 +378,12 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                 </div>
 
                 {/* Moves */}
-                <div>
+                <div className="flex flex-col gap-1 text-left">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                         Moves (max 4)
                     </label>
                     <MultiSelect
-                        options={allMoves}
+                        options={allMoves as string[]}
                         value={moves}
                         onChange={(newMoves) => {
                             setMoves(newMoves);
@@ -413,12 +396,12 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                 </div>
 
                 {/* Types */}
-                <div>
+                <div className="flex flex-col gap-1 text-left">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
                         Types (max 2)
                     </label>
                     <MultiSelect
-                        options={pokemonTypes}
+                        options={getListOfTypes([])}
                         value={types}
                         onChange={(newTypes) => {
                             setTypes(newTypes);

@@ -259,37 +259,6 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                         <div className="flex-shrink-0 font-semibold text-gray-900 dark:text-white">
                             Nuzlocke Generator
                         </div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        {runId && (
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={handleUndo}
-                                    disabled={!canUndo || isUndoing}
-                                    title="Undo (Ctrl+Z)"
-                                    className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                                >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a5 5 0 015 5v2M3 10l4-4m-4 4l4 4" />
-                                    </svg>
-                                    <span>Undo</span>
-                                    <Keyboard shortcut="⌘Z" />
-                                </button>
-                                <button
-                                    onClick={handleRedo}
-                                    disabled={!canRedo || isUndoing}
-                                    title="Redo (Ctrl+Shift+Z)"
-                                    className="flex flex-row-reverse items-center justify-center gap-1.5 px-3 py-2 text-sm rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                                >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a5 5 0 00-5 5v2M21 10l-4-4m4 4l-4 4" />
-                                    </svg>
-                                    <span>Redo</span>
-                                    <Keyboard shortcut="⌘⇧Z" />
-                                </button>
-                            </div>
-                        )}
                         {isAuthenticated && (
                             <div className="relative" ref={dropdownRef}>
                                 <button
@@ -311,7 +280,7 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                                 </button>
 
                                 {isDropdownOpen && (
-                                    <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50 max-h-96 overflow-y-auto">
+                                    <div className="absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50 max-h-96 overflow-y-auto">
                                         <div className="p-2 space-y-1">
                                             {runs.length > 0 ? (
                                                 runs.map((run) => (
@@ -357,6 +326,37 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                                         </div>
                                     </div>
                                 )}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        {runId && (
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={handleUndo}
+                                    disabled={!canUndo || isUndoing}
+                                    title="Undo (Ctrl+Z)"
+                                    className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a5 5 0 015 5v2M3 10l4-4m-4 4l4 4" />
+                                    </svg>
+                                    <span>Undo</span>
+                                    <Keyboard shortcut="⌘Z" />
+                                </button>
+                                <button
+                                    onClick={handleRedo}
+                                    disabled={!canRedo || isUndoing}
+                                    title="Redo (Ctrl+Shift+Z)"
+                                    className="flex flex-row-reverse items-center justify-center gap-1.5 px-3 py-2 text-sm rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a5 5 0 00-5 5v2M21 10l-4-4m4 4l-4 4" />
+                                    </svg>
+                                    <span>Redo</span>
+                                    <Keyboard shortcut="⌘⇧Z" />
+                                </button>
                             </div>
                         )}
 
