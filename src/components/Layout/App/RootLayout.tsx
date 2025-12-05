@@ -25,8 +25,6 @@ export const RootLayout: React.FC = () => {
             />
             <main className="flex min-h-screen">
                 <Sidebar
-                    runs={runs}
-                    isAuthenticated={isAuthenticated}
                     onRunsChange={() => revalidator.revalidate()}
                 />
                 <div className="flex-1 relative">
