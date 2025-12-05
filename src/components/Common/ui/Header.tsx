@@ -4,6 +4,7 @@ import { useDarkMode } from "../../../hooks/useDarkMode";
 import { createRun, getRun, restoreRunState, type RunSummary } from "api/runs";
 import { useUndoRedoStore } from "hooks/useUndoRedo";
 import { useAuthStore } from "components/Layout/App/auth";
+import { Keyboard } from "./Keyboard";
 
 interface HeaderProps {
     runs: RunSummary[];
@@ -273,17 +274,19 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a5 5 0 015 5v2M3 10l4-4m-4 4l4 4" />
                                     </svg>
                                     <span>Undo</span>
+                                    <Keyboard shortcut="⌘Z" />
                                 </button>
                                 <button
                                     onClick={handleRedo}
                                     disabled={!canRedo || isUndoing}
                                     title="Redo (Ctrl+Shift+Z)"
-                                    className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                                    className="flex flex-row-reverse items-center justify-center gap-1.5 px-3 py-2 text-sm rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a5 5 0 00-5 5v2M21 10l-4-4m4 4l-4 4" />
                                     </svg>
                                     <span>Redo</span>
+                                    <Keyboard shortcut="⌘⇧Z" />
                                 </button>
                             </div>
                         )}

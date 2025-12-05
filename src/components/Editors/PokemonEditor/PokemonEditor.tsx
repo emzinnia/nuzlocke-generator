@@ -8,6 +8,7 @@ import { Types } from 'utils/Types';
 import { addPokemonToRun, patchRunWithHistory } from 'api/runs';
 import type { Pokemon } from 'models/Pokemon';
 import { debounce } from 'utils/debounce';
+import { PokemonIconPlain } from 'components/Pokemon/PokemonIcon/PokemonIcon';
 
 // Flatten all moves from movesByType into a single sorted array
 const allMoves = Array.from(
@@ -208,16 +209,32 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
 
             <div className="space-y-2">
                 {/* Species */}
-                <Select
-                    value={selectedPokemon}
-                    onChange={(e) => {
-                        setSelectedPokemon(e.target.value);
-                        updateField('species', e.target.value);
-                    }}
-                    disabled={isDisabled}
-                    options={listOfPokemon}
-                    className="w-full"
-                />
+                <div className="flex items-center gap-2">
+                    <PokemonIconPlain
+                        species={selectedPokemon}
+                        forme={currentPokemon?.forme}
+                        shiny={currentPokemon?.shiny}
+                        gender={currentPokemon?.gender}
+                        customIcon={currentPokemon?.customIcon}
+                        egg={currentPokemon?.egg}
+                        selectedId={null}
+                        onClick={() => {}}
+                        imageStyle={{
+                            height: "32px",
+                            maxWidth: "auto",
+                        }}
+                    />
+                    <Select
+                        value={selectedPokemon}
+                        onChange={(e) => {
+                            setSelectedPokemon(e.target.value);
+                            updateField('species', e.target.value);
+                        }}
+                        disabled={isDisabled}
+                        options={listOfPokemon}
+                        className="flex-1"
+                    />
+                </div>
 
                 {/* Nickname */}
                 <Field
