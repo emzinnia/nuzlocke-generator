@@ -117,7 +117,7 @@ export function CheckpointsDisplay({
                                 badge.image.startsWith("http") ||
                                 badge.image.startsWith("data")
                                     ? badge.image
-                                    : `./img/checkpoints/${badge.image}.png`
+                                    : `/img/checkpoints/${badge.image}.png`
                             }
                         />
                         {badge.name === "Rising Badge" ? <br /> : null}

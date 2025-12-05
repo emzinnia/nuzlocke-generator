@@ -9,7 +9,7 @@ import {
 import { css, cx } from "emotion";
 import * as React from "react";
 
-const hofImage = "assets/hall-of-fame.png";
+const hofImage = "/assets/hall-of-fame.png";
 
 const styles = {
     hallOfFameDialog: css`

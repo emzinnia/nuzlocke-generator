@@ -243,7 +243,7 @@ export function PokemonSelectInput({
             <img
                 style={{ position: "absolute" }}
                 alt={value}
-                src={`icons/pokeball/${formatBallText(value)}.png`}
+                src={`/icons/pokeball/${formatBallText(value)}.png`}
             />
         ) : null;
 

@@ -79,7 +79,7 @@ export function PokemonPokeball({
         >
             <img
                 alt={pokemon.pokeball}
-                src={`icons/pokeball/${formatBallText(pokemon.pokeball)}.png`}
+                src={`/icons/pokeball/${formatBallText(pokemon.pokeball)}.png`}
             />
         </div>
     ) : null;

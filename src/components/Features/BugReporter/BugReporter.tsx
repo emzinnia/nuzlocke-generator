@@ -112,7 +112,7 @@ export class BugReporterBase extends React.Component<
                                     }}
                                     alt=""
                                     role="presentation"
-                                    src={`./icons/pokemon/regular/${this.getButtonPokemon(stage)}.png`}
+                                    src={`/icons/pokemon/regular/${this.getButtonPokemon(stage)}.png`}
                                 />
                             )}
                         </Button>

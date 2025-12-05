@@ -158,7 +158,7 @@ export function TeamPokemon({
         type1Color: typeToColor(pokemon?.types?.[0] ?? "Normal"),
         type2Color: typeToColor(pokemon?.types?.[1] ?? "Normal"),
         pokeball: pokemon.pokeball
-            ? `icons/pokeball/${formatBallText(pokemon?.pokeball || "None")}.png`
+            ? `/icons/pokeball/${formatBallText(pokemon?.pokeball || "None")}.png`
             : undefined,
         pokeballComponent: ReactDOMServer.renderToString(
             <PokemonPokeball
@@ -168,7 +168,7 @@ export function TeamPokemon({
             />,
         ),
         item: pokemon.item
-            ? `icons/hold-item/${(pokemon.item || "")
+            ? `/icons/hold-item/${(pokemon.item || "")
                   .toLowerCase()
                   .replace(/'/g, "")
                   .replace(/\s/g, "-")}.png`

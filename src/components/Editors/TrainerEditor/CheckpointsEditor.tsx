@@ -35,7 +35,7 @@ export interface CheckpointsSelectState {
 const checkpointImageURL = (name) =>
     name.startsWith("http") || name.startsWith("data")
         ? name
-        : `./img/checkpoints/${name}.png`;
+        : `/img/checkpoints/${name}.png`;
 
 export class CheckpointsSelect extends React.Component<
     CheckpointsSelectProps,

@@ -23,7 +23,7 @@ export function DeleteAlert({
             <div style={{ display: "flex" }}>
                 <img
                     style={{ height: "10rem" }}
-                    src={"./assets/img/trash.png"}
+                    src={"/assets/img/trash.png"}
                     alt="Sad Trubbish"
                 />
                 <p style={{ fontSize: "1.2rem", padding: "1rem" }}>

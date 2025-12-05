@@ -27,7 +27,7 @@ const normalizeSpeciesName = (species: string): string => {
 };
 
 const getIconURL = (species: string, shiny?: boolean): string => {
-    const baseURL = 'icons/pokemon/';
+    const baseURL = '/icons/pokemon/';
     const variant = shiny ? 'shiny' : 'regular';
     return `${baseURL}${variant}/${normalizeSpeciesName(species)}.png`;
 };

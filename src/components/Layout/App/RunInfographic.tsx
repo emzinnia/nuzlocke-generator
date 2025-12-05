@@ -40,7 +40,7 @@ const getLargeImageUrl = (pokemon: Pokemon): string => {
         return pokemon.customImage;
     }
     if (pokemon.egg) {
-        return "img/egg.jpg";
+        return "/img/egg.jpg";
     }
     const species = pokemon.species || "Ditto";
     const pokedexNumber = speciesToNumber(species as Species) || 132; // Default to Ditto (#132)
@@ -140,7 +140,7 @@ const TeamPokemonCard: React.FC<{ pokemon: Pokemon }> = ({ pokemon }) => {
                 {pokemon.item && (
                     <div style={styles.teamCardItem}>
                         <img
-                            src={`icons/hold-item/${pokemon.item.toLowerCase().replace(/'/g, "").replace(/\s/g, "-")}.png`}
+                            src={`/icons/hold-item/${pokemon.item.toLowerCase().replace(/'/g, "").replace(/\s/g, "-")}.png`}
                             alt={pokemon.item}
                             style={styles.itemIcon}
                             onError={({ currentTarget }) => {

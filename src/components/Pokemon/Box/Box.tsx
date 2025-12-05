@@ -226,7 +226,7 @@ export const Box: React.FC<BoxProps> = (props) => {
         const bg = background || getDefaultBackground(name);
         return bg?.startsWith("http")
             ? `url(${bg})`
-            : `url(./assets/img/box/${bg}.png)`;
+            : `url(/assets/img/box/${bg}.png)`;
     };
 
     const getDefaultBackground = (boxName: string) => {

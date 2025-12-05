@@ -59,7 +59,7 @@ const getPokemonImagePath = (species: string): string => {
         .replace(/:/g, "-")
         .replace(/♀/g, "-f")
         .replace(/♂/g, "-m");
-    return `img/${normalized}.jpg`;
+    return `/img/${normalized}.jpg`;
 };
 
 // Type badge component

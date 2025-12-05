@@ -46,7 +46,7 @@ import { PokemonIconPlain } from "components/Pokemon/PokemonIcon/PokemonIcon";
 import { CheckpointsInputList } from "components/Editors/TrainerEditor/BadgeInput";
 import { getImages, Image } from "components/Common/Shared/ImagesDrawer";
 
-const pokeball = "./assets/pokeball.png";
+const pokeball = "/assets/pokeball.png";
 
 export interface CopyPokemonButtonProps {
     onClick: (event: React.MouseEvent<HTMLElement>) => void;

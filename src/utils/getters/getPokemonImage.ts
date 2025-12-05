@@ -171,11 +171,11 @@ export async function getPokemonImage({
     }
 
     if (editor?.temtemMode) {
-        return `url(img/temtem/${species?.trim()}.png)`;
+        return `url(/img/temtem/${species?.trim()}.png)`;
     }
 
     if (egg) {
-        return "url(img/egg.jpg)";
+        return "url(/img/egg.jpg)";
     }
 
     if (
@@ -270,23 +270,23 @@ export async function getPokemonImage({
             [521, 592, 593, 668, 678].includes(regularNumber || 0) &&
             (gender === "f" || gender === "Female")
         ) {
-            return `url(img/sugimori/female/${regularNumber}${getIconFormeSuffix(
+            return `url(/img/sugimori/female/${regularNumber}${getIconFormeSuffix(
                 forme as keyof typeof Forme,
             )}.png)`;
         }
-        return `url(img/sugimori/${regularNumber}${getIconFormeSuffix(
+        return `url(/img/sugimori/${regularNumber}${getIconFormeSuffix(
             forme as keyof typeof Forme,
         )}.png)`;
     }
 
     if (style?.teamImages === "dream world") {
-        return `url(img/dw/${regularNumber || 1}.svg)`;
+        return `url(/img/dw/${regularNumber || 1}.svg)`;
     }
 
     const handleMimeJr = (s?: string) => (s === "Mime Jr." ? "mime-jr" : s);
 
     if (style?.teamImages === "shuffle") {
-        return `url(img/shuffle/${(handleMimeJr(species) || "Ditto")
+        return `url(/img/shuffle/${(handleMimeJr(species) || "Ditto")
             .trim()
             .replace(/\'/g, "")
             .replace(/\s/g, "-")
@@ -295,7 +295,7 @@ export async function getPokemonImage({
     }
 
     if (style?.teamImages === "tcg") {
-        return `url(img/tcg/${(
+        return `url(/img/tcg/${(
             handleTcgTransforms(
                 addForme(
                     (species || "").replace(/\s/g, "").replace(/'/g, ""),
@@ -307,19 +307,19 @@ export async function getPokemonImage({
     }
     // TEMPORARY STOPGAPS & Edge Cases & Special favors
     if (species === "Dugtrio" && forme === "Alolan" && shiny) {
-        return "url(img/alolan-dugtrio-shiny.jpg)";
+        return "url(/img/alolan-dugtrio-shiny.jpg)";
     }
     if (species === "Gyarados" && shiny) {
-        return "url(img/gyarados-shiny.jpg)";
+        return "url(/img/gyarados-shiny.jpg)";
     }
     if (species === "Indeedee" && gender === "Male") {
-        return "url(img/indeedee-m.jpg)";
+        return "url(/img/indeedee-m.jpg)";
     }
     if (species === "Basculegion" && gender === "Female") {
-        return "url(img/basculegion-f.jpg)";
+        return "url(/img/basculegion-f.jpg)";
     }
 
-    return `url(img/${(
+    return `url(/img/${(
         addForme(
             (species || "")
                 .trim()

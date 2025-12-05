@@ -23,6 +23,9 @@ const RunPage = React.lazy(() =>
 const DataPage = React.lazy(() =>
     import("./components/Layout/App/DataPage").then((m) => ({ default: m.DataPage }))
 );
+const RoadmapPage = React.lazy(() =>
+    import("./components/Layout/App/RoadmapPage").then((m) => ({ default: m.RoadmapPage }))
+);
 
 // Auth check helper
 function requireAuth() {
@@ -136,6 +139,18 @@ export const router = createBrowserRouter([
                         <DataPage />
                     </React.Suspense>
                 ),
+            },
+            {
+                path: "roadmap",
+                element: (
+                    <React.Suspense fallback={<RouteLoading />}>
+                        <RoadmapPage />
+                    </React.Suspense>
+                ),
+                loader: () => {
+                    requireAuth();
+                    return null;
+                },
             },
             {
                 path: "runs/:id",

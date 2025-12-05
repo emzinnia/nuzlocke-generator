@@ -129,7 +129,7 @@ export const getIconURL = ({
     customIcon,
     egg,
 }: IconURLArgs) => {
-    const baseURL = "icons/pokemon/";
+    const baseURL = "/icons/pokemon/";
     const isShiny = shiny ? "shiny" : "regular";
     const isFemaleSpecific =
         significantGenderDifferenceList.includes(species) &&
@@ -183,7 +183,7 @@ export function PokemonIconPlain({
                 alt={species}
                 onError={({ currentTarget }) => {
                     currentTarget.onerror = null;
-                    currentTarget.src = "icons/pokemon/unknown.png";
+                    currentTarget.src = "/icons/pokemon/unknown.png";
                 }}
                 src={customIcon ?? getIconURL({
                     id,

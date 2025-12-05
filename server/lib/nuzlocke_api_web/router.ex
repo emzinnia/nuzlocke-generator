@@ -28,6 +28,15 @@ defmodule NuzlockeApiWeb.Router do
 
     resources "/runs", RunController, except: [:new, :edit]
     post "/runs/:id/patch", RunController, :patch
+
+    # Roadmap routes
+    get "/roadmap", RoadmapController, :index
+    post "/roadmap/versions", RoadmapController, :create_version
+    put "/roadmap/versions/:id", RoadmapController, :update_version
+    delete "/roadmap/versions/:id", RoadmapController, :delete_version
+    post "/roadmap/features", RoadmapController, :create_feature
+    put "/roadmap/features/:id", RoadmapController, :update_feature
+    delete "/roadmap/features/:id", RoadmapController, :delete_feature
   end
 
   # Public API routes

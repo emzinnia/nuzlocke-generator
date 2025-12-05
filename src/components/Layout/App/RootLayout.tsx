@@ -18,7 +18,11 @@ export const RootLayout: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-            <Header />
+            <Header
+                runs={runs}
+                isAuthenticated={isAuthenticated}
+                onRunsChange={() => revalidator.revalidate()}
+            />
             <main className="flex min-h-screen">
                 <Sidebar
                     runs={runs}
