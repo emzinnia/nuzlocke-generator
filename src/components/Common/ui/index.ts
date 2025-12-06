@@ -2,6 +2,7 @@ export * from "./Alert";
 export * from "./Button";
 export * from "./Checkbox";
 export * from "./Collapsible";
+export * from "./Dialog";
 export * from "./Field";
 export * from "./Header";
 export * from "./Icon";

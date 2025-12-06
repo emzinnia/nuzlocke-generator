@@ -40,14 +40,105 @@ export const fullGameData: FullGame = {
             routeName: "Route 1",
             pokemonMap: [],
         },
+        {
+            id: "2",
+            routeName: "Route 2",
+            pokemonMap: [
+                {
+                    id: "5",
+                    species: "Rattata",
+                    levelRange: [1, 10],
+                    method: EncounterMethod.Grass,
+                },
+            ],
+        },
+        {
+            id: "3",
+            routeName: "Route 3",
+            pokemonMap: [
+                {
+                    id: "6",
+                    species: "Spearow",
+                    levelRange: [1, 10],
+                    method: EncounterMethod.Grass,
+                },
+            ],
+        },
+        {
+            id: "4",
+            routeName: "Route 4",
+            pokemonMap: [
+                {
+                    id: "7",
+                    species: "Fearow",
+                    levelRange: [1, 10],
+                    method: EncounterMethod.Grass,
+                },
+            ],
+        },
+        {
+            id: "5",
+            routeName: "Route 5",
+            pokemonMap: [
+                {
+                    id: "8",
+                    species: "Ekans",
+                    levelRange: [1, 10],
+                    method: EncounterMethod.Grass,
+                },
+            ],
+        },
+        {
+            id: "6",
+            routeName: "Route 6",
+            pokemonMap: [
+                {
+                    id: "9",
+                    species: "Arbok",
+                    levelRange: [1, 10],
+                    method: EncounterMethod.Grass,
+                },
+            ],
+        },
+        {
+            id: "7",
+            routeName: "Route 7",
+            pokemonMap: [
+                {
+                    id: "10",
+                    species: "Pidgeot",
+                    levelRange: [1, 10],
+                    method: EncounterMethod.Grass,
+                },
+            ],
+        },
     ],
     keyTrainers: [
         {
-            name: "Red",
+            name: "Rival",
             id: "1",
-            time: "04:33",
-            badge: { name: "Boulder Badge", image: "boulder-badge" },
-            pokemon: [],
+            pokemon: [
+                {
+                    level: 5,
+                    starter: true,
+                    species: "Charmander",
+                }
+            ],
+        },
+        {
+            name: "Rival",
+            id: "2",
+            pokemon: [
+                {
+                    level: 9,
+                    species: "Pidgey",
+                },
+                {
+                    level: 8,
+                    starter: true,
+                    species: "Charmander",
+                }
+            ],
         },
     ],
     trainerRoutesOrders: [],

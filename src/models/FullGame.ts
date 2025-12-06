@@ -33,9 +33,8 @@ export interface FullGame {
     keyTrainers: {
         name: string;
         id: string;
-        time: string;
-        badge: Badge;
-        pokemon: Pokemon[];
+        badge?: Badge;
+        pokemon: (Partial<Pokemon> & { starter?: boolean })[];
     }[];
     trainerRoutesOrders: string[];
 }
