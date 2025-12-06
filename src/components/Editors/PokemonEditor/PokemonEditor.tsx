@@ -487,9 +487,10 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({
                         onClick={handleAddPokemon}
                         variant="primary"
                         disabled={isAdding}
-                        className="w-full"
+                        aria-busy={isAdding}
+                        className={`w-full text-center justify-center ${isAdding ? "shimmer" : ""}`}
                     >
-                        {isAdding ? "Adding..." : "Add Pokemon"}
+                        Add Pokemon
                     </Button>
                 )}
             </div>

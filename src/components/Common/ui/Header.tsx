@@ -5,9 +5,9 @@ import { createRun, getRun, restoreRunState, type RunSummary } from "api/runs";
 import { useUndoRedoStore } from "hooks/useUndoRedo";
 import { useAuthStore } from "components/Layout/App/auth";
 import { Keyboard } from "./Keyboard";
-import { Dialog, DialogBody, DialogFooter } from "./Dialog";
 import { Settings } from "lucide-react";
 import { Button } from "./Button";
+import { SettingsDialog } from "./SettingsDialog";
 
 interface HeaderProps {
     runs: RunSummary[];
@@ -52,18 +52,6 @@ const NavItem: React.FC<NavItemProps> = ({ to, icon, label, requiresAuth, isAuth
     );
 };
 
-type SettingsCategory = "general" | "theming" | "hotkeys" | "rules" | "saves" | "plugins" | "beta";
-
-const settingsCategories: { id: SettingsCategory; label: string }[] = [
-    { id: "general", label: "General" },
-    { id: "theming", label: "Theming" },
-    { id: "hotkeys", label: "Hotkeys" },
-    { id: "rules", label: "Rules" },
-    { id: "saves", label: "Saves" },
-    { id: "plugins", label: "Plugins" },
-    { id: "beta", label: "Beta" },
-];
-
 export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsChange }) => {
     const { isDark, toggle } = useDarkMode();
     const navigate = useNavigate();
@@ -73,7 +61,6 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
-    const [activeSettingsCategory, setActiveSettingsCategory] = React.useState<SettingsCategory>("general");
     const dropdownRef = React.useRef<HTMLDivElement>(null);
     const menuRef = React.useRef<HTMLDivElement>(null);
 
@@ -183,70 +170,11 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
     }, [isDropdownOpen, isMenuOpen]);
 
     const handleOpenSettings = () => {
-        setActiveSettingsCategory("general");
         setIsSettingsOpen(true);
     };
 
     const closeSettings = () => {
         setIsSettingsOpen(false);
-        setActiveSettingsCategory("general");
-    };
-
-    const renderSettingsContent = () => {
-        if (activeSettingsCategory === "general") {
-            return (
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <p className="text-sm font-medium text-foreground">Autosave</p>
-                        <label className="flex items-center gap-2 text-sm">
-                            <input type="checkbox" defaultChecked />
-                            Enable autosave every 5 minutes
-                        </label>
-                    </div>
-
-                    <div className="space-y-2">
-                        <p className="text-sm font-medium text-foreground">Notifications</p>
-                        <label className="flex items-center gap-2 text-sm">
-                            <input type="checkbox" defaultChecked />
-                            Show encounter reminders
-                        </label>
-                        <label className="flex items-center gap-2 text-sm">
-                            <input type="checkbox" />
-                            Show patch success toast
-                        </label>
-                    </div>
-                </div>
-            );
-        }
-
-        if (activeSettingsCategory === "theming") {
-            return (
-                <div className="space-y-2">
-                    <p className="text-sm font-medium text-foreground">Theme</p>
-                    <div className="flex items-center gap-3 text-sm">
-                        <label className="flex items-center gap-2">
-                            <input type="radio" name="theme" defaultChecked />
-                            System
-                        </label>
-                        <label className="flex items-center gap-2">
-                            <input type="radio" name="theme" />
-                            Light
-                        </label>
-                        <label className="flex items-center gap-2">
-                            <input type="radio" name="theme" />
-                            Dark
-                        </label>
-                    </div>
-                </div>
-            );
-        }
-
-        const label = settingsCategories.find((category) => category.id === activeSettingsCategory)?.label;
-        return (
-            <div className="text-sm text-muted-foreground">
-                {label ? `${label} settings are coming soon.` : "More settings are coming soon."}
-            </div>
-        );
     };
 
     return (
@@ -492,45 +420,7 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                 </div>
             </div>
 
-            <Dialog
-                isOpen={isSettingsOpen}
-                onClose={closeSettings}
-                title="Settings"
-                icon={<Settings size={18} />}
-            >
-                <DialogBody className="grid grid-cols-[180px,1fr] gap-4 items-start">
-                    <div className="border border-border rounded-md p-2 space-y-1 bg-muted/40">
-                        {settingsCategories.map((category) => {
-                            const isActive = category.id === activeSettingsCategory;
-                            return (
-                                <button
-                                    key={category.id}
-                                    type="button"
-                                    onClick={() => setActiveSettingsCategory(category.id)}
-                                    className={`w-full text-left px-2.5 py-2 text-sm rounded-md transition-colors border ${
-                                        isActive
-                                            ? "bg-accent text-accent-foreground border-border font-medium"
-                                            : "border-transparent hover:bg-muted"
-                                    }`}
-                                >
-                                    {category.label}
-                                </button>
-                            );
-                        })}
-                    </div>
-
-                    <div className="space-y-3 text-sm">{renderSettingsContent()}</div>
-                </DialogBody>
-                <DialogFooter>
-                    <Button
-                        onClick={closeSettings}
-                        variant="secondary"
-                        className="px-4 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-accent transition-colors"
-                    >
-                        Close
-                    </Button>
-                </DialogFooter>
-            </Dialog>
+            <SettingsDialog isOpen={isSettingsOpen} onClose={closeSettings} />
         </header>
     );
 };
