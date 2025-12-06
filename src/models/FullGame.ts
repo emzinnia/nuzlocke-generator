@@ -30,7 +30,7 @@ export interface FullGame {
             method: EncounterMethod;
         }[];
     }[];
-    keyTrainers: {
+    bosses: {
         name: string;
         id: string;
         badge?: Badge;

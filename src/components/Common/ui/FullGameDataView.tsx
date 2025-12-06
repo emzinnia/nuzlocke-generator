@@ -27,6 +27,9 @@ export const FullGameDataView: React.FC<FullGameDataViewProps> = ({
     const [completedRoutes, setCompletedRoutes] = React.useState<Set<string>>(
         () => new Set()
     );
+    const [skippedRoutes, setSkippedRoutes] = React.useState<Set<string>>(
+        () => new Set()
+    );
 
     const handleAddPokemon = React.useCallback<AddPokemonHandler>(
         async ({ species, status, met, routeId }) => {
@@ -42,9 +45,32 @@ export const FullGameDataView: React.FC<FullGameDataViewProps> = ({
                 next.add(routeId);
                 return next;
             });
+            setSkippedRoutes((prev) => {
+                if (!prev.has(routeId)) return prev;
+                const next = new Set(prev);
+                next.delete(routeId);
+                return next;
+            });
         },
         [runId]
     );
+    const handleSkipRoute = React.useCallback((routeId: string) => {
+        setSkippedRoutes((prev) => {
+            const next = new Set(prev);
+            if (next.has(routeId)) {
+                next.delete(routeId);
+            } else {
+                next.add(routeId);
+            }
+            return next;
+        });
+        setCompletedRoutes((prev) => {
+            if (!prev.has(routeId)) return prev;
+            const next = new Set(prev);
+            next.delete(routeId);
+            return next;
+        });
+    }, []);
 
     return (
         <div className="space-y-6">
@@ -53,8 +79,10 @@ export const FullGameDataView: React.FC<FullGameDataViewProps> = ({
                 routes={data.routes}
                 onAddPokemon={handleAddPokemon}
                 completedRoutes={completedRoutes}
+                skippedRoutes={skippedRoutes}
+                onSkipRoute={handleSkipRoute}
             />
-            <KeyTrainersSection keyTrainers={data.keyTrainers} />
+            <BossesSection bosses={data.bosses} />
             <TrainerRoutesSection orders={data.trainerRoutesOrders} />
         </div>
     );
@@ -89,10 +117,14 @@ function RoutesSection({
     routes,
     onAddPokemon,
     completedRoutes,
+    skippedRoutes,
+    onSkipRoute,
 }: {
     routes: FullGame["routes"];
     onAddPokemon: AddPokemonHandler;
     completedRoutes: Set<string>;
+    skippedRoutes: Set<string>;
+    onSkipRoute: (routeId: string) => void;
 }) {
     if (!routes.length) return null;
 
@@ -108,6 +140,8 @@ function RoutesSection({
                         route={route}
                         onAddPokemon={onAddPokemon}
                         isCompleted={completedRoutes.has(route.id)}
+                        isSkipped={skippedRoutes.has(route.id)}
+                        onSkipRoute={onSkipRoute}
                     />
                 ))}
             </div>
@@ -119,32 +153,61 @@ function RouteCard({
     route,
     onAddPokemon,
     isCompleted,
+    isSkipped,
+    onSkipRoute,
 }: {
     route: FullGame["routes"][number];
     onAddPokemon: AddPokemonHandler;
     isCompleted: boolean;
+    isSkipped: boolean;
+    onSkipRoute: (routeId: string) => void;
 }) {
     const hasEncounters = route.pokemonMap.length > 0;
+    const isCollapsed = isCompleted || isSkipped || !hasEncounters;
 
     return (
         <div
-            className={`p-3 bg-card text-card-foreground rounded-sm border border-border ${
-                isCompleted
-                    ? "border-green-500 bg-green-50 dark:bg-green-900/20"
-                    : ""
+            className={`p-3 rounded-sm border transition-colors ${
+                isSkipped
+                    ? "border-gray-300 bg-gray-100 text-gray-500 dark:bg-gray-900/40 dark:border-gray-700"
+                    : isCompleted
+                      ? "border-green-500 bg-green-50 text-green-900 dark:bg-green-900/20 dark:text-green-100"
+                      : "bg-card text-card-foreground border-border"
             }`}
         >
-            <div className="flex items-center justify-between mb-1">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <div className="flex items-center justify-between mb-1 gap-2">
+                <p
+                    className={`text-sm font-medium ${
+                        isSkipped
+                            ? "text-gray-600 dark:text-gray-300"
+                            : "text-gray-900 dark:text-gray-100"
+                    }`}
+                >
                     {route.routeName}
                 </p>
-                {isCompleted && (
-                    <span className="text-green-600 dark:text-green-300 font-semibold">
-                        ✓
-                    </span>
-                )}
+                <div className="flex items-center gap-2">
+                    {isCompleted && (
+                        <span className="text-green-600 dark:text-green-300 font-semibold">
+                            ✓
+                        </span>
+                    )}
+                    {!isCompleted && (
+                        <button
+                            type="button"
+                            onClick={() => onSkipRoute(route.id)}
+                            className={`text-xs cursor-pointer px-2 py-1 rounded-sm border transition-colors ${
+                                isSkipped
+                                    ? "border-gray-300 bg-gray-200 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                                    : "border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                            }`}
+                            aria-pressed={isSkipped}
+                        >
+                            {isSkipped ? "Skipped" : "Skip"}
+                        </button>
+                    )}
+                </div>
             </div>
-            {!isCompleted && hasEncounters && (
+            {!isCollapsed && (
                 <EncounterList
                     encounters={route.pokemonMap}
                     routeName={route.routeName}
@@ -207,20 +270,20 @@ function EncounterList({
     );
 }
 
-function KeyTrainersSection({
-    keyTrainers,
+function BossesSection({
+    bosses,
 }: {
-    keyTrainers: FullGame["keyTrainers"];
+    bosses: FullGame["bosses"];
 }) {
-    if (!keyTrainers.length) return null;
+    if (!bosses.length) return null;
 
     return (
         <div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-                Key Trainers ({keyTrainers.length})
+                Bosses ({bosses.length})
             </h3>
             <div className="space-y-3">
-                {keyTrainers.map((trainer) => (
+                {bosses.map((trainer) => (
                     <TrainerCard key={trainer.id} trainer={trainer} />
                 ))}
             </div>
@@ -231,7 +294,7 @@ function KeyTrainersSection({
 function TrainerCard({
     trainer,
 }: {
-    trainer: FullGame["keyTrainers"][number];
+    trainer: FullGame["bosses"][number];
 }) {
     const hasPokemon = trainer.pokemon.length > 0;
 
@@ -266,7 +329,7 @@ function TrainerCard({
 function TrainerPokemonList({
     pokemon,
 }: {
-    pokemon: FullGame["keyTrainers"][number]["pokemon"];
+    pokemon: FullGame["bosses"][number]["pokemon"];
 }) {
     return (
         <div className="mt-2">

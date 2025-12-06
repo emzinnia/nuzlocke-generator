@@ -80,7 +80,7 @@ export const RightSidebar: React.FC = () => {
         return (
             <button
                 onClick={handleExpand}
-                className="fixed top-16 right-0 z-50 bg-sidebar text-sidebar-foreground border border-sidebar-border shadow px-2 py-2 rounded-l-md hover:bg-sidebar/80 transition-colors flex items-center justify-center"
+                className="fixed top-4 right-0 z-50 bg-sidebar text-sidebar-foreground border border-sidebar-border shadow px-2 py-2 rounded-l-md hover:bg-sidebar/80 transition-colors flex items-center justify-center"
                 aria-label="Open right sidebar"
             >
                 <Icon icon={ChevronLeft} size={18} />
@@ -93,7 +93,7 @@ export const RightSidebar: React.FC = () => {
             className="bg-sidebar text-sidebar-foreground border-l border-sidebar-border h-screen relative flex-shrink-0 transition-colors flex flex-col group/sidebar"
             style={{ width }}
         >
-            <div className="absolute top-1/2 -translate-y-1/2 -left-3 z-10">
+            <div className="absolute top-4 -left-3 z-10">
                 <button
                     onClick={handleCollapse}
                     className="w-7 h-10 bg-sidebar text-sidebar-foreground border border-sidebar-border rounded-l-md hover:bg-sidebar/80 flex items-center justify-center shadow"

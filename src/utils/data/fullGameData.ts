@@ -113,7 +113,7 @@ export const fullGameData: FullGame = {
             ],
         },
     ],
-    keyTrainers: [
+    bosses: [
         {
             name: "Rival",
             id: "1",

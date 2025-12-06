@@ -92,7 +92,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onRunsChange }) => {
         return (
             <button
                 onClick={handleExpand}
-                className="fixed top-16 left-0 z-50 bg-sidebar text-sidebar-foreground border border-sidebar-border shadow px-2 py-2 rounded-r-md hover:bg-sidebar/80 transition-colors flex items-center justify-center"
+                className="fixed top-4 left-0 z-50 bg-sidebar text-sidebar-foreground border border-sidebar-border shadow px-2 py-2 rounded-r-md hover:bg-sidebar/80 transition-colors flex items-center justify-center"
                 aria-label="Open sidebar"
             >
                 <Icon icon={ChevronRight} size={18} />
@@ -107,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onRunsChange }) => {
             className="bg-sidebar text-sidebar-foreground border-r border-sidebar-border h-screen relative flex-shrink-0 transition-colors flex flex-col group/sidebar"
             style={{ width }}
         >
-            <div className="absolute top-1/2 -translate-y-1/2 -right-3 z-10">
+            <div className="absolute top-4 -right-3 z-10">
                 <button
                     onClick={handleCollapse}
                     className="w-7 h-10 bg-sidebar text-sidebar-foreground border border-sidebar-border rounded-r-md hover:bg-sidebar/80 flex items-center justify-center shadow"
