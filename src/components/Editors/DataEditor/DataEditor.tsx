@@ -19,7 +19,6 @@ import {
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { ErrorBoundary } from "components/Common/Shared";
 import { v4 as uuid } from "uuid";
-import { persistor } from "store";
 import { newNuzlocke, replaceState, setEditorHistoryDisabled } from "actions";
 import { Game, Pokemon, Trainer } from "models";
 import { omit } from "ramda";
@@ -311,7 +310,6 @@ export class DataEditorBase extends React.Component<
             ...cmm,
         });
         this.props.newNuzlocke(this.state.data, { isCopy: false });
-        this.writeAllData();
         this.setState({ isOpen: false });
     };
 
@@ -471,14 +469,6 @@ export class DataEditorBase extends React.Component<
         });
     };
 
-    private clearAllData = () => {
-        persistor.purge();
-        window.location.reload();
-    };
-
-    private writeAllData = () => {
-        persistor.flush();
-    };
 
     private toggleClearingData = () =>
         this.setState({ isClearAllDataOpen: !this.state.isClearAllDataOpen });
@@ -722,9 +712,6 @@ export class DataEditorBase extends React.Component<
                                     <input
                                         style={{ padding: ".25rem" }}
                                         className={Classes.FILE_INPUT}
-                                        ref={(ref) =>
-                                            (this.nuzlockeJsonFileInput = ref)
-                                        }
                                         onChange={this.uploadNuzlockeJsonFile}
                                         type="file"
                                         id="jsonFile"

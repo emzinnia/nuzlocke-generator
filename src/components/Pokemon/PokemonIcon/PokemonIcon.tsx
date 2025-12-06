@@ -8,7 +8,6 @@ import {
 } from "utils";
 import { Gender, GenderElementProps } from "components/Common/Shared";
 import { editPokemon, selectPokemon } from "actions";
-import { store } from "store";
 import {
     ConnectDragSource,
     ConnectDropTarget,
@@ -76,49 +75,6 @@ const usePokemonDrag = (props: BasePokemonIconProps) => {
     return dragRef;
 };
 
-const usePokemonDrop = (props: BasePokemonIconProps) => {
-    const [, dropRef] = useDrop({
-        accept: "POKEMON_ICON",
-        drop: (item: { id: string; position: number; status: string }) => {
-            const newPosition = props.position;
-            const newId = props.id;
-            const newStatus = props.status;
-            const oldId = item?.id;
-            const oldPosition = item?.position;
-            const oldStatus = item?.status;
-
-            if (
-                newId == null ||
-                oldId == null ||
-                oldPosition == null ||
-                oldStatus == null
-            ) {
-                return;
-            }
-
-            store.dispatch(
-                editPokemon(
-                    {
-                        position: oldPosition,
-                        status: oldStatus,
-                    },
-                    newId,
-                ),
-            );
-            store.dispatch(
-                editPokemon(
-                    {
-                        position: newPosition,
-                        status: newStatus,
-                    },
-                    oldId,
-                ),
-            );
-        },
-    });
-
-    return dropRef;
-};
 
 export const getIconURL = ({
     id,
@@ -207,8 +163,6 @@ export const PokemonIcon = (props: BasePokemonIconProps) => {
     const dispatch = useDispatch();
 
     const { styles } = props;
-    const dragRef = usePokemonDrag(props);
-    const dropRef = usePokemonDrop(props);
     const onClick = () => {
         dispatch(selectPokemon(props.id!));
     };
@@ -218,19 +172,12 @@ export const PokemonIcon = (props: BasePokemonIconProps) => {
         imageRendering: (styles ?? appStyle)?.iconRendering as React.CSSProperties["imageRendering"],
     };
 
-    const combinedRef = (node: HTMLDivElement | null) => {
-        dragRef(node);
-        dropRef(node);
-    };
-
     return (
-        <div ref={combinedRef}>
             <PokemonIconPlain
-                onClick={onClick}
-                imageStyle={imageStyle}
-                selectedId={selectedId}
-                {...props}
-            />
-        </div>
+            {...props}
+            onClick={onClick}
+            imageStyle={imageStyle}
+            selectedId={selectedId}
+        />
     );
 };

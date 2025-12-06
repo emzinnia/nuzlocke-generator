@@ -12,7 +12,6 @@ import {
 import { Pokemon } from "models";
 import { sortPokes, sortPokesReverse, noop, generateEmptyPokemon } from "utils";
 import { listOfHotkeys } from "utils";
-import { persistor } from "store";
 import { State } from "state";
 import { createStore } from "redux";
 import { appReducers } from "reducers";
@@ -113,25 +112,6 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
 
     private getLastPokemonId() {
         return this.props.pokemon.sort(sortPokesReverse)[0].id;
-    }
-
-    private manualSave() {
-        persistor
-            .flush()
-            .then((res) => {
-                const toaster = Toaster.create();
-                toaster.show({
-                    message: "Save successful!",
-                    intent: Intent.SUCCESS,
-                });
-            })
-            .catch((err) => {
-                const toaster = Toaster.create();
-                toaster.show({
-                    message: "Saved failed. Please try again.",
-                    intent: Intent.DANGER,
-                });
-            });
     }
 
     private previousPokemon() {
