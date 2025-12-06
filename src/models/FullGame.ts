@@ -1,7 +1,7 @@
 import { Badge } from "./Badge";
 import { Pokemon } from "./Pokemon";
 
-enum EncounterMethod {
+export enum EncounterMethod {
     Grass = "Grass",
     TallGrass = "Tall Grass",
     Surf = "Surf",
@@ -24,7 +24,9 @@ export interface FullGame {
         id: string;
         routeName: string;
         pokemonMap: {
-            Pokemon: Pokemon & { levelRange: [number, number] },
+            id: string;
+            species: string;
+            levelRange: [number, number];
             method: EncounterMethod;
         }[];
     }[];

@@ -16,11 +16,11 @@ export const Collapsible: React.FC<CollapsibleProps> = ({
     const [isOpen, setIsOpen] = React.useState(defaultOpen);
 
     return (
-        <div className={`mt-8 pt-4 border-t border-gray-200 dark:border-gray-700 ${className || ''}`}>
+        <div className={`p-2 rounded-sm h-full bg-card text-card-foreground ${className || ''}`}>
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full flex items-center justify-between text-left cursor-pointer"
+                className={`w-full flex items-center justify-between text-left cursor-pointer ${!isOpen ? 'pb-0' : 'pb-3'}`}
             >
                 <span className="text-xs text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wide">
                     {title}
@@ -35,7 +35,7 @@ export const Collapsible: React.FC<CollapsibleProps> = ({
                 </svg>
             </button>
             {isOpen && (
-                <div className="mt-2">
+                <div className="">
                     {children}
                 </div>
             )}

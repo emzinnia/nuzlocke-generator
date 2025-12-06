@@ -217,7 +217,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({
             )}
 
             <div className="space-2 grid grid-cols-3 gap-2">
-                <div className="flex items-center gap-2 col-span-2">
+                <div className="flex flex-end gap-2 col-span-2">
                     <div className="flex flex-col gap-1 text-left">
                         <Label>Species</Label>
                         <PokemonIconPlain
@@ -243,7 +243,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({
                         }}
                         disabled={isDisabled}
                         options={listOfPokemon}
-                        className="flex-1"
+                        className="flex-1 h-8 self-end"
                     />
                     <DeletePokemonButton
                         pokemonId={selectedPokemonId ?? undefined}

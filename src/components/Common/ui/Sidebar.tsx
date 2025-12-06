@@ -72,7 +72,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onRunsChange }) => {
             className="bg-sidebar text-sidebar-foreground border-r border-sidebar-border h-screen relative flex-shrink-0 transition-colors flex flex-col group/sidebar"
             style={{ width }}
         >
-            <div ref={scrollContainerRef} className="@container p-4 overflow-x-hidden overflow-y-auto flex-1 scrollbar-gutter-stable sidebar-scroll">
+            <div ref={scrollContainerRef} className="@container p-0 pl-4 overflow-x-hidden overflow-y-auto flex-1 scrollbar-gutter-stable sidebar-scroll">
                 <div className="grid gap-4 grid-cols-1 @[350px]:grid-cols-2">
                     <div className="@[350px]:col-span-2">
                         <ErrorBoundary errorMessage="Ooops. Something failed...">
