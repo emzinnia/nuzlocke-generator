@@ -10,6 +10,8 @@ export enum EncounterMethod {
     Headbutt = "Headbutt",
     SweetScent = "Sweet Scent",
     Dive = "Dive",
+    Gift = "Gift",
+    Starter = "Starter",
 }
 
 /**

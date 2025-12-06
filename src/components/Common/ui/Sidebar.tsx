@@ -3,9 +3,9 @@ import { useParams } from "react-router-dom";
 import { PokemonEditor } from "components/Editors/PokemonEditor/PokemonEditor";
 import { PokemonBoxes } from "components/Editors/PokemonEditor/PokemonBoxes";
 import { TrainerEditor } from "components/Editors/TrainerEditor/TrainerEditor";
-import { GameSelector } from "components/Editors/GameEditor/GameSelector";
 import { ErrorBoundary } from "components/Common/Shared/ErrorBoundary";
 import { Icon } from "./Icon";
+import { Button } from "./Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Pokemon } from "models/Pokemon";
 
@@ -90,13 +90,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onRunsChange }) => {
 
     if (isCollapsed) {
         return (
-            <button
+            <Button
                 onClick={handleExpand}
-                className="fixed top-4 left-0 z-50 bg-sidebar text-sidebar-foreground border border-sidebar-border shadow px-2 py-2 rounded-r-md hover:bg-sidebar/80 transition-colors flex items-center justify-center"
+                variant="outline"
+                className="fixed top-4 left-0 z-50 bg-sidebar text-sidebar-foreground border border-sidebar-border shadow w-8 h-10 p-0 rounded-r-md hover:bg-sidebar/80 transition-colors flex items-center justify-center"
                 aria-label="Open sidebar"
             >
                 <Icon icon={ChevronRight} size={18} />
-            </button>
+            </Button>
         );
     }
 
@@ -108,21 +109,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ onRunsChange }) => {
             style={{ width }}
         >
             <div className="absolute top-4 -right-3 z-10">
-                <button
+                <Button
                     onClick={handleCollapse}
-                    className="w-7 h-10 bg-sidebar text-sidebar-foreground border border-sidebar-border rounded-r-md hover:bg-sidebar/80 flex items-center justify-center shadow"
+                    variant="outline"
+                    className="w-8 h-10 p-0 bg-sidebar text-sidebar-foreground border border-sidebar-border rounded-r-md hover:bg-sidebar/80 flex items-center justify-center shadow"
                     aria-label="Collapse sidebar"
                 >
                     <Icon icon={ChevronLeft} size={18} />
-                </button>
+                </Button>
             </div>
             <div ref={scrollContainerRef} className="@container p-0 pl-4 overflow-x-hidden overflow-y-auto flex-1 scrollbar-gutter-stable sidebar-scroll">
                 <div className="grid gap-4 grid-cols-1 @[350px]:grid-cols-2">
-                    <div className="@[350px]:col-span-2">
-                        <ErrorBoundary errorMessage="Ooops. Something failed...">
-                            <GameSelector runId={runId} onGameUpdated={onRunsChange} />
-                        </ErrorBoundary>
-                    </div>
                     <div>
                         <ErrorBoundary errorMessage="Ooops. Something failed...">
                             <TrainerEditor runId={runId} onTrainerUpdated={onRunsChange} />

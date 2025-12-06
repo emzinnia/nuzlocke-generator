@@ -11,6 +11,7 @@ import {
   type Feature,
   type FeatureStatus,
 } from 'api/roadmap';
+import { Button } from 'components/Common/ui/Button';
 
 const STATUS_COLUMNS: { status: FeatureStatus; label: string; color: string }[] = [
   { status: 'planned', label: 'Planned', color: 'bg-slate-500' },
@@ -69,15 +70,16 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart }: FeatureCardPr
           >
             {feature.title}
           </span>
-          <button
+          <Button
             onClick={() => onDelete(feature.id)}
+            variant="icon"
             className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-opacity"
             title="Delete feature"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
       )}
     </div>
@@ -190,33 +192,35 @@ function KanbanColumn({
             className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white placeholder-gray-500"
           />
           <div className="flex gap-2 mt-2">
-            <button
+            <Button
               onClick={handleAdd}
               className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
               Add
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => {
                 setNewTitle('');
                 setIsAdding(false);
               }}
+              variant="ghost"
               className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
-        <button
+        <Button
           onClick={() => setIsAdding(true)}
+          variant="ghost"
           className="mt-3 w-full py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors flex items-center justify-center gap-1"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Add feature
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -286,7 +290,7 @@ function VersionSelector({
               className="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-blue-500 rounded-lg focus:outline-none text-gray-900 dark:text-white"
             />
           ) : (
-            <button
+            <Button
               onClick={() => onSelect(version)}
               onDoubleClick={() => handleStartEdit(version)}
               className={`px-4 py-1.5 text-sm rounded-lg transition-colors ${
@@ -296,18 +300,19 @@ function VersionSelector({
               }`}
             >
               {version.name}
-            </button>
+            </Button>
           )}
           {selectedVersion?.id === version.id && versions.length > 1 && (
-            <button
+            <Button
               onClick={() => onDelete(version.id)}
+              variant="icon"
               className="ml-1 p-1 text-gray-400 hover:text-red-500 transition-colors"
               title="Delete version"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </button>
+            </Button>
           )}
         </div>
       ))}
@@ -329,32 +334,34 @@ function VersionSelector({
             autoFocus
             className="px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white placeholder-gray-500"
           />
-          <button
+          <Button
             onClick={handleCreate}
             className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
           >
             Add
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               setNewName('');
               setIsCreating(false);
             }}
+            variant="ghost"
             className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
           >
             Cancel
-          </button>
+          </Button>
         </div>
       ) : (
-        <button
+        <Button
           onClick={() => setIsCreating(true)}
+          variant="ghost"
           className="px-3 py-1.5 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors flex items-center gap-1"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Add Version
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -527,11 +534,11 @@ export function RoadmapPage() {
       {error && (
         <div className="mb-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg flex items-center justify-between">
           <span>{error}</span>
-          <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700">
+          <Button onClick={() => setError(null)} variant="ghost" className="text-red-500 hover:text-red-700">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
       )}
 

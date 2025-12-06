@@ -1,6 +1,7 @@
 import React from 'react';
-import { Collapsible } from 'components/Common/ui';
-import { getRun } from 'api/runs';
+import { MoreVertical } from 'lucide-react';
+import { Button, Collapsible, Icon, Menu, MenuItem, Popover } from 'components/Common/ui';
+import { getRun, patchRunWithHistory } from 'api/runs';
 import type { Pokemon } from 'models/Pokemon';
 
 interface PokemonBoxesProps {
@@ -73,7 +74,9 @@ const StatusGroup: React.FC<{
     pokemon: Pokemon[];
     selectedPokemonId?: string | null;
     onSelectPokemon?: (id: string | null) => void;
-}> = ({ status, pokemon, selectedPokemonId, onSelectPokemon }) => {
+    onClearBox?: (status: string) => void;
+    isClearing?: boolean;
+}> = ({ status, pokemon, selectedPokemonId, onSelectPokemon, onClearBox, isClearing }) => {
     if (pokemon.length === 0) return null;
 
     const statusColors: Record<string, string> = {
@@ -87,8 +90,37 @@ const StatusGroup: React.FC<{
 
     return (
         <div className="mb-3">
-            <div className={`text-xs font-semibold uppercase tracking-wide mb-1 ${colorClass}`}>
-                {status} ({pokemon.length})
+            <div className="flex items-center justify-between mb-1 gap-2">
+                <div className={`text-xs font-semibold uppercase tracking-wide ${colorClass}`}>
+                    {status} ({pokemon.length})
+                </div>
+                {onClearBox && (
+                    <Popover
+                        interactionKind="click-target-only"
+                        minimal
+                        position="bottom"
+                        popoverClassName="min-w-[140px]"
+                        content={
+                            <Menu>
+                                <MenuItem
+                                    onSelect={() => onClearBox(status)}
+                                    disabled={isClearing}
+                                >
+                                    {isClearing ? 'Clearing...' : 'Clear Box'}
+                                </MenuItem>
+                            </Menu>
+                        }
+                    >
+                        <Button
+                            type="button"
+                            variant="icon"
+                            className="p-1 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-300 transition-colors"
+                            aria-label={`Box actions for ${status}`}
+                        >
+                            <Icon icon={MoreVertical} size={14} />
+                        </Button>
+                    </Popover>
+                )}
             </div>
             <div className="flex flex-wrap gap-0.5 bg-gray-100 dark:bg-gray-700/50 rounded p-1">
                 {pokemon.map((p) => (
@@ -108,10 +140,13 @@ export const PokemonBoxes: React.FC<PokemonBoxesProps> = ({ runId, onRefresh, se
     const [pokemon, setPokemon] = React.useState<Pokemon[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
     const [error, setError] = React.useState<string | null>(null);
+    const [actionError, setActionError] = React.useState<string | null>(null);
+    const [clearingStatus, setClearingStatus] = React.useState<string | null>(null);
 
     const fetchPokemon = React.useCallback(async () => {
         setIsLoading(true);
         setError(null);
+        setActionError(null);
         try {
             const run = await getRun(runId);
             const loadedPokemon = (run.data.pokemon as Pokemon[]) || [];
@@ -175,6 +210,42 @@ export const PokemonBoxes: React.FC<PokemonBoxesProps> = ({ runId, onRefresh, se
         return orderedGroups;
     }, [pokemon]);
 
+    const handleClearBox = React.useCallback(
+        async (status: string) => {
+            if (!runId) return;
+
+            setActionError(null);
+            setClearingStatus(status);
+
+            try {
+                const filtered = pokemon.filter(
+                    (p) => (p.status || 'Boxed') !== status
+                );
+
+                await patchRunWithHistory(runId, { pokemon: filtered });
+
+                setPokemon(filtered);
+                onPokemonLoaded?.(filtered);
+
+                if (
+                    selectedPokemonId &&
+                    !filtered.some((p) => p.id === selectedPokemonId)
+                ) {
+                    onSelectPokemon?.(null);
+                }
+
+                onRefresh?.();
+            } catch (err) {
+                setActionError(
+                    err instanceof Error ? err.message : 'Failed to clear box'
+                );
+            } finally {
+                setClearingStatus(null);
+            }
+        },
+        [pokemon, runId, onRefresh, onPokemonLoaded, selectedPokemonId, onSelectPokemon]
+    );
+
     if (isLoading) {
         return (
             <Collapsible title="Boxes" defaultOpen={true}>
@@ -207,6 +278,11 @@ export const PokemonBoxes: React.FC<PokemonBoxesProps> = ({ runId, onRefresh, se
 
     return (
         <Collapsible title={`Boxes (${pokemon.length})`} defaultOpen={true}>
+            {actionError && (
+                <div className="mb-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded">
+                    {actionError}
+                </div>
+            )}
             {groupedPokemon.map(({ status, pokemon: groupPokemon }) => (
                 <StatusGroup
                     key={status}
@@ -214,6 +290,8 @@ export const PokemonBoxes: React.FC<PokemonBoxesProps> = ({ runId, onRefresh, se
                     pokemon={groupPokemon}
                     selectedPokemonId={selectedPokemonId}
                     onSelectPokemon={onSelectPokemon}
+                    onClearBox={handleClearBox}
+                    isClearing={clearingStatus === status}
                 />
             ))}
         </Collapsible>

@@ -6,6 +6,30 @@ export const fullGameData: FullGame = {
     name: "Red Version",
     routes: [
         {
+            id: "-1",
+            routeName: "Starter",
+            pokemonMap: [
+                {
+                    id: "1",
+                    species: "Charmander",
+                    levelRange: [5, 5],
+                    method: EncounterMethod.Starter,
+                },
+                {
+                    id: "2",
+                    species: "Squirtle",
+                    levelRange: [5, 5],
+                    method: EncounterMethod.Starter,
+                },
+                {
+                    id: "3",
+                    species: "Bulbasaur",
+                    levelRange: [5, 5],
+                    method: EncounterMethod.Starter,
+                },
+            ],
+        },
+        {
             id: "0",
             routeName: "Pallet Town",
             pokemonMap: [

@@ -194,8 +194,9 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({
             )}
 
             {isEditMode && (
-                <button
+                <Button
                     type="button"
+                    variant="ghost"
                     onClick={onClearSelection}
                     className="mb-3 w-full text-left px-2 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors flex items-center gap-2"
                 >
@@ -213,7 +214,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({
                         />
                     </svg>
                     Back to Add Pokemon
-                </button>
+                </Button>
             )}
 
             <div className="space-2 grid grid-cols-3 gap-2">
@@ -288,14 +289,14 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({
                                 }
                                 autoFocus
                             />
-                            <button
+                            <Button
                                 type="button"
                                 onClick={handleAddCustomStatus}
                                 className="px-2 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
                             >
                                 Add
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 type="button"
                                 onClick={() => {
                                     setIsAddingCustomStatus(false);
@@ -304,7 +305,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({
                                 className="px-2 py-1 text-sm bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500"
                             >
                                 Cancel
-                            </button>
+                            </Button>
                         </div>
                     ) : (
                         <Select

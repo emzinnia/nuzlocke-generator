@@ -3,7 +3,7 @@ import { listOfPokemon, Species } from "utils/data/listOfPokemon";
 import { speciesToNumber } from "utils/getters/speciesToNumber";
 import { matchSpeciesToTypes } from "utils/formatters/matchSpeciesToTypes";
 import { Types } from "utils/Types";
-import { Select } from "components/Common/ui";
+import { Select, Button } from "components/Common/ui";
 import { normalizeSpeciesName } from "utils";
 
 // Type colors for badges
@@ -200,23 +200,25 @@ export const DataPage: React.FC = () => {
             {/* Pagination */}
             {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-2">
-                    <button
+                    <Button
                         onClick={() => setPage((p) => Math.max(0, p - 1))}
                         disabled={page === 0}
+                        variant="secondary"
                         className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 dark:hover:bg-gray-600"
                     >
                         Previous
-                    </button>
+                    </Button>
                     <span className="text-sm text-gray-600 dark:text-gray-400">
                         Page {page + 1} of {totalPages}
                     </span>
-                    <button
+                    <Button
                         onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                         disabled={page >= totalPages - 1}
+                        variant="secondary"
                         className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 dark:hover:bg-gray-600"
                     >
                         Next
-                    </button>
+                    </Button>
                 </div>
             )}
         </div>

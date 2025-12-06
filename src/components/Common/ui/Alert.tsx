@@ -51,12 +51,12 @@ export const Alert: React.FC<AlertProps> = ({
                     <Button variant="secondary" onClick={onCancel}>
                         {cancelButtonText}
                     </Button>
-                    <button
+                    <Button
                         onClick={onConfirm}
-                        className={`px-4 py-2 text-sm text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${confirmButtonClasses}`}
+                        className={`px-4 py-2 text-sm text-white ${confirmButtonClasses}`}
                     >
                         {confirmButtonText}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

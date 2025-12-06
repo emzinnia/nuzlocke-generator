@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "./Button";
 
 export interface CollapsibleProps {
     title: string;
@@ -17,10 +18,11 @@ export const Collapsible: React.FC<CollapsibleProps> = ({
 
     return (
         <div className={`p-2 rounded-sm h-full bg-card text-card-foreground ${className || ''}`}>
-            <button
+            <Button
                 type="button"
+                variant="ghost"
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full flex items-center justify-between text-left cursor-pointer ${!isOpen ? 'pb-0' : 'pb-3'}`}
+                className={`w-full flex items-center justify-between text-left ${!isOpen ? 'pb-0' : 'pb-3'}`}
             >
                 <span className="text-xs text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wide">
                     {title}
@@ -33,7 +35,7 @@ export const Collapsible: React.FC<CollapsibleProps> = ({
                 >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
-            </button>
+            </Button>
             {isOpen && (
                 <div className="">
                     {children}

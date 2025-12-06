@@ -5,6 +5,9 @@ import { createRun, getRun, restoreRunState, type RunSummary } from "api/runs";
 import { useUndoRedoStore } from "hooks/useUndoRedo";
 import { useAuthStore } from "components/Layout/App/auth";
 import { Keyboard } from "./Keyboard";
+import { Dialog, DialogBody, DialogFooter } from "./Dialog";
+import { Settings } from "lucide-react";
+import { Button } from "./Button";
 
 interface HeaderProps {
     runs: RunSummary[];
@@ -57,6 +60,7 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
     const [isUndoing, setIsUndoing] = React.useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+    const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
     const menuRef = React.useRef<HTMLDivElement>(null);
 
@@ -171,15 +175,16 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center gap-4">
                         <div className="relative" ref={menuRef}>
-                            <button
+                            <Button
                                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                className="p-2 rounded-md text-foreground hover:bg-accent transition-colors"
+                                variant="ghost"
+                                className="p-2 h-auto w-auto rounded-md text-foreground hover:bg-accent transition-colors"
                                 aria-label="Menu"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                                 </svg>
-                            </button>
+                            </Button>
 
                             {isMenuOpen && (
                                 <div className="absolute left-0 mt-2 w-56 bg-popover text-popover-foreground rounded-md shadow-lg border border-border z-50">
@@ -234,15 +239,16 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
 
                                     <div className="border-t border-border p-2">
                                         {isAuthenticated ? (
-                                            <button
+                                            <Button
                                                 onClick={logout}
-                                                className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 rounded-md transition-colors flex items-center gap-2"
+                                                variant="ghost"
+                                                className="w-full justify-start text-left px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 rounded-md transition-colors flex items-center gap-2"
                                             >
                                                 <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                                 </svg>
                                                 <span>Logout</span>
-                                            </button>
+                                            </Button>
                                         ) : (
                                             <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">
                                                 <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,8 +267,9 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                         </div>
                         {isAuthenticated && (
                             <div className="relative" ref={dropdownRef}>
-                                <button
+                                <Button
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                    variant="ghost"
                                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground hover:bg-accent rounded-md transition-colors"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -277,7 +284,7 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                                     >
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                     </svg>
-                                </button>
+                                </Button>
 
                                 {isDropdownOpen && (
                                     <div className="absolute left-0 mt-2 w-64 bg-popover text-popover-foreground rounded-md shadow-lg border border-border z-50 max-h-96 overflow-y-auto">
@@ -306,10 +313,11 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                                             )}
                                         </div>
                                         <div className="border-t border-border p-2">
-                                            <button
+                                            <Button
                                                 onClick={handleCreateRun}
                                                 disabled={isCreating}
-                                                className="w-full text-left px-3 py-2 text-sm text-primary hover:bg-primary/10 disabled:opacity-50 rounded-md transition-colors flex items-center gap-2"
+                                                variant="ghost"
+                                                className="w-full justify-start text-left px-3 py-2 text-sm text-primary hover:bg-primary/10 disabled:opacity-50 rounded-md transition-colors flex items-center gap-2"
                                             >
                                                 {isCreating ? (
                                                     <svg className="animate-spin w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
@@ -322,7 +330,7 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                                                     </svg>
                                                 )}
                                                 <span className="truncate">{isCreating ? "Creating..." : "New Nuzlocke Run"}</span>
-                                            </button>
+                                            </Button>
                                         </div>
                                     </div>
                                 )}
@@ -333,10 +341,11 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                     <div className="flex items-center gap-4">
                         {runId && (
                             <div className="flex items-center gap-2">
-                                <button
+                                <Button
                                     onClick={handleUndo}
                                     disabled={!canUndo || isUndoing}
                                     title="Undo (Ctrl+Z)"
+                                    variant="secondary"
                                     className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-secondary text-secondary-foreground hover:bg-accent"
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -344,11 +353,12 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                                     </svg>
                                     <span>Undo</span>
                                     <Keyboard shortcut="⌘Z" />
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     onClick={handleRedo}
                                     disabled={!canRedo || isUndoing}
                                     title="Redo (Ctrl+Shift+Z)"
+                                    variant="secondary"
                                     className="flex flex-row-reverse items-center justify-center gap-1.5 px-3 py-2 text-sm rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-secondary text-secondary-foreground hover:bg-accent"
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -356,13 +366,14 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                                     </svg>
                                     <span>Redo</span>
                                     <Keyboard shortcut="⌘⇧Z" />
-                                </button>
+                                </Button>
                             </div>
                         )}
 
-                        <button
+                        <Button
                             onClick={toggle}
-                            className="p-2 rounded-lg bg-secondary hover:bg-accent transition-colors"
+                            variant="ghost"
+                            className="p-2 h-auto w-auto rounded-lg bg-secondary hover:bg-accent transition-colors"
                             title={isDark ? "Switch to light mode" : "Switch to dark mode"}
                             aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
                         >
@@ -387,10 +398,75 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                                     <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
                                 </svg>
                             )}
-                        </button>
+                        </Button>
+                        <Button
+                            onClick={() => setIsSettingsOpen(true)}
+                            variant="ghost"
+                            className="p-2 h-auto w-auto rounded-lg bg-secondary hover:bg-accent transition-colors"
+                            title="Settings"
+                            aria-label="Settings"
+                        >
+                            <Settings className="w-5 h-5" />
+                        </Button>
                     </div>
                 </div>
             </div>
+
+            <Dialog
+                isOpen={isSettingsOpen}
+                onClose={() => setIsSettingsOpen(false)}
+                title="Settings"
+                icon={<Settings size={18} />}
+            >
+                <DialogBody className="space-y-4">
+                    <div className="space-y-2">
+                        <p className="text-sm font-medium text-foreground">Theme</p>
+                        <div className="flex items-center gap-3 text-sm">
+                            <label className="flex items-center gap-2">
+                                <input type="radio" name="theme" defaultChecked />
+                                System
+                            </label>
+                            <label className="flex items-center gap-2">
+                                <input type="radio" name="theme" />
+                                Light
+                            </label>
+                            <label className="flex items-center gap-2">
+                                <input type="radio" name="theme" />
+                                Dark
+                            </label>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <p className="text-sm font-medium text-foreground">Autosave</p>
+                        <label className="flex items-center gap-2 text-sm">
+                            <input type="checkbox" defaultChecked />
+                            Enable autosave every 5 minutes
+                        </label>
+                    </div>
+
+                    <div className="space-y-2">
+                        <p className="text-sm font-medium text-foreground">Notifications</p>
+                        <label className="flex items-center gap-2 text-sm">
+                            <input type="checkbox" defaultChecked />
+                            Show encounter reminders
+                        </label>
+                        <label className="flex items-center gap-2 text-sm">
+                            <input type="checkbox" />
+                            Show patch success toast
+                        </label>
+                    </div>
+                </DialogBody>
+                <DialogFooter>
+                    <Button
+                        onClick={() => setIsSettingsOpen(false)}
+                        variant="secondary"
+                        className="px-4 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-accent transition-colors"
+                    >
+                        Close
+                    </Button>
+                </DialogFooter>
+            </Dialog>
         </header>
     );
 };

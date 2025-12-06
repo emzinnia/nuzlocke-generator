@@ -7,6 +7,7 @@ export * from "./Field";
 export * from "./Header";
 export * from "./Icon";
 export * from "./Input";
+export * from "./Menu";
 export * from "./MultiSelect";
 export * from "./Popover";
 export * from "./Select";

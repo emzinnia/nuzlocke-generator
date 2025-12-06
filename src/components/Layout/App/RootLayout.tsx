@@ -34,7 +34,9 @@ export const RootLayout: React.FC = () => {
                     )}
                     <Outlet />
                 </div>
-                <RightSidebar />
+                <RightSidebar
+                    onRunsChange={() => revalidator.revalidate()}
+                />
             </main>
         </div>
     );

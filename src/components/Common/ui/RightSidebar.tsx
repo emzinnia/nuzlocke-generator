@@ -3,7 +3,9 @@ import { useParams } from "react-router-dom";
 import { fullGameData } from "utils/data/fullGameData";
 import { ErrorBoundary } from "components/Common/Shared/ErrorBoundary";
 import { FullGameDataView } from "components/Common/ui/FullGameDataView";
+import { GameSelector } from "components/Editors/GameEditor/GameSelector";
 import { Icon } from "./Icon";
+import { Button } from "./Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const MIN_WIDTH = 0;
@@ -12,7 +14,11 @@ const DEFAULT_WIDTH = 256;
 const STORAGE_KEY = "right-sidebar-width";
 const COLLAPSED_KEY = "right-sidebar-collapsed";
 
-export const RightSidebar: React.FC = () => {
+interface RightSidebarProps {
+    onRunsChange?: () => void;
+}
+
+export const RightSidebar: React.FC<RightSidebarProps> = ({ onRunsChange }) => {
     const { id: runId } = useParams<{ id: string }>();
     const [isCollapsed, setIsCollapsed] = React.useState(() => {
         return localStorage.getItem(COLLAPSED_KEY) === "true";
@@ -78,13 +84,14 @@ export const RightSidebar: React.FC = () => {
 
     if (isCollapsed) {
         return (
-            <button
+            <Button
                 onClick={handleExpand}
-                className="fixed top-4 right-0 z-50 bg-sidebar text-sidebar-foreground border border-sidebar-border shadow px-2 py-2 rounded-l-md hover:bg-sidebar/80 transition-colors flex items-center justify-center"
+                variant="outline"
+                className="fixed top-4 right-0 z-50 bg-sidebar text-sidebar-foreground border border-sidebar-border shadow w-8 h-10 p-0 rounded-l-md hover:bg-sidebar/80 transition-colors flex items-center justify-center"
                 aria-label="Open right sidebar"
             >
                 <Icon icon={ChevronLeft} size={18} />
-            </button>
+            </Button>
         );
     }
 
@@ -94,21 +101,32 @@ export const RightSidebar: React.FC = () => {
             style={{ width }}
         >
             <div className="absolute top-4 -left-3 z-10">
-                <button
+                <Button
                     onClick={handleCollapse}
-                    className="w-7 h-10 bg-sidebar text-sidebar-foreground border border-sidebar-border rounded-l-md hover:bg-sidebar/80 flex items-center justify-center shadow"
+                    variant="outline"
+                    className="w-8 h-10 p-0 bg-sidebar text-sidebar-foreground border border-sidebar-border rounded-l-md hover:bg-sidebar/80 flex items-center justify-center shadow"
                     aria-label="Collapse right sidebar"
                 >
                     <Icon icon={ChevronRight} size={18} />
-                </button>
+                </Button>
             </div>
             <div
                 ref={scrollContainerRef}
                 className="p-4 overflow-x-hidden overflow-y-auto flex-1 scrollbar-gutter-stable"
             >
-                <ErrorBoundary errorMessage="Failed to load game data">
-                    <FullGameDataView data={fullGameData} runId={runId} />
-                </ErrorBoundary>
+                <div className="space-y-4">
+                    {runId && (
+                        <ErrorBoundary errorMessage="Ooops. Something failed...">
+                            <GameSelector
+                                runId={runId}
+                                onGameUpdated={onRunsChange}
+                            />
+                        </ErrorBoundary>
+                    )}
+                    <ErrorBoundary errorMessage="Failed to load game data">
+                        <FullGameDataView data={fullGameData} runId={runId} />
+                    </ErrorBoundary>
+                </div>
             </div>
 
             <div

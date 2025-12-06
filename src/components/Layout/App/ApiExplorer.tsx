@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { getAuthToken } from "api/client";
+import { Button } from "components/Common/ui/Button";
 
 interface Endpoint {
   id: string;
@@ -285,7 +286,7 @@ export const ApiExplorer: React.FC = () => {
             {selectedEndpoint.method}
           </span>
           <code className="text-slate-300 flex-1 overflow-x-auto">{buildUrl()}</code>
-          <button
+          <Button
             onClick={executeRequest}
             disabled={isLoading}
             className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-600 disabled:cursor-not-allowed text-white px-4 py-1.5 rounded-md font-sans font-medium transition-colors"
@@ -313,7 +314,7 @@ export const ApiExplorer: React.FC = () => {
             ) : (
               "Send"
             )}
-          </button>
+          </Button>
         </div>
 
         {/* Path Parameters */}

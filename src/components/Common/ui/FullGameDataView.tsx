@@ -2,6 +2,7 @@ import * as React from "react";
 import type { FullGame } from "models/FullGame";
 import { PokemonIconPlain } from "components/Pokemon/PokemonIcon";
 import { Popover } from "./Popover";
+import { Button } from "./Button";
 import { addPokemonToRun } from "api/runs";
 
 const STATUS_OPTIONS = ["Team", "Boxed", "Dead", "Champs", "Missed"] as const;
@@ -192,10 +193,11 @@ function RouteCard({
                         </span>
                     )}
                     {!isCompleted && (
-                        <button
+                        <Button
                             type="button"
+                            variant="outline"
                             onClick={() => onSkipRoute(route.id)}
-                            className={`text-xs cursor-pointer px-2 py-1 rounded-sm border transition-colors ${
+                            className={`text-xs px-2 py-1 ${
                                 isSkipped
                                     ? "border-gray-300 bg-gray-200 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                                     : "border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
@@ -203,7 +205,7 @@ function RouteCard({
                             aria-pressed={isSkipped}
                         >
                             {isSkipped ? "Skipped" : "Skip"}
-                        </button>
+                        </Button>
                     )}
                 </div>
             </div>
@@ -241,8 +243,9 @@ function EncounterList({
                             content={
                                 <div className="flex flex-col min-w-[100px]">
                                     {STATUS_OPTIONS.map((status) => (
-                                        <button
+                                        <Button
                                             key={status}
+                                            variant="ghost"
                                             onClick={() =>
                                                 onAddPokemon({
                                                     species: encounter.species,
@@ -251,10 +254,10 @@ function EncounterList({
                                                     routeId,
                                                 })
                                             }
-                                            className="px-3 py-2 cursor-pointer text-left text-sm bg-primary-foreground hover:bg-primary/90 first:rounded-t last:rounded-b"
+                                            className="w-full px-3 py-2 justify-start text-left text-sm bg-primary-foreground hover:bg-primary/90 first:rounded-t last:rounded-b"
                                         >
                                             {status}
-                                        </button>
+                                        </Button>
                                     ))}
                                 </div>
                             }

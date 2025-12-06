@@ -3,6 +3,7 @@ import { useRouteLoaderData, useRevalidator } from "react-router-dom";
 import { login, register } from "api/auth";
 import { useAuthStore } from "./auth";
 import type { RootLoaderData } from "./RootLayout";
+import { Button } from "components/Common/ui/Button";
 
 export const HomePage: React.FC = () => {
     const [email, setEmail] = React.useState("");
@@ -90,20 +91,20 @@ export const HomePage: React.FC = () => {
                     />
                 </div>
                 <div className="flex gap-3">
-                    <button
+                    <Button
                         onClick={handleLogin}
                         disabled={isSubmitting}
                         className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2 px-4 rounded-md font-medium transition-colors"
                     >
                         {isSubmitting ? "..." : "Login"}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={handleRegister}
                         disabled={isSubmitting}
                         className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white py-2 px-4 rounded-md font-medium transition-colors"
                     >
                         {isSubmitting ? "..." : "Register"}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

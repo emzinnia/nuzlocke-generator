@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { X } from "lucide-react";
+import { Button } from "./Button";
 
 export interface DialogProps {
     isOpen: boolean;
@@ -63,21 +64,23 @@ export const Dialog: React.FC<DialogProps> = ({
                             )}
                             <h2 className="text-lg font-semibold">{title}</h2>
                         </div>
-                        <button
+                        <Button
                             onClick={onClose}
-                            className="p-1 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                            variant="ghost"
+                            className="p-1 h-auto w-auto rounded text-muted-foreground hover:text-foreground hover:bg-muted"
                         >
                             <X size={18} />
-                        </button>
+                        </Button>
                     </div>
                 )}
                 {!title && (
-                    <button
+                    <Button
                         onClick={onClose}
-                        className="absolute top-3 right-3 p-1 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                        variant="ghost"
+                        className="absolute top-3 right-3 p-1 h-auto w-auto rounded text-muted-foreground hover:text-foreground hover:bg-muted"
                     >
                         <X size={18} />
-                    </button>
+                    </Button>
                 )}
                 {children}
             </div>
