@@ -4,7 +4,7 @@ import { PokemonIconPlain } from "components/Pokemon/PokemonIcon";
 import { Popover } from "./Popover";
 import { addPokemonToRun } from "api/runs";
 
-const STATUS_OPTIONS = ["Team", "Boxed", "Dead", "Champs"] as const;
+const STATUS_OPTIONS = ["Team", "Boxed", "Dead", "Champs", "Missed"] as const;
 
 interface FullGameDataViewProps {
     data: FullGame;

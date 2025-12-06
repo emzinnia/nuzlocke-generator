@@ -91,6 +91,7 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({
 
             <div className="space-y-2">
                 <Field
+                    className="items-center"
                     label="Name"
                     inputProps={{
                         type: "text",
@@ -100,6 +101,7 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({
                     }}
                 />
                 <Field
+                    className="items-center"
                     label="ID"
                     inputProps={{
                         type: "text",
@@ -109,6 +111,7 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({
                     }}
                 />
                 <Field
+                    className="items-center"
                     label="Time"
                     inputProps={{
                         type: "text",
@@ -118,6 +121,7 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({
                     }}
                 />
                 <Field
+                    className="items-center"
                     label="Money"
                     inputProps={{
                         type: "text",
@@ -127,6 +131,7 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({
                     }}
                 />
                 <Field
+                    className="items-center"
                     label="Title"
                     inputProps={{
                         type: "text",
@@ -136,6 +141,7 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({
                     }}
                 />
                 <Field
+                    className="items-center"
                     label="Image"
                     inputProps={{
                         type: "text",
@@ -145,6 +151,7 @@ export const TrainerEditor: React.FC<TrainerEditorProps> = ({
                     }}
                 />
                 <Field
+                    className="items-center"
                     label="Notes"
                     inputProps={{
                         type: "text",
