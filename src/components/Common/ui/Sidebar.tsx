@@ -105,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onRunsChange }) => {
 
     return (
         <aside
-            className="bg-sidebar text-sidebar-foreground border-r border-sidebar-border h-screen relative flex-shrink-0 transition-colors flex flex-col group/sidebar"
+            className="bg-sidebar text-sidebar-foreground border-r border-sidebar-border h-screen relative flex-shrink-0 transition-colors flex flex-col overflow-hidden group/sidebar"
             style={{ width }}
         >
             <div className="absolute top-4 -right-3 z-10">

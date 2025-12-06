@@ -97,7 +97,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ onRunsChange }) => {
 
     return (
         <aside
-            className="bg-sidebar text-sidebar-foreground border-l border-sidebar-border h-screen relative flex-shrink-0 transition-colors flex flex-col group/sidebar"
+            className="bg-sidebar text-sidebar-foreground border-l border-sidebar-border h-screen relative flex-shrink-0 transition-colors flex flex-col overflow-hidden group/sidebar"
             style={{ width }}
         >
             <div className="absolute top-4 -left-3 z-10">
@@ -112,7 +112,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ onRunsChange }) => {
             </div>
             <div
                 ref={scrollContainerRef}
-                className="p-4 overflow-x-hidden overflow-y-auto flex-1 scrollbar-gutter-stable"
+                className="p-4 overflow-x-hidden overflow-y-auto flex-1 scrollbar-gutter-stable sidebar-scroll"
             >
                 <div className="space-y-4">
                     {runId && (
