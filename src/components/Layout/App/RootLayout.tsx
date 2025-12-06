@@ -18,7 +18,7 @@ export const RootLayout: React.FC = () => {
     const isLoading = navigation.state === "loading";
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+        <div className="min-h-screen bg-background text-foreground transition-colors">
             <Header
                 runs={runs}
                 isAuthenticated={isAuthenticated}

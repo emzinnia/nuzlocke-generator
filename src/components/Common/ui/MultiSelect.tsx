@@ -42,14 +42,14 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
                     {value.map((item) => (
                         <span
                             key={item}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full"
+                            className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-primary-foreground text-primary rounded-full"
                         >
                             {item}
                             {!disabled && (
                                 <button
                                     type="button"
                                     onClick={() => handleRemove(item)}
-                                    className="hover:text-blue-900 dark:hover:text-blue-100"
+                                    className="hover:text-primary-foreground"
                                 >
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -67,7 +67,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
                     onChange={handleAdd}
                     disabled={disabled}
                     defaultValue=""
-                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                    className="w-full px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
                 >
                     <option value="" disabled>
                         {placeholder} {max && `(${value.length}/${max})`}

@@ -53,7 +53,7 @@ export const RightSidebar: React.FC = () => {
 
     return (
         <aside
-            className="bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 h-screen relative flex-shrink-0 transition-colors flex flex-col group/sidebar"
+            className="bg-sidebar text-sidebar-foreground border-l border-sidebar-border h-screen relative flex-shrink-0 transition-colors flex flex-col group/sidebar"
             style={{ width }}
         >
             <div

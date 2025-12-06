@@ -1,25 +1,29 @@
-import React from 'react';
-import { Button, Field, Select, MultiSelect, Collapsible } from 'components/Common/ui';
-import { listOfPokemon } from 'utils/data/listOfPokemon';
-import { listOfNatures } from 'utils/data/listOfNatures';
-import { listOfAbilities } from 'utils/data/listOfAbilities';
-import { movesByType } from 'utils/data/movesByType';
-import { Types } from 'utils/Types';
-import { getListOfTypes } from 'utils/Types';
-import { addPokemonToRun, patchRunWithHistory } from 'api/runs';
-import type { Pokemon } from 'models/Pokemon';
-import { debounce } from 'utils/debounce';
-import { PokemonIconPlain } from 'components/Pokemon/PokemonIcon/PokemonIcon';
-import { DeletePokemonButton } from 'components/Pokemon/DeletePokemonButton/DeletePokemonButton';
+import React from "react";
+import {
+    Button,
+    Field,
+    Select,
+    MultiSelect,
+    Collapsible,
+} from "components/Common/ui";
+import { listOfPokemon } from "utils/data/listOfPokemon";
+import { listOfNatures } from "utils/data/listOfNatures";
+import { listOfAbilities } from "utils/data/listOfAbilities";
+import { movesByType } from "utils/data/movesByType";
+import { Types } from "utils/Types";
+import { getListOfTypes } from "utils/Types";
+import { addPokemonToRun, patchRunWithHistory } from "api/runs";
+import type { Pokemon } from "models/Pokemon";
+import { debounce } from "utils/debounce";
+import { PokemonIconPlain } from "components/Pokemon/PokemonIcon/PokemonIcon";
+import { DeletePokemonButton } from "components/Pokemon/DeletePokemonButton/DeletePokemonButton";
+import { Label } from "components/Common/ui/Label";
 
-// Flatten all moves from movesByType into a single sorted array
-const allMoves = Array.from(
-    new Set(Object.values(movesByType).flat())
-).sort();
+const allMoves = Array.from(new Set(Object.values(movesByType).flat())).sort();
 
-const genderOptions = ['Male', 'Female', 'Neutral'];
+const genderOptions = ["Male", "Female", "Neutral"];
 
-const defaultStatusOptions = ['Team', 'Dead', 'Boxed', 'Champs'];
+const defaultStatusOptions = ["Team", "Dead", "Boxed", "Champs"];
 
 interface PokemonEditorProps {
     runId: string;
@@ -29,61 +33,70 @@ interface PokemonEditorProps {
     onClearSelection?: () => void;
 }
 
-export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAdded, selectedPokemonId, pokemonList, onClearSelection }) => {
-    // Form state for both add and edit modes
-    const [selectedPokemon, setSelectedPokemon] = React.useState('Bulbasaur');
-    const [nickname, setNickname] = React.useState('');
-    const [status, setStatus] = React.useState('');
+export const PokemonEditor: React.FC<PokemonEditorProps> = ({
+    runId,
+    onPokemonAdded,
+    selectedPokemonId,
+    pokemonList,
+    onClearSelection,
+}) => {
+    const [selectedPokemon, setSelectedPokemon] = React.useState("Bulbasaur");
+    const [nickname, setNickname] = React.useState("");
+    const [status, setStatus] = React.useState("");
     const [customStatuses, setCustomStatuses] = React.useState<string[]>([]);
-    const [isAddingCustomStatus, setIsAddingCustomStatus] = React.useState(false);
-    const [newCustomStatus, setNewCustomStatus] = React.useState('');
-    const [level, setLevel] = React.useState<number | ''>('');
-    const [metLocation, setMetLocation] = React.useState('');
-    const [metLevel, setMetLevel] = React.useState<number | ''>('');
-    const [gender, setGender] = React.useState('');
-    const [nature, setNature] = React.useState('');
-    const [ability, setAbility] = React.useState('');
+    const [isAddingCustomStatus, setIsAddingCustomStatus] =
+        React.useState(false);
+    const [newCustomStatus, setNewCustomStatus] = React.useState("");
+    const [level, setLevel] = React.useState<number | "">("");
+    const [metLocation, setMetLocation] = React.useState("");
+    const [metLevel, setMetLevel] = React.useState<number | "">("");
+    const [gender, setGender] = React.useState("");
+    const [nature, setNature] = React.useState("");
+    const [ability, setAbility] = React.useState("");
     const [moves, setMoves] = React.useState<string[]>([]);
     const [types, setTypes] = React.useState<string[]>([]);
     const [isAdding, setIsAdding] = React.useState(false);
     const [isSaving, setIsSaving] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
 
-    // Determine if we're in edit mode
     const isEditMode = Boolean(selectedPokemonId);
-    const currentPokemon = pokemonList?.find(p => p.id === selectedPokemonId);
+    const currentPokemon = pokemonList?.find((p) => p.id === selectedPokemonId);
 
-    // Load selected pokemon data into form when selection changes
     React.useEffect(() => {
         if (currentPokemon) {
-            setSelectedPokemon(currentPokemon.species || 'Bulbasaur');
-            setNickname(currentPokemon.nickname || '');
-            setStatus(currentPokemon.status || '');
-            setLevel(currentPokemon.level ?? '');
-            setMetLocation(currentPokemon.met || '');
-            setMetLevel(currentPokemon.metLevel ?? '');
-            setGender(currentPokemon.gender || '');
-            setNature(currentPokemon.nature || '');
-            setAbility(currentPokemon.ability || '');
+            setSelectedPokemon(currentPokemon.species || "Bulbasaur");
+            setNickname(currentPokemon.nickname || "");
+            setStatus(currentPokemon.status || "");
+            setLevel(currentPokemon.level ?? "");
+            setMetLocation(currentPokemon.met || "");
+            setMetLevel(currentPokemon.metLevel ?? "");
+            setGender(currentPokemon.gender || "");
+            setNature(currentPokemon.nature || "");
+            setAbility(currentPokemon.ability || "");
             setMoves(currentPokemon.moves || []);
             setTypes((currentPokemon.types as string[]) || []);
         }
     }, [currentPokemon]);
 
-    // Debounced save function for edit mode
     const saveEditedPokemon = React.useMemo(
         () =>
             debounce(async (updatedPokemon: Partial<Pokemon>) => {
                 if (!selectedPokemonId || !pokemonList) return;
                 setIsSaving(true);
                 try {
-                    const updatedList = pokemonList.map(p =>
-                        p.id === selectedPokemonId ? { ...p, ...updatedPokemon } : p
+                    const updatedList = pokemonList.map((p) =>
+                        p.id === selectedPokemonId
+                            ? { ...p, ...updatedPokemon }
+                            : p
                     );
                     await patchRunWithHistory(runId, { pokemon: updatedList });
                     onPokemonAdded?.();
                 } catch (err) {
-                    setError(err instanceof Error ? err.message : 'Failed to save Pokemon');
+                    setError(
+                        err instanceof Error
+                            ? err.message
+                            : "Failed to save Pokemon"
+                    );
                 } finally {
                     setIsSaving(false);
                 }
@@ -91,7 +104,6 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
         [runId, selectedPokemonId, pokemonList, onPokemonAdded]
     );
 
-    // Update a field and save if in edit mode
     const updateField = (field: keyof Pokemon, value: unknown) => {
         if (isEditMode && currentPokemon) {
             saveEditedPokemon({ [field]: value });
@@ -101,7 +113,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
     const allStatusOptions = [...defaultStatusOptions, ...customStatuses];
 
     const handleStatusChange = (value: string) => {
-        if (value === '__add_custom__') {
+        if (value === "__add_custom__") {
             setIsAddingCustomStatus(true);
         } else {
             setStatus(value);
@@ -109,23 +121,26 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
     };
 
     const handleAddCustomStatus = () => {
-        if (newCustomStatus.trim() && !allStatusOptions.includes(newCustomStatus.trim())) {
+        if (
+            newCustomStatus.trim() &&
+            !allStatusOptions.includes(newCustomStatus.trim())
+        ) {
             setCustomStatuses([...customStatuses, newCustomStatus.trim()]);
             setStatus(newCustomStatus.trim());
         }
-        setNewCustomStatus('');
+        setNewCustomStatus("");
         setIsAddingCustomStatus(false);
     };
 
     const resetForm = () => {
-        setNickname('');
-        setStatus('');
-        setLevel('');
-        setMetLocation('');
-        setMetLevel('');
-        setGender('');
-        setNature('');
-        setAbility('');
+        setNickname("");
+        setStatus("");
+        setLevel("");
+        setMetLocation("");
+        setMetLevel("");
+        setGender("");
+        setNature("");
+        setAbility("");
         setMoves([]);
         setTypes([]);
     };
@@ -142,7 +157,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                 level: level || undefined,
                 met: metLocation || undefined,
                 metLevel: metLevel || undefined,
-                gender: gender as 'Male' | 'Female' | 'Neutral' | undefined,
+                gender: gender as "Male" | "Female" | "Neutral" | undefined,
                 nature: nature || undefined,
                 ability: ability || undefined,
                 moves: moves.length > 0 ? moves : undefined,
@@ -152,7 +167,9 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
             resetForm();
             onPokemonAdded?.();
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to add Pokemon');
+            setError(
+                err instanceof Error ? err.message : "Failed to add Pokemon"
+            );
         } finally {
             setIsAdding(false);
         }
@@ -160,7 +177,9 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
 
     const title = isEditMode
         ? isSaving
-            ? `Editing ${currentPokemon?.nickname || currentPokemon?.species} (Saving...)`
+            ? `Editing ${
+                  currentPokemon?.nickname || currentPokemon?.species
+              } (Saving...)`
             : `Editing ${currentPokemon?.nickname || currentPokemon?.species}`
         : "Add Pokemon";
 
@@ -180,35 +199,47 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                     onClick={onClearSelection}
                     className="mb-3 w-full text-left px-2 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors flex items-center gap-2"
                 >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                        />
                     </svg>
                     Back to Add Pokemon
                 </button>
             )}
 
             <div className="space-2 grid grid-cols-3 gap-2">
-                {/* Species */}
                 <div className="flex items-center gap-2 col-span-2">
-                    <PokemonIconPlain
-                        species={selectedPokemon}
-                        forme={currentPokemon?.forme}
-                        shiny={currentPokemon?.shiny}
-                        gender={currentPokemon?.gender}
-                        customIcon={currentPokemon?.customIcon}
-                        egg={currentPokemon?.egg}
-                        selectedId={null}
-                        onClick={() => {}}
-                        imageStyle={{
-                            height: "32px",
-                            maxWidth: "auto",
-                        }}
-                    />
+                    <div className="flex flex-col gap-1 text-left">
+                        <Label>Species</Label>
+                        <PokemonIconPlain
+                            species={selectedPokemon}
+                            forme={currentPokemon?.forme}
+                            shiny={currentPokemon?.shiny}
+                            gender={currentPokemon?.gender}
+                            customIcon={currentPokemon?.customIcon}
+                            egg={currentPokemon?.egg}
+                            selectedId={null}
+                            onClick={() => {}}
+                            imageStyle={{
+                                height: "32px",
+                                maxWidth: "auto",
+                            }}
+                        />
+                    </div>
                     <Select
                         value={selectedPokemon}
                         onChange={(e) => {
                             setSelectedPokemon(e.target.value);
-                            updateField('species', e.target.value);
+                            updateField("species", e.target.value);
                         }}
                         disabled={isDisabled}
                         options={listOfPokemon}
@@ -225,7 +256,6 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                     />
                 </div>
 
-                {/* Nickname */}
                 <Field
                     label="Nickname"
                     className="flex flex-col gap-1 text-left"
@@ -234,25 +264,28 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                         value: nickname,
                         onChange: (e) => {
                             setNickname(e.target.value);
-                            updateField('nickname', e.target.value);
+                            updateField("nickname", e.target.value);
                         },
                         placeholder: "Nickname (optional)",
                         disabled: isDisabled,
                     }}
                 />
 
-                {/* Status */}
-                <div className="flex gap-1 w-full justify-between items-center flex-col">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                <div className="flex gap-1 w-full justify-between items-start flex-col">
+                    <Label>Status</Label>
                     {isAddingCustomStatus ? (
-                        <div className="flex-1 ml-2 flex gap-1">
+                        <div className="flex-1 flex gap-1">
                             <input
                                 type="text"
                                 value={newCustomStatus}
-                                onChange={(e) => setNewCustomStatus(e.target.value)}
+                                onChange={(e) =>
+                                    setNewCustomStatus(e.target.value)
+                                }
                                 placeholder="New status..."
                                 className="flex-1 px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                onKeyDown={(e) => e.key === 'Enter' && handleAddCustomStatus()}
+                                onKeyDown={(e) =>
+                                    e.key === "Enter" && handleAddCustomStatus()
+                                }
                                 autoFocus
                             />
                             <button
@@ -264,7 +297,10 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                             </button>
                             <button
                                 type="button"
-                                onClick={() => { setIsAddingCustomStatus(false); setNewCustomStatus(''); }}
+                                onClick={() => {
+                                    setIsAddingCustomStatus(false);
+                                    setNewCustomStatus("");
+                                }}
                                 className="px-2 py-1 text-sm bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500"
                             >
                                 Cancel
@@ -275,22 +311,27 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                             value={status}
                             onChange={(e) => {
                                 handleStatusChange(e.target.value);
-                                if (e.target.value !== '__add_custom__') {
-                                    updateField('status', e.target.value);
+                                if (e.target.value !== "__add_custom__") {
+                                    updateField("status", e.target.value);
                                 }
                             }}
                             disabled={isDisabled}
                             options={[
-                                { value: '', label: 'Select...' },
-                                ...allStatusOptions.map(s => ({ value: s, label: s })),
-                                { value: '__add_custom__', label: '+ Add custom...' }
+                                { value: "", label: "Select..." },
+                                ...allStatusOptions.map((s) => ({
+                                    value: s,
+                                    label: s,
+                                })),
+                                {
+                                    value: "__add_custom__",
+                                    label: "+ Add custom...",
+                                },
                             ]}
-                            className="flex-1 ml-2"
+                            className="flex-1"
                         />
                     )}
                 </div>
 
-                {/* Level */}
                 <Field
                     className="flex flex-col gap-1 text-left"
                     label="Level"
@@ -299,16 +340,17 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                         min: 1,
                         value: level,
                         onChange: (e) => {
-                            const val = e.target.value ? parseInt(e.target.value) : '';
+                            const val = e.target.value
+                                ? parseInt(e.target.value)
+                                : "";
                             setLevel(val);
-                            updateField('level', val || undefined);
+                            updateField("level", val || undefined);
                         },
                         placeholder: "1-100",
                         disabled: isDisabled,
                     }}
                 />
 
-                {/* Met Location */}
                 <Field
                     className="flex flex-col gap-1 text-left"
                     label="Met Location"
@@ -317,14 +359,13 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                         value: metLocation,
                         onChange: (e) => {
                             setMetLocation(e.target.value);
-                            updateField('met', e.target.value);
+                            updateField("met", e.target.value);
                         },
                         placeholder: "Where caught",
                         disabled: isDisabled,
                     }}
                 />
 
-                {/* Met Level */}
                 <Field
                     className="flex flex-col gap-1 text-left"
                     label="Met Level"
@@ -333,92 +374,109 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                         min: 1,
                         value: metLevel,
                         onChange: (e) => {
-                            const val = e.target.value ? parseInt(e.target.value) : '';
+                            const val = e.target.value
+                                ? parseInt(e.target.value)
+                                : "";
                             setMetLevel(val);
-                            updateField('metLevel', val || undefined);
+                            updateField("metLevel", val || undefined);
                         },
                         placeholder: "1-100",
                         disabled: isDisabled,
                     }}
                 />
 
-                {/* Gender */}
-                <div className="flex gap-1 w-full justify-between items-center flex-col">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
+                <div className="flex gap-1 w-full justify-between items-start flex-col">
+                    <Label>Gender</Label>
                     <Select
                         value={gender}
                         onChange={(e) => {
                             setGender(e.target.value);
-                            updateField('gender', e.target.value || undefined);
+                            updateField("gender", e.target.value || undefined);
                         }}
                         disabled={isDisabled}
-                        options={[{ value: '', label: 'Select...' }, ...genderOptions.map(g => ({ value: g, label: g }))]}
-                        className="flex-1 ml-2"
+                        options={[
+                            { value: "", label: "Select..." },
+                            ...genderOptions.map((g) => ({
+                                value: g,
+                                label: g,
+                            })),
+                        ]}
+                        className="flex-1 w-full"
                     />
                 </div>
 
-                {/* Nature */}
-                <div className="flex gap-1 w-full justify-between items-center flex-col">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Nature</label>
+                <div className="flex gap-1 w-full justify-between items-start flex-col">
+                    <Label>Nature</Label>
                     <Select
                         value={nature}
                         onChange={(e) => {
                             setNature(e.target.value);
-                            updateField('nature', e.target.value || undefined);
+                            updateField("nature", e.target.value || undefined);
                         }}
                         disabled={isDisabled}
-                        options={[{ value: '', label: 'Select...' }, ...listOfNatures.map(n => ({ value: n, label: n }))]}
-                        className="flex-1 ml-2"
+                        options={[
+                            { value: "", label: "Select..." },
+                            ...listOfNatures.map((n) => ({
+                                value: n,
+                                label: n,
+                            })),
+                        ]}
+                        className="flex-1 w-full"
                     />
                 </div>
 
-                {/* Ability */}
-                <div className="flex gap-1 w-full justify-between items-center flex-col">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Ability</label>
+                <div className="flex gap-1 w-full justify-between items-start flex-col">
+                    <Label>Ability</Label>
                     <Select
                         value={ability}
                         onChange={(e) => {
                             setAbility(e.target.value);
-                            updateField('ability', e.target.value || undefined);
+                            updateField("ability", e.target.value || undefined);
                         }}
                         disabled={isDisabled}
-                        options={[{ value: '', label: 'Select...' }, ...listOfAbilities.map(a => ({ value: a, label: a }))]}
-                        className="flex-1 ml-2"
+                        options={[
+                            { value: "", label: "Select..." },
+                            ...listOfAbilities.map((a) => ({
+                                value: a,
+                                label: a,
+                            })),
+                        ]}
+                        className="flex-1 w-full"
                     />
                 </div>
 
-                {/* Moves */}
                 <div className="flex flex-col gap-1 text-left">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
-                        Moves (max 4)
-                    </label>
-                    <MultiSelect
-                        options={allMoves as string[]}
-                        value={moves}
-                        onChange={(newMoves) => {
-                            setMoves(newMoves);
-                            updateField('moves', newMoves.length > 0 ? newMoves : undefined);
-                        }}
-                        max={4}
-                        placeholder="Add move..."
-                        disabled={isDisabled}
-                    />
-                </div>
-
-                {/* Types */}
-                <div className="flex flex-col gap-1 text-left">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
-                        Types (max 2)
-                    </label>
+                    <Label>Types (max 2)</Label>
                     <MultiSelect
                         options={getListOfTypes([])}
                         value={types}
                         onChange={(newTypes) => {
                             setTypes(newTypes);
-                            updateField('types', newTypes.length > 0 ? newTypes : undefined);
+                            updateField(
+                                "types",
+                                newTypes.length > 0 ? newTypes : undefined
+                            );
                         }}
                         max={2}
                         placeholder="Add type..."
+                        disabled={isDisabled}
+                    />
+                </div>
+
+                <div className="flex flex-col gap-1 text-left col-span-3">
+                    <Label>Moves (max 4)</Label>
+                    <MultiSelect
+                        options={allMoves as string[]}
+                        value={moves}
+                        onChange={(newMoves) => {
+                            setMoves(newMoves);
+                            updateField(
+                                "moves",
+                                newMoves.length > 0 ? newMoves : undefined
+                            );
+                        }}
+                        max={4}
+                        placeholder="Add move..."
                         disabled={isDisabled}
                     />
                 </div>
@@ -430,7 +488,7 @@ export const PokemonEditor: React.FC<PokemonEditorProps> = ({ runId, onPokemonAd
                         disabled={isAdding}
                         className="w-full"
                     >
-                        {isAdding ? 'Adding...' : 'Add Pokemon'}
+                        {isAdding ? "Adding..." : "Add Pokemon"}
                     </Button>
                 )}
             </div>

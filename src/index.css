@@ -3,6 +3,78 @@
 /* Enable class-based dark mode for Tailwind v4 */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Theme color variables - Light mode */
+:root {
+  --theme-background: oklch(0.98 0 0);
+  --theme-foreground: oklch(0.1 0 0);
+  --theme-card: oklch(1 0 0);
+  --theme-card-foreground: oklch(0.1 0 0);
+  --theme-border: oklch(0.9 0 0);
+  --theme-input: oklch(0.95 0 0);
+  --theme-primary: oklch(0.55 0.25 265);
+  --theme-primary-foreground: oklch(1 0 0);
+  --theme-ring: oklch(0.55 0.25 265);
+  --theme-sidebar: oklch(1 0 0);
+  --theme-sidebar-foreground: oklch(0.1 0 0);
+  --theme-sidebar-border: oklch(0.9 0 0);
+  --theme-muted: oklch(0.95 0 0);
+  --theme-muted-foreground: oklch(0.45 0 0);
+  --theme-accent: oklch(0.95 0 0);
+  --theme-accent-foreground: oklch(0.1 0 0);
+  --theme-popover: oklch(1 0 0);
+  --theme-popover-foreground: oklch(0.1 0 0);
+  --theme-secondary: oklch(0.95 0 0);
+  --theme-secondary-foreground: oklch(0.1 0 0);
+}
+
+/* Theme color variables - AMOLED dark mode */
+.dark {
+  --theme-background: oklch(0 0 0);
+  --theme-foreground: oklch(1 0 0);
+  --theme-card: oklch(0.08 0 0);
+  --theme-card-foreground: oklch(1 0 0);
+  --theme-border: oklch(0.20 0 0);
+  --theme-input: oklch(0.15 0 0);
+  --theme-primary: oklch(0.75 0.25 265);
+  --theme-primary-foreground: oklch(0 0 0);
+  --theme-ring: oklch(0.75 0.25 265);
+  --theme-sidebar: oklch(0.05 0 0);
+  --theme-sidebar-foreground: oklch(1 0 0);
+  --theme-sidebar-border: oklch(0.20 0 0);
+  --theme-muted: oklch(0.18 0 0);
+  --theme-muted-foreground: oklch(0.70 0 0);
+  --theme-accent: oklch(0.15 0 0);
+  --theme-accent-foreground: oklch(1 0 0);
+  --theme-popover: oklch(0.05 0 0);
+  --theme-popover-foreground: oklch(1 0 0);
+  --theme-secondary: oklch(0.15 0 0);
+  --theme-secondary-foreground: oklch(1 0 0);
+}
+
+/* Register theme colors with Tailwind v4 - these use CSS variables that change based on dark mode */
+@theme inline {
+  --color-background: var(--theme-background);
+  --color-foreground: var(--theme-foreground);
+  --color-card: var(--theme-card);
+  --color-card-foreground: var(--theme-card-foreground);
+  --color-border: var(--theme-border);
+  --color-input: var(--theme-input);
+  --color-primary: var(--theme-primary);
+  --color-primary-foreground: var(--theme-primary-foreground);
+  --color-ring: var(--theme-ring);
+  --color-sidebar: var(--theme-sidebar);
+  --color-sidebar-foreground: var(--theme-sidebar-foreground);
+  --color-sidebar-border: var(--theme-sidebar-border);
+  --color-muted: var(--theme-muted);
+  --color-muted-foreground: var(--theme-muted-foreground);
+  --color-accent: var(--theme-accent);
+  --color-accent-foreground: var(--theme-accent-foreground);
+  --color-popover: var(--theme-popover);
+  --color-popover-foreground: var(--theme-popover-foreground);
+  --color-secondary: var(--theme-secondary);
+  --color-secondary-foreground: var(--theme-secondary-foreground);
+}
+
 /* Scrollbar gutter utility */
 .scrollbar-gutter-stable {
   scrollbar-gutter: stable;
@@ -17,11 +89,11 @@
 
 /* Show scrollbar on sidebar hover */
 .group\/sidebar:hover .sidebar-scroll {
-  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  scrollbar-color: oklch(0.65 0 0 / 0.5) transparent;
 }
 
 .dark .group\/sidebar:hover .sidebar-scroll {
-  scrollbar-color: rgba(107, 114, 128, 0.5) transparent;
+  scrollbar-color: oklch(0.35 0 0 / 0.5) transparent;
 }
 
 /* Webkit scrollbar styling (Chrome, Safari, Edge) */
@@ -40,18 +112,18 @@
 }
 
 .group\/sidebar:hover .sidebar-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.5);
+  background-color: oklch(0.65 0 0 / 0.5);
 }
 
 .group\/sidebar:hover .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(156, 163, 175, 0.7);
+  background-color: oklch(0.65 0 0 / 0.7);
 }
 
 .dark .group\/sidebar:hover .sidebar-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(107, 114, 128, 0.5);
+  background-color: oklch(0.35 0 0 / 0.5);
 }
 
 .dark .group\/sidebar:hover .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(107, 114, 128, 0.7);
+  background-color: oklch(0.35 0 0 / 0.7);
 }
 

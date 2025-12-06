@@ -69,7 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onRunsChange }) => {
 
     return (
         <aside
-            className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-screen relative flex-shrink-0 transition-colors flex flex-col group/sidebar"
+            className="bg-sidebar text-sidebar-foreground border-r border-sidebar-border h-screen relative flex-shrink-0 transition-colors flex flex-col group/sidebar"
             style={{ width }}
         >
             <div ref={scrollContainerRef} className="@container p-4 overflow-x-hidden overflow-y-auto flex-1 scrollbar-gutter-stable sidebar-scroll">

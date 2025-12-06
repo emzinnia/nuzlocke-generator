@@ -1,5 +1,6 @@
 import React from "react";
 import { Input } from "./Input";
+import { Label } from "./Label";
 
 export interface FieldProps {
     label: string;
@@ -7,10 +8,14 @@ export interface FieldProps {
     className?: string;
 }
 
-export const Field: React.FC<FieldProps> = ({ label, inputProps, className }) => {
+export const Field: React.FC<FieldProps> = ({
+    label,
+    inputProps,
+    className,
+}) => {
     return (
-        <div className={`flex gap-1 w-full justify-between ${className || ''}`}>
-            <label className="text-xs text-left font-medium text-gray-700 dark:text-gray-300">{label}</label>
+        <div className={`flex gap-1 w-full justify-between ${className || ""}`}>
+            <Label>{label}</Label>
             <Input {...inputProps} />
         </div>
     );
