@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useParams } from "react-router-dom";
 import { fullGameData } from "utils/data/fullGameData";
 import { ErrorBoundary } from "components/Common/Shared/ErrorBoundary";
 import { FullGameDataView } from "components/Common/ui/FullGameDataView";
@@ -9,6 +10,7 @@ const DEFAULT_WIDTH = 256;
 const STORAGE_KEY = "right-sidebar-width";
 
 export const RightSidebar: React.FC = () => {
+    const { id: runId } = useParams<{ id: string }>();
     const [width, setWidth] = React.useState(() => {
         const saved = localStorage.getItem(STORAGE_KEY);
         return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
@@ -61,7 +63,7 @@ export const RightSidebar: React.FC = () => {
                 className="p-4 overflow-x-hidden overflow-y-auto flex-1 scrollbar-gutter-stable"
             >
                 <ErrorBoundary errorMessage="Failed to load game data">
-                    <FullGameDataView data={fullGameData} />
+                    <FullGameDataView data={fullGameData} runId={runId} />
                 </ErrorBoundary>
             </div>
 

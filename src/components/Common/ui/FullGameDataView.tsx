@@ -1,11 +1,27 @@
 import * as React from "react";
 import type { FullGame } from "models/FullGame";
+import { PokemonIconPlain } from "components/Pokemon/PokemonIcon";
+import { Popover } from "./Popover";
+import { addPokemonToRun } from "api/runs";
+
+const STATUS_OPTIONS = ["Team", "Boxed", "Dead", "Champs"] as const;
 
 interface FullGameDataViewProps {
     data: FullGame;
+    runId?: string;
 }
 
-export const FullGameDataView: React.FC<FullGameDataViewProps> = ({ data }) => {
+export const FullGameDataView: React.FC<FullGameDataViewProps> = ({ data, runId }) => {
+    const handleAddPokemon = async (species: string, status: string, met: string) => {
+        if (!runId) return;
+        await addPokemonToRun(runId, {
+            species,
+            nickname: species,
+            status,
+            met,
+        });
+    };
+
     return (
         <div className="space-y-6">
             <div>
@@ -38,29 +54,38 @@ export const FullGameDataView: React.FC<FullGameDataViewProps> = ({ data }) => {
                         {data.routes.map((route) => (
                             <div
                                 key={route.id}
-                                className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700"
+                                className="p-3 bg-card text-card-foreground rounded-sm border border-border"
                             >
                                 <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-1">
                                     {route.routeName}
                                 </h4>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                                    ID: {route.id}
-                                </p>
                                 {route.pokemonMap.length > 0 ? (
                                     <div className="mt-2">
-                                        <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                            Encounters ({route.pokemonMap.length}):
-                                        </p>
-                                        <ul className="space-y-1">
-                                            {route.pokemonMap.map((encounter, idx) => (
-                                                <li
-                                                    key={idx}
-                                                    className="text-xs text-gray-700 dark:text-gray-300 pl-2 border-l-2 border-blue-300 dark:border-blue-600"
-                                                >
-                                                    {encounter.Pokemon.species} (Lv.
-                                                    {encounter.Pokemon.levelRange[0]}-
-                                                    {encounter.Pokemon.levelRange[1]}) -{" "}
-                                                    {encounter.method}
+
+                                        <ul className="flex flex-wrap gap-1">
+                                            {route.pokemonMap.map((encounter) => (
+                                                <li key={encounter.id}>
+                                                    <Popover
+                                                        position="bottom"
+                                                        minimal
+                                                        content={
+                                                            <div className="flex flex-col min-w-[100px]">
+                                                                {STATUS_OPTIONS.map((status) => (
+                                                                    <button
+                                                                        key={status}
+                                                                        onClick={() => handleAddPokemon(encounter.species, status, route.routeName)}
+                                                                        className="px-3 py-2 cursor-pointer text-left text-sm bg-primary-foreground hover:bg-primary/90 first:rounded-t last:rounded-b"
+                                                                    >
+                                                                        {status}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        }
+                                                    >
+                                                        <div className="bg-card h-12 text-primary rounded-sm p-1 flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all">
+                                                            <PokemonIconPlain species={encounter.species} />
+                                                        </div>
+                                                    </Popover>
                                                 </li>
                                             ))}
                                         </ul>
@@ -85,7 +110,7 @@ export const FullGameDataView: React.FC<FullGameDataViewProps> = ({ data }) => {
                         {data.keyTrainers.map((trainer) => (
                             <div
                                 key={trainer.id}
-                                className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700"
+                                className="p-3 bg-card text-card-foreground rounded-sm border border-border"
                             >
                                 <div className="flex items-start justify-between mb-2">
                                     <div>
