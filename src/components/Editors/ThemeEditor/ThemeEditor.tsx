@@ -25,7 +25,7 @@ import {
     Intent,
 } from "@blueprintjs/core";
 import { ColorInput } from "components/Common/ui";
-import { ChampsPokemon, PokemonIcon, ErrorBoundary } from "components";
+import { ChampsPokemon, PokemonIcon, ErrorBoundary, ThemeSelect } from "components";
 import {} from "themes";
 import { BoxedPokemon } from "components/Pokemon/BoxedPokemon/BoxedPokemon";
 import { DeadPokemon } from "components/Pokemon/DeadPokemon/DeadPokemon";
