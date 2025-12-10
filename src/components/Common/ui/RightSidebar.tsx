@@ -16,9 +16,10 @@ const COLLAPSED_KEY = "right-sidebar-collapsed";
 
 interface RightSidebarProps {
     onRunsChange?: () => void;
+    isAuthenticated: boolean;
 }
 
-export const RightSidebar: React.FC<RightSidebarProps> = ({ onRunsChange }) => {
+export const RightSidebar: React.FC<RightSidebarProps> = ({ onRunsChange, isAuthenticated }) => {
     const { id: runId } = useParams<{ id: string }>();
     const [isCollapsed, setIsCollapsed] = React.useState(() => {
         return localStorage.getItem(COLLAPSED_KEY) === "true";
@@ -82,15 +83,19 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ onRunsChange }) => {
         localStorage.setItem(STORAGE_KEY, nextWidth.toString());
     };
 
+    if (!isAuthenticated || !runId) {
+        return null;
+    }
+
     if (isCollapsed) {
         return (
             <Button
                 onClick={handleExpand}
                 variant="outline"
-                className="fixed top-4 right-0 z-50 bg-sidebar text-sidebar-foreground border border-sidebar-border shadow w-8 h-10 p-0 rounded-l-md hover:bg-sidebar/80 transition-colors flex items-center justify-center"
+                className="fixed top-4 right-2 z-50 bg-sidebar text-sidebar-foreground border border-sidebar-border shadow w-10 h-12 p-0 rounded-l-lg hover:bg-sidebar/80 transition-colors flex items-center justify-center"
                 aria-label="Open right sidebar"
             >
-                <Icon icon={ChevronLeft} size={18} />
+                <Icon icon={ChevronLeft} size={22} />
             </Button>
         );
     }
@@ -100,14 +105,14 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ onRunsChange }) => {
             className="bg-sidebar text-sidebar-foreground border-l border-sidebar-border h-screen relative flex-shrink-0 transition-colors flex flex-col overflow-hidden group/sidebar"
             style={{ width }}
         >
-            <div className="absolute top-4 -left-3 z-10">
+            <div className="absolute top-4 left-3 z-20">
                 <Button
                     onClick={handleCollapse}
                     variant="outline"
-                    className="w-8 h-10 p-0 bg-sidebar text-sidebar-foreground border border-sidebar-border rounded-l-md hover:bg-sidebar/80 flex items-center justify-center shadow"
+                    className="w-10 h-12 p-0 bg-sidebar text-sidebar-foreground border border-sidebar-border rounded-l-lg hover:bg-sidebar/80 flex items-center justify-center shadow"
                     aria-label="Collapse right sidebar"
                 >
-                    <Icon icon={ChevronRight} size={18} />
+                    <Icon icon={ChevronRight} size={22} />
                 </Button>
             </div>
             <div

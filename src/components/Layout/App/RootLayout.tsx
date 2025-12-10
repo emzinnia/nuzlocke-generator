@@ -35,6 +35,7 @@ export const RootLayout: React.FC = () => {
                     <Outlet />
                 </div>
                 <RightSidebar
+                    isAuthenticated={isAuthenticated}
                     onRunsChange={() => revalidator.revalidate()}
                 />
             </main>

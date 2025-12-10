@@ -6,24 +6,48 @@ import { defineConfig } from "eslint/config";
 
 export default defineConfig([
     {
-        files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
-        plugins: { js },
-        extends: ["js/recommended"],
-    },
-    {
-        files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
-        languageOptions: { globals: { ...globals.browser, ...globals.node } },
-    },
-    tseslint.configs.recommended,
-    pluginReact.configs.flat.recommended,
-    {
         ignores: [
             "**/node_modules/**",
             "**/dist/**",
             "**/build/**",
             "**/coverage/**",
             "**/lighthouse/**",
+            "**/server/**",
+            "**/_old/**",
+            "**/__tests__/**",
+            "webpack.config.ts",
+            ".eslintrc.js",
+            ".babelrc",
+            "jest-config.json",
+            "server.ts",
+            "setupTests.ts",
+            "stylus.config.ts",
+            "babel.config.js",
+            "imageCheck.ts",
+            "massRename.ts",
+            "scraper.js",
+            "vite.config.js",
+            "cypress.config.ts",
+            "tailwind.config.js",
         ],
+    },
+    {
+        files: ["src/**/*.{js,mjs,cjs,ts,jsx,tsx}"],
+        plugins: { js },
+        extends: ["js/recommended"],
+    },
+    {
+        files: ["src/**/*.{js,mjs,cjs,ts,jsx,tsx}"],
+        languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    },
+    tseslint.configs.recommended,
+    pluginReact.configs.flat.recommended,
+    {
+        settings: {
+            react: {
+                version: "detect",
+            },
+        },
     },
     {
         rules: {

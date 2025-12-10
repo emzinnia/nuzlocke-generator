@@ -93,10 +93,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onRunsChange }) => {
             <Button
                 onClick={handleExpand}
                 variant="outline"
-                className="fixed top-4 left-0 z-50 bg-sidebar text-sidebar-foreground border border-sidebar-border shadow w-8 h-10 p-0 rounded-r-md hover:bg-sidebar/80 transition-colors flex items-center justify-center"
+                className="fixed top-4 left-2 z-50 bg-sidebar text-sidebar-foreground border border-sidebar-border shadow w-10 h-12 p-0 rounded-r-lg hover:bg-sidebar/80 transition-colors flex items-center justify-center"
                 aria-label="Open sidebar"
             >
-                <Icon icon={ChevronRight} size={18} />
+                <Icon icon={ChevronRight} size={22} />
             </Button>
         );
     }
@@ -108,14 +108,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onRunsChange }) => {
             className="bg-sidebar text-sidebar-foreground border-r border-sidebar-border h-screen relative flex-shrink-0 transition-colors flex flex-col overflow-hidden group/sidebar"
             style={{ width }}
         >
-            <div className="absolute top-4 -right-3 z-10">
+            <div className="absolute top-4 right-3 z-20">
                 <Button
                     onClick={handleCollapse}
                     variant="outline"
-                    className="w-8 h-10 p-0 bg-sidebar text-sidebar-foreground border border-sidebar-border rounded-r-md hover:bg-sidebar/80 flex items-center justify-center shadow"
+                    className="w-10 h-12 p-0 bg-sidebar text-sidebar-foreground border border-sidebar-border rounded-r-lg hover:bg-sidebar/80 flex items-center justify-center shadow"
                     aria-label="Collapse sidebar"
                 >
-                    <Icon icon={ChevronLeft} size={18} />
+                    <Icon icon={ChevronLeft} size={22} />
                 </Button>
             </div>
             <div ref={scrollContainerRef} className="@container p-0 pl-4 overflow-x-hidden overflow-y-auto flex-1 scrollbar-gutter-stable sidebar-scroll">
