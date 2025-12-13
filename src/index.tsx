@@ -62,13 +62,14 @@ void injectGlobal`
     body {
         background: #fff;
         font-family: 'Arial';
+        overflow-x: hidden;
     }
 
     .app {
         display: flex;
         height: 100vh;
         min-width: 100%;
-        overflow-y: hidden;
+        overflow: hidden;
     }
 
     .opacity-medium {
