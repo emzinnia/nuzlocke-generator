@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import * as React from "react";
-import { Dialog, Classes, Button, DialogProps } from "@blueprintjs/core";
+import { Dialog, DialogBody, Button } from "components/Common/ui";
 import { css, cx } from "emotion";
 import * as styles from "components/Features/Result/styles";
 import { Styles, classWithDarkTheme, getPatchlessVersion } from "utils";
@@ -86,6 +86,7 @@ const fetcher = (...args) => fetch(...args).then((res) => res.json());
 export interface ReleaseDialogProps {
     onClose: (e?: React.SyntheticEvent) => void;
     style: Styles;
+    isOpen: boolean;
 }
 
 export interface ReleaseNote {
@@ -94,7 +95,7 @@ export interface ReleaseNote {
     note: string;
 }
 
-export function ReleaseDialog(props: DialogProps & ReleaseDialogProps) {
+export function ReleaseDialog(props: ReleaseDialogProps) {
     const [seePrevious, setSeePrevious] = React.useState(false);
     const { data, error } = useSwr("/release/latest", fetcher);
     const { data: allNotesData, error: allNotesError } = useSwr(
@@ -104,7 +105,6 @@ export function ReleaseDialog(props: DialogProps & ReleaseDialogProps) {
 
     React.useEffect(() => console.log(data), [data]);
 
-    // @TODO: figure out these states
     if (error || allNotesError) return null;
     if (!data || !allNotesData) return null;
 
@@ -119,9 +119,9 @@ export function ReleaseDialog(props: DialogProps & ReleaseDialogProps) {
             onClose={props.onClose}
             icon="document"
             title={`Release Notes ${version}`}
-            className={`release-dialog ${props.style.editorDarkMode ? Classes.DARK : ""}`}
+            className={`release-dialog ${props.style.editorDarkMode ? "dark" : ""}`}
         >
-            <div className={Classes.DIALOG_BODY}>
+            <DialogBody>
                 <div className="release-notes-wrapper">
                     <h3
                         className={cx(
@@ -170,7 +170,7 @@ export function ReleaseDialog(props: DialogProps & ReleaseDialogProps) {
                             );
                         })}
                 </div>
-            </div>
+            </DialogBody>
         </Dialog>
     );
 }

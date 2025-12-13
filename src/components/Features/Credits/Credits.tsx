@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Classes, Dialog, Intent, Button } from "@blueprintjs/core";
+import { Dialog, Button } from "components/Common/ui";
 import { useSelector } from "react-redux";
 import { State } from "state";
 import { css, cx } from "emotion";
@@ -44,7 +44,6 @@ export interface CreditsProps {}
 export function Credits() {
     const [creditsModal, setCreditsModal] = React.useState(false);
     const style = useSelector<State, State["style"]>((state) => state.style);
-    //const parsedCredits: CreditsData = JSON.parse(credits);
 
     return (
         <>
@@ -52,7 +51,7 @@ export function Credits() {
                 isOpen={creditsModal}
                 onClose={() => setCreditsModal(false)}
                 icon="edit"
-                className={style.editorDarkMode ? Classes.DARK : ""}
+                className={style.editorDarkMode ? "dark" : ""}
                 title="Credits"
             >
                 <div
@@ -119,7 +118,7 @@ export function Credits() {
             </Dialog>
             <Button
                 style={{ margin: "0.5rem auto", display: "block" }}
-                intent={Intent.PRIMARY}
+                intent="primary"
                 minimal
                 onClick={() => setCreditsModal(true)}
             >

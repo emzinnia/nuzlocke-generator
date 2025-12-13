@@ -1,6 +1,5 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { Toaster, Intent } from "@blueprintjs/core";
 import {
     selectPokemon,
     deletePokemon,

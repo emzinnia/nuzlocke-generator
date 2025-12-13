@@ -1,6 +1,6 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { Dialog, Classes } from "@blueprintjs/core";
+import { Dialog, DialogBody } from "components/Common/ui";
 import { State } from "state";
 import { ErrorBoundary } from "components";
 import { MassEditorTable } from "./MassEditorTable";
@@ -18,14 +18,14 @@ export class MassEditorBase extends React.Component<MassEditorProps> {
                 icon="edit"
                 isOpen={this.props.isOpen}
                 onClose={this.props.toggleDialog}
-                className={`wide-dialog ${this.props.style.editorDarkMode ? Classes.DARK : ""}`}
+                className={`wide-dialog ${this.props.style.editorDarkMode ? "dark" : ""}`}
                 title="Mass Editor"
             >
-                <div className={Classes.DIALOG_BODY}>
+                <DialogBody>
                     <ErrorBoundary>
                         <MassEditorTable />
                     </ErrorBoundary>
-                </div>
+                </DialogBody>
             </Dialog>
         );
     }

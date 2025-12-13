@@ -1,11 +1,4 @@
-import {
-    Button,
-    ButtonGroup,
-    Classes,
-    Dialog,
-    DialogProps,
-    Intent,
-} from "@blueprintjs/core";
+import { Button, ButtonGroup, Dialog, DialogBody, DialogFooter } from "components/Common/ui";
 import { css, cx } from "emotion";
 import * as React from "react";
 
@@ -25,12 +18,17 @@ const styles = {
     hallOfFameText: css``,
 };
 
-export type HallOfFameDialogProps = DialogProps & {};
+export interface HallOfFameDialogProps {
+    isOpen: boolean;
+    onClose: (e?: React.SyntheticEvent) => void;
+    title: string;
+    icon?: string | React.ReactNode;
+}
 
 export function HallOfFameDialog(props: HallOfFameDialogProps) {
     return (
         <Dialog {...props}>
-            <div className={cx(styles.hallOfFameDialog, Classes.DIALOG_BODY)}>
+            <DialogBody className={cx(styles.hallOfFameDialog)}>
                 <img
                     alt="Hall of Fame"
                     className={styles.hallOfFameImage}
@@ -40,21 +38,19 @@ export function HallOfFameDialog(props: HallOfFameDialogProps) {
                     Submitting to the Hall of Fame uploads your nuzlocke to a
                     persistent record.
                 </p>
-                <div className={Classes.DIALOG_FOOTER}>
-                    <ButtonGroup className={Classes.DIALOG_FOOTER_ACTIONS}>
-                        <Button
-                            intent={Intent.DANGER}
-                            minimal
-                            onClick={props.onClose}
-                        >
-                            Cancel
-                        </Button>
-                        <Button intent={Intent.SUCCESS}>
-                            Submit to Hall of Fame
-                        </Button>
-                    </ButtonGroup>
-                </div>
-            </div>
+            </DialogBody>
+            <DialogFooter>
+                <Button
+                    intent="danger"
+                    minimal
+                    onClick={props.onClose}
+                >
+                    Cancel
+                </Button>
+                <Button intent="success">
+                    Submit to Hall of Fame
+                </Button>
+            </DialogFooter>
         </Dialog>
     );
 }

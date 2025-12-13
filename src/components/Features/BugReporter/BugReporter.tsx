@@ -1,14 +1,7 @@
 import * as React from "react";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
-import {
-    Button,
-    Intent,
-    TextArea,
-    Checkbox,
-    Toaster,
-    Classes,
-    Spinner,
-} from "@blueprintjs/core";
+import { Button, TextArea, Checkbox, Spinner } from "components/Common/ui";
+import { toast } from "components/Common/ui/Toast";
 import { connect } from "react-redux";
 import { css } from "emotion";
 
@@ -64,7 +57,7 @@ export class BugReporterBase extends React.Component<
                             width: "100%",
                             marginBottom: "0.25rem",
                         }}
-                        className={Classes.INPUT}
+                        className="px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                         required
                         type="text"
                         placeholder="Issue Title"
@@ -86,7 +79,7 @@ export class BugReporterBase extends React.Component<
                         }}
                     >
                         <Checkbox
-                            onChange={(e) =>
+                            onChange={(checked) =>
                                 this.setState((state) => ({
                                     includeNuzlocke: !state.includeNuzlocke,
                                 }))
@@ -98,11 +91,11 @@ export class BugReporterBase extends React.Component<
                             disabled={!userReportTitle || isSending}
                             onClick={this.sendBugReport}
                             minimal
-                            intent={Intent.DANGER}
+                            intent="danger"
                         >
                             Submit{" "}
                             {isSending ? (
-                                <Spinner className={spinner} size={20} />
+                                <Spinner size="small" className={spinner} />
                             ) : (
                                 <img
                                     style={{
@@ -162,11 +155,7 @@ export class BugReporterBase extends React.Component<
             .then((res) => res.json())
             .then((res) => {
                 if (res.status === 200 || res.status === 201) {
-                    const toaster = Toaster.create();
-                    toaster.show({
-                        message: "Bug report sent!",
-                        intent: Intent.SUCCESS,
-                    });
+                    toast.success("Bug report sent!");
                     this.setState({
                         userReport: "",
                         userReportTitle: "",
@@ -174,20 +163,12 @@ export class BugReporterBase extends React.Component<
                         isSending: false,
                     });
                 } else {
-                    const toaster = Toaster.create();
-                    toaster.show({
-                        message: "Bug report failed. Please try again.",
-                        intent: Intent.DANGER,
-                    });
+                    toast.error("Bug report failed. Please try again.");
                     this.setState({ isSending: false });
                 }
             })
             .catch((err) => {
-                const toaster = Toaster.create();
-                toaster.show({
-                    message: `Bug report failed. Please try again. ${err}`,
-                    intent: Intent.DANGER,
-                });
+                toast.error(`Bug report failed. Please try again. ${err}`);
                 this.setState({ isSending: false });
             });
     };

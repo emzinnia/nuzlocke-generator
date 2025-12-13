@@ -1,14 +1,7 @@
 import * as React from "react";
-import {
-    Button,
-    Intent,
-    Popover,
-    Icon,
-    PopoverInteractionKind,
-    Classes,
-    Toaster,
-    HTMLSelect,
-} from "@blueprintjs/core";
+import { Button, Popover, HTMLSelect } from "components/Common/ui";
+import { toast } from "components/Common/ui/Toast";
+import { Info } from "lucide-react";
 import { State } from "state";
 import { connect } from "react-redux";
 import { addBox, AddBoxArgs } from "actions";
@@ -53,11 +46,7 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
             this.props.addBox(this.state.newBox as AddBoxArgs);
             this.setState({ newBox: baseBox });
         } catch (e) {
-            const toaster = Toaster.create();
-            toaster.show({
-                message: "Cannot name a box the same as a current one.",
-                intent: Intent.DANGER,
-            });
+            toast.error("Cannot name a box the same as a current one.");
         }
     };
 
@@ -95,8 +84,8 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
             <>
                 <Button
                     onClick={this.toggleBoxForm}
-                    icon={"plus"}
-                    className={Classes.SMALL}
+                    icon="plus"
+                    small
                     style={{
                         margin: ".25rem",
                         height: "2rem",
@@ -107,7 +96,7 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                         transition: "200ms",
                         transform: isBoxFormOpen ? "rotate(135deg)" : undefined,
                     }}
-                    intent={Intent.SUCCESS}
+                    intent="success"
                 />
                 <div style={{ clear: "both" }} />
                 {isBoxFormOpen && (
@@ -124,12 +113,12 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                         }}
                     >
                         <div style={inputStyle}>
-                            <label style={labelStyle} className={Classes.LABEL}>
+                            <label style={labelStyle} className="text-sm font-medium text-foreground">
                                 Name
                             </label>
                             <input
                                 required
-                                className={Classes.INPUT}
+                                className="px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                                 autoComplete="false"
                                 onInput={this.editFormInput}
                                 value={this.state.newBox.name}
@@ -138,13 +127,11 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                             />
                         </div>
                         <div style={inputStyle}>
-                            <label style={labelStyle} className={Classes.LABEL}>
+                            <label style={labelStyle} className="text-sm font-medium text-foreground">
                                 Background{" "}
                                 <Popover
                                     minimal
-                                    interactionKind={
-                                        PopoverInteractionKind.HOVER
-                                    }
+                                    interactionKind="hover"
                                     content={
                                         <div
                                             style={{
@@ -159,14 +146,14 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                                         </div>
                                     }
                                 >
-                                    <Icon
+                                    <Info
+                                        size={14}
                                         style={{ marginLeft: ".25rem" }}
-                                        icon="info-sign"
                                     />
                                 </Popover>
                             </label>
                             <input
-                                className={Classes.INPUT}
+                                className="px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                                 onInput={this.editFormInput}
                                 value={this.state.newBox.background}
                                 name="background"
@@ -175,22 +162,15 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                         </div>
 
                         <div style={inputStyle}>
-                            <label style={labelStyle} className={Classes.LABEL}>
+                            <label style={labelStyle} className="text-sm font-medium text-foreground">
                                 Inherit From...
                             </label>
                             <HTMLSelect
                                 onChange={this.editFormInput}
                                 value={this.state.newBox.inheritFrom}
                                 name="inheritFrom"
-                            >
-                                {["Team", "Boxed", "Dead", "Champs"].map(
-                                    (box, idx) => (
-                                        <option key={idx} value={box}>
-                                            {box}
-                                        </option>
-                                    ),
-                                )}
-                            </HTMLSelect>
+                                options={["Team", "Boxed", "Dead", "Champs"]}
+                            />
                         </div>
                         <div
                             style={{
@@ -200,7 +180,7 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                         >
                             <Button
                                 onClick={this.toggleBoxForm}
-                                intent={Intent.DANGER}
+                                intent="danger"
                                 style={{ margin: "0 .5rem" }}
                                 minimal
                             >
@@ -209,7 +189,7 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                             <Button
                                 style={{ margin: "0 .5rem" }}
                                 onClick={this.confirmNewBox}
-                                intent={Intent.SUCCESS}
+                                intent="success"
                                 disabled={!this.state.newBox.name}
                             >
                                 Confirm

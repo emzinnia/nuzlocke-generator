@@ -9,7 +9,7 @@ import {
 } from "actions";
 import { gameOfOriginToColor, listOfGames, feature, Game } from "utils";
 
-import { Button, Intent, Switch, Classes, HTMLSelect } from "@blueprintjs/core";
+import { Button, Switch, HTMLSelect } from "components/Common/ui";
 import { RulesEditorDialog } from "components/Editors/RulesEditor/RulesEditor";
 import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
@@ -55,7 +55,6 @@ export class GameEditorBase extends React.Component<
 
     public render() {
         const { game } = this.props;
-        // Awful hack to get rid of `isOpen` conflict warning
         const RED: any = RulesEditorDialog;
         return (
             <>
@@ -64,7 +63,7 @@ export class GameEditorBase extends React.Component<
                     <div style={gameSubEditorStyle}>
                         <div>
                             <label
-                                className={Classes.INLINE}
+                                className="inline-flex items-center gap-2"
                                 style={{
                                     fontSize: "80%",
                                     marginRight: ".5rem",
@@ -75,16 +74,13 @@ export class GameEditorBase extends React.Component<
                             <HTMLSelect
                                 value={game.name}
                                 onChange={this.onChange}
-                            >
-                                {listOfGames.map((game) => (
-                                    <option key={game}>{game}</option>
-                                ))}
-                            </HTMLSelect>
+                                options={listOfGames}
+                            />
                         </div>
                         <Button
                             onClick={this.toggleDialog}
                             icon="list"
-                            intent={Intent.PRIMARY}
+                            intent="primary"
                         >
                             Modify Rules
                         </Button>
@@ -92,7 +88,7 @@ export class GameEditorBase extends React.Component<
                     <div style={gameSubEditorStyle}>
                         <div style={{ fontSize: "80%" }}>
                             <label
-                                className={Classes.INLINE}
+                                className="inline-flex items-center gap-2"
                                 style={{ marginRight: "calc(.75rem + 2px)" }}
                             >
                                 Name
@@ -102,7 +98,7 @@ export class GameEditorBase extends React.Component<
                                 value={game.customName}
                                 autoComplete={"false"}
                                 size={20}
-                                className={Classes.INPUT}
+                                className="px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                                 type="text"
                                 placeholder={game.name}
                             />
@@ -114,13 +110,12 @@ export class GameEditorBase extends React.Component<
                                     alignItems: "center",
                                     justifyContent: "center",
                                 }}
-                                className={Classes.MINIMAL}
+                                minimal
                             >
                                 <Switch
-                                    // style={{...darkModeStyle(this.props.style.editorDarkMode), marginBottom: 0}}
                                     label="TemTem Mode"
                                     checked={this.props.editor.temtemMode}
-                                    onChange={(_e) =>
+                                    onChange={(checked) =>
                                         this.props.toggleTemtemMode()
                                     }
                                 />

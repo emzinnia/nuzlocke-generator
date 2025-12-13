@@ -2,8 +2,8 @@ import * as React from "react";
 import { State } from "state";
 import { getListOfTypes, typeToColor, Types, getContrastColor } from "utils";
 import { createCustomType, deleteCustomType, editCustomType } from "actions";
-import { ColorInput } from "components/Common/ui";
-import { Classes, Button, Icon } from "@blueprintjs/core";
+import { ColorInput, Button } from "components/Common/ui";
+import { Trash2 } from "lucide-react";
 
 export interface TypesEditorProps {
     customTypes: State["customTypes"];
@@ -16,6 +16,14 @@ export interface TypesEditorState {
     type: string;
     color: string;
 }
+
+const rgbaOrHex = (color: any) => {
+    if (color?.rgb?.a !== 1) {
+        const { r, g, b, a } = color.rgb;
+        return `rgba(${r}, ${g}, ${b}, ${a})`;
+    }
+    return color.hex;
+};
 
 export class TypesEditor extends React.Component<
     TypesEditorProps,
@@ -37,7 +45,7 @@ export class TypesEditor extends React.Component<
                         }
                         style={{ margin: "4px" }}
                         value={this.state.type}
-                        className={Classes.INPUT}
+                        className="px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                         type="text"
                         placeholder="Type Name"
                     />
@@ -70,9 +78,9 @@ export class TypesEditor extends React.Component<
                             customTypes={customTypes}
                             type={ct.type}
                         />
-                        <Icon
-                            style={{ color: "red" }}
-                            icon="trash"
+                        <Trash2
+                            size={16}
+                            className="text-red-500 cursor-pointer"
                             onClick={(_e) => deleteCustomType(ct.id)}
                         />
                     </div>

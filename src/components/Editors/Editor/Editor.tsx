@@ -2,7 +2,6 @@ import * as React from "react";
 import { useSelector } from "react-redux";
 import { cx } from "emotion";
 import {} from "state";
-import { Classes } from "@blueprintjs/core";
 import { ErrorBoundary, Skeleton } from "components";
 import { editorStyles } from "./styles";
 import "./editor.css";
@@ -61,9 +60,6 @@ const Credits = React.lazy(() =>
     })),
 );
 
-/**
- * The main editor interface.
- */
 export function Editor() {
     const minimized = useSelector(minimizedSelector);
     const editorDarkMode = useSelector(editorModeSelector);
@@ -73,7 +69,7 @@ export function Editor() {
             className={cx(
                 "editor",
                 editorStyles.base,
-                editorDarkMode ? Classes.DARK : "",
+                editorDarkMode ? "dark" : "",
             )}
             style={{
                 width: minimized ? "0%" : "33%",

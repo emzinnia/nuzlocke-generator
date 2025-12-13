@@ -1,4 +1,3 @@
-import {} from "@blueprintjs/core";
 import { Pokemon } from "models";
 import * as React from "react";
 import { State } from "state";
@@ -15,7 +14,6 @@ export interface PokemonImageProps {
     style?: State["style"];
     editor?: State["editor"];
     name?: State["game"]["name"];
-    /* A URL that overrides getPokemonImage() */
     url?: string;
 }
 
@@ -35,8 +33,6 @@ export function PokemonImage({
     const [image, setImage] = React.useState("");
 
     React.useEffect(() => {
-        // If a URL is defined, we return it through cors-anywhere
-        // Otherwise, we just use getPokemonImage() (which also uses cors-anywhere under the hood)
         try {
             if (url) {
                 (async () => {

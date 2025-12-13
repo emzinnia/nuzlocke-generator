@@ -4,15 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { TrainerInfoEditField } from "./TrainerInfoEditField";
 import { editTrainer } from "actions";
 
-import {
-    Popover,
-    Menu,
-    Button,
-    Position,
-    Checkbox,
-    Dialog,
-    Classes,
-} from "@blueprintjs/core";
+import { Popover, Menu, Button, Checkbox, Dialog, DialogBody } from "components/Common/ui";
 import { CheckpointsEditor } from "./CheckpointsEditor";
 import { cx } from "emotion";
 import { State } from "state";
@@ -47,49 +39,52 @@ export function CheckpointsInputList({
             content={
                 <Menu>
                     {checkpoints.length === 0 && (
-                        <div style={{ width: "200px" }}>
+                        <div style={{ width: "200px" }} className="p-2 text-sm">
                             Select a game or configure custom checkpoints to see
                             them here!
                         </div>
                     )}
                     {Array.isArray(checkpoints) &&
                         checkpoints?.map((badge) => (
-                            <Checkbox
-                                onChange={(e: any) => {
-                                    if (
-                                        !e.target.checked ||
-                                        checkpointsObtained.some(
-                                            (b) => b.name === badge.name,
-                                        )
-                                    ) {
-                                        const badges =
-                                            checkpointsObtained.filter(
-                                                (b) => b.name !== badge.name,
-                                            );
-                                        onChange(badges);
-                                    } else {
-                                        const badges = [
-                                            ...checkpointsObtained,
-                                            badge,
-                                        ];
-                                        onChange(badges);
-                                    }
-                                }}
-                                checked={checkpointsObtained.some(
-                                    (b) => b.name === badge.name,
-                                )}
-                                key={badge.name}
-                                label={badge.name}
-                            />
+                            <div key={badge.name} className="px-3 py-1">
+                                <Checkbox
+                                    onChange={(checked) => {
+                                        if (
+                                            !checked ||
+                                            checkpointsObtained.some(
+                                                (b) => b.name === badge.name,
+                                            )
+                                        ) {
+                                            const badges =
+                                                checkpointsObtained.filter(
+                                                    (b) => b.name !== badge.name,
+                                                );
+                                            onChange(badges);
+                                        } else {
+                                            const badges = [
+                                                ...checkpointsObtained,
+                                                badge,
+                                            ];
+                                            onChange(badges);
+                                        }
+                                    }}
+                                    checked={checkpointsObtained.some(
+                                        (b) => b.name === badge.name,
+                                    )}
+                                    label={badge.name}
+                                />
+                            </div>
                         ))}
                     {toggle && (
-                        <Button onClick={toggle} minimal>
-                            Customize Checkpoints
-                        </Button>
+                        <div className="px-3 py-1 border-t border-border">
+                            <Button onClick={toggle} minimal>
+                                Customize Checkpoints
+                            </Button>
+                        </div>
                     )}
                 </Menu>
             }
-            position={Position.BOTTOM}
+            position="bottom"
         >
             <Button
                 fill
@@ -125,23 +120,18 @@ export function BadgeInput({ onChange, checkpointsCleared }: BadgeInputProps) {
             <Dialog
                 isOpen={isOpen}
                 onClose={toggle}
-                className={cx(Classes.DIALOG, {
-                    [Classes.DARK]: style.editorDarkMode,
-                })}
-                canOutsideClickClose={false}
+                className={cx(style.editorDarkMode && "dark")}
                 title="Checkpoints Editor"
-                icon="badge"
-                style={{ width: "60rem" }}
+                icon="edit"
             >
-                <div
+                <DialogBody
                     className={cx(
-                        Classes.DIALOG_BODY,
                         Styles.checkpointsEditor,
                         "has-nice-scrollbars",
                     )}
                 >
                     <CheckpointsEditor checkpoints={checkpoints} />
-                </div>
+                </DialogBody>
             </Dialog>
             <TrainerInfoEditField
                 data-testid="badge-input"

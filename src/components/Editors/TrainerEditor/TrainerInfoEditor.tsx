@@ -1,13 +1,8 @@
 import * as React from "react";
 
 import { BadgeInput } from "./BadgeInput";
-import {
-    Popover,
-    PopoverInteractionKind,
-    Position,
-    Menu,
-    Icon,
-} from "@blueprintjs/core";
+import { Popover, Menu } from "components/Common/ui";
+import { Info } from "lucide-react";
 import { listOfTrainers } from "utils";
 import { TrainerInfoEditField } from "./TrainerInfoEditField";
 import { useDispatch, useSelector } from "react-redux";
@@ -80,19 +75,21 @@ export function TrainerInfoEditor() {
                 label={
                     <Popover
                         minimal={true}
-                        interactionKind={PopoverInteractionKind.HOVER}
-                        position={Position.BOTTOM}
+                        interactionKind="hover"
+                        position="bottom"
                         content={
                             <Menu style={{ width: "10rem" }}>
-                                Type: image url. You can also use these keywords{" "}
-                                {listOfTrainers.map((t) => (
-                                    <SpanBlock key={t} text={capitalize(t)} />
-                                ))}
+                                <div className="p-2 text-sm">
+                                    Type: image url. You can also use these keywords{" "}
+                                    {listOfTrainers.map((t) => (
+                                        <SpanBlock key={t} text={capitalize(t)} />
+                                    ))}
+                                </div>
                             </Menu>
                         }
                     >
-                        <span>
-                            Trainer Image <Icon icon="info-sign" />
+                        <span className="flex items-center gap-1 cursor-help">
+                            Trainer Image <Info size={14} />
                         </span>
                     </Popover>
                 }

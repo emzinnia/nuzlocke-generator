@@ -1,4 +1,4 @@
-import { Tag } from "@blueprintjs/core";
+import { Tag } from "components/Common/ui";
 import { PokemonIcon } from "components";
 import * as React from "react";
 import { State } from "state";
@@ -11,7 +11,6 @@ export interface NuzlockeGameTagsProps {
     data: State;
     color: string;
     isCopy: boolean;
-    /* size in kilobytes */
     size: string;
 }
 
@@ -50,7 +49,7 @@ export function NuzlockeGameTags({
                     style={{ minWidth: "50%" }}
                 >
                     <Tag
-                        round
+                        className="rounded-full"
                         style={{
                             margin: "0 2px",
                             background: gameOfOriginToColor(game),
@@ -65,7 +64,7 @@ export function NuzlockeGameTags({
                     </Tag>
                     {isCurrent && (
                         <Tag
-                            round
+                            className="rounded-full"
                             style={{
                                 margin: "0 2px",
                                 background: "rgba(0,0,0,0.1)",
@@ -77,7 +76,7 @@ export function NuzlockeGameTags({
                     )}
                     {isCopy && (
                         <Tag
-                            round
+                            className="rounded-full"
                             style={{
                                 margin: "0 2px",
                                 background: "rgba(0,0,0,0.1)",
@@ -89,7 +88,7 @@ export function NuzlockeGameTags({
                     )}
                     {size && (
                         <Tag
-                            round
+                            className="rounded-full"
                             style={{
                                 margin: "0 2px",
                                 background: "rgba(0,0,0,0.1)",

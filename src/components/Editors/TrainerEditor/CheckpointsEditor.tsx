@@ -1,13 +1,7 @@
 import * as React from "react";
 import { cx } from "emotion";
-import {
-    Classes,
-    Button,
-    Icon,
-    Intent,
-    Popover,
-    PopoverInteractionKind,
-} from "@blueprintjs/core";
+import { Button, Popover } from "components/Common/ui";
+import { Link, Trash2 } from "lucide-react";
 import { classWithDarkTheme, feature, Styles } from "utils";
 import * as styles from "./style";
 import { connect } from "react-redux";
@@ -62,7 +56,7 @@ export class CheckpointsSelect extends React.Component<
                             key={key}
                             name={badge.name}
                             style={{ display: "block" }}
-                            className={Classes.MINIMAL}
+                            minimal
                         >
                             <img
                                 className={cx(styles.checkpointImage(1))}
@@ -83,14 +77,13 @@ export class CheckpointsSelect extends React.Component<
             <>
                 <Popover
                     minimal
-                    interactionKind={PopoverInteractionKind.CLICK}
+                    interactionKind="click"
                     content={this.renderOptions(checkpoint)}
                 >
                     <div
                         className={cx(
                             styles.checkpointSelect,
-                            Classes.SELECT,
-                            Classes.BUTTON,
+                            "px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md cursor-pointer",
                             "has-nice-scrollbars",
                         )}
                     >
@@ -157,7 +150,6 @@ export class CheckpointsEditorBase extends React.Component<
                             ),
                         )}
                     >
-                        {/* <Icon icon='drag-handle-vertical' /> */}
                         <div className={cx(styles.checkpointName)}>
                             <img
                                 className={cx(styles.checkpointImage())}
@@ -171,7 +163,7 @@ export class CheckpointsEditorBase extends React.Component<
                                         checkpoint.name,
                                     )
                                 }
-                                className={Classes.INPUT}
+                                className="px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                                 type="text"
                                 value={checkpoint.name}
                             />
@@ -180,10 +172,10 @@ export class CheckpointsEditorBase extends React.Component<
                             onEdit={(i, n) => this.props.editCheckpoint(i, n)}
                             checkpoint={checkpoint}
                         />
-                        <div className={Classes.INPUT_GROUP}>
-                            <Icon icon={"link"} />
+                        <div className="flex items-center gap-1">
+                            <Link size={14} className="text-muted-foreground" />
                             <input
-                                className={Classes.INPUT}
+                                className="px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                                 placeholder="https://..."
                                 value={checkpoint.image}
                                 type="text"
@@ -213,13 +205,12 @@ export class CheckpointsEditorBase extends React.Component<
                                 />
                             )}
                         </div>
-                        <Icon
-                            style={{ cursor: "pointer" }}
+                        <Trash2
+                            size={16}
+                            className={cx(styles.checkpointDelete, "text-red-500 cursor-pointer")}
                             onClick={(e) =>
                                 this.props.deleteCheckpoint(checkpoint.name)
                             }
-                            className={cx(styles.checkpointDelete)}
-                            icon="trash"
                         />
                     </li>
                 );
@@ -244,7 +235,7 @@ export class CheckpointsEditorBase extends React.Component<
                     <Button
                         onClick={this.addCheckpoint}
                         icon="plus"
-                        intent={Intent.SUCCESS}
+                        intent="success"
                     >
                         {" "}
                         Add Checkpoint

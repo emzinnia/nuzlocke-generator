@@ -20,20 +20,9 @@ import {
     useDrop,
 } from "react-dnd";
 
-import {
-    Icon,
-    Popover,
-    PopoverInteractionKind,
-    Menu,
-    MenuItem,
-    Position,
-    Button,
-    Intent,
-    Alert,
-    Classes,
-    Toaster,
-    Toast,
-} from "@blueprintjs/core";
+import { MoreVertical, Check } from "lucide-react";
+import { Alert, Popover, Menu, MenuItem } from "components/Common/ui";
+import { toast } from "components/Common/ui/Toast";
 import { connect, useDispatch } from "react-redux";
 import {
     PokemonIcon,
@@ -129,17 +118,12 @@ export const Box: React.FC<BoxProps> = (props) => {
         accept: "POKEMON_ICON",
         drop: (item: PokemonIconProps, monitor) => {
             if (props.id == null || item.id == null) {
-                const toaster = Toaster.create();
-                toaster.show({
-                    message: "Failed to move Pokémon",
-                    intent: Intent.DANGER,
-                });
+                toast.error("Failed to move Pokémon");
                 return;
             }
             dispatch(
                 editPokemon(
                     {
-                        // position: oldPosition,
                         status: props.name,
                     },
                     item.id,
@@ -218,13 +202,12 @@ export const Box: React.FC<BoxProps> = (props) => {
             className={`box ${name.replace(/\s/g, "-")}-box`}
         >
             <Alert
-                icon="trash"
                 isOpen={deleteConfirmationOpen}
                 onCancel={toggleDialog}
                 onConfirm={handleDeleteBox}
                 confirmButtonText="Delete Box"
                 cancelButtonText="Cancel"
-                intent={Intent.DANGER}
+                intent="danger"
             >
                 <p>
                     This will delete the currently selected Box and all Pokémon
@@ -232,12 +215,11 @@ export const Box: React.FC<BoxProps> = (props) => {
                 </p>
             </Alert>
             <Popover
-                position={Position.BOTTOM_LEFT}
+                position="auto"
                 minimal
-                interactionKind={PopoverInteractionKind.CLICK_TARGET_ONLY}
-                popoverClassName="no-list-item-types"
+                interactionKind="click-target-only"
                 content={
-                    <>
+                    <Menu>
                         <MenuItem text="Change Wallpaper">
                             {wallpapers.map((wall) => (
                                 <MenuItem
@@ -264,16 +246,8 @@ export const Box: React.FC<BoxProps> = (props) => {
                                                     inheritFrom: b,
                                                 })
                                             }
-                                            text={
-                                                b === inheritFrom ? (
-                                                    <>
-                                                        <Icon icon="small-tick" />{" "}
-                                                        {b}
-                                                    </>
-                                                ) : (
-                                                    b
-                                                )
-                                            }
+                                            icon={b === inheritFrom ? <Check size={14} /> : undefined}
+                                            text={b}
                                         />
                                     ),
                                 )}
@@ -285,7 +259,6 @@ export const Box: React.FC<BoxProps> = (props) => {
                         />
                         <MenuItem
                             onClick={handleClearBox}
-                            className={Classes.FILL}
                             text="Clear Box"
                         />
                         {!["Team", "Boxed", "Dead", "Champs"].includes(
@@ -293,11 +266,11 @@ export const Box: React.FC<BoxProps> = (props) => {
                         ) && (
                             <MenuItem
                                 onClick={toggleDialog}
-                                className={Classes.FILL}
                                 text="Delete Box"
+                                danger
                             />
                         )}
-                    </>
+                    </Menu>
                 }
             >
                 <span
@@ -319,7 +292,7 @@ export const Box: React.FC<BoxProps> = (props) => {
                         userSelect: "none",
                     }}
                 >
-                    <Icon style={{ transform: "rotate(90deg)" }} icon="more" />
+                    <MoreVertical size={16} />
                     {name}
                 </span>
             </Popover>

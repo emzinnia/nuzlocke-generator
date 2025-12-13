@@ -1,14 +1,7 @@
 import * as React from "react";
-import {
-    Popover,
-    Button,
-    Menu,
-    Position,
-    MenuItem,
-    Intent,
-    Icon,
-    Toaster,
-} from "@blueprintjs/core";
+import { Popover, Button, Menu, MenuItem } from "components/Common/ui";
+import { toast } from "components/Common/ui/Toast";
+import { MoreVertical } from "lucide-react";
 import { connect } from "react-redux";
 import { State } from "state";
 import {
@@ -102,7 +95,7 @@ export class NuzlockeSaveBase extends React.Component<
                 }}
             >
                 <Button
-                    intent={Intent.SUCCESS}
+                    intent="success"
                     icon="add"
                     style={{ marginBottom: "0.25rem" }}
                     onClick={() => {
@@ -131,7 +124,6 @@ export class NuzlockeSaveBase extends React.Component<
                         parsedData = isCurrent
                             ? JSON.parse(state)
                             : JSON.parse(data);
-                        //parsedData = JSON.parse(data);
                     } catch (_e) {
                         // Ignore parse errors
                     }
@@ -156,7 +148,6 @@ export class NuzlockeSaveBase extends React.Component<
                                 boxShadow: "0 0 4px rgba(0,0,0,0.1)",
                                 marginBottom: "2px",
                                 justifyContent: "space-between",
-                                // width: isMobile() ? '80%' : '100%',
                             }}
                             key={id}
                         >
@@ -184,13 +175,12 @@ export class NuzlockeSaveBase extends React.Component<
                                 />
                             )}
                             <Popover
-                                position={Position.BOTTOM_RIGHT}
+                                position="auto"
                                 content={
                                     <Menu>
                                         <MenuItem
-                                            shouldDismissPopover={false}
                                             disabled={isCurrent}
-                                            icon="swap-horizontal"
+                                            icon={<ArrowLeftRight size={14} />}
                                             onClick={() => {
                                                 try {
                                                     updateSwitchNuzlocke(
@@ -200,19 +190,13 @@ export class NuzlockeSaveBase extends React.Component<
                                                     );
                                                     replaceState(parsedData);
                                                 } catch (e) {
-                                                    const toaster =
-                                                        Toaster.create();
-                                                    toaster.show({
-                                                        message: `Failed to switch nuzlockes. ${e}`,
-                                                        intent: Intent.DANGER,
-                                                    });
+                                                    toast.error(`Failed to switch nuzlockes. ${e}`);
                                                 }
                                             }}
                                             text="Switch to this Nuzlocke"
                                         />
                                         <MenuItem
-                                            shouldDismissPopover={false}
-                                            icon="clipboard"
+                                            icon={<Copy size={14} />}
                                             onClick={() => {
                                                 try {
                                                     if (
@@ -226,29 +210,22 @@ export class NuzlockeSaveBase extends React.Component<
                                                         isCopy: true,
                                                     });
                                                 } catch (e) {
-                                                    const toaster =
-                                                        Toaster.create();
-                                                    toaster.show({
-                                                        message: `Failed to copy nuzlocke. ${e}`,
-                                                        intent: Intent.DANGER,
-                                                    });
+                                                    toast.error(`Failed to copy nuzlocke. ${e}`);
                                                 }
                                             }}
                                             text="Copy this Nuzlocke"
-                                        ></MenuItem>
+                                        />
                                         {feature.hallOfFame && (
                                             <MenuItem
-                                                shouldDismissPopover={false}
                                                 onClick={this.toggleIsHofOpen}
-                                                icon={"crown"}
+                                                icon={<Crown size={14} />}
                                                 text="Submit to Hall of Fame"
                                             />
                                         )}
                                         <MenuItem
                                             disabled={saves.length === 1}
-                                            shouldDismissPopover={false}
-                                            icon="trash"
-                                            intent={Intent.DANGER}
+                                            icon={<Trash2 size={14} />}
+                                            danger
                                             onClick={() => {
                                                 const deletionFunction = () => {
                                                     try {
@@ -266,12 +243,7 @@ export class NuzlockeSaveBase extends React.Component<
                                                         }
                                                         this.toggleIsDeletingNuzlocke();
                                                     } catch (e) {
-                                                        const toaster =
-                                                            Toaster.create();
-                                                        toaster.show({
-                                                            message: `Failed to delete nuzlocke. ${e}`,
-                                                            intent: Intent.DANGER,
-                                                        });
+                                                        toast.error(`Failed to delete nuzlocke. ${e}`);
                                                     }
                                                 };
                                                 this.setState({
@@ -284,13 +256,12 @@ export class NuzlockeSaveBase extends React.Component<
                                     </Menu>
                                 }
                             >
-                                <Icon
+                                <MoreVertical
+                                    size={16}
                                     style={{
-                                        transform: "rotate(90deg)",
                                         marginLeft: "auto",
                                         cursor: "pointer",
                                     }}
-                                    icon="more"
                                 />
                             </Popover>
                         </div>
@@ -304,6 +275,8 @@ export class NuzlockeSaveBase extends React.Component<
         return this.renderMenu();
     }
 }
+
+import { ArrowLeftRight, Copy, Crown, Trash2 } from "lucide-react";
 
 export const NuzlockeSave = connect(
     (state: State) => ({

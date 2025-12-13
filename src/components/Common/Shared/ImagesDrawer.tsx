@@ -1,12 +1,6 @@
-import {
-    Button,
-    Classes,
-    Drawer,
-    DrawerSize,
-    Icon,
-    Intent,
-    Toaster,
-} from "@blueprintjs/core";
+import { Button, Drawer, DrawerSize } from "components/Common/ui";
+import { toast } from "components/Common/ui/Toast";
+import { Trash2 } from "lucide-react";
 import { css, cx } from "emotion";
 import * as React from "react";
 import { ImageUpload } from "./ImageUpload";
@@ -16,8 +10,6 @@ import { State } from "state";
 import { isDarkModeSelector } from "selectors";
 import { Skeleton } from "./Skeletons";
 import { toggleDialog } from "actions";
-
-// 'p-1 m-1 w-40 h-40 relative flex justify-center align-center overflow-y-auto'
 
 const styles = {
     imagesDrawer: css`
@@ -87,10 +79,6 @@ class NuzlockeGeneratorDB extends Dexie {
 }
 
 export const db = new NuzlockeGeneratorDB();
-// db.version(1).stores({
-//     // eslint-disable-next-line @typescript-eslint/quotes
-//     images: `++id, image, name`
-// });
 
 import { v4 as _uuid } from "uuid";
 
@@ -139,15 +127,11 @@ export function ImagesDrawerInner() {
     }, [layoutView]);
 
     const deleteImage = (id: number) => async () => {
-        const toaster = Toaster.create();
         try {
             const _deletion = await db.images.where("id").equals(id).delete();
             setRefresh(id);
         } catch (e) {
-            toaster.show({
-                message: `Error deleting item ocurred. ${e}`,
-                intent: Intent.DANGER,
-            });
+            toast.error(`Error deleting item ocurred. ${e}`);
         }
     };
 
@@ -156,7 +140,7 @@ export function ImagesDrawerInner() {
             className={cx(
                 "images-drawer",
                 styles.imagesDrawer,
-                isDarkMode && Classes.DARK,
+                isDarkMode && "dark",
             )}
         >
             <div className="p-2 relative">
@@ -197,15 +181,14 @@ export function ImagesDrawerInner() {
                         <div className={styles.inputGroup}>
                             <input
                                 readOnly
-                                className={cx(styles.input, Classes.INPUT)}
+                                className={cx(styles.input, "px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md")}
                                 value={image.name}
                             />
                             {image?.id && (
-                                <Icon
-                                    className={styles.deleteIcon}
+                                <Trash2
+                                    size={16}
+                                    className={cx(styles.deleteIcon, "text-red-500")}
                                     onClick={deleteImage(image?.id)}
-                                    icon="trash"
-                                    intent={Intent.DANGER}
                                 />
                             )}
                         </div>
@@ -228,7 +211,7 @@ export function ImagesDrawer() {
         <Drawer
             isOpen={view?.dialogs?.imageUploader}
             size={DrawerSize.STANDARD}
-            className={isDarkMode ? Classes.DARK : ""}
+            className={isDarkMode ? "dark" : ""}
             onClose={onClose}
         >
             <React.Suspense fallback={Skeleton}>

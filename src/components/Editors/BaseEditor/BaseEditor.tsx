@@ -1,4 +1,4 @@
-import { Icon, IconName } from "@blueprintjs/core";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import * as React from "react";
 
 export interface BaseEditorState {
@@ -7,7 +7,7 @@ export interface BaseEditorState {
 
 export interface BaseEditorProps {
     name: string;
-    icon?: IconName;
+    icon?: React.ReactNode;
     defaultOpen?: boolean;
 }
 
@@ -39,16 +39,9 @@ export class BaseEditor extends React.Component<
                     onClick={this.toggleEditor}
                 >
                     <span>
-                        {/* {this.props.icon && <Icon style={{
-                            opacity: 0.7,
-                            fontSize: '90%',
-                            marginRight: '4px',
-                        }} icon={this.props.icon} />} */}
                         {this.props.name}
                     </span>
-                    <Icon
-                        icon={this.state.isOpen ? "caret-up" : "caret-down"}
-                    />
+                    {this.state.isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </h4>
                 {this.state.isOpen ? this.props.children : null}
             </div>

@@ -3,15 +3,8 @@ import { Game, Pokemon, Boxes } from "models";
 import { Game as GameName, getEncounterMap, listOfGames } from "utils";
 import { State } from "state";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon/PokemonIcon";
-import {
-    Callout,
-    Classes,
-    HTMLSelect,
-    Icon,
-    Intent,
-    TextArea,
-    Tooltip,
-} from "@blueprintjs/core";
+import { Tooltip, TextArea, HTMLSelect } from "components/Common/ui";
+import { Check, X, AlertTriangle } from "lucide-react";
 import { cx } from "emotion";
 import { useDispatch } from "react-redux";
 import { updateExcludedAreas, updateCustomAreas } from "actions";
@@ -53,7 +46,7 @@ const EncounterMap = ({
                         style={{ marginLeft: "auto", cursor: "pointer" }}
                     >
                         <Tooltip content={`Hide ${area}`}>
-                            <Icon icon="cross" />
+                            <X size={14} />
                         </Tooltip>
                     </div>
                 )}
@@ -82,7 +75,7 @@ const LocationIcon = ({
     if (poke && !poke.hidden && (!poke.gift || !excludeGifts)) {
         return (
             <>
-                <Icon icon="tick" />
+                <Check size={14} className="text-green-500" />
                 <PokemonIcon style={{ pointerEvents: "none" }} {...poke} />
             </>
         );
@@ -90,7 +83,7 @@ const LocationIcon = ({
     if (poke && poke.hidden) {
         return (
             <>
-                <Icon icon="cross" />
+                <X size={14} className="text-red-500" />
                 <PokemonIcon style={{ pointerEvents: "none" }} {...poke} />
             </>
         );
@@ -244,32 +237,29 @@ export const PokemonLocationChecklist = ({
         <div>
             <div className={"flex items-center justify-between"}>
                 <label
-                    className={cx(Classes.CONTROL, Classes.CHECKBOX)}
+                    className="flex items-center gap-2 cursor-pointer"
                     style={{ margin: ".25rem 0" }}
                 >
                     <input
                         type="checkbox"
                         checked={excludeGifts}
                         onChange={(e) => setExcludeGifts(e?.target.checked)}
+                        className="w-4 h-4 border border-border rounded bg-input"
                     />
-                    <span className={Classes.CONTROL_INDICATOR}></span>
-                    <span className={Classes.LABEL}>Exclude Gifts</span>
+                    <span className="text-sm">Exclude Gifts</span>
                 </label>
                 <label
-                    className={cx(Classes.CONTROL)}
+                    className="flex items-center gap-2"
                     style={{ margin: ".25rem 0" }}
                 >
-                    <span className={Classes.LABEL}>Filter by Game</span>
+                    <span className="text-sm">Filter by Game</span>
                     <HTMLSelect
                         style={{ marginLeft: "0.25rem" }}
                         onChange={(e) =>
                             setCurrentGame(e?.target.value as GameName)
                         }
-                    >
-                        {listOfGames.map((game) => (
-                            <option key={game}>{game}</option>
-                        ))}
-                    </HTMLSelect>
+                        options={listOfGames}
+                    />
                 </label>
             </div>
             <div className="flex" style={{ justifyContent: "center" }}>
@@ -300,13 +290,16 @@ export const PokemonLocationChecklist = ({
                     value={customAreas.join("\n")}
                 />
             </div>
-            <Callout
-                intent={Intent.WARNING}
-                style={{ fontSize: "80%", marginTop: "0.5rem" }}
+            <div
+                className="flex items-start gap-2 p-3 mt-2 rounded-md bg-yellow-50 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200"
+                style={{ fontSize: "80%" }}
             >
-                Tip: Pokémon with the &quot;hidden&quot; attribute are a great
-                option for including Pokemon that got away on a certain route!
-            </Callout>
+                <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                <span>
+                    Tip: Pokémon with the &quot;hidden&quot; attribute are a great
+                    option for including Pokemon that got away on a certain route!
+                </span>
+            </div>
         </div>
     );
 };

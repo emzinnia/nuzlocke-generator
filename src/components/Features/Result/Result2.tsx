@@ -4,7 +4,7 @@ import { cx } from "emotion";
 import { Box, Pokemon } from "models";
 import { useSelector } from "react-redux";
 import { State } from "state";
-import { Menu, MenuItem } from "@blueprintjs/core";
+import { Menu, MenuItem } from "components/Common/ui";
 import {
     Layout,
     LayoutDisplay,
@@ -40,7 +40,6 @@ const getAllByStatus = (
         ?.filter((box) => {
             return (
                 box.name.toLowerCase() === status?.toLowerCase()
-                // || box?.inheritFrom?.toLowerCase() === status?.toLowerCase()
             );
         })
         .map((box) => box.name);
@@ -107,24 +106,24 @@ export function TeamPokemonMemberView({ pokemon }: { pokemon: Pokemon }) {
     const [showContext, setShowContext] = React.useState(false);
 
     const onClick = (event) => {
-        //event.preventDefault();
         setShowContext(!showContext);
     };
 
     const renderMenu = (
-        <Menu
+        <div
             style={{
                 position: "absolute",
                 top: "70%",
                 right: "-1rem",
                 zIndex: 200,
-                boxShadow: "0 0 .25rem rgba(0,0,0,0.1)",
             }}
         >
-            <MenuItem text="Edit..." />
-            <MenuItem onClick={() => setShowContext(false)} text="Delete" />
-            <MenuItem onClick={() => setShowContext(false)} text="Cancel" />
-        </Menu>
+            <Menu>
+                <MenuItem text="Edit..." />
+                <MenuItem onClick={() => setShowContext(false)} text="Delete" />
+                <MenuItem onClick={() => setShowContext(false)} text="Cancel" />
+            </Menu>
+        </div>
     );
 
     return (
@@ -313,7 +312,6 @@ export class Result extends React.Component {
     public render() {
         return (
             <div className={cx(Styles.result_wrapper, "hide-scrollbars")}>
-                {/* @TODO fix this */}
                 {/* @ts-expect-error - TopBar ref type mismatch */}
                 <TopBar ref={this.ref} />
                 <ResultInner ref={this.ref} />

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, ButtonGroup } from "@blueprintjs/core";
+import { Button, ButtonGroup } from "components/Common/ui";
 import { last, omit } from "ramda";
 import { useDispatch, useSelector } from "react-redux";
 import { State } from "state";
@@ -52,7 +52,7 @@ export function EditorControls({ editorDarkMode, minimized }) {
                 display: minimized ? "none" : "block",
             }}
         >
-            <ButtonGroup fill className={editorStyles.buttonGroup}>
+            <ButtonGroup className={`${editorStyles.buttonGroup} w-full`}>
                 <Button
                     disabled={editorHistory?.past?.length <= 0}
                     onClick={dispatchPast}

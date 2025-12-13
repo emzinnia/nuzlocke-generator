@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useDispatch } from "react-redux";
 import { addPokemon, selectPokemon } from "actions";
-import { Button, Intent } from "@blueprintjs/core";
+import { Button } from "components/Common/ui";
 import { Pokemon } from "models";
 
 export function AddPokemonButton({ pokemon }: { pokemon: Pokemon }) {
@@ -15,7 +15,7 @@ export function AddPokemonButton({ pokemon }: { pokemon: Pokemon }) {
     return (
         <Button
             icon="add"
-            intent={Intent.SUCCESS}
+            intent="success"
             className="add-new-pokemon"
             onClick={onClick}
         >

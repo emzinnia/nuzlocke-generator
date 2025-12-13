@@ -1,11 +1,10 @@
 import * as React from "react";
-import { Tooltip, Position } from "@blueprintjs/core";
+import { Tooltip } from "components/Common/ui";
 import { Pokemon } from "models";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { sortPokes } from "utils";
 import { connect } from "react-redux";
 import { editPokemon } from "actions";
-import {} from "ramda";
 
 export interface PokemonByFilterProps {
     team: Pokemon[];
@@ -36,7 +35,7 @@ export class PokemonByFilterBase extends React.PureComponent<PokemonByFilterProp
                 <Tooltip
                     key={poke.id}
                     content={poke.nickname || poke.species}
-                    position={Position.TOP}
+                    position="top"
                 >
                     <PokemonIcon
                         style={{

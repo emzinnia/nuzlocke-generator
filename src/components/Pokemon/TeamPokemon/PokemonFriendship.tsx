@@ -1,12 +1,5 @@
-// "It looks really happy! It must love you a lot."	250-255
-// "I get the feeling that it really trusts you."	200-249
-// "It's friendly toward you. It looks sort of happy."	150-199
-// "It's quite cute."	100-149
-// "You should treat it better. It's not used to you."	50-99
-// "It doesn't seem to like you at all. It looks mean."	0-49
-
 import * as React from "react";
-import { Icon } from "@blueprintjs/core";
+import { Heart, HeartCrack } from "lucide-react";
 import { v4 as uuid } from "uuid";
 
 export const determineNumberOfHearts = (friendship: number) => {
@@ -22,11 +15,10 @@ export const generateHearts = (
     friendship: ReturnType<typeof determineNumberOfHearts>,
 ) => {
     return Array.from(Array(friendship).keys()).map((k) => (
-        <Icon
-            iconSize={12}
+        <Heart
+            size={12}
             data-testid="friendship-icon"
             key={uuid()}
-            icon="heart"
         />
     ));
 };
@@ -42,10 +34,9 @@ export function PokemonFriendship({ friendship }: PokemonFriendshipProps) {
     const numberOfHearts = determineNumberOfHearts(friendship);
     if (numberOfHearts === 0)
         return (
-            <Icon
-                iconSize={12}
+            <HeartCrack
+                size={12}
                 data-testid="friendship-broken-icon"
-                icon="heart-broken"
             />
         );
 

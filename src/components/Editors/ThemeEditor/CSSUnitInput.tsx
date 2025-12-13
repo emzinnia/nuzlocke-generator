@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Classes, HTMLSelect } from "@blueprintjs/core";
+import { HTMLSelect } from "components/Common/ui";
 import * as css from "./styles";
 import { cx } from "emotion";
 import { head, last } from "ramda";
@@ -95,21 +95,15 @@ export class CSSUnitInput extends React.Component<
 
         return (
             <div className={cx(css.componentOption, css.cssUnit)}>
-                <label className={Classes.LABEL}>{name}</label>
+                <label className="text-sm font-medium text-foreground">{name}</label>
                 <input
-                    className={cx(Classes.INPUT, css.unitInput)}
+                    className={cx("px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring", css.unitInput)}
                     name={name}
                     onChange={this.setNumber}
                     type="number"
                     value={chosenNumber}
                 />
-                <HTMLSelect onChange={this.setUnit} value={chosenUnit}>
-                    {units?.map((u) => (
-                        <option key={u} value={u}>
-                            {u}
-                        </option>
-                    ))}
-                </HTMLSelect>
+                <HTMLSelect onChange={this.setUnit} value={chosenUnit} options={units} />
             </div>
         );
     }

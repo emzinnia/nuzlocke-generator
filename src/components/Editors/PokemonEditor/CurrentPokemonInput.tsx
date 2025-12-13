@@ -14,12 +14,13 @@ import { editPokemon } from "actions";
 
 import { ErrorBoundary } from "components/Common/Shared";
 
-import { TagInput, Classes, TextArea, HTMLSelect } from "@blueprintjs/core";
+import { TagInput, TextArea, HTMLSelect } from "components/Common/ui";
 import { State } from "state";
 import { Pokemon } from "models";
 import { cx } from "emotion";
 import { useDebounceCallback } from "@react-hook/debounce";
 import { useMemo } from "react";
+import { Swords } from "lucide-react";
 
 interface CurrentPokemonInputProps {
     labelName: string;
@@ -116,13 +117,13 @@ export function PokemonAutocompleteInput({
     setEdit,
     items,
 }: PokemonInputProps) {
-    const [_isOpen, _setIsOpen] = React.useState(false);
-    const [_visibleItems, _setVisibleItems] = React.useState(items);
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [visibleItems, setVisibleItems] = React.useState(items);
     const [selectedItem, setSelectedItem] = React.useState();
     const handleKeyDown = () => {};
     const _updateItems = () => {};
-    const closeList = () => {};
-    const openList = () => {};
+    const closeList = () => setIsOpen(false);
+    const openList = () => setIsOpen(true);
 
     return (
         <>
@@ -169,7 +170,7 @@ export function PokemonTextInput({
             placeholder={placeholder}
             disabled={disabled}
             className={
-                disabled ? `${Classes.DISABLED} ${Classes.TEXT_MUTED}` : ""
+                disabled ? "opacity-50 cursor-not-allowed text-muted-foreground" : ""
             }
         />
     );
@@ -194,9 +195,10 @@ export function PokemonTextAreaInput({
             placeholder={placeholder}
             disabled={disabled}
             style={{ width: "100%" }}
+            fill
             className={
                 disabled
-                    ? `${Classes.DISABLED} ${Classes.TEXT_MUTED} ${Classes.FILL}`
+                    ? "opacity-50 cursor-not-allowed text-muted-foreground"
                     : ""
             }
         />
@@ -206,7 +208,6 @@ export function PokemonTextAreaInput({
 export function PokemonNumberInput({
     inputName,
     type,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     value,
     placeholder,
     disabled,
@@ -247,6 +248,16 @@ export function PokemonSelectInput({
             />
         ) : null;
 
+    const formattedOptions = usesKeyValue
+        ? (options as { key: string; value: string | null }[])?.map((item) => ({
+              label: item.key,
+              value: item.value ?? "",
+          }))
+        : (options as string[])?.map((item) => ({
+              label: item,
+              value: item,
+          }));
+
     return (
         <HTMLSelect
             style={inputName === "status" ? { width: "120px" } : {}}
@@ -256,19 +267,8 @@ export function PokemonSelectInput({
             }}
             value={value}
             name={inputName}
-        >
-            {!usesKeyValue
-                ? options
-                    ? (options as any)?.map((item, index) => (
-                          <option key={index}>{item}</option>
-                      ))
-                    : null
-                : (options as any)?.map((item, index) => (
-                      <option value={item.value} key={index}>
-                          {item.key}
-                      </option>
-                  ))}
-        </HTMLSelect>
+            options={formattedOptions}
+        />
     );
 }
 
@@ -297,35 +297,26 @@ export function PokemonDoubleSelectInput({
         [inputName, edit],
     );
 
+    const formattedOptions = (options as string[])?.map((item) => ({
+        label: item,
+        value: item,
+    }));
+
     return (
         <span className="double-select-wrapper">
             <HTMLSelect
                 onChange={onSelect(0)}
                 value={edit?.[inputName]?.[0]}
                 name={inputName}
-            >
-                {options
-                    ? (options as any).map((item, index) => (
-                          <option value={item} key={index}>
-                              {item}
-                          </option>
-                      ))
-                    : null}
-            </HTMLSelect>
+                options={formattedOptions}
+            />
             <span>&nbsp;</span>
             <HTMLSelect
                 onChange={onSelect(1)}
                 value={edit?.[inputName]?.[1]}
                 name={inputName}
-            >
-                {options
-                    ? (options as any).map((item, index) => (
-                          <option value={item} key={index}>
-                              {item}
-                          </option>
-                      ))
-                    : null}
-            </HTMLSelect>
+                options={formattedOptions}
+            />
         </span>
     );
 }
@@ -342,7 +333,7 @@ export function PokemonCheckboxInput({
     setEdit,
 }: PokemonInputProps) {
     return (
-        <label className={cx(Classes.CONTROL, Classes.CHECKBOX)}>
+        <label className="flex items-center gap-2 cursor-pointer">
             <input
                 onChange={(e) => {
                     onChange(e);
@@ -351,8 +342,8 @@ export function PokemonCheckboxInput({
                 checked={edit[inputName]}
                 type={type}
                 name={inputName}
+                className="w-4 h-4 border border-border rounded bg-input"
             />
-            <span className={Classes.CONTROL_INDICATOR} />
         </label>
     );
 }
@@ -379,36 +370,21 @@ export function PokemonMoveInput({
 
     return (
         <ErrorBoundary>
-            <TagInput
-                fill
-                leftIcon="ninja"
-                tagProps={(v, _i) => {
-                    // @TODO: Fix inconsitencies with bad parameter types
-                    const background =
-                        typeToColor(
-                            // @ts-expect-error @TODO: fix mapping
-                            moves(v) ||
-                                getMoveType(v?.toString()?.trim() || ""),
-                            customTypes,
-                        ) || "transparent";
-                    const color = getContrastColor(background);
-                    return {
-                        style: {
-                            background,
-                            color,
-                        },
-                    };
-                }}
-                onChange={(values) => {
-                    const edit = {
-                        moves: values,
-                    };
-                    if (selectedId) {
-                        dispatch(editPokemon(edit, selectedId));
-                    }
-                }}
-                values={value || []}
-            />
+            <div className="flex items-center gap-2">
+                <Swords size={14} className="text-muted-foreground" />
+                <TagInput
+                    values={value || []}
+                    onChange={(values) => {
+                        const edit = {
+                            moves: values,
+                        };
+                        if (selectedId) {
+                            dispatch(editPokemon(edit, selectedId));
+                        }
+                    }}
+                    className="flex-1"
+                />
+            </div>
         </ErrorBoundary>
     );
 }

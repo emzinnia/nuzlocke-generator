@@ -1,12 +1,6 @@
 import * as React from "react";
-import {
-    Button,
-    Dialog,
-    Intent,
-    TextArea,
-    Icon,
-    Classes,
-} from "@blueprintjs/core";
+import { Button, Dialog, DialogBody, TextArea } from "components/Common/ui";
+import { Trash2 } from "lucide-react";
 import { connect } from "react-redux";
 import { editRule, addRule, deleteRule, resetRules } from "actions";
 
@@ -28,7 +22,7 @@ export class RulesEditor extends React.Component<RulesEditorProps> {
                 <div className="rule-no">{index + 1}</div>
                 <TextArea
                     defaultValue={rule}
-                    className={Classes.FILL}
+                    fill
                     onChange={(e: any) =>
                         this.props.editRule(index, e.target.value)
                     }
@@ -41,10 +35,9 @@ export class RulesEditor extends React.Component<RulesEditorProps> {
                     className="rule-delete"
                     title="Delete Rule"
                 >
-                    <Icon
-                        intent={Intent.DANGER}
-                        style={{ cursor: "pointer" }}
-                        icon={"trash"}
+                    <Trash2
+                        size={16}
+                        className="text-red-500 cursor-pointer"
                     />
                 </div>
             </li>
@@ -56,7 +49,7 @@ export class RulesEditor extends React.Component<RulesEditorProps> {
             <>
                 <Button
                     onClick={(_) => this.props.addRule()}
-                    intent={Intent.PRIMARY}
+                    intent="primary"
                 >
                     Add Rule
                 </Button>
@@ -66,7 +59,7 @@ export class RulesEditor extends React.Component<RulesEditorProps> {
                         this.props.resetRules();
                         this.forceUpdate();
                     }}
-                    intent={Intent.WARNING}
+                    intent="warning"
                 >
                     Reset Rules
                 </Button>
@@ -99,11 +92,11 @@ export const RulesEditorDialogBase = (
         <Dialog
             isOpen={props.isOpen}
             onClose={props.onClose}
-            className={`rules-editor-dialog ${props.style.editorDarkMode ? Classes.DARK : ""}`}
+            className={`rules-editor-dialog ${props.style.editorDarkMode ? "dark" : ""}`}
             title="Rules Editor"
             icon="edit"
         >
-            <div className={Classes.DIALOG_BODY}>
+            <DialogBody>
                 <RulesEditor
                     rules={props.rules}
                     editRule={props.editRule}
@@ -111,7 +104,7 @@ export const RulesEditorDialogBase = (
                     deleteRule={props.deleteRule}
                     resetRules={props.resetRules}
                 />
-            </div>
+            </DialogBody>
         </Dialog>
     );
 };

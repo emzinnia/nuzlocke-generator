@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, ButtonGroup, Slider, Classes } from "@blueprintjs/core";
+import { Button, ButtonGroup, Slider } from "components/Common/ui";
 import { useSelector, useDispatch } from "react-redux";
 import { State } from "state";
 import { editStyle } from "actions";
@@ -23,11 +23,9 @@ export function ZoomLevel() {
         setZoomLevel(styleZoomLevel);
     }, [styleZoomLevel]);
 
-    //const setZoomLevel = (zoomLevel: number) => dispatch(editStyle({ zoomLevel }));
-
     return (
-        <div className={cx("style-edit", darkMode && Classes.DARK)}>
-            <ButtonGroup className={cx(darkMode && Classes.DARK)}>
+        <div className={cx("style-edit", darkMode && "dark")}>
+            <ButtonGroup className={cx(darkMode && "dark")}>
                 <Button
                     icon="zoom-out"
                     onClick={() => {
@@ -38,12 +36,14 @@ export function ZoomLevel() {
                 />{" "}
                 <Button style={{ padding: "0 1.25rem" }}>
                     <Slider
-                        onRelease={(value) => setZoomLevel(value)}
-                        onChange={onChange}
+                        onChange={(value) => {
+                            setZoomLevel(value);
+                            onChange();
+                        }}
                         value={zoomLevel}
                         min={0.2}
                         max={2}
-                        stepSize={0.1}
+                        step={0.1}
                     />
                 </Button>
                 <Button

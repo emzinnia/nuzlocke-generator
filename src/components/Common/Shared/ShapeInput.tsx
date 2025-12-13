@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Classes } from "@blueprintjs/core";
 
 export enum Shape {
     Circle,
@@ -27,7 +26,7 @@ export class ShapeInput extends React.Component<ShapeInputProps> {
 
     public render() {
         return (
-            <div className={Classes.INPUT}>
+            <div className="px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md">
                 <div className="shape">
                     {this.renderShape}
                     <input type="text" />
