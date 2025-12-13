@@ -8,8 +8,12 @@ The backend provides:
 - **User authentication** via JWT tokens
 - **Persistent storage** for nuzlocke runs in PostgreSQL
 - **Real-time synchronization** via Phoenix Channels (WebSockets)
-- **Optimistic updates** with revision-based conflict resolution
-- **Debounced writes** to minimize database load
+- **Optimistic updates** with monotonic server-side revisions (server-ordered “last write wins” for overlapping keys)
+- **Debounced writes** to minimize database load (frontend batches at ~150ms; backend debounces DB flushes at 200ms)
+
+Implementation notes:
+- Phoenix is running on **Phoenix 1.8** with **Bandit** (`Bandit.PhoenixAdapter`).
+- CORS is configured in `server/lib/nuzlocke_api_web/endpoint.ex` and (by default) allows `http://localhost:5173`, `http://localhost:3000`, and `http://localhost:8080`.
 
 ## Architecture Diagram
 
@@ -39,7 +43,8 @@ The backend provides:
 │  │     Router       │           │  │   UserSocket   │   │     │
 │  │  • /api/auth/*   │           │  │  • JWT verify  │   │     │
 │  │  • /api/runs/*   │           │  │  • Channels    │   │     │
-│  │  • /api/releases │           │  └───────┬────────┘   │     │
+│  │  • /api/roadmap  │           │  └───────┬────────┘   │     │
+│  │  • /api/releases │           │          │            │     │
 │  │  • /api/report   │           │          │            │     │
 │  └────────┬─────────┘           │          ▼            │     │
 │           │                     │  ┌────────────────┐   │     │
@@ -65,7 +70,7 @@ The backend provides:
 │  │  │  • id       │  │  • id                           │      │
 │  │  │  • email    │  │  • user_id (FK)                 │      │
 │  │  │  • password │  │  • name                         │      │
-│  │  │    _hash    │  │  • data (JSONB)                 │      │
+│  │  │    _hash    │  │  • data (map/JSONB)             │      │
 │  │  └─────────────┘  │  • revision                     │      │
 │  │                   └─────────────────────────────────┘      │
 │  └────────────────────────────────────────────────────────────┘│
@@ -105,11 +110,11 @@ Frontend                              Backend
    ├────────────────────────────────────►│
    │                                     │ Verify JWT
    │                                     │ Load from DB
-   │  { run: { id, name, data, rev } }   │
+   │  { run: { id, name, data, revision } }   │
    │◄────────────────────────────────────┤
    │                                     │
    │  Connect WebSocket                  │
-   │  ws://localhost:4000/socket         │
+   │  ws://localhost:4000/socket?token=<jwt>  │
    ├────────────────────────────────────►│
    │                                     │
    │  Join channel "run:<id>"            │
@@ -162,19 +167,12 @@ User Edit          Frontend                    RunStore              Database
 
 ### 4. Conflict Resolution
 
-Conflicts are resolved using revision numbers:
+The backend includes a `revision` counter on every run update (REST and WebSocket) and increments it on every patch it applies.
 
-```elixir
-# When a client receives an update:
-channel.on("update", ({ revision, data }) => {
-  setRun(current => {
-    if (revision > current.revision) {
-      return data;  # Accept newer revision
-    }
-    return current; # Ignore stale update
-  });
-});
-```
+Important details for this project:
+- The server does **not** accept/compare a “client revision” when applying patches, so there is no true conflict detection. Updates are applied in the order the backend processes them.
+- Patch merges are **deep merges for maps**. For non-map values (including arrays), the right-hand value **replaces** the left-hand value.
+- The frontend’s `useRunChannel` hook forwards every `update` event to consumers and tracks `currentRevision`, but it does not itself reject out-of-order events. If you need strict ordering, compare `payload.revision` against your current revision before applying.
 
 ## Key Components
 
@@ -182,7 +180,7 @@ channel.on("update", ({ revision, data }) => {
 
 #### Guardian (JWT Authentication)
 
-Located in `lib/nuzlocke_api/guardian.ex`:
+Located in `server/lib/nuzlocke_api/guardian.ex`:
 
 ```elixir
 defmodule NuzlockeApi.Guardian do
@@ -201,9 +199,19 @@ defmodule NuzlockeApi.Guardian do
 end
 ```
 
+#### Auth Pipeline + EnsureAuth plug
+
+Located in:
+- `server/lib/nuzlocke_api_web/plugs/auth_pipeline.ex`
+- `server/lib/nuzlocke_api_web/plugs/ensure_auth.ex`
+
+How it works:
+- `AuthPipeline` verifies a `Bearer <token>` header and (if present/valid) loads the user into the connection (`allow_blank: true`).
+- `EnsureAuth` blocks protected routes if there is no authenticated user (`401 { "error": "Unauthorized" }`).
+
 #### RunStore GenServer
 
-Located in `lib/nuzlocke_api/run_store.ex`:
+Located in `server/lib/nuzlocke_api/run_store.ex`:
 
 The RunStore is the heart of the real-time system. Each active run gets its own GenServer process that:
 
@@ -212,6 +220,9 @@ The RunStore is the heart of the real-time system. Each active run gets its own 
 3. **Debounces DB writes** - 200ms batching to reduce load
 4. **Broadcasts updates** - Notifies all connected clients
 5. **Auto-terminates** - Shuts down after 30 minutes of inactivity
+6. **Retries DB flushes** - If a DB write fails, it re-schedules another flush
+
+Processes are registered under `NuzlockeApi.RunStoreRegistry` and started via the `NuzlockeApi.RunStoreSupervisor` (`DynamicSupervisor`).
 
 ```elixir
 # Process lifecycle
@@ -241,7 +252,7 @@ end
 
 #### Phoenix Channels
 
-Located in `lib/nuzlocke_api_web/channels/`:
+Located in `server/lib/nuzlocke_api_web/channels/`:
 
 ```elixir
 # RunChannel handles real-time communication per run
@@ -256,6 +267,17 @@ def handle_in("patch", %{"patch" => patch}, socket) do
   RunStore.apply_patch(run_id, patch)
 end
 ```
+
+#### UserSocket / UserChannel
+
+Located in:
+- `server/lib/nuzlocke_api_web/channels/user_socket.ex`
+- `server/lib/nuzlocke_api_web/channels/user_channel.ex`
+
+Notes:
+- WebSocket connections support `?token=<jwt>`. If the token is valid, the socket is assigned `user_id`.
+- The socket also allows connecting without a token (`user_id` is `nil`), but protected channels (like `run:<id>`) enforce ownership on join.
+- The `user:<user_id>` channel is intended for server→client broadcasts. Today, `RunController.create` broadcasts `run_created` on `user:<user_id>`.
 
 ### Frontend Components
 
@@ -350,12 +372,31 @@ export function sendPatch(runId: string, patch: Partial<State>, sendFn) {
 | POST | `/api/runs/:id/patch` | Apply patch | Yes |
 | DELETE | `/api/runs/:id` | Delete run | Yes |
 
+### Roadmap Endpoints
+
+These routes are authenticated in this project.
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/roadmap` | List versions + features | Yes |
+| POST | `/api/roadmap/versions` | Create a version | Yes |
+| PUT | `/api/roadmap/versions/:id` | Update a version | Yes |
+| DELETE | `/api/roadmap/versions/:id` | Delete a version | Yes |
+| POST | `/api/roadmap/features` | Create a feature | Yes |
+| PUT | `/api/roadmap/features/:id` | Update a feature | Yes |
+| DELETE | `/api/roadmap/features/:id` | Delete a feature | Yes |
+
 ### Public Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/releases/:type` | Get GitHub releases (`latest` or `all`) |
 | POST | `/api/report` | Submit bug report |
+
+Notes on public endpoint payloads:
+- `/api/releases/latest` returns `{ status: 200, payload: { notes: [release] } }` (or an empty list if none)
+- `/api/releases/all` returns `{ status: 200, payload: { notes: [...] } }` (excluding the latest release)
+- `/api/report` requires `GH_ACCESS_TOKEN` on the backend and returns `{ status: <http-status-from-github> }` on success
 
 ### WebSocket Channels
 
@@ -372,6 +413,12 @@ export function sendPatch(runId: string, patch: Partial<State>, sendFn) {
 | `patch` | client→server | `{ patch: {...} }` | Apply a patch |
 | `get_state` | client→server | `{}` | Request current state |
 | `update` | server→client | `{ revision, data }` | State updated |
+
+**User Channel Events:**
+
+| Event | Direction | Payload | Description |
+|-------|-----------|---------|-------------|
+| `run_created` | server→client | `{ run_id }` | Run was created via REST |
 
 ## Database Schema
 
@@ -392,7 +439,7 @@ export function sendPatch(runId: string, patch: Partial<State>, sendFn) {
 | id | UUID | Primary key |
 | user_id | UUID | Foreign key to users |
 | name | string | Run name |
-| data | JSONB | Full run state |
+| data | map (JSONB) | Full run state |
 | revision | integer | Version number |
 | inserted_at | datetime | Created timestamp |
 | updated_at | datetime | Updated timestamp |
@@ -411,6 +458,19 @@ The `data` JSONB column stores the complete run state matching the frontend's Re
   ...
 }
 ```
+
+### versions / features (roadmap)
+
+| Table | Column | Type | Description |
+|------|--------|------|-------------|
+| versions | id | UUID | Primary key |
+| versions | name | string | Version name |
+| versions | position | integer | Ordering |
+| features | id | UUID | Primary key |
+| features | version_id | UUID | FK to versions |
+| features | title | string | Feature title |
+| features | status | string | `planned` / `in_progress` / `done` |
+| features | position | integer | Ordering (within a version + status lane) |
 
 ## Development
 
@@ -446,6 +506,10 @@ Backend (`server/.env`):
 GH_ACCESS_TOKEN=<github_token>
 GUARDIAN_SECRET_KEY=<jwt_secret>  # Production only
 SECRET_KEY_BASE=<phoenix_secret>  # Production only
+DATABASE_URL=<postgres_url>        # Production only (required in prod)
+PHX_HOST=<backend_host>            # Production only
+PORT=4000                          # Optional (defaults to 4000)
+PHX_SERVER=true                    # Required when running as a release
 ```
 
 ## Production Deployment
@@ -467,7 +531,9 @@ SECRET_KEY_BASE=<phoenix_secret>  # Production only
 
 ### CORS Configuration
 
-Update `lib/nuzlocke_api_web/endpoint.ex` to include production frontend domain:
+Update `server/lib/nuzlocke_api_web/endpoint.ex` to include your production frontend domain(s).
+
+Note: CORS is currently a hard-coded allowlist of localhost ports for development. For production, you’ll want to replace/extend it with your deployed frontend origin(s) (or make it configurable via env var).
 
 ```elixir
 plug CORSPlug,
