@@ -4,18 +4,27 @@ import {
     Button,
     ButtonGroup,
     Dialog,
-    Callout,
+    DialogBody,
+    DialogFooter,
     TextArea,
-    Intent,
-    Toaster,
     Switch,
-    Classes,
     Checkbox,
     Icon,
     Popover,
-    PopoverInteractionKind,
     HTMLSelect,
-} from "@blueprintjs/core";
+    Label,
+    classNames,
+} from "components/Common/ui";
+import { toast } from "components/Common/ui/Toast";
+import {
+    Database,
+    Upload,
+    Download,
+    Save,
+    Trash2,
+    Info,
+    Check,
+} from "lucide-react";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { ErrorBoundary } from "components/Common/Shared";
 import { v4 as uuid } from "uuid";
@@ -80,17 +89,11 @@ const isValidJSON = (data: string): boolean => {
     }
 };
 
-// This is to handle very weird/rare edge cases where data
-// can be parsed, but then in turn has to be "double-parsed"
 const handleExceptions = (data: State | Record<string, unknown>) => {
     let updated: Partial<State> = {};
 
     if (typeof (data as State).pokemon === "string") {
-        const toaster = Toaster.create();
-        toaster.show({
-            message: "Issue with data detected. Attempting to fix...",
-            intent: Intent.DANGER,
-        });
+        toast.error("Issue with data detected. Attempting to fix...");
         for (const prop in data) {
             try {
                 updated = {
@@ -165,21 +168,13 @@ export function SaveGameSettingsDialog({
     boxMappings,
     setBoxMappings,
 }: SaveGameSettingsDialogProps) {
-    // const select = (
-    //     <Select
-    //         items={boxes}
-    //         onItemSelect={() => {}}
-    //     >
-    //     </Select>
-    // );
-
     return (
-        <div className={cx(Classes.DIALOG_BODY, "has-nice-scrollbars")}>
+        <DialogBody className="has-nice-scrollbars">
             <Switch
-                labelElement={
+                label={
                     <>
                         <strong>Merge Data?</strong>
-                        <p className={Classes.TEXT_MUTED}>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">
                             Merges your current data with that of the save file,
                             using an ID match algorithm. Disabling this will
                             overwrite your current data with that from the save
@@ -211,19 +206,19 @@ export function SaveGameSettingsDialog({
                                 value={value.status}
                                 boxes={boxes}
                             />
-                            <div
-                                className={Classes.BUTTON}
+                            <span
+                                className="inline-flex items-center px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded"
                                 style={{
                                     marginLeft: "0.25rem",
                                     cursor: "default",
                                     width: "8rem",
                                 }}
-                            >{`Box ${value.key}`}</div>
+                            >{`Box ${value.key}`}</span>
                         </div>
                     );
                 })}
             </div>
-        </div>
+        </DialogBody>
     );
 }
 
@@ -262,11 +257,7 @@ export class DataEditorBase extends React.Component<
         if (isValidJSON(e.target.value)) {
             this.setState({ data: e.target.value });
         } else {
-            const toaster = Toaster.create();
-            toaster.show({
-                message: "Failed to parse invalid JSON",
-                intent: Intent.DANGER,
-            });
+            toast.error("Failed to parse invalid JSON");
         }
     };
 
@@ -454,11 +445,7 @@ export class DataEditorBase extends React.Component<
             };
 
             worker.onmessageerror = (err) => {
-                const toaster = Toaster.create();
-                toaster.show({
-                    message: `Failed to parse save file. ${err}`,
-                    intent: Intent.DANGER,
-                });
+                toast.error(`Failed to parse save file. ${err}`);
                 console.error(err);
             };
 
@@ -506,7 +493,7 @@ export class DataEditorBase extends React.Component<
                     }}
                 >
                     <div
-                        className={cx(Classes.LABEL, Classes.INLINE)}
+                        className="inline text-xs"
                         style={{ padding: ".25rem 0", paddingBottom: ".5rem" }}
                     >
                         <HTMLSelect
@@ -530,7 +517,7 @@ export class DataEditorBase extends React.Component<
                     </div>
 
                     <div
-                        className={cx(Classes.LABEL, Classes.INLINE)}
+                        className="inline text-xs"
                         style={{
                             padding: ".25rem 0",
                             paddingBottom: ".5rem",
@@ -539,7 +526,7 @@ export class DataEditorBase extends React.Component<
                     >
                         <input
                             style={{ padding: ".25rem" }}
-                            className={Classes.FILE_INPUT}
+                            className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                             ref={(ref) => (this.fileInput = ref)}
                             onChange={this.uploadFile(
                                 this.props.replaceState,
@@ -555,7 +542,7 @@ export class DataEditorBase extends React.Component<
                     <Button
                         onClick={() => this.setState({ isSettingsOpen: true })}
                         minimal
-                        intent={Intent.PRIMARY}
+                        intent="primary"
                     >
                         Options
                     </Button>
@@ -564,12 +551,10 @@ export class DataEditorBase extends React.Component<
                         isOpen={this.state.isSettingsOpen}
                         onClose={() => this.setState({ isSettingsOpen: false })}
                         title={"Save Upload Settings"}
-                        className={
-                            this.props.state.style.editorDarkMode
-                                ? Classes.DARK
-                                : ""
-                        }
-                        icon="floppy-disk"
+                        className={classNames({
+                            "dark": this.props.state.style.editorDarkMode,
+                        })}
+                        icon={<Save size={18} />}
                     >
                         <SaveGameSettingsDialog
                             mergeDataMode={this.state.mergeDataMode}
@@ -612,7 +597,7 @@ export class DataEditorBase extends React.Component<
 
     public render() {
         return (
-            <BaseEditor icon="database" name="Data">
+            <BaseEditor icon={<Database size={16} />} name="Data">
                 <DeleteAlert
                     onConfirm={this.clearAllData}
                     isOpen={this.state.isClearAllDataOpen}
@@ -626,24 +611,19 @@ export class DataEditorBase extends React.Component<
                             ? "Exported Nuzlocke Save"
                             : "Import Nuzlocke Save"
                     }
-                    className={
-                        this.props.state.style.editorDarkMode
-                            ? Classes.DARK
-                            : ""
-                    }
-                    icon="floppy-disk"
+                    className={classNames({
+                        "dark": this.props.state.style.editorDarkMode,
+                    })}
+                    icon={<Save size={18} />}
                 >
                     {this.state.mode === "export" ? (
                         <>
-                            <Callout>
+                            <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded m-4">
                                 Copy this and paste it somewhere safe!
-                            </Callout>
-                            <div
+                            </div>
+                            <DialogBody
                                 style={{ height: "40vh", overflow: "auto" }}
-                                className={cx(
-                                    Classes.DIALOG_BODY,
-                                    "has-nice-scrollbars",
-                                )}
+                                className="has-nice-scrollbars"
                             >
                                 <span
                                     suppressContentEditableWarning={true}
@@ -651,8 +631,8 @@ export class DataEditorBase extends React.Component<
                                 >
                                     {JSON.stringify(this.props.state, null, 2)}
                                 </span>
-                            </div>
-                            <div className={Classes.DIALOG_FOOTER}>
+                            </DialogBody>
+                            <DialogFooter>
                                 <a
                                     href={this.state.href}
                                     download={`nuzlocke_${
@@ -666,42 +646,28 @@ export class DataEditorBase extends React.Component<
                                     }_${uuid().slice(0, 4)}.json`}
                                 >
                                     <Button
-                                        icon={"download"}
-                                        intent={Intent.PRIMARY}
+                                        icon={<Download size={16} />}
+                                        intent="primary"
                                     >
                                         Download
                                     </Button>
                                 </a>
-                            </div>
+                            </DialogFooter>
                         </>
                     ) : (
                         <>
-                            <div
-                                className={cx(
-                                    Classes.DIALOG_BODY,
-                                    "has-nice-scrollbars",
-                                )}
-                            >
+                            <DialogBody className="has-nice-scrollbars">
                                 <TextArea
-                                    className={cx(
-                                        "custom-css-input",
-                                        Classes.FILL,
-                                    )}
+                                    className="custom-css-input w-full"
                                     onChange={this.uploadJSON}
                                     placeholder="Paste nuzlocke.json contents here, or use the file uploader"
                                     value={this.state.data}
-                                    large={true}
                                 />
                                 <ErrorBoundary>
                                     {this.renderTeam(this.state.data)}
                                 </ErrorBoundary>
-                            </div>
-                            <div className={Classes.DIALOG_FOOTER}>
-                                {/*<Checkbox
-                                    checked={this.state.overrideImport}
-                                    label='Overwrite current save data (will otherwise merge into nuzlocke saves)'
-                                    onChange={e => this.setState({ overrideImport: e.currentTarget.checked })}
-                                />*/}
+                            </DialogBody>
+                            <DialogFooter>
                                 <div
                                     style={{
                                         display: "flex",
@@ -711,7 +677,7 @@ export class DataEditorBase extends React.Component<
                                 >
                                     <input
                                         style={{ padding: ".25rem" }}
-                                        className={Classes.FILE_INPUT}
+                                        className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                         onChange={this.uploadNuzlockeJsonFile}
                                         type="file"
                                         id="jsonFile"
@@ -719,11 +685,11 @@ export class DataEditorBase extends React.Component<
                                         accept=".json"
                                     />
                                     <Button
-                                        icon="tick"
+                                        icon={<Check size={16} />}
                                         intent={
                                             this.state.data === ""
-                                                ? Intent.NONE
-                                                : Intent.SUCCESS
+                                                ? "none"
+                                                : "success"
                                         }
                                         onClick={this.confirmImport}
                                         disabled={
@@ -731,13 +697,14 @@ export class DataEditorBase extends React.Component<
                                                 ? true
                                                 : false
                                         }
-                                        text="Confirm"
                                         style={{
                                             marginLeft: "auto",
                                         }}
-                                    />
+                                    >
+                                        Confirm
+                                    </Button>
                                 </div>
-                            </div>
+                            </DialogFooter>
                         </>
                     )}
                 </Dialog>
@@ -745,35 +712,32 @@ export class DataEditorBase extends React.Component<
                 <ButtonGroup style={{ margin: ".25rem" }}>
                     <Button
                         onClick={() => this.importState()}
-                        icon="import"
-                        intent={Intent.PRIMARY}
+                        icon={<Upload size={16} />}
+                        intent="primary"
                     >
                         Import Data
                     </Button>
                     <Button
                         onClick={() => this.exportState(this.props.state)}
-                        icon="export"
+                        icon={<Download size={16} />}
                     >
                         Export Data
                     </Button>
-                    {/* <Button icon='add' intent={Intent.SUCCESS}>
-                        New Nuzlocke
-                    </Button> */}
                 </ButtonGroup>
                 {this.renderSaveFileUI()}
                 <ButtonGroup style={{ margin: ".25rem" }}>
                     <Button
                         minimal
-                        intent={Intent.SUCCESS}
+                        intent="success"
                         onClick={this.writeAllData}
-                        icon="floppy-disk"
+                        icon={<Save size={16} />}
                     >
                         Force Save
                     </Button>
                     <Button
-                        icon="trash"
+                        icon={<Trash2 size={16} />}
                         onClick={this.toggleClearingData}
-                        intent={Intent.DANGER}
+                        intent="danger"
                         minimal
                     >
                         Clear All Data
@@ -787,7 +751,7 @@ export class DataEditorBase extends React.Component<
                                 e.currentTarget.checked,
                             )
                         }
-                        labelElement={
+                        label={
                             <>
                                 Disable Editor History{" "}
                                 <Popover
@@ -802,11 +766,9 @@ export class DataEditorBase extends React.Component<
                                             performance on larger saves
                                         </div>
                                     }
-                                    interactionKind={
-                                        PopoverInteractionKind.HOVER
-                                    }
+                                    interactionKind="hover"
                                 >
-                                    <Icon icon="info-sign" />
+                                    <Icon icon={<Info size={14} />} />
                                 </Popover>
                             </>
                         }

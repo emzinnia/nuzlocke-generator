@@ -14,16 +14,15 @@ import {
 } from "utils";
 import {
     Button,
-    TreeNodeInfo,
-    Tree,
-    Classes,
     Menu,
     MenuItem,
     Icon,
     Switch,
     TextArea,
-    Intent,
-} from "@blueprintjs/core";
+    Input,
+    Label,
+} from "components/Common/ui";
+import { Download, Upload, LayoutGrid, Palette } from "lucide-react";
 import { ColorInput } from "components/Common/ui";
 import { ChampsPokemon, PokemonIcon, ErrorBoundary, ThemeSelect } from "components";
 import {} from "themes";
@@ -114,12 +113,17 @@ const team: Pokemon[] = [
     modelPokemonF,
 ];
 
-type ComponentNode = TreeNodeInfo & {
+interface ComponentNode {
+    id: number;
+    icon?: string;
+    isExpanded?: boolean;
+    isSelected?: boolean;
+    label: string;
     component: any;
     import?: string;
     options?: { props: any; baseProps?: any };
     childNodes?: ComponentNode[];
-};
+}
 
 const componentTree: ComponentNode[] = [
     {
@@ -219,16 +223,15 @@ export interface ThemeEditorProps {
 }
 
 export interface ThemEditorState {
-    componentTree: TreeNodeInfo[];
+    componentTree: ComponentNode[];
 }
 
 export const NumericValue = ({ name, value, onChange }) => (
     <div className={cx(css.componentOption)}>
-        <label style={{ marginBottom: 0 }} className={Classes.LABEL}>
+        <Label style={{ marginBottom: 0 }}>
             {name}
-        </label>
-        <input
-            className={Classes.INPUT}
+        </Label>
+        <Input
             name={name}
             onChange={onChange}
             type="number"
@@ -239,11 +242,10 @@ export const NumericValue = ({ name, value, onChange }) => (
 
 export const TextInput = ({ name, value, onChange }) => (
     <div className={cx(css.componentOption)}>
-        <label style={{ marginBottom: 0 }} className={Classes.LABEL}>
+        <Label style={{ marginBottom: 0 }}>
             {name}
-        </label>
-        <input
-            className={Classes.INPUT}
+        </Label>
+        <Input
             type="text"
             value={value}
             name={name}
@@ -254,9 +256,9 @@ export const TextInput = ({ name, value, onChange }) => (
 
 export const WrapWithLabel = ({ name, children }) => (
     <div className={cx(css.componentOption)}>
-        <label style={{ marginBottom: 0 }} className={Classes.LABEL}>
+        <Label style={{ marginBottom: 0 }}>
             {name}
-        </label>
+        </Label>
         {children}
     </div>
 );
@@ -284,8 +286,7 @@ export class ThemeEditorBase extends React.Component<
     }
 
     private onNodeClick = (
-        node: TreeNodeInfo,
-        _nodePath: number[],
+        node: ComponentNode,
         e: React.MouseEvent<HTMLElement>,
     ) => {
         const originallySelected = node.isSelected;
@@ -300,12 +301,12 @@ export class ThemeEditorBase extends React.Component<
         this.setState(this.state);
     };
 
-    private onNodeCollapse = (node: TreeNodeInfo) => {
+    private onNodeCollapse = (node: ComponentNode) => {
         node.isExpanded = false;
         this.setState(this.state);
     };
 
-    private onNodeExpand = (node: TreeNodeInfo) => {
+    private onNodeExpand = (node: ComponentNode) => {
         node.isExpanded = true;
         this.setState(this.state);
     };
@@ -341,15 +342,17 @@ export class ThemeEditorBase extends React.Component<
     };
 
     private forEachNode(
-        nodes: TreeNodeInfo[],
-        callback: (node: TreeNodeInfo) => void,
+        nodes: ComponentNode[],
+        callback: (node: ComponentNode) => void,
     ) {
         if (nodes == null) {
             return;
         }
         for (const node of nodes) {
             callback(node);
-            this.forEachNode(node.childNodes!, callback);
+            if (node.childNodes) {
+                this.forEachNode(node.childNodes, callback);
+            }
         }
     }
 

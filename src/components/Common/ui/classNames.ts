@@ -1,3 +1,20 @@
+type ClassValue = string | boolean | undefined | null | Record<string, boolean | undefined>;
+
+export function classNames(...args: ClassValue[]): string {
+    return args
+        .flatMap((arg) => {
+            if (!arg) return [];
+            if (typeof arg === "string") return arg;
+            if (typeof arg === "object") {
+                return Object.entries(arg)
+                    .filter(([, value]) => value)
+                    .map(([key]) => key);
+            }
+            return [];
+        })
+        .join(" ");
+}
+
 export const Classes = {
     DARK: "dark",
     LABEL: "text-sm font-medium text-foreground",

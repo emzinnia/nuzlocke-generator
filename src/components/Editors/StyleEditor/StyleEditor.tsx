@@ -254,12 +254,12 @@ export class StyleEditorBase extends React.Component<
                 </div>
 
                 <div className={styleEdit}>
-                    <label
+                    <Label
                         htmlFor="itemStyle"
-                        className={cx(Classes.LABEL, Classes.INLINE)}
+                        className="inline text-xs mr-2"
                     >
                         Item Style
-                    </label>
+                    </Label>
                     <HTMLSelect
                         name="itemStyle"
                         onChange={(e) => editEvent(e, props, undefined)}
@@ -276,12 +276,12 @@ export class StyleEditorBase extends React.Component<
                 </div>
 
                 <div className={styleEdit}>
-                    <label
+                    <Label
                         htmlFor="pokeballStyle"
-                        className={cx(Classes.LABEL, Classes.INLINE)}
+                        className="inline text-xs mr-2"
                     >
                         Pokéball Style
-                    </label>
+                    </Label>
                     <HTMLSelect
                         name="pokeballStyle"
                         onChange={(e) => editEvent(e, props, undefined)}
@@ -299,39 +299,39 @@ export class StyleEditorBase extends React.Component<
 
                 <div className={createStyleEdit(true)}>
                     <div>
-                        <label
+                        <Label
                             htmlFor="resultWidth"
-                            className={cx(Classes.LABEL, Classes.INLINE)}
+                            className="inline text-xs mr-2"
                         >
                             Result Dimensions
-                        </label>
+                        </Label>
                         <span style={{ fontSize: "80%", marginRight: "2px" }}>
                             w
                         </span>
-                        <input
+                        <Input
                             name="resultWidth"
-                            className={cx(Classes.INPUT, "small-input")}
+                            className={cx("small-input")}
                             onChange={(e) => editEvent(e, props)}
                             value={props.style.resultWidth}
                             type="number"
-                            min="0"
-                            step="10"
+                            min={0}
+                            step={10}
                         />
-                        <Icon icon="cross" style={{ marginRight: "0" }} />
+                        <Icon icon={<XIcon size={14} />} style={{ marginRight: "0" }} />
                         <span style={{ fontSize: "80%", marginRight: "2px" }}>
                             h
                         </span>
-                        <input
+                        <Input
                             name="resultHeight"
-                            className={cx(Classes.INPUT, "small-input")}
+                            className={cx("small-input")}
                             style={{
                                 opacity: props.style.useAutoHeight ? 0.3 : 1,
                             }}
                             onChange={(e) => editEvent(e, props)}
                             value={props.style.resultHeight}
                             type="number"
-                            min="0"
-                            step="10"
+                            min={0}
+                            step={10}
                         />
                     </div>
                     <div className={Styles.autoHeightCheckbox}>
@@ -360,31 +360,31 @@ export class StyleEditorBase extends React.Component<
 
                 <div className={createStyleEdit(true)}>
                     <div>
-                        <label
+                        <Label
                             htmlFor="trainerWidth"
-                            className={cx(Classes.LABEL, Classes.INLINE)}
+                            className="inline text-xs mr-2"
                         >
                             Trainer Dimensions
-                        </label>
+                        </Label>
                         <span style={{ fontSize: "80%", marginRight: "2px" }}>
                             w
                         </span>
-                        <input
+                        <Input
                             name="trainerWidth"
-                            className={cx(Classes.INPUT, "small-input")}
+                            className={cx("small-input")}
                             onChange={(e) => editEvent(e, props)}
                             style={{
                                 opacity: props.style.trainerAuto ? 0.3 : 1,
                             }}
                             value={props.style.trainerWidth}
                         />
-                        <Icon icon="cross" style={{ marginRight: "0" }} />
+                        <Icon icon={<XIcon size={14} />} style={{ marginRight: "0" }} />
                         <span style={{ fontSize: "80%", marginRight: "2px" }}>
                             h
                         </span>
-                        <input
+                        <Input
                             name="trainerHeight"
-                            className={cx(Classes.INPUT, "small-input")}
+                            className={cx("small-input")}
                             style={{
                                 opacity: props.style.trainerAuto ? 0.3 : 1,
                             }}
@@ -431,9 +431,9 @@ export class StyleEditorBase extends React.Component<
                 </div>
 
                 <div className={styleEdit}>
-                    <label className={cx(Classes.LABEL, Classes.INLINE)}>
+                    <Label className="inline text-xs mr-2">
                         Background color
-                    </label>
+                    </Label>
                     <ColorInput
                         onChange={(e) => editEvent(e, props)}
                         name={"bgColor"}
@@ -449,9 +449,9 @@ export class StyleEditorBase extends React.Component<
                 </div>
 
                 <div className={styleEdit}>
-                    <label className={cx(Classes.LABEL, Classes.INLINE)}>
+                    <Label className="inline text-xs mr-2">
                         Accent color
-                    </label>
+                    </Label>
                     <ColorInput
                         onChange={(e) => editEvent(e, props)}
                         name={"accentColor"}
@@ -467,9 +467,9 @@ export class StyleEditorBase extends React.Component<
                 </div>
 
                 <div className={styleEdit}>
-                    <label className={cx(Classes.LABEL, Classes.INLINE)}>
+                    <Label className="inline text-xs mr-2">
                         Header color
-                    </label>
+                    </Label>
                     <ColorInput
                         name="topHeaderColor"
                         onChange={(e) => editEvent(e, props)}
@@ -485,14 +485,13 @@ export class StyleEditorBase extends React.Component<
                 </div>
 
                 <div className={styleEdit}>
-                    <label className={cx(Classes.LABEL, Classes.INLINE)}>
+                    <Label className="inline text-xs mr-2">
                         Background Image
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         value={props.style.backgroundImage}
                         name="backgroundImage"
                         onChange={(e) => editEvent(e, props)}
-                        className={Classes.INPUT}
                     />
                     <span> </span>
                     <Checkbox
@@ -514,9 +513,9 @@ export class StyleEditorBase extends React.Component<
                 </div>
 
                 <div className={styleEdit}>
-                    <label className={cx(Classes.LABEL, Classes.INLINE)}>
+                    <Label className="inline text-xs mr-2">
                         Rules Location
-                    </label>
+                    </Label>
                     <HTMLSelect
                         name="displayRulesLocation"
                         onChange={(e) => editEvent(e, props, undefined)}
@@ -555,12 +554,12 @@ export class StyleEditorBase extends React.Component<
                 </div>
 
                 <div className={styleEdit}>
-                    <label
+                    <Label
                         htmlFor="teamImages"
-                        className={cx(Classes.LABEL, Classes.INLINE)}
+                        className="inline text-xs mr-2"
                     >
                         Team Images
-                    </label>
+                    </Label>
                     <HTMLSelect
                         name="teamImages"
                         onChange={(e) =>
@@ -578,10 +577,7 @@ export class StyleEditorBase extends React.Component<
                         props.game.name === "Shield") &&
                     props.style.teamImages === "shuffle" ? (
                         <div
-                            className={cx(
-                                Classes.CALLOUT,
-                                Classes.INTENT_DANGER,
-                            )}
+                            className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 rounded p-2"
                             style={calloutStyle}
                         >
                             Shuffle images are not supported for this game
@@ -599,10 +595,7 @@ export class StyleEditorBase extends React.Component<
                     ].includes(props.game.name) &&
                     props.style.teamImages === "dream world" ? (
                         <div
-                            className={cx(
-                                Classes.CALLOUT,
-                                Classes.INTENT_DANGER,
-                            )}
+                            className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 rounded p-2"
                             style={calloutStyle}
                         >
                             Dream world images are not supported for this game
@@ -611,10 +604,7 @@ export class StyleEditorBase extends React.Component<
                     {["Sword", "Shield"].includes(props.game.name) &&
                     props.style.teamImages === "tcg" ? (
                         <div
-                            className={cx(
-                                Classes.CALLOUT,
-                                Classes.INTENT_DANGER,
-                            )}
+                            className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 rounded p-2"
                             style={calloutStyle}
                         >
                             TCG images are not fully supported for this game
@@ -623,34 +613,33 @@ export class StyleEditorBase extends React.Component<
                 </div>
 
                 <div className={styleEdit}>
-                    <label
+                    <Label
                         htmlFor="boxedPokemonPerLine"
-                        className={cx(Classes.LABEL, Classes.INLINE)}
+                        className="inline text-xs mr-2"
                     >
                         Pokemon Per Line (Boxed)
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         name="boxedPokemonPerLine"
-                        className={cx(Classes.INPUT, "small-input")}
+                        className="small-input"
                         onChange={(e) => editEvent(e, props)}
                         value={props.style.boxedPokemonPerLine}
                         type="number"
-                        min="01"
-                        step="1"
-                        max="20"
+                        min={1}
+                        step={1}
+                        max={20}
                     />
                 </div>
 
                 <div className={styleEdit}>
-                    <label
+                    <Label
                         htmlFor="linkedPokemonText"
-                        className={cx(Classes.LABEL, Classes.INLINE)}
+                        className="inline text-xs mr-2"
                     >
                         Linked Pokemon Text
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         name="linkedPokemonText"
-                        className={cx(Classes.INPUT)}
                         onChange={(e) => editEvent(e, props)}
                         value={props?.style?.linkedPokemonText}
                     />
@@ -942,20 +931,20 @@ export class StyleEditorBase extends React.Component<
                 </div>
 
                 <div className="custom-css-input-wrapper">
-                    <label
-                        className={cx(Classes.LABEL, "flex", "justify-between")}
+                    <Label
+                        className="flex justify-between"
                     >
                         <span>Custom CSS</span>
                         {feature.themeEditing && (
                             <Button
                                 minimal
-                                intent={Intent.PRIMARY}
+                                intent="primary"
                                 onClick={this.toggleCSSGuide}
                             >
                                 Check out the CSS Guide!
                             </Button>
                         )}
-                    </label>
+                    </Label>
                     <TextAreaDebounced
                         name="customCSS"
                         props={props}
@@ -965,13 +954,12 @@ export class StyleEditorBase extends React.Component<
 
                 {feature.resultv2 && (
                     <div className="custom-css-input-wrapper">
-                        <label
+                        <Label
                             style={{ padding: ".5rem", marginBottom: 0 }}
-                            className={Classes.LABEL}
                         >
                             Custom Team HTML{" "}
                             {/*<a href=''>Check out Layout Guide</a>*/}
-                        </label>
+                        </Label>
                         <TextAreaDebounced
                             name="customTeamHTML"
                             props={props}

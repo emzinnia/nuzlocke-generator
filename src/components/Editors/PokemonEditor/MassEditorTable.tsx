@@ -1,101 +1,106 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import {
-    Cell,
-    Column,
-    Table,
-    CellRenderer,
-    EditableCell,
-    JSONFormat,
-} from "@blueprintjs/table";
 import { State } from "state";
 import { sortPokes, generateEmptyPokemon, normalizeSpeciesName } from "utils";
 import { PokemonKeys, Pokemon } from "models";
 import { editPokemon as editPokemonType } from "actions";
 import { AddPokemonButton } from "components/Pokemon/AddPokemonButton/AddPokemonButton";
-import { Button } from "@blueprintjs/core";
+import { Button, Input } from "components/Common/ui";
+import { Download } from "lucide-react";
 
 export interface MassEditorTableProps {
     pokemon: State["pokemon"];
     editPokemon: editPokemonType;
 }
 
-const determineCell = (key: keyof Pokemon, value: any, id, editPokemon) => {
-    if (key === "extraData") {
+interface EditableCellProps {
+    value: string;
+    onConfirm: (value: string) => void;
+}
+
+const EditableCell: React.FC<EditableCellProps> = ({ value, onConfirm }) => {
+    const [isEditing, setIsEditing] = React.useState(false);
+    const [editValue, setEditValue] = React.useState(value);
+
+    const handleBlur = () => {
+        setIsEditing(false);
+        if (editValue !== value) {
+            onConfirm(editValue);
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter") {
+            handleBlur();
+        }
+        if (e.key === "Escape") {
+            setEditValue(value);
+            setIsEditing(false);
+        }
+    };
+
+    if (isEditing) {
         return (
-            <Cell>
-                <JSONFormat>{value}</JSONFormat>
-            </Cell>
+            <Input
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onBlur={handleBlur}
+                onKeyDown={handleKeyDown}
+                autoFocus
+                className="w-full h-full border-0 p-0 text-xs"
+            />
         );
     }
-    if (key === "id") {
-        return <Cell>{id}</Cell>;
-    }
-    if (key === "checkpoints") {
-        return (
-            <Cell>
-                <JSONFormat>{value}</JSONFormat>
-            </Cell>
-        );
-    }
+
     return (
-        <EditableCell
-            onConfirm={(value) => {
-                let transformedValue: string | string[] = value;
-                if (key === "moves" || key === "types") {
-                    transformedValue = value?.split(",").map((s) => s.trim());
-                }
-                editPokemon({ [key]: transformedValue }, id);
-            }}
-            value={value}
-        />
+        <div
+            className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-1"
+            onClick={() => setIsEditing(true)}
+        >
+            {value || <span className="text-gray-400">—</span>}
+        </div>
     );
 };
 
-const cellRenderer: (
-    pokemon: Pokemon[],
-    key: keyof Pokemon,
-    editPokemon,
-) => CellRenderer =
-    (pokemon: Pokemon[], key: string, editPokemon) => (rowIndex: number) => {
-        return determineCell(
-            key as keyof Pokemon,
-            pokemon[rowIndex][key],
-            pokemon[rowIndex].id,
-            editPokemon,
-        );
-    };
+const formatValue = (value: any): string => {
+    if (value === null || value === undefined) return "";
+    if (Array.isArray(value)) return value.join(", ");
+    if (typeof value === "object") return JSON.stringify(value);
+    return String(value);
+};
 
-export function renderColumns(pokemon, editPokemon) {
-    const standardColumns = Object.keys(PokemonKeys).map((key) => {
+const determineCell = (key: keyof Pokemon, value: any, id: string, editPokemon: editPokemonType) => {
+    if (key === "extraData" || key === "checkpoints") {
         return (
-            // @ts-expect-error react return type nonsense
-            <Column
-                key={key}
-                name={key}
-                cellRenderer={cellRenderer(
-                    pokemon,
-                    key as keyof Pokemon,
-                    editPokemon,
-                )}
-            />
+            <td className="border border-gray-200 dark:border-gray-700 p-1 text-xs max-w-[150px] truncate">
+                <pre className="text-xs overflow-hidden text-ellipsis">{formatValue(value)}</pre>
+            </td>
         );
-    });
-
-    const normalizedNameColumn = (
-        <Column
-            key="normalizedName"
-            name="normalizedName"
-            cellRenderer={(rowIndex: number) => {
-                const species = pokemon[rowIndex]?.species;
-                const normalized = species ? normalizeSpeciesName(species as any) : "";
-                return <Cell>{normalized}</Cell>;
-            }}
-        />
+    }
+    if (key === "id") {
+        return (
+            <td className="border border-gray-200 dark:border-gray-700 p-1 text-xs text-gray-500">
+                {id?.slice(0, 8)}...
+            </td>
+        );
+    }
+    return (
+        <td className="border border-gray-200 dark:border-gray-700 p-0 text-xs">
+            <EditableCell
+                value={formatValue(value)}
+                onConfirm={(newValue) => {
+                    let transformedValue: string | string[] = newValue;
+                    if (key === "moves" || key === "types") {
+                        transformedValue = newValue?.split(",").map((s) => s.trim());
+                    }
+                    editPokemon({ [key]: transformedValue }, id);
+                }}
+            />
+        </td>
     );
+};
 
-    return [...standardColumns, normalizedNameColumn];
-}
+const columns = [...Object.keys(PokemonKeys), "normalizedName"];
 
 const downloadCSV = (pokemon: Pokemon[]) => {
     if (pokemon.length === 0) {
@@ -165,13 +170,50 @@ export function MassEditorTableBase({
 }: MassEditorTableProps) {
     return (
         <>
-            <Table numRows={pokemon.length} numFrozenColumns={2}>
-                {renderColumns(pokemon, editPokemon)}
-            </Table>
+            <div className="overflow-auto max-h-[60vh] border border-gray-200 dark:border-gray-700 rounded">
+                <table className="w-full border-collapse text-sm">
+                    <thead className="sticky top-0 bg-gray-100 dark:bg-gray-800">
+                        <tr>
+                            {columns.map((key) => (
+                                <th
+                                    key={key}
+                                    className="border border-gray-200 dark:border-gray-700 p-1 text-xs font-medium text-left whitespace-nowrap"
+                                >
+                                    {key}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {pokemon.map((poke) => (
+                            <tr key={poke.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
+                                {columns.map((key) => {
+                                    if (key === "normalizedName") {
+                                        return (
+                                            <td
+                                                key={key}
+                                                className="border border-gray-200 dark:border-gray-700 p-1 text-xs"
+                                            >
+                                                {poke.species ? normalizeSpeciesName(poke.species as any) : ""}
+                                            </td>
+                                        );
+                                    }
+                                    return determineCell(
+                                        key as keyof Pokemon,
+                                        poke[key as keyof Pokemon],
+                                        poke.id,
+                                        editPokemon
+                                    );
+                                })}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
             <div style={{ display: "flex", justifyContent: "space-between", paddingTop: "1rem" }}>
                 <AddPokemonButton pokemon={generateEmptyPokemon(pokemon)} />
                 <Button
-                    icon="download"
+                    icon={<Download size={16} />}
                     onClick={() => downloadCSV(pokemon)}
                 >
                     Download as CSV

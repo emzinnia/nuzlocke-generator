@@ -46,7 +46,6 @@
         "@babel/plugin-transform-modules-commonjs": "^7.14.5",
         "@babel/preset-react": "^7.14.5",
         "@babel/preset-typescript": "^7.14.5",
-        "@blueprintjs/select": "^5.3.20",
         "@builder.io/partytown": "^0.7.5",
         "@emmaramirez/dom-to-image": "^3.0.2",
         "@react-hook/debounce": "^3.0.0",
@@ -108,9 +107,6 @@
     "devDependencies": {
         "@babel/core": "^7.10.1",
         "@babel/plugin-syntax-import-meta": "^7.10.4",
-        "@blueprintjs/core": "^5.19.0",
-        "@blueprintjs/icons": "^5.9.0",
-        "@blueprintjs/table": "^5.3.14",
         "@eslint/js": "^9.26.0",
         "@tailwindcss/vite": "^4.1.17",
         "@testing-library/react": "^10.4.9",

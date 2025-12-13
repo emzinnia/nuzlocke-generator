@@ -28,16 +28,13 @@ import { cx } from "emotion";
 import * as Styles from "./styles";
 import { v4 as uuid } from "uuid";
 import {
-    Classes,
     Icon,
     Popover,
-    Position,
-    PopoverInteractionKind,
     Button,
-    Intent,
     ButtonGroup,
     Tooltip,
-} from "@blueprintjs/core";
+} from "components/Common/ui";
+import { Copy, ChevronUp, ChevronDown } from "lucide-react";
 import { addPokemon } from "actions";
 import { State } from "state";
 import { CurrentPokemonLayoutItem } from "./CurrentPokemonLayoutItem";
@@ -56,22 +53,17 @@ export const CopyPokemonButton: React.FunctionComponent<
     CopyPokemonButtonProps
 > = ({ onClick }: CopyPokemonButtonProps) => {
     return (
-        <Popover
-            interactionKind={PopoverInteractionKind.HOVER}
-            position={Position.TOP}
-            content={
-                <div
-                    style={{ padding: "1rem" }}
-                >{`Copy Pok${accentedE}mon`}</div>
-            }
+        <Tooltip
+            content={`Copy Pok${accentedE}mon`}
+            position="top"
         >
             <Icon
                 title="Copy Pokemon"
-                icon="duplicate"
+                icon={<Copy size={16} />}
                 className={cx(Styles.copyButton)}
                 onClick={onClick}
             />
-        </Popover>
+        </Tooltip>
     );
 };
 
@@ -113,8 +105,8 @@ export function EvolutionSelection({ currentPokemon, onEvolve }) {
         return (
             <Button
                 onClick={onEvolve(species)}
-                className={Classes.MINIMAL}
-                intent={Intent.PRIMARY}
+                minimal
+                intent="primary"
             >
                 Evolve
             </Button>
@@ -124,8 +116,8 @@ export function EvolutionSelection({ currentPokemon, onEvolve }) {
             <Popover
                 popoverClassName={"no-list-item-types"}
                 minimal
-                position={Position.BOTTOM_LEFT}
-                interactionKind={PopoverInteractionKind.CLICK_TARGET_ONLY}
+                position="bottom-start"
+                interactionKind="click-target-only"
                 content={
                     <>
                         {evos.map((evo) => (
@@ -143,7 +135,7 @@ export function EvolutionSelection({ currentPokemon, onEvolve }) {
                     </>
                 }
             >
-                <Button className={Classes.MINIMAL} intent={Intent.PRIMARY}>
+                <Button minimal intent="primary">
                     Evolve
                 </Button>
             </Popover>
@@ -687,7 +679,7 @@ export class CurrentPokemonEditBase extends React.Component<
                     />
                     <Button
                         className={Styles.moveEditButton}
-                        intent={Intent.PRIMARY}
+                        intent="primary"
                         onClick={this.toggleDialog}
                         minimal
                     >
@@ -705,12 +697,13 @@ export class CurrentPokemonEditBase extends React.Component<
                 <Button
                     onClick={this.expandView}
                     data-expandedview={this.state.expandedView.toString()}
-                    intent={Intent.PRIMARY}
-                    className={cx(Classes.FILL, "current-pokemon-more")}
+                    intent="primary"
+                    fill
+                    className="current-pokemon-more"
                     icon={
                         this.state.expandedView
-                            ? "symbol-triangle-up"
-                            : "symbol-triangle-down"
+                            ? <ChevronUp size={16} />
+                            : <ChevronDown size={16} />
                     }
                 >
                     {this.state.expandedView ? "Less" : "More"}
