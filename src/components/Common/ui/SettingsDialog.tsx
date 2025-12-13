@@ -1,7 +1,8 @@
 import React from "react";
-import { Settings } from "lucide-react";
+import { Settings, RotateCcw } from "lucide-react";
 import { Dialog, DialogBody, DialogFooter } from "./Dialog";
 import { Button } from "./Button";
+import { useHotkeysStore, formatHotkey, type HotkeyBinding, type HotkeyAction } from "hooks/useHotkeys";
 
 type SettingsCategoryId = "general" | "theming" | "hotkeys" | "rules" | "saves" | "plugins" | "beta";
 
@@ -86,6 +87,61 @@ const settingsCategories: SettingsCategory[] = [
     { id: "beta", label: "Beta", settings: [] },
 ];
 
+interface HotkeyInputProps {
+    binding: HotkeyBinding;
+    onUpdate: (key: string, modifiers: HotkeyBinding['modifiers']) => void;
+}
+
+const HotkeyInput: React.FC<HotkeyInputProps> = ({ binding, onUpdate }) => {
+    const [isRecording, setIsRecording] = React.useState(false);
+    const inputRef = React.useRef<HTMLButtonElement>(null);
+
+    React.useEffect(() => {
+        if (!isRecording) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (e.key === 'Escape') {
+                setIsRecording(false);
+                return;
+            }
+            
+            if (['Control', 'Shift', 'Alt', 'Meta'].includes(e.key)) {
+                return;
+            }
+
+            onUpdate(e.key, {
+                ctrl: e.ctrlKey,
+                shift: e.shiftKey,
+                alt: e.altKey,
+                meta: e.metaKey,
+            });
+            setIsRecording(false);
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isRecording, onUpdate]);
+
+    return (
+        <button
+            ref={inputRef}
+            type="button"
+            onClick={() => setIsRecording(true)}
+            onBlur={() => setIsRecording(false)}
+            className={`px-3 py-1.5 text-sm font-mono rounded border transition-colors min-w-[100px] text-center ${
+                isRecording
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-border bg-muted hover:bg-accent'
+            }`}
+        >
+            {isRecording ? 'Press keys...' : formatHotkey(binding)}
+        </button>
+    );
+};
+
 interface SettingsDialogProps {
     isOpen: boolean;
     onClose: () => void;
@@ -155,7 +211,49 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ isOpen, onClose 
         );
     };
 
+    const hotkeyBindings = useHotkeysStore((state) => state.bindings);
+    const updateBinding = useHotkeysStore((state) => state.updateBinding);
+    const resetToDefaults = useHotkeysStore((state) => state.resetToDefaults);
+
+    const renderHotkeysContent = () => {
+        return (
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <p className="text-sm text-muted-foreground">
+                        Click on a shortcut to change it. Press Escape to cancel.
+                    </p>
+                    <Button
+                        variant="ghost"
+                        onClick={resetToDefaults}
+                        className="text-xs px-2 py-1 h-auto gap-1"
+                    >
+                        <RotateCcw size={12} />
+                        Reset
+                    </Button>
+                </div>
+                <div className="space-y-2">
+                    {hotkeyBindings.map((binding) => (
+                        <div
+                            key={binding.action}
+                            className="flex items-center justify-between py-2 border-b border-border last:border-0"
+                        >
+                            <span className="text-sm">{binding.label}</span>
+                            <HotkeyInput
+                                binding={binding}
+                                onUpdate={(key, modifiers) => updateBinding(binding.action, key, modifiers)}
+                            />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
     const renderSettingsContent = () => {
+        if (activeCategory === "hotkeys") {
+            return renderHotkeysContent();
+        }
+
         const category = settingsCategories.find((item) => item.id === activeCategory);
 
         if (!category) {

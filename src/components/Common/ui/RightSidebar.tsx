@@ -7,6 +7,7 @@ import { GameSelector } from "components/Editors/GameEditor/GameSelector";
 import { Icon } from "./Icon";
 import { Button } from "./Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useHotkeyListener } from "hooks/useHotkeys";
 
 const MIN_WIDTH = 0;
 const MAX_WIDTH = 500;
@@ -83,6 +84,16 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ onRunsChange, isAuth
         localStorage.setItem(STORAGE_KEY, nextWidth.toString());
     };
 
+    const handleToggle = React.useCallback(() => {
+        if (isCollapsed) {
+            handleExpand();
+        } else {
+            handleCollapse();
+        }
+    }, [isCollapsed]);
+
+    useHotkeyListener('toggleRightSidebar', handleToggle);
+
     if (!isAuthenticated || !runId) {
         return null;
     }
@@ -92,10 +103,10 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ onRunsChange, isAuth
             <Button
                 onClick={handleExpand}
                 variant="outline"
-                className="fixed top-4 right-2 z-50 bg-sidebar text-sidebar-foreground border border-sidebar-border shadow w-10 h-12 p-0 rounded-l-lg hover:bg-sidebar/80 transition-colors flex items-center justify-center"
+                className="fixed top-20 right-0 z-50 bg-sidebar text-sidebar-foreground border border-sidebar-border shadow w-6 h-8 !p-0 rounded-l hover:bg-sidebar/80 transition-colors flex items-center justify-center"
                 aria-label="Open right sidebar"
             >
-                <Icon icon={ChevronLeft} size={22} />
+                <Icon icon={ChevronLeft} size={16} />
             </Button>
         );
     }
@@ -105,19 +116,19 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ onRunsChange, isAuth
             className="bg-sidebar text-sidebar-foreground border-l border-sidebar-border h-screen relative flex-shrink-0 transition-colors flex flex-col overflow-hidden group/sidebar"
             style={{ width }}
         >
-            <div className="absolute top-4 left-3 z-20">
+            <div className="absolute top-4 left-0 z-20">
                 <Button
                     onClick={handleCollapse}
                     variant="outline"
-                    className="w-10 h-12 p-0 bg-sidebar text-sidebar-foreground border border-sidebar-border rounded-l-lg hover:bg-sidebar/80 flex items-center justify-center shadow"
+                    className="w-6 h-8 !p-0 bg-sidebar text-sidebar-foreground border border-sidebar-border rounded-r hover:bg-sidebar/80 flex items-center justify-center shadow"
                     aria-label="Collapse right sidebar"
                 >
-                    <Icon icon={ChevronRight} size={22} />
+                    <Icon icon={ChevronRight} size={16} />
                 </Button>
             </div>
             <div
                 ref={scrollContainerRef}
-                className="p-4 overflow-x-hidden overflow-y-auto flex-1 scrollbar-gutter-stable sidebar-scroll"
+                className="pt-12 pb-4 pr-4 pl-8 overflow-x-hidden overflow-y-auto flex-1 scrollbar-gutter-stable sidebar-scroll"
             >
                 <div className="space-y-4">
                     {runId && (
