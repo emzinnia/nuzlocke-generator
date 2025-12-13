@@ -1,10 +1,12 @@
 import * as React from "react";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useRevalidator } from "react-router-dom";
 import deepmerge from "deepmerge";
 import type { Run } from "api/runs";
+import { updateRun } from "api/runs";
 import { useRunChannel } from "api/useRunChannel";
 import { RunInfographic } from "./RunInfographic";
 import { Button } from "components/Common/ui/Button";
+import { Pencil, Check, X } from "lucide-react";
 
 interface RunLoaderData {
     run: Run;
@@ -17,9 +19,16 @@ const overwriteArrays: deepmerge.Options = {
 
 export const RunPage: React.FC = () => {
     const { run } = useLoaderData() as RunLoaderData;
+    const revalidator = useRevalidator();
     
     // Local state for real-time updates
     const [runData, setRunData] = React.useState(run);
+    
+    // Editable title state
+    const [isEditingName, setIsEditingName] = React.useState(false);
+    const [editedName, setEditedName] = React.useState(run.name);
+    const [isSaving, setIsSaving] = React.useState(false);
+    const inputRef = React.useRef<HTMLInputElement>(null);
     
     // Reset local state when navigating to a different run OR when loader brings newer data
     React.useEffect(() => {
@@ -35,7 +44,57 @@ export const RunPage: React.FC = () => {
             // Keep local state if it has newer data from real-time updates
             return prev;
         });
+        // Also reset edited name when run changes
+        setEditedName(run.name);
+        setIsEditingName(false);
     }, [run]);
+    
+    // Focus input when entering edit mode
+    React.useEffect(() => {
+        if (isEditingName && inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, [isEditingName]);
+    
+    const handleStartEditing = () => {
+        setEditedName(runData.name);
+        setIsEditingName(true);
+    };
+    
+    const handleCancelEditing = () => {
+        setEditedName(runData.name);
+        setIsEditingName(false);
+    };
+    
+    const handleSaveName = async () => {
+        const trimmedName = editedName.trim();
+        if (!trimmedName || trimmedName === runData.name) {
+            handleCancelEditing();
+            return;
+        }
+        
+        setIsSaving(true);
+        try {
+            const updatedRun = await updateRun(run.id, { name: trimmedName });
+            setRunData(prev => ({ ...prev, name: updatedRun.name }));
+            setIsEditingName(false);
+            revalidator.revalidate();
+        } catch (err) {
+            console.error('Failed to rename run:', err);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+    
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleSaveName();
+        } else if (e.key === 'Escape') {
+            handleCancelEditing();
+        }
+    };
     
     // Subscribe to real-time updates via Phoenix Channel
     const { isConnected } = useRunChannel(run.id, {
@@ -64,9 +123,51 @@ export const RunPage: React.FC = () => {
     });
 
     return (
-        <div className="p-6">
+        <div className="p-6 px-14">
             <div className="flex items-center gap-3 mb-4">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{runData.name}</h1>
+                {isEditingName ? (
+                    <div className="flex items-center gap-2">
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            value={editedName}
+                            onChange={(e) => setEditedName(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            disabled={isSaving}
+                            className="text-3xl font-bold text-gray-900 dark:text-white bg-transparent border-b-2 border-primary focus:outline-none focus:border-primary/80 disabled:opacity-50 px-1"
+                        />
+                        <Button
+                            onClick={handleSaveName}
+                            disabled={isSaving}
+                            variant="ghost"
+                            className="p-1.5 h-auto w-auto text-green-600 hover:text-green-700 hover:bg-green-100 dark:hover:bg-green-900/30 rounded transition-colors"
+                            title="Save"
+                        >
+                            <Check size={20} />
+                        </Button>
+                        <Button
+                            onClick={handleCancelEditing}
+                            disabled={isSaving}
+                            variant="ghost"
+                            className="p-1.5 h-auto w-auto text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                            title="Cancel"
+                        >
+                            <X size={20} />
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="flex items-center gap-2 group">
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{runData.name}</h1>
+                        <Button
+                            onClick={handleStartEditing}
+                            variant="ghost"
+                            className="p-1.5 h-auto w-auto opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all"
+                            title="Rename run"
+                        >
+                            <Pencil size={18} />
+                        </Button>
+                    </div>
+                )}
                 {/* Real-time connection indicator */}
                 <span
                     className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${
