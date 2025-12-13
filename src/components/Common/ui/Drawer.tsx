@@ -1,41 +1,51 @@
 import React, { useEffect, useRef } from "react";
-import { X, FileText, Edit, type LucideIcon } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "./Button";
 
-const iconMap: Record<string, LucideIcon> = {
-    document: FileText,
-    edit: Edit,
-};
+type DrawerPosition = "left" | "right";
+type DrawerSize = "small" | "standard" | "large";
 
-function renderIcon(icon: string | React.ReactNode): React.ReactNode {
-    if (typeof icon === "string") {
-        const IconComponent = iconMap[icon];
-        if (IconComponent) {
-            return <IconComponent size={18} />;
-        }
-        return null;
-    }
-    return icon;
-}
-
-export interface DialogProps {
+interface DrawerProps {
     isOpen: boolean;
-    onClose: (e?: React.SyntheticEvent) => void;
+    onClose: () => void;
     title?: string;
-    icon?: string | React.ReactNode;
+    icon?: React.ReactNode;
+    position?: DrawerPosition;
+    size?: DrawerSize;
     className?: string;
     children: React.ReactNode;
 }
 
-export const Dialog: React.FC<DialogProps> = ({
+const sizeClasses: Record<DrawerSize, string> = {
+    small: "w-64",
+    standard: "w-96",
+    large: "w-[32rem]",
+};
+
+const positionClasses: Record<DrawerPosition, { container: string; panel: string; translate: string }> = {
+    left: {
+        container: "left-0",
+        panel: "left-0",
+        translate: "-translate-x-full",
+    },
+    right: {
+        container: "right-0",
+        panel: "right-0",
+        translate: "translate-x-full",
+    },
+};
+
+export const Drawer: React.FC<DrawerProps> = ({
     isOpen,
     onClose,
     title,
     icon,
+    position = "right",
+    size = "standard",
     className = "",
     children,
 }) => {
-    const dialogRef = useRef<HTMLDivElement>(null);
+    const drawerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
@@ -58,24 +68,30 @@ export const Dialog: React.FC<DialogProps> = ({
         };
     }, [isOpen]);
 
-    if (!isOpen) return null;
+    const posStyles = positionClasses[position];
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div
+            className={`fixed inset-0 z-50 transition-opacity duration-300 ${
+                isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+            }`}
+        >
             <div
                 className="absolute inset-0 bg-black/50"
                 onClick={onClose}
             />
             <div
-                ref={dialogRef}
-                className={`relative z-10 bg-card text-card-foreground rounded-lg shadow-xl border border-border max-w-lg w-full mx-4 max-h-[85vh] flex flex-col ${className}`}
+                ref={drawerRef}
+                className={`absolute top-0 ${posStyles.panel} h-full ${sizeClasses[size]} max-w-[90vw] bg-card text-card-foreground shadow-xl border-l border-border flex flex-col transition-transform duration-300 ease-out ${
+                    isOpen ? "translate-x-0" : posStyles.translate
+                } ${className}`}
             >
                 {title && (
-                    <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
                         <div className="flex items-center gap-2">
                             {icon && (
                                 <span className="text-muted-foreground">
-                                    {renderIcon(icon)}
+                                    {icon}
                                 </span>
                             )}
                             <h2 className="text-lg font-semibold">{title}</h2>
@@ -93,45 +109,22 @@ export const Dialog: React.FC<DialogProps> = ({
                     <Button
                         onClick={onClose}
                         variant="ghost"
-                        className="absolute top-3 right-3 p-1 h-auto w-auto rounded text-muted-foreground hover:text-foreground hover:bg-muted"
+                        className="absolute top-3 right-3 p-1 h-auto w-auto rounded text-muted-foreground hover:text-foreground hover:bg-muted z-10"
                     >
                         <X size={18} />
                     </Button>
                 )}
-                {children}
+                <div className="flex-1 overflow-y-auto">
+                    {children}
+                </div>
             </div>
         </div>
     );
 };
 
-export interface DialogBodyProps {
-    children: React.ReactNode;
-    className?: string;
-}
-
-export const DialogBody: React.FC<DialogBodyProps> = ({
-    children,
-    className = "",
-}) => {
-    return (
-        <div className={`px-5 py-4 overflow-y-auto flex-1 ${className}`}>
-            {children}
-        </div>
-    );
+export const DrawerSize = {
+    SMALL: "small" as DrawerSize,
+    STANDARD: "standard" as DrawerSize,
+    LARGE: "large" as DrawerSize,
 };
 
-export interface DialogFooterProps {
-    children: React.ReactNode;
-    className?: string;
-}
-
-export const DialogFooter: React.FC<DialogFooterProps> = ({
-    children,
-    className = "",
-}) => {
-    return (
-        <div className={`px-5 py-4 border-t border-border flex justify-end gap-3 ${className}`}>
-            {children}
-        </div>
-    );
-};
