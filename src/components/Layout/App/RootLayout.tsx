@@ -4,6 +4,7 @@ import { Header } from "components/Common/ui/Header";
 import { Sidebar } from "components/Common/ui/Sidebar";
 import { RightSidebar } from "components/Common/ui/RightSidebar";
 import type { RunSummary } from "api/runs";
+import { useGlobalHotkeys } from "hooks/useHotkeys";
 
 export interface RootLoaderData {
     runs: RunSummary[];
@@ -14,6 +15,8 @@ export const RootLayout: React.FC = () => {
     const { runs, isAuthenticated } = useLoaderData() as RootLoaderData;
     const navigation = useNavigation();
     const revalidator = useRevalidator();
+
+    useGlobalHotkeys();
 
     const isLoading = navigation.state === "loading";
 

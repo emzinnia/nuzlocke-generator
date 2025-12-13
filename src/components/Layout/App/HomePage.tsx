@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useRouteLoaderData, useRevalidator } from "react-router-dom";
+import { useRouteLoaderData, useRevalidator, useNavigate } from "react-router-dom";
 import { login, register } from "api/auth";
 import { useAuthStore } from "./auth";
 import type { RootLoaderData } from "./RootLayout";
@@ -11,8 +11,9 @@ export const HomePage: React.FC = () => {
     const [error, setError] = React.useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-    const { isAuthenticated } = useRouteLoaderData("root") as RootLoaderData || { isAuthenticated: false };
+    const { isAuthenticated, runs } = useRouteLoaderData("root") as RootLoaderData || { isAuthenticated: false, runs: [] };
     const revalidator = useRevalidator();
+    const navigate = useNavigate();
 
     const handleLogin = async () => {
         setError(null);
@@ -48,12 +49,21 @@ export const HomePage: React.FC = () => {
         }
     };
 
+    React.useEffect(() => {
+        if (isAuthenticated && runs.length > 0) {
+            const mostRecentRun = [...runs].sort(
+                (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+            )[0];
+            navigate(`/runs/${mostRecentRun.id}`, { replace: true });
+        }
+    }, [isAuthenticated, runs, navigate]);
+
     if (isAuthenticated) {
         return (
             <div className="p-6">
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Dashboard</h1>
                 <p className="text-gray-600 dark:text-gray-400">
-                    Welcome! You are logged in. Use the sidebar to navigate.
+                    {runs.length > 0 ? "Redirecting to your most recent run..." : "Welcome! Use the sidebar to create a new run."}
                 </p>
             </div>
         );

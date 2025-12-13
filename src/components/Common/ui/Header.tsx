@@ -1,13 +1,14 @@
 import * as React from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { useDarkMode } from "../../../hooks/useDarkMode";
-import { createRun, getRun, restoreRunState, type RunSummary } from "api/runs";
+import { createRun, deleteRun, getRun, restoreRunState, type RunSummary } from "api/runs";
 import { useUndoRedoStore } from "hooks/useUndoRedo";
 import { useAuthStore } from "components/Layout/App/auth";
 import { Keyboard } from "./Keyboard";
-import { Settings } from "lucide-react";
+import { Settings, Trash2 } from "lucide-react";
 import { Button } from "./Button";
 import { SettingsDialog } from "./SettingsDialog";
+import { DeleteRunDialog } from "./DeleteRunDialog";
 
 interface HeaderProps {
     runs: RunSummary[];
@@ -61,6 +62,8 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
+    const [runToDelete, setRunToDelete] = React.useState<RunSummary | null>(null);
+    const [isDeleting, setIsDeleting] = React.useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
     const menuRef = React.useRef<HTMLDivElement>(null);
 
@@ -88,6 +91,27 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
         navigate("/");
         onRunsChange();
         setIsMenuOpen(false);
+    };
+
+    const handleDeleteRun = async () => {
+        if (!runToDelete) return;
+        
+        setIsDeleting(true);
+        try {
+            await deleteRun(runToDelete.id);
+            onRunsChange();
+            
+            if (runId === runToDelete.id) {
+                navigate("/");
+            }
+            
+            setRunToDelete(null);
+            setIsDropdownOpen(false);
+        } catch (err) {
+            console.error('Delete failed:', err);
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     const handleUndo = React.useCallback(async () => {
@@ -299,20 +323,35 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
                                         <div className="p-2 space-y-1">
                                             {runs.length > 0 ? (
                                                 runs.map((run) => (
-                                                    <NavLink
+                                                    <div
                                                         key={run.id}
-                                                        to={`/runs/${run.id}`}
-                                                        onClick={() => setIsDropdownOpen(false)}
-                                                        className={({ isActive }) =>
-                                                            `block px-3 py-2 text-sm rounded-md transition-colors truncate ${
-                                                                isActive
-                                                                    ? "bg-primary/20 text-primary font-medium"
-                                                                    : "text-foreground hover:bg-accent"
-                                                            }`
-                                                        }
+                                                        className="flex items-center gap-1 group"
                                                     >
-                                                        {run.name}
-                                                    </NavLink>
+                                                        <NavLink
+                                                            to={`/runs/${run.id}`}
+                                                            onClick={() => setIsDropdownOpen(false)}
+                                                            className={({ isActive }) =>
+                                                                `flex-1 px-3 py-2 text-sm rounded-md transition-colors truncate ${
+                                                                    isActive
+                                                                        ? "bg-primary/20 text-primary font-medium"
+                                                                        : "text-foreground hover:bg-accent"
+                                                                }`
+                                                            }
+                                                        >
+                                                            {run.name}
+                                                        </NavLink>
+                                                        <Button
+                                                            variant="ghost"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setRunToDelete(run);
+                                                            }}
+                                                            className="p-1.5 h-auto w-auto opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded transition-all"
+                                                            title={`Delete ${run.name}`}
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </Button>
+                                                    </div>
                                                 ))
                                             ) : (
                                                 <div className="text-muted-foreground italic text-xs px-3 py-2">
@@ -421,6 +460,14 @@ export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsCha
             </div>
 
             <SettingsDialog isOpen={isSettingsOpen} onClose={closeSettings} />
+
+            <DeleteRunDialog
+                isOpen={runToDelete !== null}
+                onClose={() => setRunToDelete(null)}
+                onConfirm={handleDeleteRun}
+                runName={runToDelete?.name ?? ""}
+                isDeleting={isDeleting}
+            />
         </header>
     );
 };

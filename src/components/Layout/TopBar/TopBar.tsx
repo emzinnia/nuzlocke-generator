@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, Classes, Spinner, Intent } from "@blueprintjs/core";
+import { Button, Spinner } from "components/Common/ui";
 import { connect } from "react-redux";
 import * as styles from "components/Features/Result/styles";
 import { classWithDarkTheme, getPatchlessVersion, Styles } from "utils";
@@ -40,8 +40,6 @@ export interface TopBarState {
     isMenuOpen: boolean;
 }
 
-const darkModeStyle = (mode: boolean) => (mode ? { color: "#fff" } : {});
-
 export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
     public state = {
         isOpen: !this.props.sawRelease?.[getPatchlessVersion(version) ?? 0],
@@ -69,6 +67,7 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
         const { isMenuOpen } = this.state;
 
         const shouldShow = isMobile() ? isMenuOpen : true;
+        const darkMode = this.props.style.editorDarkMode;
 
         return (
             <div
@@ -76,7 +75,7 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                     classWithDarkTheme(
                         styles,
                         "topBar",
-                        this.props.style.editorDarkMode,
+                        darkMode,
                     ),
                     isMobile() && styles.topBar_mobile,
                     isMobile() && isMenuOpen && styles.topBar_mobile_open,
@@ -85,32 +84,24 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                 {isMobile() && (
                     <>
                         <Button
-                            style={darkModeStyle(
-                                this.props.style.editorDarkMode,
-                            )}
                             onClick={() =>
                                 this.setState((state) => ({
                                     isMenuOpen: !state.isMenuOpen,
                                 }))
                             }
-                            className={Classes.MINIMAL}
-                            icon={"menu"}
+                            minimal
+                            icon="menu"
                         >
                             Nuzlocke Generator
                         </Button>
                         <Button
                             style={{
-                                ...darkModeStyle(
-                                    this.props.style.editorDarkMode,
-                                ),
                                 zIndex: 22,
                                 position: "relative",
                             }}
                             onClick={() => this.props.toggleMobileResultView()}
-                            className={cx(
-                                Classes.MINIMAL,
-                                styles.close_result_button,
-                            )}
+                            minimal
+                            className={styles.close_result_button}
                             icon={showResultInMobile ? "cross" : "eye-open"}
                         >
                             {showResultInMobile ? "Close" : "View Result"}
@@ -121,15 +112,12 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                 {shouldShow && (
                     <>
                         <Button
-                            style={darkModeStyle(
-                                this.props.style.editorDarkMode,
-                            )}
                             onClick={() =>
                                 this.props.changeEditorSize(
                                     !this.props.editor.minimized,
                                 )
                             }
-                            className={Classes.MINIMAL}
+                            minimal
                             icon={
                                 this.props.editor.minimized
                                     ? "minimize"
@@ -143,56 +131,38 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                         </Button>
                         {isDownloading ? (
                             <Button
-                                className={Classes.MINIMAL}
+                                minimal
                                 style={{
-                                    ...darkModeStyle(
-                                        this.props.style.editorDarkMode,
-                                    ),
                                     height: "30px",
                                 }}
                             >
-                                <Spinner className={"inline-flex"} size={20} />{" "}
+                                <Spinner size="small" className="inline-flex" />{" "}
                                 Downloading
                             </Button>
                         ) : (
                             <Button
-                                style={darkModeStyle(
-                                    this.props.style.editorDarkMode,
-                                )}
                                 onClick={this.props.onClickDownload}
-                                className={Classes.MINIMAL}
+                                minimal
                                 icon="download"
                             >
                                 Download Image
                             </Button>
                         )}
                         <Button
-                            style={darkModeStyle(
-                                this.props.style.editorDarkMode,
-                            )}
                             onClick={() => {
                                 this.props.editStyle({
-                                    editorDarkMode:
-                                        !this.props.style.editorDarkMode,
+                                    editorDarkMode: !darkMode,
                                 });
                             }}
-                            className={Classes.MINIMAL}
-                            icon={
-                                this.props.style.editorDarkMode
-                                    ? "flash"
-                                    : "moon"
-                            }
+                            minimal
+                            icon={darkMode ? "flash" : "moon"}
                         >
-                            {this.props.style.editorDarkMode ? "Light" : "Dark"}{" "}
-                            Mode
+                            {darkMode ? "Light" : "Dark"} Mode
                         </Button>
                         {this.props.children}
                         <Button
-                            style={darkModeStyle(
-                                this.props.style.editorDarkMode,
-                            )}
                             onClick={this.toggleDialog}
-                            className={Classes.MINIMAL}
+                            minimal
                             icon="star"
                         >
                             {version}
