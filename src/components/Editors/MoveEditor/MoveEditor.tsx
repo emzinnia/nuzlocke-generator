@@ -4,12 +4,14 @@ import { State } from "state";
 import { movesByType, getListOfTypes } from "utils";
 import {
     Dialog,
-    Intent,
+    DialogBody,
     Button,
     Icon,
-    Classes,
     HTMLSelect,
-} from "@blueprintjs/core";
+    Input,
+    Label,
+    classNames,
+} from "components/Common/ui";
 import { Move } from "components/Pokemon/TeamPokemon/Moves";
 import {
     editCustomMoveMap,
@@ -21,6 +23,7 @@ import {
 import { ErrorBoundary } from "components";
 import { TypesEditor } from "./TypesEditor";
 import { cx } from "emotion";
+import { Trash, Search, Edit } from "lucide-react";
 
 export interface MoveEditorProps {
     game: State["game"];
@@ -115,7 +118,7 @@ export class MoveEditorBase extends React.Component<
                                 position: "absolute",
                                 cursor: "pointer",
                             }}
-                            icon="trash"
+                            icon={<Trash size={16} />}
                         />
                     </div>
                 );
@@ -179,15 +182,14 @@ export class MoveEditorBase extends React.Component<
         return (
             <ErrorBoundary>
                 <Dialog
-                    icon="edit"
-                    canOutsideClickClose={false}
+                    icon={<Edit size={18} />}
                     isOpen={isOpen}
                     onClose={toggleDialog}
-                    className={`wide-dialog ${style.editorDarkMode ? Classes.DARK : ""}`}
+                    className={classNames("wide-dialog", { dark: style.editorDarkMode })}
                     title="Move Editor"
                 >
-                    <div
-                        className={cx(Classes.DIALOG_BODY, "move-editor")}
+                    <DialogBody
+                        className={cx("move-editor")}
                         style={{
                             height: "800px",
                         }}
@@ -205,41 +207,36 @@ export class MoveEditorBase extends React.Component<
                             }}
                             className="add-move-wrapper"
                         >
-                            <label
+                            <Label
                                 style={{ padding: "0.5rem" }}
-                                className={cx(Classes.INLINE)}
+                                className="inline"
                             >
                                 Add A Move
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 placeholder="Move Name"
                                 style={{ width: "10rem", margin: "0 .25rem" }}
                                 onChange={(e) =>
                                     this.setState({ moveName: e.target.value })
                                 }
                                 value={moveName}
-                                className={Classes.INPUT}
                                 type="text"
                             />
-                            <div
-                                className={Classes.SELECT}
+                            <HTMLSelect
                                 style={{ width: "8rem", margin: "0 .25rem" }}
+                                onChange={(e) =>
+                                    this.setState({
+                                        moveType: e.target.value,
+                                    })
+                                }
+                                value={moveType}
                             >
-                                <select
-                                    onChange={(e) =>
-                                        this.setState({
-                                            moveType: e.target.value,
-                                        })
-                                    }
-                                    value={moveType}
-                                >
-                                    {types.map((opt) => (
-                                        <option key={opt} value={opt}>
-                                            {opt}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                                {types.map((opt) => (
+                                    <option key={opt} value={opt}>
+                                        {opt}
+                                    </option>
+                                ))}
+                            </HTMLSelect>
                             <Button
                                 style={{ margin: "0 .25rem" }}
                                 onClick={(_e) => {
@@ -248,7 +245,7 @@ export class MoveEditorBase extends React.Component<
                                         moveName,
                                     );
                                 }}
-                                intent={Intent.PRIMARY}
+                                intent="primary"
                                 disabled={!(moveType && moveName)}
                             >
                                 Add Move
@@ -274,18 +271,17 @@ export class MoveEditorBase extends React.Component<
                                 }}
                             >
                                 <div
-                                    className={Classes.INPUT_GROUP}
+                                    className="flex items-center gap-2"
                                     style={{
                                         width: "50%",
                                         margin: "0 auto",
                                         position: "sticky",
                                     }}
                                 >
-                                    <Icon icon="search" />
-                                    <input
+                                    <Icon icon={<Search size={16} />} />
+                                    <Input
                                         value={this.state.searchTerm}
                                         onInput={this.onSearch}
-                                        className={Classes.INPUT}
                                         type="search"
                                         dir="auto"
                                     />
@@ -309,7 +305,7 @@ export class MoveEditorBase extends React.Component<
                                 />
                             </div>
                         </div>
-                    </div>
+                    </DialogBody>
                 </Dialog>
             </ErrorBoundary>
         );

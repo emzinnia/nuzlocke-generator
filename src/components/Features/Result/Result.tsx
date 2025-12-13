@@ -12,7 +12,7 @@ import {
 import { DeadPokemon } from "components/Pokemon/DeadPokemon/DeadPokemon";
 import { BoxedPokemon } from "components/Pokemon/BoxedPokemon/BoxedPokemon";
 import { ChampsPokemon } from "components/Pokemon/ChampsPokemon/ChampsPokemon";
-import { TrainerResult } from "components/Features/Result/TrainerResult"; // Self-referential? Or maybe Result2?
+import { TrainerResult } from "components/Features/Result/TrainerResult";
 import { TopBar } from "components/Layout/TopBar/TopBar";
 import { ErrorBoundary } from "components/Common/Shared";
 import { Stats } from "./Stats";
@@ -35,12 +35,11 @@ import "./Result.css";
 import "./themes.css";
 import { State } from "state";
 import isMobile from "is-mobile";
-import { Button, Classes, MenuItem } from "@blueprintjs/core";
+import { Button, HTMLSelect, Menu, MenuItem } from "components/Common/ui";
 import { clamp } from "ramda";
 import { resultSelector } from "selectors";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { normalizeSpeciesName } from "utils/getters/normalizeSpeciesName";
-import { Select } from "@blueprintjs/select";
 
 async function load() {
     const resource = await import("@emmaramirez/dom-to-image");
@@ -88,30 +87,13 @@ type ZoomValue = (typeof ZoomValues)[number];
 const convertToPercentage = (n: number) => `${n * 100}%`;
 
 const TopBarItems = ({ editorDarkMode, setZoomLevel, currentZoomLevel }) => {
-    // @TODO: make this look decent
     return (
-        <Select<ZoomValue>
-            className={cx({ "bp5-dark": editorDarkMode })}
-            filterable={false}
-            items={ZoomValues}
-            itemRenderer={(item, { handleClick }) => (
-                <MenuItem
-                    key={item.key}
-                    onClick={handleClick}
-                    text={item.value}
-                />
-            )}
-            noResults={<MenuItem disabled={true} text="No results." />}
-            onItemSelect={(item) => {
-                console.log("item", item);
-                setZoomLevel(item.key);
-            }}
-        >
-            <Button
-                text={convertToPercentage(currentZoomLevel) ?? "100%"}
-                endIcon="double-caret-vertical"
-            />
-        </Select>
+        <HTMLSelect
+            className={cx({ dark: editorDarkMode })}
+            value={currentZoomLevel}
+            onChange={(e) => setZoomLevel(parseFloat(e.target.value))}
+            options={ZoomValues.map((z) => ({ label: z.value, value: z.key.toString() }))}
+        />
     );
 };
 
@@ -395,7 +377,6 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
     };
 
     private onZoom = (e?: React.WheelEvent<HTMLElement>) => {
-        // @ts-expect-error - e may be undefined but we check shiftKey
         if (e?.shiftKey) {
             const deltaY = e?.deltaY ?? -3;
             this.setState({ zoomLevel: clamp(0.1, 5, -deltaY / 3) });
@@ -457,7 +438,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                 style={{ width: "100%", overflowY: "scroll" }}
             >
                 {isMobile() && editor.showResultInMobile && (
-                    <div className={Classes.OVERLAY_BACKDROP}></div>
+                    <div className="fixed inset-0 bg-black/50 z-40"></div>
                 )}
                 <ErrorBoundary>
                     {/* @ts-expect-error suppress typing error */}
@@ -587,42 +568,12 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                         {style.template === "Generations" &&
                         trainerSectionOrientation === "vertical" ? (
                             <div className="statuses-wrapper">
-                                {/* {this.renderContainer(
-                                        this.getPokemonByStatus('Boxed'),
-                                        paddingForVerticalTrainerSection,
-                                    box?.[1],
-                                    )}
-                                    {this.renderContainer(
-                                        this.getPokemonByStatus('Dead'),
-                                        paddingForVerticalTrainerSection,
-                                    box?.[2],
-                                    )}
-                                    {this.renderContainer(
-                                        this.getPokemonByStatus('Champs'),
-                                        paddingForVerticalTrainerSection,
-                                    box?.[3],
-                                    )} */}
                                 {this.renderOtherPokemonStatuses(
                                     paddingForVerticalTrainerSection,
                                 )}
                             </div>
                         ) : (
                             <>
-                                {/* {this.renderContainer(
-                                        this.getPokemonByStatus('Boxed'),
-                                        paddingForVerticalTrainerSection,
-                                    box?.[1],
-                                    )}
-                                    {this.renderContainer(
-                                        this.getPokemonByStatus('Dead'),
-                                        paddingForVerticalTrainerSection,
-                                    box?.[2],
-                                    )}
-                                    {this.renderContainer(
-                                        this.getPokemonByStatus('Champs'),
-                                        paddingForVerticalTrainerSection,
-                                    box?.[3],
-                                    )} */}
                                 {this.renderOtherPokemonStatuses(
                                     paddingForVerticalTrainerSection,
                                 )}

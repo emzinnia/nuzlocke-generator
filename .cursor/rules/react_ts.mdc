@@ -56,6 +56,18 @@ You are an expert in **TypeScript, React, Vite, Zustand, and Tailwind**, buildin
 * Never use `any`; prefer narrow unions, generics, or inference.
 * Avoid non-null assertions (`!`) unless unavoidable in React refs.
 * Prefer **type guards** for parsing and restoring saved runs.
+* Do not use `React.FC` as the type for function components. Instead, simply type the props
+
+Example:
+
+```tsx
+interface ComponentProps {
+  title: string;
+  name?: string;
+}
+
+const Component = ({ title, name }: ComponentProps) =>
+```
 
 ---
 

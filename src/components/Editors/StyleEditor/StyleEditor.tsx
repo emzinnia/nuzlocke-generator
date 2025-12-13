@@ -17,13 +17,13 @@ import {
     TextArea,
     Checkbox,
     Button,
-    Intent,
-    Classes,
     Drawer,
-    DrawerSize,
     Icon,
     HTMLSelect,
-} from "@blueprintjs/core";
+    Input,
+    Label,
+    classNames,
+} from "components/Common/ui";
 import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { ColorInput } from "components/Common/ui";
@@ -33,6 +33,7 @@ import { ThemeEditor } from "components/Editors/ThemeEditor/ThemeEditor";
 import { customCSSGuide as text } from "utils/customCSSGuide";
 import ReactMarkdown from "react-markdown";
 import { debounce } from "utils/debounce";
+import { Palette, X as XIcon } from "lucide-react";
 
 const editEvent = (
     e: any,
@@ -137,9 +138,8 @@ export const TextAreaDebounced = ({
 
     return (
         <TextArea
-            large={true}
             onChange={onChange}
-            className={cx("custom-css-input", Classes.FILL)}
+            className={cx("custom-css-input", "w-full")}
             value={value}
             name={name}
         />
@@ -180,16 +180,16 @@ export class StyleEditorBase extends React.Component<
             padding: "7px",
         };
         return (
-            <BaseEditor icon="style" name="Style">
+            <BaseEditor icon={<Palette size={16} />} name="Style">
                 {feature.themeEditing ? (
                     <Drawer
                         isOpen={this.state.isThemeEditorOpen}
                         onClose={this.toggleThemeEditor}
-                        size={DrawerSize.LARGE}
+                        size="large"
                         title="Theme Editor"
-                        icon="style"
+                        icon={<Palette size={18} />}
                         className={cx(Styles.dialog, {
-                            [Classes.DARK]: props.style.editorDarkMode,
+                            "dark": props.style.editorDarkMode,
                         })}
                     >
                         <ThemeEditor />
@@ -198,13 +198,13 @@ export class StyleEditorBase extends React.Component<
                 <Drawer
                     isOpen={this.state.isCSSGuideOpen}
                     onClose={this.toggleCSSGuide}
-                    size={DrawerSize.LARGE}
+                    size="large"
                     title="CSS Guide"
-                    icon="style"
+                    icon={<Palette size={18} />}
                     className={cx(
                         Styles.dialog,
                         {
-                            [Classes.DARK]: props.style.editorDarkMode,
+                            "dark": props.style.editorDarkMode,
                         },
                         "release-notes-wrapper",
                     )}
@@ -212,12 +212,12 @@ export class StyleEditorBase extends React.Component<
                     <ReactMarkdown>{text}</ReactMarkdown>
                 </Drawer>
                 <div className={styleEdit}>
-                    <label
+                    <Label
                         htmlFor="template"
-                        className={cx(Classes.LABEL, Classes.INLINE)}
+                        className="inline text-xs mr-2"
                     >
                         Template
-                    </label>
+                    </Label>
                     <HTMLSelect
                         name="template"
                         onChange={(e) =>
@@ -233,7 +233,7 @@ export class StyleEditorBase extends React.Component<
                         <Button
                             onClick={this.toggleThemeEditor}
                             style={{ marginLeft: ".25rem" }}
-                            intent={Intent.PRIMARY}
+                            intent="primary"
                             minimal
                         >
                             Edit Theme

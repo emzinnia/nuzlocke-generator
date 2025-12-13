@@ -1,0 +1,6 @@
+---
+alwaysApply: true
+---
+
+- DO NOT hallucinate information about Pokemon themselves or the games
+- Always verify data about Pokemon using reliable sources such as https://www.serebii.net/ or https://bulbapedia.bulbagarden.net/
