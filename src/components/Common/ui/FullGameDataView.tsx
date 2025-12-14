@@ -3,6 +3,7 @@ import type { FullGame } from "models/FullGame";
 import { PokemonIconPlain } from "components/Pokemon/PokemonIcon";
 import { Popover } from "./Popover";
 import { Button } from "./Button";
+import { Collapsible } from "./Collapsible";
 import { addPokemonToRun } from "api/runs";
 
 const STATUS_OPTIONS = ["Team", "Boxed", "Dead", "Champs", "Missed"] as const;
@@ -130,10 +131,7 @@ function RoutesSection({
     if (!routes.length) return null;
 
     return (
-        <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-                Routes ({routes.length})
-            </h3>
+        <Collapsible title={`Routes (${routes.length})`} defaultOpen>
             <div className="space-y-3">
                 {routes.map((route) => (
                     <RouteCard
@@ -146,7 +144,7 @@ function RoutesSection({
                     />
                 ))}
             </div>
-        </div>
+        </Collapsible>
     );
 }
 
@@ -281,16 +279,13 @@ function BossesSection({
     if (!bosses.length) return null;
 
     return (
-        <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-                Bosses ({bosses.length})
-            </h3>
+        <Collapsible title={`Bosses (${bosses.length})`} defaultOpen>
             <div className="space-y-3">
                 {bosses.map((trainer) => (
                     <TrainerCard key={trainer.id} trainer={trainer} />
                 ))}
             </div>
-        </div>
+        </Collapsible>
     );
 }
 
@@ -371,15 +366,12 @@ function TrainerRoutesSection({
     if (!orders.length) return null;
 
     return (
-        <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-                Trainer Route Orders
-            </h3>
+        <Collapsible title={`Trainer Route Orders (${orders.length})`} defaultOpen>
             <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
                 <p className="text-xs text-gray-700 dark:text-gray-300 font-mono">
                     {orders.join(", ") || "None"}
                 </p>
             </div>
-        </div>
+        </Collapsible>
     );
 }
