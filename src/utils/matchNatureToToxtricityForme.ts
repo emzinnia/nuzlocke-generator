@@ -1,7 +1,7 @@
 import { Forme } from "./Forme";
 import { Nature } from "./Nature";
 
-export const matchNatureToToxtricityForme = (nature: Nature): keyof typeof Forme => {
+export const matchNatureToToxtricityForme = (nature: Nature): "AmpedUp" | "Lowkey" => {
     const ampedNatures: Nature[] = [
         Nature.Adamant,
         Nature.Brave,
