@@ -128,6 +128,10 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
         </div>
     );
 
+    const getTypeBgColor = (type: Types) => {
+        return typeToColor(type, customTypes) ?? style?.accentColor ?? "#394b59";
+    };
+
     const chartPanel = (
         <div className="type-effectiveness-chart">
             <div className="type-matchups-caption" style={{ marginBottom: "8px" }}>
@@ -139,10 +143,12 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                         <tr>
                             <th className="matchup-matrix-corner">Atk \ Def</th>
                             {POKEMON_TYPES.map((defType) => (
-                                <th key={defType}>
-                                    <span className="type-chip" style={getTypeChipStyle(defType)}>
-                                        {defType}
-                                    </span>
+                                <th
+                                    key={defType}
+                                    className="type-header-cell"
+                                    style={{ backgroundColor: getTypeBgColor(defType) }}
+                                >
+                                    {defType}
                                 </th>
                             ))}
                         </tr>
@@ -150,10 +156,11 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                     <tbody>
                         {POKEMON_TYPES.map((atkType) => (
                             <tr key={atkType}>
-                                <th>
-                                    <span className="type-chip" style={getTypeChipStyle(atkType)}>
-                                        {atkType}
-                                    </span>
+                                <th
+                                    className="type-header-cell"
+                                    style={{ backgroundColor: getTypeBgColor(atkType) }}
+                                >
+                                    {atkType}
                                 </th>
                                 {POKEMON_TYPES.map((defType) => {
                                     const m = chart[defType]?.[atkType] ?? 1;
