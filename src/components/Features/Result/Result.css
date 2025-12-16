@@ -460,9 +460,9 @@
 }
 
 .type-matchups-card {
-    margin: 1rem auto;
+    margin: 0;
     width: 100%;
-    max-width: 1100px;
+    max-width: none;
 }
 
 .type-matchups {
@@ -503,6 +503,33 @@
     width: auto;
     border-collapse: collapse;
     font-size: 10px;
+}
+
+.team-matchup-table {
+    width: 100%;
+    font-size: 12px;
+}
+
+.team-matchup-table th,
+.team-matchup-table td {
+    padding: 6px 12px;
+    text-align: center;
+}
+
+.team-matchup-table th:first-child,
+.team-matchup-table td:first-child {
+    text-align: left;
+    width: 80px;
+}
+
+.team-matchup-table th:not(:first-child),
+.team-matchup-table td:not(:first-child) {
+    width: calc((100% - 80px) / 4);
+}
+
+.team-matchups-summary,
+.type-effectiveness-chart {
+    padding-top: 12px;
 }
 
 .matchup-table th,
