@@ -174,13 +174,6 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
         });
     }
 
-    private getPokemonByStatus(status: string) {
-        return this.props.pokemon
-            .filter((v) => v.hasOwnProperty("id"))
-            .filter((poke) => poke.status === status)
-            .filter((poke) => !poke.hidden);
-    }
-
     private getCorrectStatusWrapper(
         pokes: Pokemon[],
         box,
@@ -675,4 +668,4 @@ export const Result = connect(resultSelector, {
     selectPokemon,
     toggleMobileResultView,
     toggleDialog,
-})(ResultBase as unknown as React.ComponentType);
+})(ResultBase as unknown as React.ComponentType<ResultProps>);
