@@ -45,7 +45,7 @@
     },
     "engines": {
         "node": "^24",
-        "npm": "^10"
+        "npm": ">=11"
     },
     "keywords": [],
     "author": "Emma Ramirez <ramireze.emma.g@gmail.com> (http://emmaramirez.me)",
@@ -170,7 +170,6 @@
         "react": "^18.3.1",
         "react-docgen-typescript": "^1.2.0",
         "react-dom": "^18.3.1",
-        "react-hot-loader": "^4.13.0",
         "react-loadable": "^5.5.0",
         "react-markdown": "^7.1.2",
         "react-polyfills": "0.0.1",

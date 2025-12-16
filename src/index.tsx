@@ -13,6 +13,7 @@ import "normalize.css/normalize.css";
 
 import { isLocal } from "utils";
 import { ErrorBoundary } from "components";
+import { AppToasterHost } from "components/Common/Shared/appToaster";
 
 (window as any).global = window;
 
@@ -115,6 +116,7 @@ async function createRender() {
 
     root.render(
         <ReduxProvider store={store}>
+            <AppToasterHost />
             {isTest ? (
                 <PersistGate
                     loading={<div>Loading...</div>}

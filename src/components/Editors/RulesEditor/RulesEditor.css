@@ -53,8 +53,7 @@
     font-size: 0.9rem;
 }
 
-.bp5-dark .preset-description,
-.bp4-dark .preset-description {
+.bp5-dark .preset-description {
     background: rgba(255, 255, 255, 0.05);
 }
 
@@ -81,8 +80,7 @@
     color: #5c7080;
 }
 
-.bp5-dark .suggest-dialog-intro,
-.bp4-dark .suggest-dialog-intro {
+.bp5-dark .suggest-dialog-intro {
     color: #a7b6c2;
 }
 
@@ -92,8 +90,7 @@
     gap: 0.75rem;
 }
 
-.suggest-form .bp5-label,
-.suggest-form .bp4-label {
+.suggest-form .bp5-label {
     margin-bottom: 0;
 }
 
@@ -106,8 +103,7 @@
     overflow-y: auto;
 }
 
-.bp5-dark .suggest-preview,
-.bp4-dark .suggest-preview {
+.bp5-dark .suggest-preview {
     background: rgba(255, 255, 255, 0.05);
 }
 
