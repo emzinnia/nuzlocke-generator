@@ -582,11 +582,6 @@
     letter-spacing: 0.5px;
 }
 
-/* Prevent Blueprint dark mode from overriding type header text color */
-.bp5-dark .matchup-matrix .type-header-cell {
-    color: unset;
-}
-
 .matchup-matrix-cell[data-mult="2"] {
     background: rgba(15, 153, 96, 0.18);
 }
