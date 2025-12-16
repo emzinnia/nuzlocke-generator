@@ -77,7 +77,7 @@ export const teamMatchupTable = css`
     th:first-child,
     td:first-child {
         text-align: left;
-        width: 80px;
+        width: 64px;
     }
 
     th:not(:first-child),
