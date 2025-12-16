@@ -128,10 +128,18 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
         </div>
     );
 
-    const getTypeHeaderStyle = (type: Types) => {
+    const getTypeHeaderStyle = (type: Types): React.CSSProperties => {
         const bgColor = typeToColor(type, customTypes) ?? style?.accentColor ?? "#394b59";
-        const textColor = getContrastColor(bgColor);
-        return { backgroundColor: bgColor, color: textColor };
+        const fgColor = getContrastColor(bgColor);
+        // Add subtle text shadow for better contrast
+        const textShadow = fgColor === "#FFFFFF"
+            ? "0 1px 2px rgba(0, 0, 0, 0.5)"
+            : "0 1px 1px rgba(255, 255, 255, 0.3)";
+        return {
+            backgroundColor: bgColor,
+            color: fgColor,
+            textShadow,
+        };
     };
 
     const chartPanel = (
