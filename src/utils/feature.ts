@@ -11,6 +11,7 @@ const featuresFromEnv = {
     imageUploads: import.meta.env.VITE_IMAGE_UPLOADS,
     emmaMode: import.meta.env.VITE_EMMA_MODE,
     tcgImages: import.meta.env.VITE_TCG_IMAGES,
+    rulesetSubmission: import.meta.env.VITE_RULESET_SUBMISSION,
 };
 
 type FeatureObject = {
