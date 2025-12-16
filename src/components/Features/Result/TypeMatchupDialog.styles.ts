@@ -161,6 +161,7 @@ export const typeMatchupsLayout = css`
     display: flex;
     gap: 1rem;
     align-items: flex-start;
+    user-select: none;
 `;
 
 export const typeMatchupsTeamPreview = css`
