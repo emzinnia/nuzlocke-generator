@@ -332,11 +332,10 @@ export class DataEditorBase extends React.Component<
             mode: "export",
         });
         this.setState({ isOpen: true });
+        const stateForExport = stripEditorDarkModeForExport(state);
         this.setState({
             href: `data:text/plain;charset=utf-8,${encodeURIComponent(
-                JSON.stringify(
-                    omit(["router", "._persist", "editorHistory"], state),
-                ),
+                JSON.stringify(stateForExport),
             )}`,
         });
     };
