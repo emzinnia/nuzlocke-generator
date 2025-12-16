@@ -131,28 +131,42 @@ export const matchupMatrixCell = css`
     line-height: 32px;
     box-sizing: border-box;
 
+    /* Heatmap: stronger multiplier = more intense color */
     &[data-mult="2"] {
-        background: rgba(15, 153, 96, 0.18);
+        background: #22c55e;
+        color: #fff;
+        font-weight: 700;
     }
 
     &[data-mult="0.5"] {
-        background: rgba(194, 48, 48, 0.14);
+        background: #ef4444;
+        color: #fff;
+        font-weight: 700;
     }
 
     &[data-mult="0"] {
-        background: rgba(137, 82, 204, 0.14);
+        background: #8b5cf6;
+        color: #fff;
+        font-weight: 700;
+    }
+
+    &[data-mult="1"] {
+        background: rgba(0, 0, 0, 0.04);
     }
 
     :global(.bp5-dark) &,
     :global(.bp-3-dark) & {
         &[data-mult="2"] {
-            background: rgba(110, 231, 183, 0.18);
+            background: #16a34a;
         }
         &[data-mult="0.5"] {
-            background: rgba(255, 107, 107, 0.16);
+            background: #dc2626;
         }
         &[data-mult="0"] {
-            background: rgba(192, 132, 252, 0.16);
+            background: #7c3aed;
+        }
+        &[data-mult="1"] {
+            background: rgba(255, 255, 255, 0.06);
         }
     }
 `;
