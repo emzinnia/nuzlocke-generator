@@ -61,6 +61,15 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
         this.state = { result2: false };
     }
 
+    private addRandomPokemon = () => {
+        const species = choose(listOfPokemon);
+        const pokemon = generateEmptyPokemon(this.props.pokemon, {
+            species,
+            status: "Team",
+        });
+        this.props.addPokemon(pokemon);
+    };
+
     public componentDidMount() {
         if (feature.resultv2) {
             // TOP SECRET
@@ -154,7 +163,7 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
                         >
                             <div className="debug-panel__title">Debug Panel</div>
                             <div className="debug-panel__actions">
-                                <Button fill small onClick={noop}>
+                                <Button fill small onClick={this.addRandomPokemon}>
                                     Add Random Pokemon
                                 </Button>
                                 <Button fill small onClick={noop}>
