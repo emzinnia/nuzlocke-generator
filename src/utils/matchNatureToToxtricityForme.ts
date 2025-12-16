@@ -23,7 +23,7 @@ export const matchNatureToToxtricityForme = (
             "Sassy",
         ].includes(nature)
     ) {
-        return "Amped";
+        return "AmpedUp";
     } else {
         return "Lowkey";
     }
