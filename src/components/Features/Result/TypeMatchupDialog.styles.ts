@@ -213,8 +213,8 @@ export const typeMatchupsStatusTitle = css`
 
 export const typeMatchupsStatusList = css`
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    flex-direction: column;
+    gap: 0.35rem;
 `;
 
 export const typeMatchupsOtherEntry = css`
