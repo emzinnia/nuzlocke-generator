@@ -131,42 +131,38 @@ export const matchupMatrixCell = css`
     line-height: 32px;
     box-sizing: border-box;
 
-    /* Heatmap: stronger multiplier = more intense color */
+    /* Heatmap: higher multiplier = more opaque green */
     &[data-mult="2"] {
-        background: #22c55e;
-        color: #fff;
-        font-weight: 700;
-    }
-
-    &[data-mult="0.5"] {
-        background: #ef4444;
-        color: #fff;
-        font-weight: 700;
-    }
-
-    &[data-mult="0"] {
-        background: #8b5cf6;
+        background: rgba(34, 197, 94, 0.85);
         color: #fff;
         font-weight: 700;
     }
 
     &[data-mult="1"] {
-        background: rgba(0, 0, 0, 0.04);
+        background: rgba(34, 197, 94, 0.15);
+    }
+
+    &[data-mult="0.5"] {
+        background: rgba(34, 197, 94, 0.06);
+    }
+
+    &[data-mult="0"] {
+        background: rgba(34, 197, 94, 0.02);
     }
 
     :global(.bp5-dark) &,
     :global(.bp-3-dark) & {
         &[data-mult="2"] {
-            background: #16a34a;
-        }
-        &[data-mult="0.5"] {
-            background: #dc2626;
-        }
-        &[data-mult="0"] {
-            background: #7c3aed;
+            background: rgba(74, 222, 128, 0.85);
         }
         &[data-mult="1"] {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(74, 222, 128, 0.15);
+        }
+        &[data-mult="0.5"] {
+            background: rgba(74, 222, 128, 0.06);
+        }
+        &[data-mult="0"] {
+            background: rgba(74, 222, 128, 0.02);
         }
     }
 `;
