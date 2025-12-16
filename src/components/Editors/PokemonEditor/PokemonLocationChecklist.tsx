@@ -113,31 +113,32 @@ export const PokemonLocationChecklist = ({
     excludedAreas: string[];
     customAreas: string[];
 }) => {
-    const calcTotals = (boxes, pokemon, encounterMap, currentGame) => {
-        const encounterTotal = encounterMap.length;
-        const totals = new Map();
+    const calcTotals = (
+        boxes,
+        pokemon,
+        encounterMap,
+        currentGame: GameName,
+    ) => {
+        const encounterTotal = encounterMap.length || 1;
+        const encounterSet = new Set(encounterMap);
 
-        for (const box of boxes) {
-            totals.set(box.name, 0);
-            for (const poke of pokemon) {
-                if (
-                    poke.status === box.name &&
-                    (currentGame === "None" ||
-                        poke.gameOfOrigin === currentGame) &&
-                    encounterMap.includes(poke.met)
-                ) {
-                    const value = totals.get(box.name);
-                    totals.set(box.name, value + 1);
-                }
-            }
+        // Count pokemon per status in a single pass (avoid boxes × pokemon nested loop)
+        const counts = new Map<string, number>();
+        for (const poke of pokemon) {
+            if (!poke || poke.hidden) continue;
+            if (currentGame !== "None" && poke.gameOfOrigin !== currentGame)
+                continue;
+            if (!encounterSet.has(poke.met)) continue;
+
+            const key = poke.status ?? "";
+            counts.set(key, (counts.get(key) ?? 0) + 1);
         }
 
-        const percentages: { key: string; percentage: string }[] = [];
-        totals.forEach((total, key) => {
+        return boxes.map((box) => {
+            const total = counts.get(box.name) ?? 0;
             const percentage = `${((total / encounterTotal) * 100).toFixed(1)}%`;
-            percentages.push({ key, percentage });
+            return { key: box.name, percentage };
         });
-        return percentages;
     };
 
     const [excludeGifts, setExcludeGifts] = React.useState(false);
@@ -152,7 +153,7 @@ export const PokemonLocationChecklist = ({
     );
     const totals = React.useMemo(
         () => calcTotals(boxes, pokemon, encounterMap, currentGame),
-        [boxes, JSON.stringify(pokemon), encounterMap, currentGame],
+        [boxes, pokemon, encounterMap, currentGame],
     );
     const hideArea = (area: string) => () =>
         dispatch(updateExcludedAreas([...excludedAreas, area]));
