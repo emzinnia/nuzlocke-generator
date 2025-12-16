@@ -37,6 +37,16 @@ export function TypeMatchupDialog() {
         [pokemon],
     );
 
+    const sortedOthers = React.useMemo(
+        () =>
+            others
+                ? Object.entries(others)
+                      .map(([status, list]) => [status, [...list].sort(sortPokes)] as const)
+                      .sort(([a], [b]) => a.localeCompare(b))
+                : [],
+        [others],
+    );
+
     const textColor = getContrastColor(style?.bgColor ?? "#383840");
 
     return (
@@ -95,10 +105,10 @@ export function TypeMatchupDialog() {
                         style={{ color: textColor, minWidth: "12.5rem", maxWidth: "17.5rem" }}
                     >
                         <h4>Other Pokémon</h4>
-                        {!others || !Object.keys(others).length ? (
+                        {!sortedOthers.length ? (
                             <div>No other Pokémon</div>
                         ) : (
-                            Object.entries(others).map(([status, list]) => (
+                            sortedOthers.map(([status, list]) => (
                                 <div key={status} className={styles.typeMatchupsStatus}>
                                     <div className={styles.typeMatchupsStatusTitle}>
                                         {status} ({list.length})
@@ -107,7 +117,7 @@ export function TypeMatchupDialog() {
                                         {list.map((poke) => (
                                             <Card
                                                 key={poke.id}
-                                                className={styles.typeMatchupsOtherEntry}
+                                                className={styles.typeMatchupsTeamEntry}
                                                 style={{ borderRadius: "0.5rem" }}
                                             >
                                                 <PokemonIconPlain
