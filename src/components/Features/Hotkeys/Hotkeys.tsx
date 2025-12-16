@@ -197,7 +197,7 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         this.props.toggleDialog("imageUploader");
     }
 
-    private movePokemonUp() {
+    private movePokemonLeft() {
         if (!this.props.selectedId || !this.props.pokemon?.length) return;
         
         const currentPoke = this.props.pokemon.find(
@@ -214,7 +214,7 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
             (p) => p.id === currentPoke.id,
         );
 
-        // Can't move up if already at the top
+        // Can't move left if already at the start
         if (currentIndex <= 0) return;
 
         const targetPoke = sameStatusPokemon[currentIndex - 1];
@@ -224,7 +224,7 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         this.props.editPokemon({ position: currentPoke.position }, targetPoke.id);
     }
 
-    private movePokemonDown() {
+    private movePokemonRight() {
         if (!this.props.selectedId || !this.props.pokemon?.length) return;
         
         const currentPoke = this.props.pokemon.find(
@@ -241,7 +241,7 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
             (p) => p.id === currentPoke.id,
         );
 
-        // Can't move down if already at the bottom
+        // Can't move right if already at the end
         if (currentIndex >= sameStatusPokemon.length - 1) return;
 
         const targetPoke = sameStatusPokemon[currentIndex + 1];
@@ -249,6 +249,49 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         // Swap positions
         this.props.editPokemon({ position: targetPoke.position }, currentPoke.id);
         this.props.editPokemon({ position: currentPoke.position }, targetPoke.id);
+    }
+
+    private getOrderedBoxNames(): string[] {
+        // Get boxes sorted by position, return their names
+        return [...this.props.boxes]
+            .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+            .map((box) => box.name);
+    }
+
+    private movePokemonStatusUp() {
+        if (!this.props.selectedId || !this.props.pokemon?.length) return;
+        
+        const currentPoke = this.props.pokemon.find(
+            (p) => p.id === this.props.selectedId,
+        );
+        if (!currentPoke) return;
+
+        const orderedBoxNames = this.getOrderedBoxNames();
+        const currentStatusIndex = orderedBoxNames.indexOf(currentPoke.status);
+        
+        // Can't move up if already at the first status or status not found
+        if (currentStatusIndex <= 0) return;
+
+        const newStatus = orderedBoxNames[currentStatusIndex - 1];
+        this.props.editPokemon({ status: newStatus }, currentPoke.id);
+    }
+
+    private movePokemonStatusDown() {
+        if (!this.props.selectedId || !this.props.pokemon?.length) return;
+        
+        const currentPoke = this.props.pokemon.find(
+            (p) => p.id === this.props.selectedId,
+        );
+        if (!currentPoke) return;
+
+        const orderedBoxNames = this.getOrderedBoxNames();
+        const currentStatusIndex = orderedBoxNames.indexOf(currentPoke.status);
+        
+        // Can't move down if already at the last status or status not found
+        if (currentStatusIndex < 0 || currentStatusIndex >= orderedBoxNames.length - 1) return;
+
+        const newStatus = orderedBoxNames[currentStatusIndex + 1];
+        this.props.editPokemon({ status: newStatus }, currentPoke.id);
     }
 
     public render() {
