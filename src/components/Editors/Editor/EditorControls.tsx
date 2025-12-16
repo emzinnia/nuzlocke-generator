@@ -77,6 +77,15 @@ export function EditorControls({ editorDarkMode, minimized }) {
         >
             <ButtonGroup fill className={editorStyles.buttonGroup}>
                 <Button
+                    disabled={!hasHistory}
+                    onClick={() => setIsHistoryPanelOpen(!isHistoryPanelOpen)}
+                    minimal
+                    fill
+                    icon="history"
+                    active={isHistoryPanelOpen}
+                    title="View History"
+                />
+                <Button
                     disabled={!canUndo}
                     onClick={dispatchUndo}
                     minimal
@@ -91,15 +100,6 @@ export function EditorControls({ editorDarkMode, minimized }) {
                     fill
                     icon="redo"
                     title="Redo (Ctrl+Y)"
-                />
-                <Button
-                    disabled={!hasHistory}
-                    onClick={() => setIsHistoryPanelOpen(!isHistoryPanelOpen)}
-                    minimal
-                    fill
-                    icon="history"
-                    active={isHistoryPanelOpen}
-                    title="View History"
                 />
             </ButtonGroup>
             <HistoryPanel
