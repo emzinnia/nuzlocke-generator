@@ -196,6 +196,60 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         this.props.toggleDialog("imageUploader");
     }
 
+    private movePokemonUp() {
+        if (!this.props.selectedId || !this.props.pokemon?.length) return;
+        
+        const currentPoke = this.props.pokemon.find(
+            (p) => p.id === this.props.selectedId,
+        );
+        if (!currentPoke) return;
+
+        // Get Pokemon in the same status box, sorted by position
+        const sameStatusPokemon = this.props.pokemon
+            .filter((p) => p.status === currentPoke.status)
+            .sort(sortPokes);
+
+        const currentIndex = sameStatusPokemon.findIndex(
+            (p) => p.id === currentPoke.id,
+        );
+
+        // Can't move up if already at the top
+        if (currentIndex <= 0) return;
+
+        const targetPoke = sameStatusPokemon[currentIndex - 1];
+        
+        // Swap positions
+        this.props.editPokemon({ position: targetPoke.position }, currentPoke.id);
+        this.props.editPokemon({ position: currentPoke.position }, targetPoke.id);
+    }
+
+    private movePokemonDown() {
+        if (!this.props.selectedId || !this.props.pokemon?.length) return;
+        
+        const currentPoke = this.props.pokemon.find(
+            (p) => p.id === this.props.selectedId,
+        );
+        if (!currentPoke) return;
+
+        // Get Pokemon in the same status box, sorted by position
+        const sameStatusPokemon = this.props.pokemon
+            .filter((p) => p.status === currentPoke.status)
+            .sort(sortPokes);
+
+        const currentIndex = sameStatusPokemon.findIndex(
+            (p) => p.id === currentPoke.id,
+        );
+
+        // Can't move down if already at the bottom
+        if (currentIndex >= sameStatusPokemon.length - 1) return;
+
+        const targetPoke = sameStatusPokemon[currentIndex + 1];
+        
+        // Swap positions
+        this.props.editPokemon({ position: targetPoke.position }, currentPoke.id);
+        this.props.editPokemon({ position: currentPoke.position }, targetPoke.id);
+    }
+
     public render() {
         return <div />;
     }
