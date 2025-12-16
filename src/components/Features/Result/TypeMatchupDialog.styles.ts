@@ -193,6 +193,32 @@ export const typeMatchupsTeamEntry = css`
     }
 `;
 
+export const typeMatchupsTeamEntryRemove = css`
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem !important;
+    cursor: pointer;
+    transition: all 0.15s ease-out;
+
+    &:hover {
+        background: rgba(219, 68, 55, 0.15);
+        transform: translateX(-4px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    :global(.bp5-dark) &:hover,
+    :global(.bp-3-dark) &:hover {
+        background: rgba(239, 68, 68, 0.22);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    }
+`;
+
+export const confirmTeamButton = css`
+    margin-top: 1rem;
+    width: 100%;
+`;
+
 export const typeMatchupsMain = css`
     flex: 1;
     min-width: 0;
