@@ -28,6 +28,7 @@ import {
     feature,
     getIconFormeSuffix,
     Species,
+    Forme,
 } from "utils";
 
 import * as Styles from "./styles";
@@ -50,7 +51,7 @@ async function load() {
 
 interface ResultProps {
     pokemon: Pokemon[];
-    game: any;
+    game: State["game"];
     trainer: Trainer;
     box: State["box"];
     editor: Editor;
@@ -127,7 +128,7 @@ export function BackspriteMontage({ pokemon }: { pokemon: Pokemon[] }) {
             {pokemon.map((poke, idx) => {
                 const image = `https://img.pokemondb.net/sprites/platinum/back-normal/${(
                     normalizeSpeciesName(poke.species as Species) || ""
-                ).toLowerCase()}${getIconFormeSuffix(poke.forme as any)}.png`;
+                ).toLowerCase()}${getIconFormeSuffix(poke.forme as keyof typeof Forme)}.png`;
 
                 return (
                     <PokemonImage key={poke.id} url={image}>
@@ -268,7 +269,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
 
     private renderContainer = (
         pokemon: Pokemon[],
-        paddingForVerticalTrainerSection: any,
+        paddingForVerticalTrainerSection: React.CSSProperties,
         box?: Box,
     ) =>
         box && pokemon && pokemon.length > 0 ? (
@@ -401,8 +402,8 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
             toggleDialog,
         } = this.props;
         const pokemonWithId = (pokemon ?? [])
-            .filter((v: any) => v && (v as any).id != null)
-            .filter((p: Pokemon) => !p.hidden);
+            .filter((v): v is Pokemon => typeof (v as Pokemon).id === "string")
+            .filter((p) => !p.hidden);
         const pokemonByStatus = new Map<string, Pokemon[]>();
         for (const p of pokemonWithId) {
             const status = p.status ?? "";
@@ -674,4 +675,4 @@ export const Result = connect(resultSelector, {
     selectPokemon,
     toggleMobileResultView,
     toggleDialog,
-})(ResultBase as any);
+})(ResultBase as unknown as React.ComponentType);
