@@ -11,12 +11,13 @@ import {
 } from "actions";
 import { Pokemon } from "models";
 import { sortPokes, sortPokesReverse, noop, generateEmptyPokemon } from "utils";
-import { listOfHotkeys } from "utils";
+import { listOfHotkeys, HotkeyList } from "utils";
 import { persistor } from "store";
 import { State } from "state";
 import { createStore } from "redux";
 import { appReducers } from "reducers";
 import { Editor } from "models";
+import { HotkeyBindings } from "reducers/hotkeys";
 
 export interface HotkeysProps {
     selectPokemon: selectPokemon;
@@ -28,6 +29,7 @@ export interface HotkeysProps {
     pokemon: Pokemon[];
     selectedId: string;
     editor: Editor;
+    customHotkeys: HotkeyBindings;
 }
 
 export class HotkeysBase extends React.PureComponent<HotkeysProps> {
@@ -63,14 +65,23 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     private handleKeyDown = (event: KeyboardEvent) => {
         return;
     };
 
+    private getEffectiveKey(hotkey: HotkeyList): string {
+        // If there's a custom binding for this action, use it
+        if (hotkey.onKeyUp && this.props.customHotkeys[hotkey.onKeyUp]) {
+            return this.props.customHotkeys[hotkey.onKeyUp];
+        }
+        return hotkey.key;
+    }
+
     private handleKeyUp = (e: KeyboardEvent) => {
         listOfHotkeys.map((hotkey) => {
-            if (e.key === hotkey.key) {
+            const effectiveKey = this.getEffectiveKey(hotkey);
+            if (e.key === effectiveKey) {
                 if (this.isTextInput(e)) {
                     noop();
                 } else {
@@ -193,6 +204,7 @@ export const Hotkeys = connect(
         pokemon: state.pokemon,
         selectedId: state.selectedId,
         editor: state.editor,
+        customHotkeys: state.hotkeys,
     }),
     {
         selectPokemon,

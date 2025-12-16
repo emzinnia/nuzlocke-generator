@@ -10,3 +10,4 @@ export * from "./listOfPokemon";
 export * from "./listOfThemes";
 export * from "./listOfTrainers";
 export * from "./movesByType";
+export * from "./nuzlockeRulesets";

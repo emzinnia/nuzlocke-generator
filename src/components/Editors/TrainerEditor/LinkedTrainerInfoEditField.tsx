@@ -11,7 +11,6 @@ const mapStateToProps = (
     ownProps: TrainerInfoEditFieldProps,
 ) => {
     return {
-        // @ts-expect-error - Dynamic property access on trainer state
         value: state.trainer[ownProps.name],
     };
 };

@@ -13,29 +13,34 @@ export const initEditorHistory = (present: any): Action<INIT_EDITOR_HISTORY, any
     };
 };
 
-// Update history with a diff (not full state)
+// Update history with forward and backward diffs (not full state snapshots)
 export type UPDATE_EDITOR_HISTORY = "UPDATE_EDITOR_HISTORY";
 export const UPDATE_EDITOR_HISTORY: UPDATE_EDITOR_HISTORY = "UPDATE_EDITOR_HISTORY";
 
 export interface UpdateEditorHistoryAction extends Action<UPDATE_EDITOR_HISTORY, any> {
-    diff: DiffEntry;
+    // Forward diff: changes to go from previous state to new state
+    forwardDiff: DiffEntry;
+    // Backward diff: changes to go from new state back to previous state
+    backwardDiff: DiffEntry;
+    // The new state (kept for updating present, but not stored in history entries)
     newState: any;
 }
 
 export type updateEditorHistory = (
-    diff: DiffEntry,
+    forwardDiff: DiffEntry,
+    backwardDiff: DiffEntry,
     newState: any,
 ) => UpdateEditorHistoryAction;
 export const updateEditorHistory = (
-    diff: DiffEntry,
+    forwardDiff: DiffEntry,
+    backwardDiff: DiffEntry,
     newState: any,
 ): UpdateEditorHistoryAction => {
     return {
         type: UPDATE_EDITOR_HISTORY,
-        diff,
+        forwardDiff,
+        backwardDiff,
         newState,
-        // Keep 'present' for backwards compatibility but it's not used
-        present: newState,
     };
 };
 

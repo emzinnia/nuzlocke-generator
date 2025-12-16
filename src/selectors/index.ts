@@ -21,4 +21,5 @@ export const resultSelector = (state: Partial<State>) => ({
     box: state.box,
     rules: state.rules,
     editor: state.editor,
+    customTypes: state.customTypes,
 });

@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { v4 as uuid } from "uuid";
 import { cx } from "emotion";
 
-import { selectPokemon, toggleMobileResultView } from "actions";
+import { selectPokemon, toggleMobileResultView, toggleDialog } from "actions";
 import {
     TeamPokemon,
     TeamPokemonBaseProps,
@@ -16,6 +16,7 @@ import { TrainerResult } from "components/Features/Result/TrainerResult"; // Sel
 import { TopBar } from "components/Layout/TopBar/TopBar";
 import { ErrorBoundary } from "components/Common/Shared";
 import { Stats } from "./Stats";
+import { TypeMatchupDialog } from "./TypeMatchupDialog";
 import { Pokemon, Trainer, Editor, Box } from "models";
 import { reducers } from "reducers";
 import {
@@ -55,8 +56,10 @@ interface ResultProps {
     editor: Editor;
     selectPokemon: selectPokemon;
     toggleMobileResultView: typeof toggleMobileResultView;
+    toggleDialog: toggleDialog;
     style: State["style"];
     rules: string[];
+    customTypes: State["customTypes"];
 }
 
 interface ResultState {
@@ -395,7 +398,6 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
     };
 
     private onZoom = (e?: React.WheelEvent<HTMLElement>) => {
-        // @ts-expect-error - e may be undefined but we check shiftKey
         if (e?.shiftKey) {
             const deltaY = e?.deltaY ?? -3;
             this.setState({ zoomLevel: clamp(0.1, 5, -deltaY / 3) });
@@ -407,7 +409,16 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
     };
 
     public render() {
-        const { style, box, trainer, pokemon, editor } = this.props;
+        const {
+            style,
+            box,
+            trainer,
+            pokemon,
+            editor,
+            game,
+            customTypes,
+            toggleDialog,
+        } = this.props;
         const numberOfTeam = getNumberOf("Team", pokemon);
         const bgColor = style ? style.bgColor : "#383840";
         const topHeaderColor = style ? style.topHeaderColor : "#333333";
@@ -439,10 +450,6 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                 </ol>
             </div>
         );
-        const others = pokemon.filter(
-            (poke) =>
-                !["Team", "Boxed", "Dead", "Champs"].includes(poke.status!),
-        );
         const enableStats = style.displayStats;
         const enableChampImage = feature.emmaMode;
         const enableBackSpriteMontage = feature.emmaMode;
@@ -456,6 +463,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                 className="hide-scrollbars"
                 style={{ width: "100%", overflowY: "scroll" }}
             >
+                <TypeMatchupDialog />
                 {isMobile() && editor.showResultInMobile && (
                     <div className={Classes.OVERLAY_BACKDROP}></div>
                 )}
@@ -465,6 +473,13 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                         isDownloading={this.state.isDownloading}
                         onClickDownload={() => this.toImage()}
                     >
+                        <Button
+                            className={Classes.MINIMAL}
+                            icon="layout-group-by"
+                            onClick={() => toggleDialog("typeMatchups")}
+                        >
+                            Type Matchups
+                        </Button>
                         <TopBarItems
                             editorDarkMode={this.props.style.editorDarkMode}
                             setZoomLevel={(zoomLevel) =>
@@ -661,4 +676,5 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
 export const Result = connect(resultSelector, {
     selectPokemon,
     toggleMobileResultView,
+    toggleDialog,
 })(ResultBase as any);

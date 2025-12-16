@@ -10,7 +10,7 @@ import { BaseEditor } from "components";
 import { Box, BoxForm } from "components";
 import { ErrorBoundary } from "components";
 import { cx } from "emotion";
-import { addPokemon } from "actions";
+import { addPokemon, toggleDialog } from "actions";
 
 export interface PokemonEditorProps {
     team: Pokemon[];
@@ -19,6 +19,7 @@ export interface PokemonEditorProps {
     style: State["style"];
     excludedAreas: State["excludedAreas"];
     customAreas: State["customAreas"];
+    toggleDialog: toggleDialog;
 
     // @NOTE: uncomment this if you need to auto-generate Pokemon
     // will create failing tests as a warning to not push this :]
@@ -113,12 +114,28 @@ export class PokemonEditorBase extends React.Component<
                         className="button-row"
                         style={{ display: "flex", alignItems: "flex-start" }}
                     >
-                        <AddPokemonButton
-                            pokemon={{
-                                ...generateEmptyPokemon(team),
-                                gameOfOrigin: this.props.game.name || "None",
+                        <div
+                            style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "0.35rem",
                             }}
-                        />
+                        >
+                            <AddPokemonButton
+                                pokemon={{
+                                    ...generateEmptyPokemon(team),
+                                    gameOfOrigin: this.props.game.name || "None",
+                                }}
+                            />
+                            <Button
+                                icon="layout-group-by"
+                                className={Classes.MINIMAL}
+                                intent={Intent.PRIMARY}
+                                onClick={() => this.props.toggleDialog("typeMatchups")}
+                            >
+                                Type Matchups
+                            </Button>
+                        </div>
                         <div style={{ marginLeft: "auto", width: "50%" }}>
                             <Button
                                 icon={"heat-grid"}
@@ -193,6 +210,7 @@ export const PokemonEditor = connect(
     }),
     {
         addPokemon: addPokemon,
+        toggleDialog,
     },
     null,
     { pure: true },

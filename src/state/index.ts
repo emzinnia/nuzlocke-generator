@@ -3,6 +3,7 @@ import { Pokemon, Trainer, Game, Editor, Boxes, View } from "models";
 import { Checkpoints } from "reducers/checkpoints";
 import { Nuzlockes } from "reducers/nuzlocke";
 import { History } from "reducers/editorHistory";
+import { HotkeyBindings } from "reducers/hotkeys";
 
 export interface State {
     box: Boxes;
@@ -12,6 +13,7 @@ export interface State {
     editor: Editor;
     excludedAreas: string[];
     game: Game;
+    hotkeys: HotkeyBindings;
     pokemon: Pokemon[];
     rules: string[];
     sawRelease: { [v: string]: boolean };

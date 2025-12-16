@@ -36,3 +36,4 @@ export * from "./toggleDialog";
 export * from "./updateExcludedAreas";
 export * from "./updateCustomAreas";
 export * from "./syncStateFromHistory";
+export * from "./editHotkey";

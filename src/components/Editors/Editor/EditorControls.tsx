@@ -6,6 +6,7 @@ import { editorStyles } from "./styles";
 import { redoEditorHistory, syncStateFromHistory, undoEditorHistory } from "actions";
 import { useEvent } from "utils/hooks";
 import { HistoryPanel } from "./HistoryPanel";
+import { reconstructPreviousState, reconstructNextState } from "reducers/editorHistory";
 
 export function EditorControls({ editorDarkMode, minimized }) {
     const editorHistory = useSelector<State, State["editorHistory"]>(
@@ -21,11 +22,11 @@ export function EditorControls({ editorDarkMode, minimized }) {
     const dispatchUndo = React.useCallback(() => {
         if (!canUndo) return;
 
-        const { past } = editorHistory;
+        const { past, present } = editorHistory;
         const lastEntry = past[past.length - 1];
         
-        // Get the previous state directly from the stored entry
-        const previousState = lastEntry.previousState;
+        // Reconstruct the previous state by applying the backward diff
+        const previousState = reconstructPreviousState(present, lastEntry);
         
         // Update history stack first, then sync all reducers
         dispatch(undoEditorHistory());
@@ -35,11 +36,11 @@ export function EditorControls({ editorDarkMode, minimized }) {
     const dispatchRedo = React.useCallback(() => {
         if (!canRedo) return;
 
-        const { future } = editorHistory;
+        const { future, present } = editorHistory;
         const nextEntry = future[0];
         
-        // Get the next state directly from the stored entry
-        const nextState = nextEntry.nextState;
+        // Reconstruct the next state by applying the forward diff
+        const nextState = reconstructNextState(present, nextEntry);
         
         // Update history stack first, then sync all reducers
         dispatch(redoEditorHistory());
@@ -70,7 +71,6 @@ export function EditorControls({ editorDarkMode, minimized }) {
             style={{
                 width: minimized ? "0%" : "33%",
                 background: editorDarkMode ? "#222" : "#fff",
-                borderBottomColor: editorDarkMode ? "#000" : "#ccc",
                 display: minimized ? "none" : "block",
                 position: "relative",
             }}

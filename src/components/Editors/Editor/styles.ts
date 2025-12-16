@@ -13,7 +13,6 @@ export const editorStyles = {
         position: sticky;
         top: -0.25rem;
         z-index: 12;
-        border-bottom: 1px solid;
         min-width: 100%;
         max-width: 100%;
     `,

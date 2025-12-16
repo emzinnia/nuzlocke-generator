@@ -4,13 +4,14 @@ import { Button, Classes, Icon } from "@blueprintjs/core";
 import { useDispatch, useSelector } from "react-redux";
 import { State } from "state";
 import { jumpToHistoryState, syncStateFromHistory } from "actions";
+import { reconstructStateAtIndex } from "reducers/editorHistory";
 
 const styles = {
     panel: css`
         position: absolute;
         top: 100%;
         left: 0;
-        right: 0;
+        width: 200px;
         background: inherit;
         border: 1px solid #ccc;
         border-top: none;
@@ -18,6 +19,7 @@ const styles = {
         overflow-y: auto;
         z-index: 100;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 0 0 4px 4px;
     `,
     panelDark: css`
         border-color: #444;
@@ -188,23 +190,10 @@ export function HistoryPanel({ isOpen, onClose, editorDarkMode }: HistoryPanelPr
     const handleJumpTo = (index: number, type: "past" | "current" | "future") => {
         if (type === "current") return;
 
-        // Get the target state
-        let targetState: any;
+        // Reconstruct the target state using the helper function
+        const targetState = reconstructStateAtIndex(editorHistory, index);
         
-        if (type === "past") {
-            // For past items, we need the state at that point
-            // Index 0 = previousState of first entry
-            // Index 1 = nextState of first entry (= previousState of second entry)
-            if (index === 0) {
-                targetState = past[0].previousState;
-            } else {
-                targetState = past[index - 1].nextState;
-            }
-        } else {
-            // For future items, get the nextState
-            const futureIndex = index - past.length - 1;
-            targetState = future[futureIndex].nextState;
-        }
+        if (targetState == null) return;
 
         // Dispatch jump action and sync state
         dispatch(jumpToHistoryState(index));
@@ -263,4 +252,3 @@ export function HistoryPanel({ isOpen, onClose, editorDarkMode }: HistoryPanelPr
         </div>
     );
 }
-

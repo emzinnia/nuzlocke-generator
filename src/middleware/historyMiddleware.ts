@@ -71,7 +71,7 @@ function getTrackableState(state: State): Omit<State, "editorHistory"> {
  * 
  * This middleware:
  * 1. Intercepts all actions AFTER they've been processed by reducers
- * 2. Computes diffs between the previous and new state
+ * 2. Computes both forward and backward diffs between states
  * 3. Debounces rapid changes (e.g., typing) into single history entries
  * 4. Excludes UI-only and history management actions from tracking
  */
@@ -84,12 +84,15 @@ export const historyMiddleware: Middleware = (store) => {
     // Debounced function to commit history updates
     const debouncedCommit = debounce((newState: Omit<State, "editorHistory">) => {
         if (lastCommittedState) {
-            // Compute the diff between last committed and new state
-            const changes = diff(lastCommittedState, newState) as DiffEntry | undefined;
+            // Compute forward diff: lastCommittedState -> newState
+            const forwardDiff = diff(lastCommittedState, newState) as DiffEntry | undefined;
 
-            if (changes && changes.length > 0) {
-                // Dispatch the history update with the diff
-                store.dispatch(updateEditorHistory(changes, newState) as AnyAction);
+            if (forwardDiff && forwardDiff.length > 0) {
+                // Compute backward diff: newState -> lastCommittedState (for undo)
+                const backwardDiff = diff(newState, lastCommittedState) as DiffEntry;
+                
+                // Dispatch the history update with both diffs
+                store.dispatch(updateEditorHistory(forwardDiff, backwardDiff, newState) as AnyAction);
             }
         }
         // Update our reference to the last committed state
@@ -149,4 +152,3 @@ export const flushHistoryMiddleware = (store: { dispatch: (action: AnyAction) =>
     // This is a placeholder - in practice you'd need to export the debounced function
     // or use a different pattern if immediate flushing is needed
 };
-

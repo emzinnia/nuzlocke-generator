@@ -7,28 +7,28 @@ import {
     INIT_EDITOR_HISTORY,
     JUMP_TO_HISTORY_STATE,
 } from "actions";
-import { Diff } from "deep-diff";
+import { Diff, applyChange, revertChange } from "deep-diff";
 import { take } from "ramda";
 
 // A single diff entry represents the changes between two states
 export type DiffEntry = Diff<any, any>[];
 
-// A history entry stores both the previous state and the state after the change
-// This is more reliable than trying to revert diffs
-export interface HistoryEntry<T> {
-    // The state BEFORE this change was made (for undo)
-    previousState: T;
-    // The state AFTER this change was made (for redo)
-    nextState: T;
+// A history entry now stores diffs instead of full state snapshots
+// This dramatically reduces memory usage for large state trees
+export interface HistoryEntry {
+    // Changes to apply: previous -> next (for redo)
+    forwardDiff: DiffEntry;
+    // Changes to apply: next -> previous (for undo)
+    backwardDiff: DiffEntry;
 }
 
 export interface History<T> {
-    // Store state snapshots for reliable undo/redo
-    past: HistoryEntry<T>[];
-    // The current state snapshot
+    // Store diff entries (not full snapshots)
+    past: HistoryEntry[];
+    // The current state snapshot (always needed for reconstruction base)
     present?: T;
     // Future entries for redo
-    future: HistoryEntry<T>[];
+    future: HistoryEntry[];
     // Track the last revision type
     lastRevisionType: "undo" | "redo" | "update" | "load";
 }
@@ -43,7 +43,8 @@ const initial: History<any> = {
 const MAX_HISTORY_LENGTH = 50;
 
 /**
- * Deep clone an object to avoid mutations
+ * Deep clone an object - only used for present state initialization
+ * We keep this minimal since diffs eliminate most cloning needs
  */
 function deepClone<T>(obj: T): T {
     if (obj === null || typeof obj !== "object") {
@@ -53,17 +54,84 @@ function deepClone<T>(obj: T): T {
 }
 
 /**
- * Get the previous state from a history entry (for undo)
+ * Apply a forward diff to a state to get the next state
  */
-export function getPreviousState<T>(entry: HistoryEntry<T>): T {
-    return entry.previousState;
+function applyForwardDiff<T>(state: T, diff: DiffEntry): T {
+    // Clone the state first since applyChange mutates
+    const result = deepClone(state);
+    for (const change of diff) {
+        applyChange(result, null, change);
+    }
+    return result;
 }
 
 /**
- * Get the next state from a history entry (for redo)
+ * Apply a backward diff to a state to get the previous state
  */
-export function getNextState<T>(entry: HistoryEntry<T>): T {
-    return entry.nextState;
+function applyBackwardDiff<T>(state: T, diff: DiffEntry): T {
+    // Clone the state first since revertChange mutates
+    const result = deepClone(state);
+    for (const change of diff) {
+        revertChange(result, null, change);
+    }
+    return result;
+}
+
+/**
+ * Reconstruct the previous state for undo by applying the backward diff to present
+ */
+export function reconstructPreviousState<T>(present: T, entry: HistoryEntry): T {
+    return applyBackwardDiff(present, entry.backwardDiff);
+}
+
+/**
+ * Reconstruct the next state for redo by applying the forward diff to present
+ */
+export function reconstructNextState<T>(present: T, entry: HistoryEntry): T {
+    return applyForwardDiff(present, entry.forwardDiff);
+}
+
+/**
+ * Reconstruct a state at a given index in the history timeline
+ * Index 0 = earliest state (before first change)
+ * Index past.length = current state (present)
+ * Index > past.length = future states
+ */
+export function reconstructStateAtIndex<T>(
+    history: History<T>,
+    targetIndex: number
+): T | undefined {
+    const { past, present, future } = history;
+    
+    if (present == null) {
+        return undefined;
+    }
+    
+    const currentIndex = past.length;
+    
+    // Already at target
+    if (targetIndex === currentIndex) {
+        return present;
+    }
+    
+    let state = deepClone(present);
+    
+    if (targetIndex < currentIndex) {
+        // Going backward: apply backward diffs from present
+        // We need to apply diffs from past[currentIndex-1] down to past[targetIndex]
+        for (let i = currentIndex - 1; i >= targetIndex; i--) {
+            state = applyBackwardDiff(state, past[i].backwardDiff);
+        }
+    } else {
+        // Going forward: apply forward diffs from present
+        // We need to apply diffs from future[0] up to future[targetIndex - currentIndex - 1]
+        const stepsForward = targetIndex - currentIndex;
+        for (let i = 0; i < stepsForward; i++) {
+            state = applyForwardDiff(state, future[i].forwardDiff);
+        }
+    }
+    
+    return state;
 }
 
 export function editorHistory(
@@ -94,28 +162,29 @@ export function editorHistory(
             if (present == null) {
                 return {
                     past: [],
-                    present: deepClone(action.newState),
+                    present: action.newState,
                     future: [],
                     lastRevisionType: "update",
                 };
             }
 
-            // Check if there's actually a change (action.diff is still passed for this check)
-            if (action.diff == null || action.diff.length === 0) {
+            // Check if there's actually a change
+            const forwardDiff = action.forwardDiff;
+            if (forwardDiff == null || forwardDiff.length === 0) {
                 return state;
             }
 
-            // Create a history entry with both previous and next states
-            const entry: HistoryEntry<any> = {
-                previousState: deepClone(present),
-                nextState: deepClone(action.newState),
+            // Create a history entry with diffs (not full snapshots)
+            const entry: HistoryEntry = {
+                forwardDiff: forwardDiff,
+                backwardDiff: action.backwardDiff,
             };
 
             return {
                 // Store the entry - limit to MAX_HISTORY_LENGTH
                 past: [...take(MAX_HISTORY_LENGTH - 1, past), entry],
-                // Update present to the new state
-                present: deepClone(action.newState),
+                // Update present to the new state (no deep clone needed - immutable by convention)
+                present: action.newState,
                 // Clear future on new changes (can't redo after new edits)
                 future: [],
                 lastRevisionType: "update",
@@ -133,8 +202,8 @@ export function editorHistory(
             const lastEntry = past[past.length - 1];
             const newPast = past.slice(0, -1);
 
-            // Use the stored previous state directly
-            const previousState = lastEntry.previousState;
+            // Reconstruct the previous state by applying the backward diff
+            const previousState = applyBackwardDiff(present, lastEntry.backwardDiff);
 
             return {
                 past: newPast,
@@ -156,8 +225,8 @@ export function editorHistory(
             const nextEntry = future[0];
             const newFuture = future.slice(1);
 
-            // Use the stored next state directly
-            const nextState = nextEntry.nextState;
+            // Reconstruct the next state by applying the forward diff
+            const nextState = applyForwardDiff(present, nextEntry.forwardDiff);
 
             return {
                 // Move entry to past
@@ -182,55 +251,68 @@ export function editorHistory(
                 return state; // Already at this state
             }
             
-            // Combine all entries to make navigation easier
-            const allEntries = [...past];
-            const allStates: any[] = [];
-            
-            // Extract all states in order
-            // First state is the previousState of the first entry
-            if (past.length > 0) {
-                allStates.push(past[0].previousState);
-                for (const entry of past) {
-                    allStates.push(entry.nextState);
-                }
-            } else {
-                allStates.push(present);
-            }
-            
-            // Add future states
-            for (const entry of future) {
-                allStates.push(entry.nextState);
-            }
-            
-            // Target state
-            const targetState = allStates[targetIndex];
-            if (!targetState) {
+            // Reconstruct the target state
+            const targetState = reconstructStateAtIndex(state, targetIndex);
+            if (targetState == null) {
                 return state;
             }
             
-            // Rebuild past/future based on target index
-            const newPast: HistoryEntry<any>[] = [];
-            const newFuture: HistoryEntry<any>[] = [];
+            // For jump, we need to rebuild the past/future arrays
+            // This is more complex with diffs - we need to recompute diffs for the new timeline
+            // For simplicity, we'll reconstruct all intermediate states and recompute diffs
             
-            // Build new past (all states before target)
-            for (let i = 0; i < targetIndex; i++) {
-                newPast.push({
-                    previousState: allStates[i],
-                    nextState: allStates[i + 1],
-                });
+            // First, reconstruct all states in the timeline
+            const allStates: any[] = [];
+            
+            // Reconstruct states from index 0 to end
+            let tempState = deepClone(present);
+            
+            // Go back to state 0
+            for (let i = currentIndex - 1; i >= 0; i--) {
+                tempState = applyBackwardDiff(tempState, past[i].backwardDiff);
+            }
+            allStates.push(tempState);
+            
+            // Now go forward through all past entries
+            for (let i = 0; i < past.length; i++) {
+                tempState = applyForwardDiff(tempState, past[i].forwardDiff);
+                allStates.push(tempState);
             }
             
-            // Build new future (all states after target)
-            for (let i = targetIndex; i < allStates.length - 1; i++) {
-                newFuture.push({
-                    previousState: allStates[i],
-                    nextState: allStates[i + 1],
-                });
+            // Add future states
+            for (let i = 0; i < future.length; i++) {
+                tempState = applyForwardDiff(tempState, future[i].forwardDiff);
+                allStates.push(tempState);
+            }
+            
+            // Now rebuild past/future with the original diffs, just rearranged
+            const allEntries = [...past, ...future];
+            
+            const newPast: HistoryEntry[] = [];
+            const newFuture: HistoryEntry[] = [];
+            
+            // Entries before targetIndex go to past
+            for (let i = 0; i < targetIndex; i++) {
+                if (i < past.length) {
+                    newPast.push(past[i]);
+                } else {
+                    // This was a future entry, need to include it
+                    newPast.push(future[i - past.length]);
+                }
+            }
+            
+            // Entries at and after targetIndex go to future
+            for (let i = targetIndex; i < allEntries.length; i++) {
+                if (i < past.length) {
+                    newFuture.push(past[i]);
+                } else {
+                    newFuture.push(future[i - past.length]);
+                }
             }
             
             return {
                 past: newPast,
-                present: deepClone(targetState),
+                present: targetState,
                 future: newFuture,
                 lastRevisionType: targetIndex < currentIndex ? "undo" : "redo",
             };
