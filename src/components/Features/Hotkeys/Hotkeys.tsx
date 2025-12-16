@@ -1,6 +1,5 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { Toaster, Intent } from "@blueprintjs/core";
 import {
     selectPokemon,
     deletePokemon,
@@ -40,7 +39,6 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
     private keyUpActions: Map<string, Array<() => void>> = new Map();
     private firstPokemonId: string | null = null;
     private lastPokemonId: string | null = null;
-    private toaster = Toaster.create();
 
     public constructor(props) {
         super(props);
@@ -193,20 +191,10 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
     }
 
     private manualSave() {
-        persistor
-            .flush()
-            .then((res) => {
-                this.toaster.show({
-                    message: "Save successful!",
-                    intent: Intent.SUCCESS,
-                });
-            })
-            .catch((err) => {
-                this.toaster.show({
-                    message: "Saved failed. Please try again.",
-                    intent: Intent.DANGER,
-                });
-            });
+        // Manual save without overlay toaster feedback (deprecated)
+        persistor.flush().catch((err) => {
+            console.error("Manual save failed", err);
+        });
     }
 
     private previousPokemon() {
