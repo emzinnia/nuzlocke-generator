@@ -1,7 +1,14 @@
 import * as React from "react";
-import { render, screen, fireEvent } from "utils/testUtils";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { render, screen, fireEvent, waitFor } from "utils/testUtils";
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import { RulesEditor, RulesEditorDialogBase, presetRules } from "../RulesEditor";
+
+const originalFetch = global.fetch;
+
+afterEach(() => {
+    vi.restoreAllMocks();
+    global.fetch = originalFetch;
+});
 
 describe("presetRules", () => {
     it("contains expected rulesets", () => {
@@ -192,6 +199,102 @@ describe("RulesEditor", () => {
         
         const ruleItems = container.querySelectorAll(".rules-list-item");
         expect(ruleItems.length).toBe(0);
+    });
+
+    it("opens and closes the suggest dialog", () => {
+        render(<RulesEditor {...defaultProps} />);
+
+        fireEvent.click(screen.getByText("Suggest as Community Ruleset"));
+        expect(screen.getByText("Ruleset Name")).toBeDefined();
+
+        fireEvent.click(screen.getByText("Cancel"));
+        expect(screen.queryByText("Ruleset Name")).toBeNull();
+    });
+
+    it("enforces submit button disabled states", () => {
+        render(<RulesEditor {...defaultProps} rules={[]} />);
+        fireEvent.click(screen.getByText("Suggest as Community Ruleset"));
+
+        const submitButton = screen.getByText("Submit Suggestion").closest("button") as HTMLButtonElement;
+        expect(submitButton.disabled).toBe(true);
+
+        fireEvent.change(screen.getByPlaceholderText("e.g., Ironmon Challenge"), {
+            target: { value: "Community Rule" },
+        });
+        expect(submitButton.disabled).toBe(true); // still disabled because no rules to submit
+    });
+
+    it("enables submit when a name is provided and rules exist", () => {
+        render(<RulesEditor {...defaultProps} />);
+        fireEvent.click(screen.getByText("Suggest as Community Ruleset"));
+
+        fireEvent.change(screen.getByPlaceholderText("e.g., Ironmon Challenge"), {
+            target: { value: "Ironmon" },
+        });
+
+        const submitButton = screen.getByText("Submit Suggestion").closest("button") as HTMLButtonElement;
+        expect(submitButton.disabled).toBe(false);
+    });
+
+    it("submits suggestions and re-enables the button on success", async () => {
+        const fetchMock = vi.fn().mockResolvedValue({
+            json: vi.fn().mockResolvedValue({ status: 200 }),
+        } as any);
+        global.fetch = fetchMock as any;
+
+        render(<RulesEditor {...defaultProps} />);
+        fireEvent.click(screen.getByText("Suggest as Community Ruleset"));
+
+        fireEvent.change(screen.getByPlaceholderText("e.g., Ironmon Challenge"), {
+            target: { value: "Ironmon" },
+        });
+        fireEvent.change(screen.getByPlaceholderText("Brief description of this ruleset..."), {
+            target: { value: "Hard mode variant" },
+        });
+
+        const submitButton = screen.getByText("Submit Suggestion").closest("button") as HTMLButtonElement;
+        fireEvent.click(submitButton);
+
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+        const fetchCall = fetchMock.mock.calls[0];
+        expect(fetchCall[0]).toContain("/suggest-ruleset");
+        const body = JSON.parse(fetchCall[1].body);
+        expect(body.name).toBe("Ironmon");
+        expect(body.rules).toEqual(defaultProps.rules);
+
+        await waitFor(() => expect(submitButton.disabled).toBe(false));
+    });
+
+    it("re-enables submit when the suggestion request fails", async () => {
+        const fetchMock = vi.fn().mockRejectedValue(new Error("network error"));
+        global.fetch = fetchMock as any;
+
+        render(<RulesEditor {...defaultProps} />);
+        fireEvent.click(screen.getByText("Suggest as Community Ruleset"));
+
+        fireEvent.change(screen.getByPlaceholderText("e.g., Ironmon Challenge"), {
+            target: { value: "Ironmon" },
+        });
+
+        const submitButton = screen.getByText("Submit Suggestion").closest("button") as HTMLButtonElement;
+        fireEvent.click(submitButton);
+
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+        await waitFor(() => expect(submitButton.disabled).toBe(false));
+    });
+
+    it("renders new rules when a preset is applied and props update", () => {
+        const { rerender, container } = render(<RulesEditor {...defaultProps} />);
+
+        const select = screen.getByRole("combobox");
+        fireEvent.change(select, { target: { value: "Hardcore Nuzlocke" } });
+        fireEvent.click(screen.getByText("Apply Ruleset"));
+
+        const hardcore = presetRules.find((p) => p.name === "Hardcore Nuzlocke")!;
+        rerender(<RulesEditor {...defaultProps} rules={hardcore.rules} />);
+
+        const ruleItems = container.querySelectorAll(".rules-list-item");
+        expect(ruleItems.length).toBe(hardcore.rules.length);
     });
 });
 
