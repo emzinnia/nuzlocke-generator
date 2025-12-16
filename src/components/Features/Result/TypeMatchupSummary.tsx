@@ -102,7 +102,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                         >
                             <thead>
                                 <tr>
-                                    <th style={{ width: "80px" }}>Type</th>
+                                    <th style={{ width: "64px" }}>Type</th>
                                     <th title="Team members weak to this type">Weak</th>
                                     <th title="Team members that resist this type">Resist</th>
                                     <th title="Team members immune to this type">Immune</th>
@@ -116,7 +116,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
 
                                     return (
                                         <tr key={row.type}>
-                                            <td style={{ height: "2rem", width: "100%" }}>
+                                            <td style={{ height: "2rem" }}>
                                                 <span
                                                     className={styles.typeChip}
                                                     style={{ ...chipStyle, color: chipTextColor }}
