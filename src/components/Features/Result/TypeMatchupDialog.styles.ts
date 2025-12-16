@@ -176,6 +176,20 @@ export const typeMatchupsTeamEntry = css`
     align-items: center;
     gap: 0.5rem;
     padding: 0.4rem 0.6rem !important;
+    cursor: pointer;
+    transition: all 0.15s ease-out;
+
+    &:hover {
+        background: rgba(45, 114, 210, 0.12);
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    :global(.bp5-dark) &:hover,
+    :global(.bp-3-dark) &:hover {
+        background: rgba(72, 175, 240, 0.18);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    }
 `;
 
 export const typeMatchupsMain = css`
@@ -208,6 +222,20 @@ export const typeMatchupsOtherEntry = css`
     align-items: center;
     gap: 0.35rem;
     padding: 0.35rem 0.5rem !important;
+    cursor: pointer;
+    transition: all 0.15s ease-out;
+
+    &:hover {
+        background: rgba(45, 114, 210, 0.12);
+        transform: scale(1.03);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    :global(.bp5-dark) &:hover,
+    :global(.bp-3-dark) &:hover {
+        background: rgba(72, 175, 240, 0.18);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    }
 `;
 
 export const typeMatchupsOptions = css`
