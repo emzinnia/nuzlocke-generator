@@ -63,7 +63,7 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
     }
 
     private addRandomPokemon = () => {
-        const species = choose(listOfPokemon) as Species;
+        const species = choose([...listOfPokemon]) as Species;
         const types = matchSpeciesToTypes(species);
         const pokemon = generateEmptyPokemon(this.props.pokemon, {
             species,
