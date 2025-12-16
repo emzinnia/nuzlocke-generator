@@ -8,15 +8,16 @@ const clearAppToaster = () => {
 };
 
 export const AppToasterHost: React.FC = () => {
-    const toasterRef = React.useRef<Toaster | null>(null);
+    const toasterCallback = React.useCallback((instance: Toaster | null) => {
+        appToaster = instance;
+    }, []);
 
     React.useEffect(() => {
-        appToaster = toasterRef.current;
         return clearAppToaster;
     }, []);
 
     return React.createElement(OverlayToaster, {
-        ref: toasterRef,
+        ref: toasterCallback,
         position: Position.TOP,
         maxToasts: 3,
     });

@@ -18,5 +18,5 @@ export const matchNatureToToxtricityForme = (nature: Nature): keyof typeof Forme
         Nature.Sassy,
     ];
 
-    return ampedNatures.includes(nature) ? "Amped" : "Lowkey";
+    return ampedNatures.includes(nature) ? "AmpedUp" : "Lowkey";
 };

@@ -29,7 +29,7 @@ export class ShapeInput extends React.Component<ShapeInputProps> {
         return (
             <div className={Classes.INPUT}>
                 <div className="shape">
-                    {this.renderShape}
+                    {this.renderShape()}
                     <input type="text" />
                 </div>
             </div>
