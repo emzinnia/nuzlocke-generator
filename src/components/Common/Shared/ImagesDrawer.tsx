@@ -96,12 +96,9 @@ import { v4 as _uuid } from "uuid";
 
 const _userImages = new Set<Image>();
 
-export const getImages = async () => {
-    const images = await db.images.toArray();
-
-    console.log(images);
-
-    return images;
+export const getImagesPage = async (offset: number, limit: number) => {
+    // Newest-first pagination; avoids loading all images + rendering them at once.
+    return db.images.orderBy("id").reverse().offset(offset).limit(limit).toArray();
 };
 
 export interface Image {
@@ -117,7 +114,11 @@ enum ImagesDrawerLayout {
 
 export function ImagesDrawerInner() {
     const [refresh, setRefresh] = React.useState<number | null>(null);
-    const [images, setImages] = React.useState<Image[]>();
+    const [images, setImages] = React.useState<Image[]>([]);
+    const [offset, setOffset] = React.useState(0);
+    const [hasMore, setHasMore] = React.useState(true);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const toasterRef = React.useRef(Toaster.create());
     const [layoutView, setLayoutView] = React.useState<ImagesDrawerLayout>(
         ImagesDrawerLayout.Grid,
     );
@@ -125,10 +126,37 @@ export function ImagesDrawerInner() {
         isDarkModeSelector,
     );
 
+    const PAGE_SIZE = 40;
+
+    const reload = React.useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const firstPage = await getImagesPage(0, PAGE_SIZE);
+            setImages(firstPage);
+            setOffset(firstPage.length);
+            setHasMore(firstPage.length === PAGE_SIZE);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    const loadMore = React.useCallback(async () => {
+        if (isLoading || !hasMore) return;
+        setIsLoading(true);
+        try {
+            const nextPage = await getImagesPage(offset, PAGE_SIZE);
+            setImages((prev) => [...prev, ...nextPage]);
+            setOffset((prev) => prev + nextPage.length);
+            setHasMore(nextPage.length === PAGE_SIZE);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [hasMore, isLoading, offset]);
+
     React.useEffect(() => {
-        (async () => setImages(await getImages()))();
+        void reload();
         setRefresh(null);
-    }, [refresh]);
+    }, [refresh, reload]);
 
     const setLayout = React.useCallback(() => {
         setLayoutView(
@@ -139,12 +167,11 @@ export function ImagesDrawerInner() {
     }, [layoutView]);
 
     const deleteImage = (id: number) => async () => {
-        const toaster = Toaster.create();
         try {
             const _deletion = await db.images.where("id").equals(id).delete();
             setRefresh(id);
         } catch (e) {
-            toaster.show({
+            toasterRef.current.show({
                 message: `Error deleting item ocurred. ${e}`,
                 intent: Intent.DANGER,
             });
@@ -212,6 +239,17 @@ export function ImagesDrawerInner() {
                     </div>
                 ))}
             </div>
+            {hasMore && (
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                    <Button
+                        loading={isLoading}
+                        onClick={() => void loadMore()}
+                        icon="more"
+                    >
+                        Load more
+                    </Button>
+                </div>
+            )}
         </div>
     );
 }
