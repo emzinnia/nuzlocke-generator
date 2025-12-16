@@ -32,7 +32,6 @@ import {
     Intent,
     Alert,
     Classes,
-    Toaster,
     Toast,
 } from "@blueprintjs/core";
 import { connect, useDispatch } from "react-redux";
@@ -40,6 +39,7 @@ import {
     PokemonIcon,
     PokemonIconProps,
 } from "components/Pokemon/PokemonIcon/PokemonIcon";
+import { showToast } from "components/Common/Shared/appToaster";
 
 const boxSource = {
     drop(props, monitor, component) {
@@ -60,8 +60,7 @@ const boxSourceDrop = {
         const item = monitor.getItem();
 
         if (props.id == null || item.id == null) {
-            const toaster = Toaster.create();
-            toaster.show({
+            showToast({
                 message: "Failed to move Boxes",
                 intent: Intent.DANGER,
             });
@@ -175,8 +174,7 @@ export const Box: React.FC<BoxProps> = (props) => {
         accept: "POKEMON_ICON",
         drop: (item: PokemonIconProps, monitor) => {
             if (props.id == null || item.id == null) {
-                const toaster = Toaster.create();
-                toaster.show({
+                showToast({
                     message: "Failed to move Pokémon",
                     intent: Intent.DANGER,
                 });
