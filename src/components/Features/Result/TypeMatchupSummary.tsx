@@ -111,18 +111,16 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                             </thead>
                             <tbody>
                                 {teamMatchups.map((row) => {
-                                    const chipStyle = getTypeChipStyle(row.type);
-                                    const chipTextColor = getContrastColor(chipStyle.backgroundColor);
+                                    const cellBg = typeToColor(row.type, customTypes) ?? style?.accentColor ?? "#394b59";
+                                    const cellText = getContrastColor(cellBg);
 
                                     return (
                                         <tr key={row.type}>
-                                            <td style={{ height: "2rem" }}>
-                                                <span
-                                                    className={styles.typeChip}
-                                                    style={{ ...chipStyle, color: chipTextColor }}
-                                                >
-                                                    {row.type}
-                                                </span>
+                                            <td
+                                                className={styles.typeCell}
+                                                style={{ backgroundColor: cellBg, color: cellText }}
+                                            >
+                                                {row.type}
                                             </td>
                                             <td
                                                 className={styles.matchupCell}
