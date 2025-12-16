@@ -2,6 +2,7 @@ import * as React from "react";
 import { render, screen, fireEvent } from "utils/testUtils";
 import { ColorEditBase, rgbaOrHex } from "../ColorEdit";
 import { vi, describe, it, expect, beforeEach } from "vitest";
+import { Styles } from "models";
 
 describe("rgbaOrHex", () => {
     it("returns hex when alpha is 1", () => {
@@ -33,7 +34,7 @@ describe("ColorEditBase", () => {
         onChange: mockOnChange,
         onColorChange: mockOnColorChange,
         name: "test-color",
-        style: { editorDarkMode: false },
+        style: { editorDarkMode: false } as Partial<Styles> as Styles,
     };
 
     beforeEach(() => {
