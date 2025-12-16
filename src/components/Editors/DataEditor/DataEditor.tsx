@@ -21,7 +21,7 @@ import { omit } from "ramda";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { State } from "state";
 import { noop } from "redux-saga/utils";
-import { gameOfOriginToColor, GameSaveFormat } from "utils";
+import { gameOfOriginToColor, GameSaveFormat, Styles } from "utils";
 import { DeleteAlert } from "./DeleteAlert";
 import { isEmpty } from "utils/isEmpty";
 import { showToast } from "components/Common/Shared/appToaster";
@@ -99,6 +99,20 @@ const handleExceptions = (data: State | Record<string, unknown>) => {
     }
 
     return isEmpty(updated) ? data : updated;
+};
+
+const stripEditorDarkModeForExport = (state: State) => {
+    const baseState = omit(["router", "._persist", "editorHistory"], state) as {
+        style?: Styles;
+        [key: string]: unknown;
+    };
+    const { editorDarkMode: _omit, ...styleWithoutDarkMode } =
+        baseState.style || {};
+
+    return {
+        ...baseState,
+        style: styleWithoutDarkMode,
+    };
 };
 
 export interface SaveGameSettingsDialogProps {
