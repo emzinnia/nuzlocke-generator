@@ -46,7 +46,7 @@ export function TypeMatchupDialog() {
             title="Type Matchups"
             className={style.editorDarkMode ? Classes.DARK : ""}
             canOutsideClickClose
-            style={{ width: "98vw", maxWidth: "1800px" }}
+            style={{ width: "98vw", maxWidth: "112.5rem" }}
         >
             <div className={Classes.DIALOG_BODY}>
                 <div className="type-matchups-layout">
@@ -59,7 +59,7 @@ export function TypeMatchupDialog() {
                                 <Card
                                     key={poke.id}
                                     className="type-matchups-team-entry"
-                                    style={{ borderRadius: "8px" }}
+                                    style={{ borderRadius: "0.5rem" }}
                                 >
                                     <PokemonIconPlain
                                         {...poke}
@@ -89,7 +89,7 @@ export function TypeMatchupDialog() {
                             style={style}
                         />
                     </div>
-                    <div className="type-matchups-other" style={{ color: textColor, minWidth: "200px", maxWidth: "280px" }}>
+                    <div className="type-matchups-other" style={{ color: textColor, minWidth: "12.5rem", maxWidth: "17.5rem" }}>
                         <h4>Other Pokémon</h4>
                         {!others || !Object.keys(others).length ? (
                             <div>No other Pokémon</div>
@@ -104,7 +104,7 @@ export function TypeMatchupDialog() {
                                             <Card
                                                 key={poke.id}
                                                 className="type-matchups-other-entry"
-                                                style={{ borderRadius: "8px" }}
+                                                style={{ borderRadius: "0.5rem" }}
                                             >
                                                 <PokemonIconPlain
                                                     {...poke}

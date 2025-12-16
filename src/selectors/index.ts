@@ -13,7 +13,7 @@ export const appSelector = (state: State) => ({
     view: state.view,
 });
 
-export const resultSelector = (state: Partial<State>) => ({
+export const resultSelector = (state: State) => ({
     pokemon: state.pokemon,
     game: state.game,
     trainer: state.trainer,
