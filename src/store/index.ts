@@ -13,6 +13,7 @@ import { version } from "../../package.json";
 import { reducers } from "../reducers";
 import { State } from "state";
 import { historyMiddleware } from "../middleware/historyMiddleware";
+import { setEditorDarkModePreference } from "utils";
 
 const migrations = {
     "0.0.6-beta": (state) => {
@@ -113,5 +114,22 @@ export const store = createStore(
     persistReducers,
     applyMiddleware(...middlewares),
 );
+
+let lastEditorDarkMode = store.getState().style.editorDarkMode;
+if (typeof lastEditorDarkMode === "boolean") {
+    setEditorDarkModePreference(lastEditorDarkMode);
+}
+
+store.subscribe(() => {
+    const currentEditorDarkMode = store.getState().style.editorDarkMode;
+    if (
+        typeof currentEditorDarkMode !== "boolean" ||
+        currentEditorDarkMode === lastEditorDarkMode
+    ) {
+        return;
+    }
+    lastEditorDarkMode = currentEditorDarkMode;
+    setEditorDarkModePreference(currentEditorDarkMode);
+});
 
 export const persistor = persistStore(store, undefined);
