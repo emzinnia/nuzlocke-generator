@@ -44,6 +44,18 @@ const determineCell = (
             </Cell>
         );
     }
+    const displayValue =
+        value == null
+            ? ""
+            : Array.isArray(value)
+              ? value.join(", ")
+              : typeof value === "string"
+                ? value
+                : typeof value === "number" || typeof value === "boolean"
+                  ? String(value)
+                  : typeof value === "object"
+                    ? JSON.stringify(value)
+                    : String(value);
     return (
         <EditableCell
             onConfirm={(value) => {
@@ -53,7 +65,7 @@ const determineCell = (
                 }
                 editPokemon({ [key]: transformedValue }, id);
             }}
-            value={value as any}
+            value={displayValue}
         />
     );
 };
