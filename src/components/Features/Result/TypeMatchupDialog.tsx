@@ -113,9 +113,9 @@ export function TypeMatchupDialog() {
                         ) : (
                             sortedOthers.map(([status, list]) => (
                                 <div key={status} className={styles.typeMatchupsStatus}>
-                                    <div className={styles.typeMatchupsStatusTitle}>
+                                    {/* <div className={styles.typeMatchupsStatusTitle}>
                                         {status} ({list.length})
-                                    </div>
+                                    </div> */}
                                     <div className={styles.typeMatchupsStatusList}>
                                         {list.map((poke) => (
                                             <Card
