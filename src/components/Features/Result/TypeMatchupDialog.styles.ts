@@ -221,6 +221,16 @@ export const typeMatchupsOptionsHint = css`
     margin-left: 8px;
 `;
 
+export const typeChip = css`
+    padding: 0.15rem 0.35rem;
+    border-radius: 0;
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    font-weight: 600;
+    font-size: 9px;
+    display: inline-block;
+    text-transform: uppercase;
+`;
+
 export const matchupCell = css`
     text-align: center;
 `;
