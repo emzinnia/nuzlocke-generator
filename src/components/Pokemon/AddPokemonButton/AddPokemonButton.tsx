@@ -17,6 +17,7 @@ export function AddPokemonButton({ pokemon }: { pokemon: Pokemon }) {
             icon="add"
             intent={Intent.SUCCESS}
             className="add-new-pokemon"
+            data-testid="add-pokemon-button"
             onClick={onClick}
         >
             Add New Pokémon
