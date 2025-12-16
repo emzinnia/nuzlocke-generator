@@ -108,15 +108,22 @@ export function TypeMatchupDialog() {
                 <div className={styles.typeMatchupsLayout}>
                     <div className={styles.typeMatchupsTeamPreview} style={{ color: textColor }}>
                         <h4>Team Preview</h4>
-                        <p>Select a Pokémon to swap it out from type matchups.</p>
+                        <p>Click a Pokémon to swap it out.</p>
                         {pokemon
-                            ?.filter((p) => p?.status === "Team" && !p?.hidden)
+                            ?.filter((p) => {
+                                // Show pokemon that are on team (not removed) OR added from others
+                                const isOnTeam = p?.status === "Team" && !p?.hidden;
+                                const wasRemoved = removedFromTeam.has(p.id);
+                                const wasAdded = addedToTeam.has(p.id);
+                                return (isOnTeam && !wasRemoved) || wasAdded;
+                            })
                             .sort(sortPokes)
                             .map((poke) => (
                                 <Card
                                     key={poke.id}
-                                    className={styles.typeMatchupsTeamEntry}
+                                    className={styles.typeMatchupsTeamEntryRemove}
                                     style={{ borderRadius: "0.5rem" }}
+                                    onClick={() => handleRemoveFromTeam(poke.id)}
                                 >
                                     <PokemonIconPlain
                                         {...poke}
@@ -137,6 +144,14 @@ export function TypeMatchupDialog() {
                                     </span>
                                 </Card>
                             ))}
+                        <Button
+                            className={styles.confirmTeamButton}
+                            intent={Intent.PRIMARY}
+                            disabled={!hasChanges}
+                            onClick={handleConfirmTeam}
+                        >
+                            Confirm As Team
+                        </Button>
                     </div>
                     <div className={styles.typeMatchupsMain}>
                         <TypeMatchupSummary
