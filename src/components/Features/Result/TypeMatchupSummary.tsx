@@ -161,20 +161,6 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
         </div>
     );
 
-    const getTypeHeaderStyle = (type: Types): React.CSSProperties => {
-        const bgColor = typeToColor(type, customTypes) ?? style?.accentColor ?? "#394b59";
-        const fgColor = getContrastColor(bgColor);
-        // Add subtle text shadow for better contrast
-        const textShadow = fgColor === "#FFFFFF"
-            ? "0 1px 2px rgba(0, 0, 0, 0.5)"
-            : "0 1px 1px rgba(255, 255, 255, 0.3)";
-        return {
-            backgroundColor: bgColor,
-            color: fgColor,
-            textShadow,
-        };
-    };
-
     const chartPanel = (
         <div className={styles.sectionSpacing}>
             <div className={styles.typeMatchupsCaption} style={{ marginBottom: "8px" }}>
@@ -186,12 +172,24 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                         <tr>
                             <th className={styles.matchupMatrixCorner}>Atk \ Def</th>
                             {POKEMON_TYPES.map((defType) => (
+                                // Use the same chip styling in both tabs for uniform appearance.
+                                // TODO: if chip styling changes, update both summary and chart here.
                                 <th
                                     key={defType}
                                     className={styles.typeHeaderCell}
-                                    style={getTypeHeaderStyle(defType)}
                                 >
-                                    {defType}
+                                    {(() => {
+                                        const chipStyle = getTypeChipStyle(defType);
+                                        const chipTextColor = getContrastColor(chipStyle.backgroundColor);
+                                        return (
+                                            <span
+                                                className={styles.typeChip}
+                                                style={{ ...chipStyle, color: chipTextColor }}
+                                            >
+                                                {defType}
+                                            </span>
+                                        );
+                                    })()}
                                 </th>
                             ))}
                         </tr>
@@ -199,11 +197,19 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                     <tbody>
                         {POKEMON_TYPES.map((atkType) => (
                             <tr key={atkType}>
-                                <th
-                                    className={styles.typeHeaderCell}
-                                    style={getTypeHeaderStyle(atkType)}
-                                >
-                                    {atkType}
+                                <th className={styles.typeHeaderCell}>
+                                    {(() => {
+                                        const chipStyle = getTypeChipStyle(atkType);
+                                        const chipTextColor = getContrastColor(chipStyle.backgroundColor);
+                                        return (
+                                            <span
+                                                className={styles.typeChip}
+                                                style={{ ...chipStyle, color: chipTextColor }}
+                                            >
+                                                {atkType}
+                                            </span>
+                                        );
+                                    })()}
                                 </th>
                                 {POKEMON_TYPES.map((defType) => {
                                     const m = chart[defType]?.[atkType] ?? 1;
