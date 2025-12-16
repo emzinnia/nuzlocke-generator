@@ -176,19 +176,19 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
     };
 
     const chartPanel = (
-        <div className="type-effectiveness-chart">
-            <div className="type-matchups-caption" style={{ marginBottom: "8px" }}>
+        <div className={styles.sectionSpacing}>
+            <div className={styles.typeMatchupsCaption} style={{ marginBottom: "8px" }}>
                 Each cell is the damage multiplier for the row&apos;s attacking type against the column&apos;s defending type.
             </div>
-            <div className="type-matchups-table-wrapper">
-                <table className="matchup-table matchup-matrix">
+            <div className={styles.typeMatchupsTableWrapper}>
+                <table className={`${styles.matchupTable} ${styles.matchupMatrix}`}>
                     <thead>
                         <tr>
-                            <th className="matchup-matrix-corner">Atk \ Def</th>
+                            <th className={styles.matchupMatrixCorner}>Atk \ Def</th>
                             {POKEMON_TYPES.map((defType) => (
                                 <th
                                     key={defType}
-                                    className="type-header-cell"
+                                    className={styles.typeHeaderCell}
                                     style={getTypeHeaderStyle(defType)}
                                 >
                                     {defType}
@@ -200,7 +200,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                         {POKEMON_TYPES.map((atkType) => (
                             <tr key={atkType}>
                                 <th
-                                    className="type-header-cell"
+                                    className={styles.typeHeaderCell}
                                     style={getTypeHeaderStyle(atkType)}
                                 >
                                     {atkType}
@@ -210,7 +210,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                                     return (
                                         <td
                                             key={`${atkType}-${defType}`}
-                                            className="matchup-matrix-cell"
+                                            className={styles.matchupMatrixCell}
                                             data-mult={m}
                                             title={`${atkType} → ${defType}: ${m}×`}
                                         >
@@ -227,8 +227,8 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
     );
 
     return (
-        <Card className="type-matchups-card" elevation={Elevation.ONE}>
-            <div className="type-matchups" style={{ color: textColor }}>
+        <Card className={styles.typeMatchupsCard} elevation={Elevation.ONE}>
+            <div className={styles.typeMatchups} style={{ color: textColor }}>
                 <h3 style={{ color: textColor, marginBottom: "12px" }}>
                     Type Matchups (Gen {generation})
                 </h3>
