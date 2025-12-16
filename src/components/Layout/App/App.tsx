@@ -2,17 +2,21 @@ import * as React from "react";
 import { connect } from "react-redux";
 
 import { State } from "state";
-import { feature, isLocal, noop } from "utils";
+import { addPokemon } from "actions";
+import { feature, isLocal, noop, choose, generateEmptyPokemon } from "utils";
 import { ErrorBoundary } from "components";
 import { Button } from "@blueprintjs/core";
 import { appSelector } from "selectors";
 import { Skeleton } from "components";
+import { listOfPokemon } from "utils/data/listOfPokemon";
 
 import "./app.css";
 
 export interface AppProps {
     style: State["style"];
     view: State["view"];
+    pokemon: State["pokemon"];
+    addPokemon: typeof addPokemon;
 }
 
 const Editor = React.lazy(() =>
