@@ -201,14 +201,14 @@ describe("RulesEditor", () => {
         expect(ruleItems.length).toBe(0);
     });
 
-    it("opens and closes the suggest dialog", () => {
+    it("opens and closes the suggest dialog", async () => {
         render(<RulesEditor {...defaultProps} />);
 
         fireEvent.click(screen.getByText("Suggest as Community Ruleset"));
         expect(screen.getByText("Ruleset Name")).toBeDefined();
 
         fireEvent.click(screen.getByText("Cancel"));
-        expect(screen.queryByText("Ruleset Name")).toBeNull();
+        await waitFor(() => expect(screen.queryByText("Ruleset Name")).toBeNull());
     });
 
     it("enforces submit button disabled states", () => {
