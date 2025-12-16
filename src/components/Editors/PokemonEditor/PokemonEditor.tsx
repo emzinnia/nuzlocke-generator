@@ -9,6 +9,7 @@ import { AddPokemonButton } from "components";
 import { BaseEditor } from "components";
 import { Box, BoxForm } from "components";
 import { ErrorBoundary } from "components";
+import { cx } from "emotion";
 import { addPokemon, toggleDialog } from "actions";
 
 export interface PokemonEditorProps {
@@ -26,6 +27,7 @@ export interface PokemonEditorProps {
 }
 
 export interface PokemonEditorState {
+    isMassEditorOpen: boolean;
     searchTerm: string;
 }
 
