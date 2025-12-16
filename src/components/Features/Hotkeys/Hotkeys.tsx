@@ -10,7 +10,7 @@ import {
     toggleDialog,
     editPokemon,
 } from "actions";
-import { Pokemon } from "models";
+import { Pokemon, Boxes } from "models";
 import { sortPokes, sortPokesReverse, noop, generateEmptyPokemon } from "utils";
 import { listOfHotkeys, HotkeyList } from "utils";
 import { persistor } from "store";
@@ -29,6 +29,7 @@ export interface HotkeysProps {
     toggleDialog: toggleDialog;
     editPokemon: typeof editPokemon;
     pokemon: Pokemon[];
+    boxes: Boxes;
     selectedId: string;
     editor: Editor;
     customHotkeys: HotkeyBindings;
