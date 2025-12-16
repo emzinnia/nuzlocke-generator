@@ -1,5 +1,6 @@
 import * as React from "react";
 import { injectGlobal } from "emotion";
+import { createRoot } from "react-dom/client";
 
 import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 import "@blueprintjs/core/lib/css/blueprint.css";
@@ -91,7 +92,6 @@ void injectGlobal`
 const mountNode = document.getElementById("app");
 
 async function createRender() {
-    const { render } = await import("react-dom");
     const { Provider } = await import("react-redux");
 
     const { DndProvider } = await import("react-dnd");
@@ -107,7 +107,13 @@ async function createRender() {
 
     const ReduxProvider = Provider as any;
 
-    render(
+    if (!mountNode) {
+        throw new Error("Failed to locate app mount node");
+    }
+
+    const root = createRoot(mountNode);
+
+    root.render(
         <ReduxProvider store={store}>
             {isTest ? (
                 <PersistGate
@@ -133,7 +139,6 @@ async function createRender() {
                 </DndProvider>
             )}
         </ReduxProvider>,
-        mountNode,
     );
 }
 
