@@ -189,6 +189,7 @@ export function TypeMatchupDialog() {
                                                 key={poke.id}
                                                 className={styles.typeMatchupsTeamEntry}
                                                 style={{ borderRadius: "0.5rem" }}
+                                                onClick={() => handleAddToTeam(poke.id)}
                                             >
                                                 <PokemonIconPlain
                                                     {...poke}
