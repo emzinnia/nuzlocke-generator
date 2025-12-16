@@ -302,6 +302,7 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
 export const Hotkeys = connect(
     (state: Pick<State, keyof State>) => ({
         pokemon: state.pokemon,
+        boxes: state.box,
         selectedId: state.selectedId,
         editor: state.editor,
         customHotkeys: state.hotkeys,
