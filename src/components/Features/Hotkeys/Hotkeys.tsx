@@ -269,10 +269,14 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         const orderedBoxNames = this.getOrderedBoxNames();
         const currentStatusIndex = orderedBoxNames.indexOf(currentPoke.status);
         
-        // Can't move up if already at the first status or status not found
-        if (currentStatusIndex <= 0) return;
+        if (currentStatusIndex < 0) return;
 
-        const newStatus = orderedBoxNames[currentStatusIndex - 1];
+        // Cycle to the last status if at the first, otherwise go to previous
+        const newIndex = currentStatusIndex === 0 
+            ? orderedBoxNames.length - 1 
+            : currentStatusIndex - 1;
+
+        const newStatus = orderedBoxNames[newIndex];
         this.props.editPokemon({ status: newStatus }, currentPoke.id);
     }
 
@@ -287,10 +291,14 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         const orderedBoxNames = this.getOrderedBoxNames();
         const currentStatusIndex = orderedBoxNames.indexOf(currentPoke.status);
         
-        // Can't move down if already at the last status or status not found
-        if (currentStatusIndex < 0 || currentStatusIndex >= orderedBoxNames.length - 1) return;
+        if (currentStatusIndex < 0) return;
 
-        const newStatus = orderedBoxNames[currentStatusIndex + 1];
+        // Cycle to the first status if at the last, otherwise go to next
+        const newIndex = currentStatusIndex === orderedBoxNames.length - 1 
+            ? 0 
+            : currentStatusIndex + 1;
+
+        const newStatus = orderedBoxNames[newIndex];
         this.props.editPokemon({ status: newStatus }, currentPoke.id);
     }
 
