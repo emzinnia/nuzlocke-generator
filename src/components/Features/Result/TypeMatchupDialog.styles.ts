@@ -281,7 +281,8 @@ export const typeCell = css`
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.3px;
-    padding: 0.4rem 0.5rem !important;
+    padding: 0.4rem 0.6rem !important;
+    min-width: 56px;
     transition: filter 0.15s ease-out;
 
     &:hover {
