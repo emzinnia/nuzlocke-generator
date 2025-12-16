@@ -7,7 +7,6 @@ import {
     Callout,
     TextArea,
     Intent,
-    Toaster,
     Switch,
     Classes,
     HTMLSelect,
@@ -25,6 +24,7 @@ import { noop } from "redux-saga/utils";
 import { gameOfOriginToColor, GameSaveFormat } from "utils";
 import { DeleteAlert } from "./DeleteAlert";
 import { isEmpty } from "utils/isEmpty";
+import { showToast } from "components/Common/Shared/appToaster";
 // @TODO: fix codegen imports
 // import codegen from 'codegen.macro';
 import { BoxMappings } from "parsers/utils/boxMappings";
@@ -82,8 +82,7 @@ const handleExceptions = (data: State | Record<string, unknown>) => {
     let updated: Partial<State> = {};
 
     if (typeof (data as State).pokemon === "string") {
-        const toaster = Toaster.create();
-        toaster.show({
+        showToast({
             message: "Issue with data detected. Attempting to fix...",
             intent: Intent.DANGER,
         });
@@ -258,8 +257,7 @@ export class DataEditorBase extends React.Component<
         if (isValidJSON(e.target.value)) {
             this.setState({ data: e.target.value });
         } else {
-            const toaster = Toaster.create();
-            toaster.show({
+            showToast({
                 message: "Failed to parse invalid JSON",
                 intent: Intent.DANGER,
             });
@@ -451,8 +449,7 @@ export class DataEditorBase extends React.Component<
             };
 
             worker.onmessageerror = (err) => {
-                const toaster = Toaster.create();
-                toaster.show({
+                showToast({
                     message: `Failed to parse save file. ${err}`,
                     intent: Intent.DANGER,
                 });
