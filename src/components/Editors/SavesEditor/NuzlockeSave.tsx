@@ -7,7 +7,6 @@ import {
     MenuItem,
     Intent,
     Icon,
-    Toaster,
 } from "@blueprintjs/core";
 import { connect } from "react-redux";
 import { State } from "state";
@@ -26,6 +25,7 @@ import { appReducers } from "reducers";
 import { NuzlockeGameTags } from "./NuzlockeGameTags";
 import { DeleteAlert } from "components/Editors/DataEditor/DeleteAlert";
 import { HallOfFameDialog } from "./HallOfFameDialog";
+import { showToast } from "components/Common/Shared/appToaster";
 
 export interface NuzlockeSaveControlsProps {
     nuzlockes: State["nuzlockes"];
@@ -200,9 +200,7 @@ export class NuzlockeSaveBase extends React.Component<
                                                     );
                                                     replaceState(parsedData);
                                                 } catch (e) {
-                                                    const toaster =
-                                                        Toaster.create();
-                                                    toaster.show({
+                                                    showToast({
                                                         message: `Failed to switch nuzlockes. ${e}`,
                                                         intent: Intent.DANGER,
                                                     });
@@ -226,9 +224,7 @@ export class NuzlockeSaveBase extends React.Component<
                                                         isCopy: true,
                                                     });
                                                 } catch (e) {
-                                                    const toaster =
-                                                        Toaster.create();
-                                                    toaster.show({
+                                                    showToast({
                                                         message: `Failed to copy nuzlocke. ${e}`,
                                                         intent: Intent.DANGER,
                                                     });
@@ -266,9 +262,7 @@ export class NuzlockeSaveBase extends React.Component<
                                                         }
                                                         this.toggleIsDeletingNuzlocke();
                                                     } catch (e) {
-                                                        const toaster =
-                                                            Toaster.create();
-                                                        toaster.show({
+                                                        showToast({
                                                             message: `Failed to delete nuzlocke. ${e}`,
                                                             intent: Intent.DANGER,
                                                         });
