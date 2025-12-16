@@ -346,7 +346,7 @@ export function TeamPokemonBaseMinimal(
         >
             <div
                 role="presentation"
-                onClick={() => props.selectPokemon?.(poke!.id)}
+                onClick={() => props.selectPokemon?.(poke.id)}
                 style={{ cursor: "pointer" }}
             >
                 <PokemonImage
