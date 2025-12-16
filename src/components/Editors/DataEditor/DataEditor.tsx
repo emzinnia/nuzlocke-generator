@@ -10,17 +10,13 @@ import {
     Toaster,
     Switch,
     Classes,
-    Checkbox,
-    Icon,
-    Popover,
-    PopoverInteractionKind,
     HTMLSelect,
 } from "@blueprintjs/core";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { ErrorBoundary } from "components/Common/Shared";
 import { v4 as uuid } from "uuid";
 import { persistor } from "store";
-import { newNuzlocke, replaceState, setEditorHistoryDisabled } from "actions";
+import { newNuzlocke, replaceState } from "actions";
 import { Game, Pokemon, Trainer } from "models";
 import { omit } from "ramda";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
@@ -39,7 +35,6 @@ export interface DataEditorProps {
     state: State;
     replaceState: replaceState;
     newNuzlocke: newNuzlocke;
-    setEditorHistoryDisabled: setEditorHistoryDisabled;
 }
 
 export interface DataEditorState {
@@ -792,39 +787,6 @@ export class DataEditorBase extends React.Component<
                         Clear All Data
                     </Button>
                 </ButtonGroup>
-                <div style={{ marginLeft: "0.825rem" }}>
-                    <Checkbox
-                        checked={this.props.state.editor.editorHistoryDisabled}
-                        onChange={(e) =>
-                            this.props.setEditorHistoryDisabled(
-                                e.currentTarget.checked,
-                            )
-                        }
-                        labelElement={
-                            <>
-                                Disable Editor History{" "}
-                                <Popover
-                                    content={
-                                        <div
-                                            style={{
-                                                width: "8rem",
-                                                padding: ".25rem",
-                                            }}
-                                        >
-                                            Can be used to achieve better editor
-                                            performance on larger saves
-                                        </div>
-                                    }
-                                    interactionKind={
-                                        PopoverInteractionKind.HOVER
-                                    }
-                                >
-                                    <Icon icon="info-sign" />
-                                </Popover>
-                            </>
-                        }
-                    />
-                </div>
             </BaseEditor>
         );
     }
@@ -833,5 +795,4 @@ export class DataEditorBase extends React.Component<
 export const DataEditor = connect((state: State) => ({ state: state }), {
     replaceState,
     newNuzlocke,
-    setEditorHistoryDisabled,
 })(DataEditorBase);

@@ -5,6 +5,7 @@ import {
     RESET_RULES,
     Action,
     REPLACE_STATE,
+    SYNC_STATE_FROM_HISTORY,
 } from "actions";
 
 const initialState = [
@@ -16,7 +17,7 @@ const initialState = [
 export function rules(
     state: string[] = initialState,
     action: Action<
-        EDIT_RULE | ADD_RULE | DELETE_RULE | RESET_RULES | REPLACE_STATE
+        EDIT_RULE | ADD_RULE | DELETE_RULE | RESET_RULES | REPLACE_STATE | SYNC_STATE_FROM_HISTORY
     >,
 ) {
     switch (action.type) {
@@ -33,6 +34,8 @@ export function rules(
             return state.filter((_, index) => index + 1 !== action.target);
         case REPLACE_STATE:
             return action.replaceWith.rules;
+        case SYNC_STATE_FROM_HISTORY:
+            return action.syncWith.rules;
         case RESET_RULES:
             return initialState;
         default:

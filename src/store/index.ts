@@ -12,6 +12,7 @@ import storage from "redux-persist/lib/storage";
 import { version } from "../../package.json";
 import { reducers } from "../reducers";
 import { State } from "state";
+import { historyMiddleware } from "../middleware/historyMiddleware";
 
 const migrations = {
     "0.0.6-beta": (state) => {
@@ -99,7 +100,7 @@ export const history = createBrowserHistory();
 
 export const persistReducers = persistCombineReducers(config, reducers as any);
 
-export const middlewares: Middleware[] = [];
+export const middlewares: Middleware[] = [historyMiddleware];
 
 if (import.meta.env.PROD) {
     // No additional middlewares in production

@@ -11,7 +11,9 @@ import {
     reorderCheckpoints,
     resetCheckpoints,
     REPLACE_STATE,
+    SYNC_STATE_FROM_HISTORY,
     replaceState,
+    syncStateFromHistory,
 } from "actions";
 import { Badge } from "models";
 import { getBadges, Game } from "utils";
@@ -27,6 +29,7 @@ export function checkpoints(
         | resetCheckpoints
         | reorderCheckpoints
         | replaceState
+        | syncStateFromHistory
     >,
 ) {
     switch (action.type) {
@@ -39,6 +42,8 @@ export function checkpoints(
             return [...state, action.checkpoint];
         case REPLACE_STATE:
             return action.replaceWith.checkpoints;
+        case SYNC_STATE_FROM_HISTORY:
+            return action.syncWith.checkpoints;
         case EDIT_CHECKPOINT: {
             const newState = state.slice();
             newState.splice(

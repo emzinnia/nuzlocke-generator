@@ -2,21 +2,17 @@ import * as React from "react";
 import { connect } from "react-redux";
 
 import { State } from "state";
-import { updateEditorHistory } from "actions";
 import { feature, isLocal } from "utils";
-import { History } from "reducers/editorHistory";
 import { ErrorBoundary } from "components";
 import { Button } from "@blueprintjs/core";
-import { updaterSelector, appSelector } from "selectors";
+import { appSelector } from "selectors";
 import { Skeleton } from "components";
-import { isEqual } from "utils/isEqual";
 
 import "./app.css";
 
 export interface AppProps {
     style: State["style"];
     view: State["view"];
-    editor: State["editor"];
 }
 
 const Editor = React.lazy(() =>
@@ -55,39 +51,6 @@ const Hotkeys = React.lazy(() =>
     })),
 );
 
-export class UpdaterBase extends React.Component<{
-    present: Omit<State, "editorHistory">;
-    updateEditorHistory: updateEditorHistory;
-    lrt: History<any>["lastRevisionType"];
-}> {
-    public componentDidMount() {
-        // initial history record
-        this.props.updateEditorHistory(this.props.present);
-    }
-
-    public UNSAFE_componentWillReceiveProps(prev) {
-        if (
-            prev.lrt === "update" &&
-            this.props.present != null &&
-            this.props.present != null &&
-            !isEqual(this.props.present, prev.present)
-        ) {
-            const t0 = performance.now();
-            this.props.updateEditorHistory(prev.present);
-            const t1 = performance.now();
-            console.log(`Updated history in ${t1 - t0}ms`);
-        }
-    }
-
-    public render() {
-        return <div />;
-    }
-}
-
-export const Updater = connect(updaterSelector, { updateEditorHistory }, null, {
-    pure: false,
-})(UpdaterBase);
-
 export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
     public constructor(props: AppProps) {
         super(props);
@@ -106,12 +69,10 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
     }
 
     public render() {
-        const { style, view, editor } = this.props;
+        const { style, view } = this.props;
         const { result2 } = this.state;
         const isDarkMode = style.editorDarkMode;
         console.log("features", feature);
-
-        const UpdaterComponent = !editor.editorHistoryDisabled && <Updater />;
 
         return (
             <ErrorBoundary
@@ -138,7 +99,6 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
                             : "#fff",
                     }}
                 >
-                    {UpdaterComponent}
                     <ErrorBoundary key={1}>
                         <React.Suspense fallback={Skeleton}>
                             <Hotkeys />

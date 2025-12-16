@@ -1,5 +1,4 @@
 import { State } from "state";
-import { omit } from "ramda";
 import { Pokemon } from "models";
 
 export const gameNameSelector = (state: State) => state.game.name;
@@ -9,15 +8,9 @@ export const linkedPokemonSelector = (pokemon: Pokemon) => (state: State) =>
     state.pokemon.find((p) => p.id === pokemon?.linkedTo);
 export const isDarkModeSelector = (state: State) => state.style.editorDarkMode;
 
-export const updaterSelector = (state: State) => ({
-    present: omit(["editorHistory"], state),
-    lrt: state?.editorHistory?.lastRevisionType,
-});
-
 export const appSelector = (state: State) => ({
     style: state.style,
     view: state.view,
-    editor: state.editor,
 });
 
 export const resultSelector = (state: Partial<State>) => ({

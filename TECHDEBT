@@ -1,0 +1,18 @@
+TECHDEBT
+
+Actionable checklists
+- [ ] Switch editor history storage from full-state snapshots to diff-based patches using `deep-diff` to cut memory usage and GC churn.
+- [ ] Add debounced editor history updates (~300ms) in `UpdaterBase` so keystrokes do not generate a snapshot per change.
+- [ ] Replace `REPLACE_STATE` undo/redo flow with targeted diff apply/revert (`applyChange`/`revertChange`) to avoid triggering all reducers on every undo/redo.
+- [ ] Introduce periodic history checkpoints (e.g., every 20 undos) to bound reconstruction time and cap in-memory diff chains.
+- [ ] Enable `editorHistory` by default and remove legacy full-snapshot code paths once diff-based history is stable.
+- [ ] Add regression tests around undo/redo (memory footprint, reducer targeting, debounce behavior, long-session reconstruction).
+
+Summary of current tech debt
+- Editor history stores up to dozens of full snapshots of the entire state, creating multi-MB memory usage and GC pressure during longer sessions.
+- Deep equality checks and full-state cloning run on every edit, making rapid edits (typing, drag/drop) unnecessarily expensive.
+- Undo/redo relies on `REPLACE_STATE`, which triggers every reducer and can cause avoidable re-renders and side effects.
+- History updates are not debounced, so rapid keystrokes create noisy, redundant history entries and make undo stacks less usable.
+- No checkpointing strategy exists for long editing sessions, so reconstructing state from many diffs will be slow once diff-based history is introduced.
+- Editor history is currently disabled by default, masking issues rather than fixing them and leaving the feature unvalidated.
+- Automated tests around history correctness and performance are missing, so regressions (e.g., broken diff application or excessive memory use) will go unnoticed.
