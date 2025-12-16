@@ -13,6 +13,7 @@ export const isDarkModeSelector = (state: State) => state.style.editorDarkMode;
 export const appSelector = (state: State) => ({
     style: state.style,
     view: state.view,
+    pokemon: state.pokemon,
 });
 
 export const resultSelector = (state: State) => ({
