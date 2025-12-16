@@ -17,6 +17,7 @@ import { showToast } from "components/Common/Shared/appToaster";
 import "./RulesEditor.css";
 import { State } from "state";
 import { nuzlockeRulesets, NuzlockeRuleset } from "utils/data";
+import { feature } from "utils/feature";
 
 export const presetRules: NuzlockeRuleset[] = nuzlockeRulesets;
 
@@ -300,18 +301,22 @@ export class RulesEditor extends React.Component<RulesEditorProps, RulesEditorSt
                     {this.renderRules()}
                 </ul>
                 {this.renderButtons()}
-                <Divider style={{ margin: "1rem 0" }} />
-                <div className="suggest-ruleset-section">
-                    <Button
-                        icon="lightbulb"
-                        onClick={this.openSuggestDialog}
-                        minimal
-                        small
-                    >
-                        Suggest as Community Ruleset
-                    </Button>
-                </div>
-                {this.renderSuggestDialog()}
+                {feature.rulesetSubmission && (
+                    <>
+                        <Divider style={{ margin: "1rem 0" }} />
+                        <div className="suggest-ruleset-section">
+                            <Button
+                                icon="lightbulb"
+                                onClick={this.openSuggestDialog}
+                                minimal
+                                small
+                            >
+                                Suggest as Community Ruleset
+                            </Button>
+                        </div>
+                        {this.renderSuggestDialog()}
+                    </>
+                )}
             </>
         );
     }
