@@ -73,6 +73,9 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
         const { result2 } = this.state;
         const isDarkMode = style.editorDarkMode;
         const showDebugPanel = isLocal();
+        const debugPanelClassName = ["debug-panel", isDarkMode ? "bp5-dark" : ""]
+            .filter(Boolean)
+            .join(" ");
         console.log("features", feature);
 
         return (
@@ -141,7 +144,10 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
                     )}
 
                     {showDebugPanel && (
-                        <div className="debug-panel" aria-label="Debug Panel">
+                        <div
+                            className={debugPanelClassName}
+                            aria-label="Debug Panel"
+                        >
                             <div className="debug-panel__title">Debug Panel</div>
                             <div className="debug-panel__actions">
                                 <Button fill small onClick={noop}>
