@@ -7,6 +7,7 @@ import { getGameGeneration, typeToColor, getContrastColor } from "utils";
 import { Generation } from "utils/getters/getGameGeneration";
 import { getTypeChartForGeneration, POKEMON_TYPES, buildTeamMatchups } from "utils/typeMatchups";
 import { Types } from "utils/Types";
+import * as styles from "./TypeMatchupDialog.styles";
 
 interface TypeMatchupSummaryProps {
     pokemon: Pokemon[];
@@ -116,37 +117,45 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                                 </tr>
                             </thead>
                             <tbody>
-                                {teamMatchups.map((row) => (
-                                    <tr key={row.type}>
-                                        <td style={getTypeChipStyle(row.type)}>
-                                            <span style={{ color: getContrastColor(getTypeChipStyle(row.type).backgroundColor) }}>
-                                                {row.type}
-                                            </span>
-                                        </td>
-                                        <td
-                                            className="matchup-cell"
-                                            data-highlight={row.weak > 0 ? "weak" : undefined}
-                                            style={{ color: row.weak > 0 ? "#e74c3c" : undefined }}
-                                        >
-                                            {row.weak}
-                                        </td>
-                                        <td
-                                            className="matchup-cell"
-                                            data-highlight={row.resist > 0 ? "resist" : undefined}
-                                            style={{ color: row.resist > 0 ? "#2ecc71" : undefined }}
-                                        >
-                                            {row.resist}
-                                        </td>
-                                        <td
-                                            className="matchup-cell"
-                                            data-highlight={row.immune > 0 ? "immune" : undefined}
-                                            style={{ color: row.immune > 0 ? "#3498db" : undefined }}
-                                        >
-                                            {row.immune}
-                                        </td>
-                                        <td className="matchup-cell">{row.neutral}</td>
-                                    </tr>
-                                ))}
+                                {teamMatchups.map((row) => {
+                                    const chipStyle = getTypeChipStyle(row.type);
+                                    const chipTextColor = getContrastColor(chipStyle.backgroundColor);
+
+                                    return (
+                                        <tr key={row.type}>
+                                            <td style={{ height: "2rem", width: "100%" }}>
+                                                <span
+                                                    className="type-chip"
+                                                    style={{ ...chipStyle, color: chipTextColor }}
+                                                >
+                                                    {row.type}
+                                                </span>
+                                            </td>
+                                            <td
+                                                className="matchup-cell"
+                                                data-highlight={row.weak > 0 ? "weak" : undefined}
+                                                style={{ color: row.weak > 0 ? "#e74c3c" : undefined }}
+                                            >
+                                                {row.weak}
+                                            </td>
+                                            <td
+                                                className="matchup-cell"
+                                                data-highlight={row.resist > 0 ? "resist" : undefined}
+                                                style={{ color: row.resist > 0 ? "#2ecc71" : undefined }}
+                                            >
+                                                {row.resist}
+                                            </td>
+                                            <td
+                                                className="matchup-cell"
+                                                data-highlight={row.immune > 0 ? "immune" : undefined}
+                                                style={{ color: row.immune > 0 ? "#3498db" : undefined }}
+                                            >
+                                                {row.immune}
+                                            </td>
+                                            <td className="matchup-cell">{row.neutral}</td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
