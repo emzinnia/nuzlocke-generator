@@ -22,11 +22,13 @@ const EncounterMap = ({
     pokemon,
     currentGame,
     excludeGifts,
+    locationLookup,
     displayHideArea,
     onClickHideArea,
 }) => {
     return encounterMap.map((area) => {
         if (area === "") return null;
+        const found = locationLookup?.get(area.trim().toLocaleLowerCase());
         return (
             <div
                 key={area.toString()}
@@ -42,6 +44,7 @@ const EncounterMap = ({
                     pokemon={pokemon}
                     currentGame={currentGame}
                     excludeGifts={excludeGifts}
+                    poke={found}
                 />
                 <div style={{ marginLeft: "4px" }}>{area}</div>
                 {displayHideArea && (
@@ -67,18 +70,14 @@ const LocationIcon = ({
     currentGame,
     excludeGifts,
     pokemon,
+    poke,
 }: {
     area: string;
     currentGame: GameName;
     excludeGifts: boolean;
     pokemon: Pokemon[];
+    poke?: Pokemon;
 }) => {
-    const poke = pokemon.find(
-        (poke) =>
-            poke.met?.trim().toLocaleLowerCase() === area.toLocaleLowerCase() &&
-            (currentGame === "None" || poke.gameOfOrigin === currentGame),
-    );
-
     if (poke && !poke.hidden && (!poke.gift || !excludeGifts)) {
         return (
             <>
@@ -144,6 +143,18 @@ export const PokemonLocationChecklist = ({
     const [excludeGifts, setExcludeGifts] = React.useState(false);
     const [currentGame, setCurrentGame] = React.useState<GameName>("None");
     const dispatch = useDispatch();
+    const locationLookup = React.useMemo(() => {
+        const map = new Map<string, Pokemon>();
+        for (const poke of pokemon) {
+            const met = poke?.met?.trim();
+            if (!met) continue;
+            if (currentGame !== "None" && poke.gameOfOrigin !== currentGame)
+                continue;
+            const key = met.toLocaleLowerCase();
+            if (!map.has(key)) map.set(key, poke);
+        }
+        return map;
+    }, [pokemon, currentGame]);
     const encounterMap = React.useMemo(
         () =>
             getEncounterMap(game.name)
@@ -161,20 +172,14 @@ export const PokemonLocationChecklist = ({
     const updateExcludedAreasFromText = (event) => {
         const value = event.currentTarget.value;
         const areas = value.split("\n");
-        console.log("areas", value, areas);
         dispatch(updateExcludedAreas(areas));
     };
 
     const updateCustomAreasFromText = (event) => {
         const value = event.currentTarget.value;
         const areas = value.split("\n");
-        console.log("areas", value, areas);
         dispatch(updateCustomAreas(areas));
     };
-
-    React.useEffect(() => {
-        console.log("excludedAreas", excludedAreas);
-    }, [excludedAreas]);
 
     const colors = [
         "#0e1d6b",
@@ -282,6 +287,7 @@ export const PokemonLocationChecklist = ({
                 style={style}
                 currentGame={currentGame}
                 excludeGifts={excludeGifts}
+                locationLookup={locationLookup}
                 displayHideArea={true}
                 onClickHideArea={hideArea}
             />
