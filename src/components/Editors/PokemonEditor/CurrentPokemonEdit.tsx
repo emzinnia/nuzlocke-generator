@@ -186,6 +186,16 @@ export class CurrentPokemonEditBase extends React.Component<
 
     public componentDidMount() {
         getImages().then((res) => this.setState({ images: res }));
+
+        // If nothing is selected but we have Pokémon in state, select the first one
+        // so downstream inputs (e.g., species) render immediately for tests and users.
+        if (!this.props.selectedId && this.props.pokemon?.length) {
+            const firstId = this.props.pokemon[0]?.id;
+            if (firstId) {
+                this.props.selectPokemon(firstId);
+                this.setState({ selectedId: firstId });
+            }
+        }
     }
 
     private copyPokemon = (_e) => {
