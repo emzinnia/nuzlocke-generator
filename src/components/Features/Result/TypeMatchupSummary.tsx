@@ -128,8 +128,10 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
         </div>
     );
 
-    const getTypeBgColor = (type: Types) => {
-        return typeToColor(type, customTypes) ?? style?.accentColor ?? "#394b59";
+    const getTypeHeaderStyle = (type: Types) => {
+        const bgColor = typeToColor(type, customTypes) ?? style?.accentColor ?? "#394b59";
+        const textColor = getContrastColor(bgColor);
+        return { backgroundColor: bgColor, color: textColor };
     };
 
     const chartPanel = (
@@ -146,7 +148,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                                 <th
                                     key={defType}
                                     className="type-header-cell"
-                                    style={{ backgroundColor: getTypeBgColor(defType) }}
+                                    style={getTypeHeaderStyle(defType)}
                                 >
                                     {defType}
                                 </th>
@@ -158,7 +160,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                             <tr key={atkType}>
                                 <th
                                     className="type-header-cell"
-                                    style={{ backgroundColor: getTypeBgColor(atkType) }}
+                                    style={getTypeHeaderStyle(atkType)}
                                 >
                                     {atkType}
                                 </th>
