@@ -539,35 +539,48 @@
     border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
+.matchup-matrix {
+    font-size: 12px;
+}
+
 .matchup-matrix th {
     font-weight: 600;
-    padding: 0.2rem;
+    padding: 0.3rem;
 }
 
 .matchup-matrix thead th:not(.matchup-matrix-corner) {
-    width: 28px;
-    min-width: 28px;
+    width: 36px;
+    min-width: 36px;
 }
 
 .matchup-matrix tbody th {
-    padding: 0.2rem 0.3rem;
+    padding: 0.3rem 0.4rem;
 }
 
 .matchup-matrix-corner {
     text-align: left;
     white-space: nowrap;
-    padding: 0.25rem 0.4rem;
+    padding: 0.3rem 0.5rem;
 }
 
 .matchup-matrix-cell {
     font-variant-numeric: tabular-nums;
     border-radius: 0;
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
-    min-height: 28px;
-    line-height: 28px;
+    width: 36px;
+    height: 32px;
+    min-width: 36px;
+    min-height: 32px;
+    line-height: 32px;
     box-sizing: border-box;
+}
+
+.matchup-matrix .type-header-cell {
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .matchup-matrix-cell[data-mult="2"] {
