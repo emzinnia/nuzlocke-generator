@@ -312,7 +312,7 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         const currentPoke = this.props.pokemon.find(
             (p) => p.id === this.props.selectedId,
         );
-        if (!currentPoke) return;
+        if (!currentPoke || !currentPoke.status) return;
 
         const orderedBoxNames = this.getOrderedBoxNames();
         const currentStatusIndex = orderedBoxNames.indexOf(currentPoke.status);
@@ -334,7 +334,7 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         const currentPoke = this.props.pokemon.find(
             (p) => p.id === this.props.selectedId,
         );
-        if (!currentPoke) return;
+        if (!currentPoke || !currentPoke.status) return;
 
         const orderedBoxNames = this.getOrderedBoxNames();
         const currentStatusIndex = orderedBoxNames.indexOf(currentPoke.status);
