@@ -17,7 +17,7 @@ export const AppToasterHost: React.FC = () => {
     }, []);
 
     return React.createElement(OverlayToaster, {
-        ref: toasterCallback,
+        ref: toasterCallback as any,
         position: Position.TOP,
         maxToasts: 3,
     });
