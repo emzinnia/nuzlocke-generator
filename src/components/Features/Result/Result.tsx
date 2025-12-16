@@ -668,4 +668,4 @@ export const Result = connect(resultSelector, {
     selectPokemon,
     toggleMobileResultView,
     toggleDialog,
-})(ResultBase as unknown as React.ComponentType<ResultProps>);
+})(ResultBase);
