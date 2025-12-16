@@ -6,7 +6,6 @@ import { State } from "state";
 import { getGameGeneration, typeToColor, getContrastColor } from "utils";
 import { Generation } from "utils/getters/getGameGeneration";
 import { getTypeChartForGeneration, POKEMON_TYPES, buildTeamMatchups } from "utils/typeMatchups";
-import { Types } from "utils/Types";
 import * as styles from "./TypeMatchupDialog.styles";
 
 interface TypeMatchupSummaryProps {
@@ -23,7 +22,6 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
     style,
 }) => {
     const [useAbilityMatchups, setUseAbilityMatchups] = React.useState(false);
-    const isDark = !!style?.editorDarkMode;
     const generation: Generation = React.useMemo(
         () => getGameGeneration(game.name),
         [game.name],
