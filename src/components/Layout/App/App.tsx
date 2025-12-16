@@ -2,7 +2,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 
 import { State } from "state";
-import { feature, isLocal } from "utils";
+import { feature, isLocal, noop } from "utils";
 import { ErrorBoundary } from "components";
 import { Button } from "@blueprintjs/core";
 import { appSelector } from "selectors";
@@ -72,6 +72,7 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
         const { style, view } = this.props;
         const { result2 } = this.state;
         const isDarkMode = style.editorDarkMode;
+        const showDebugPanel = isLocal();
         console.log("features", feature);
 
         return (
@@ -123,7 +124,7 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
                         </ErrorBoundary>
                     )}
 
-                    {isLocal() && feature.resultv2 && (
+                    {showDebugPanel && feature.resultv2 && (
                         <Button
                             style={{
                                 position: "absolute",
@@ -137,6 +138,20 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
                         >
                             Use Result v2
                         </Button>
+                    )}
+
+                    {showDebugPanel && (
+                        <div className="debug-panel" aria-label="Debug Panel">
+                            <div className="debug-panel__title">Debug Panel</div>
+                            <div className="debug-panel__actions">
+                                <Button fill small onClick={noop}>
+                                    Add Random Pokemon
+                                </Button>
+                                <Button fill small onClick={noop}>
+                                    Create a new box of 30 Pokemon
+                                </Button>
+                            </div>
+                        </div>
                     )}
 
                     <ErrorBoundary key={4}>
