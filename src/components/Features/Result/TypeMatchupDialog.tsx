@@ -6,6 +6,7 @@ import { toggleDialog } from "actions";
 import { State } from "state";
 import { TypeMatchupSummary } from "./TypeMatchupSummary";
 import { getContrastColor, sortPokes } from "utils";
+import * as styles from "./TypeMatchupDialog.styles";
 
 export function TypeMatchupDialog() {
     const dispatch = useDispatch();
@@ -49,8 +50,8 @@ export function TypeMatchupDialog() {
             style={{ width: "98vw", maxWidth: "112.5rem" }}
         >
             <div className={Classes.DIALOG_BODY}>
-                <div className="type-matchups-layout">
-                    <div className="type-matchups-team-preview" style={{ color: textColor }}>
+                <div className={styles.typeMatchupsLayout}>
+                    <div className={styles.typeMatchupsTeamPreview} style={{ color: textColor }}>
                         <h4>Team Preview</h4>
                         {pokemon
                             ?.filter((p) => p?.status === "Team" && !p?.hidden)
@@ -58,7 +59,7 @@ export function TypeMatchupDialog() {
                             .map((poke) => (
                                 <Card
                                     key={poke.id}
-                                    className="type-matchups-team-entry"
+                                    className={styles.typeMatchupsTeamEntry}
                                     style={{ borderRadius: "0.5rem" }}
                                 >
                                     <PokemonIconPlain
@@ -81,7 +82,7 @@ export function TypeMatchupDialog() {
                                 </Card>
                             ))}
                     </div>
-                    <div className="type-matchups-main">
+                    <div className={styles.typeMatchupsMain}>
                         <TypeMatchupSummary
                             pokemon={pokemon}
                             game={game}
@@ -89,21 +90,24 @@ export function TypeMatchupDialog() {
                             style={style}
                         />
                     </div>
-                    <div className="type-matchups-other" style={{ color: textColor, minWidth: "12.5rem", maxWidth: "17.5rem" }}>
+                    <div
+                        className={styles.typeMatchupsOther}
+                        style={{ color: textColor, minWidth: "12.5rem", maxWidth: "17.5rem" }}
+                    >
                         <h4>Other Pokémon</h4>
                         {!others || !Object.keys(others).length ? (
                             <div>No other Pokémon</div>
                         ) : (
                             Object.entries(others).map(([status, list]) => (
-                                <div key={status} className="type-matchups-status">
-                                    <div className="type-matchups-status-title">
+                                <div key={status} className={styles.typeMatchupsStatus}>
+                                    <div className={styles.typeMatchupsStatusTitle}>
                                         {status} ({list.length})
                                     </div>
-                                    <div className="type-matchups-status-list">
+                                    <div className={styles.typeMatchupsStatusList}>
                                         {list.map((poke) => (
                                             <Card
                                                 key={poke.id}
-                                                className="type-matchups-other-entry"
+                                                className={styles.typeMatchupsOtherEntry}
                                                 style={{ borderRadius: "0.5rem" }}
                                             >
                                                 <PokemonIconPlain
