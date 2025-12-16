@@ -64,6 +64,7 @@ export function TypeMatchupDialog() {
                 <div className={styles.typeMatchupsLayout}>
                     <div className={styles.typeMatchupsTeamPreview} style={{ color: textColor }}>
                         <h4>Team Preview</h4>
+                        <p>Select a Pokémon to swap it out from type matchups.</p>
                         {pokemon
                             ?.filter((p) => p?.status === "Team" && !p?.hidden)
                             .sort(sortPokes)
