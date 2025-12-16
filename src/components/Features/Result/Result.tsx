@@ -462,7 +462,6 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                     <div className={Classes.OVERLAY_BACKDROP}></div>
                 )}
                 <ErrorBoundary>
-                    {/* @ts-expect-error suppress typing error */}
                     <TopBar
                         isDownloading={this.state.isDownloading}
                         onClickDownload={() => this.toImage()}
