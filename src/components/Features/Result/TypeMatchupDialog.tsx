@@ -28,7 +28,7 @@ export function TypeMatchupDialog() {
     const others = React.useMemo(
         () =>
             pokemon
-                ?.filter((p) => p?.status !== "Team" && !p?.hidden)
+                ?.filter((p) => p?.status !== "Team" && p?.status !== "Dead" && !p?.hidden)
                 .reduce<Record<string, typeof pokemon>>((acc, poke) => {
                     const key = poke.status || "Other";
                     acc[key] = acc[key] ? [...acc[key], poke] : [poke];
