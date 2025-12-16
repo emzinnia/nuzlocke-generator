@@ -179,6 +179,21 @@ export class PokemonEditorBase extends React.Component<
                         </React.Suspense>
                     </BaseEditor>
                 </BaseEditor>
+                <React.Suspense fallback={<Spinner />}>
+                    {this.state.isMassEditorOpen && (
+                        <ErrorBoundary>
+                            <MassEditor
+                                isOpen={this.state.isMassEditorOpen}
+                                toggleDialog={() =>
+                                    this.setState({
+                                        isMassEditorOpen:
+                                            !this.state.isMassEditorOpen,
+                                    })
+                                }
+                            />
+                        </ErrorBoundary>
+                    )}
+                </React.Suspense>
             </>
         );
     }
