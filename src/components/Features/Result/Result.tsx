@@ -473,13 +473,6 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                         isDownloading={this.state.isDownloading}
                         onClickDownload={() => this.toImage()}
                     >
-                        <Button
-                            className={Classes.MINIMAL}
-                            icon="layout-group-by"
-                            onClick={() => toggleDialog("typeMatchups")}
-                        >
-                            Type Matchups
-                        </Button>
                         <TopBarItems
                             editorDarkMode={this.props.style.editorDarkMode}
                             setZoomLevel={(zoomLevel) =>
