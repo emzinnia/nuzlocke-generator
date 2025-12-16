@@ -12,6 +12,5 @@ export function TestProvider({ children }: any) {
         },
     } as State);
 
-    // @ts-expect-error - React types version conflict between @types/react and @types/react-redux
     return <Provider store={store}>{children}</Provider>;
 }

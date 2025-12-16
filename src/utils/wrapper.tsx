@@ -5,7 +5,6 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 export const Wrapper = ({ children }) => (
-    // @ts-expect-error - React types version conflict between @types/react and @types/react-redux
     <Provider store={store}>
         <DndProvider backend={HTML5Backend}>{children}</DndProvider>
     </Provider>
