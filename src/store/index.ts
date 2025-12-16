@@ -115,13 +115,13 @@ export const store = createStore(
     applyMiddleware(...middlewares),
 );
 
-let lastEditorDarkMode = store.getState().style.editorDarkMode;
+let lastEditorDarkMode = (store.getState() as unknown as State).style?.editorDarkMode;
 if (typeof lastEditorDarkMode === "boolean") {
     setEditorDarkModePreference(lastEditorDarkMode);
 }
 
 store.subscribe(() => {
-    const currentEditorDarkMode = store.getState().style.editorDarkMode;
+    const currentEditorDarkMode = (store.getState() as unknown as State).style?.editorDarkMode;
     if (
         typeof currentEditorDarkMode !== "boolean" ||
         currentEditorDarkMode === lastEditorDarkMode
