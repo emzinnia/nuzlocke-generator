@@ -257,6 +257,23 @@ export const typeChip = css`
     font-size: 9px;
     display: inline-block;
     text-transform: uppercase;
+    cursor: pointer;
+    transition:
+        transform 0.15s ease-out,
+        box-shadow 0.15s ease-out,
+        filter 0.15s ease-out;
+
+    &:hover {
+        transform: translateY(-1px) scale(1.02);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+        filter: brightness(1.05);
+    }
+
+    :global(.bp5-dark) &:hover,
+    :global(.bp-3-dark) &:hover {
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+        filter: brightness(1.08);
+    }
 `;
 
 export const matchupCell = css`
