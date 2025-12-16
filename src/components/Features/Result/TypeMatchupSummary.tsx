@@ -3,7 +3,7 @@ import * as React from "react";
 import { Card, Elevation, Tabs, Tab } from "@blueprintjs/core";
 import { Pokemon, Game } from "models";
 import { State } from "state";
-import { getGameGeneration, typeToColor } from "utils";
+import { getGameGeneration, typeToColor, getContrastColor } from "utils";
 import { Generation } from "utils/getters/getGameGeneration";
 import { getTypeChartForGeneration, POKEMON_TYPES, buildTeamMatchups } from "utils/typeMatchups";
 import { Types } from "utils/Types";
