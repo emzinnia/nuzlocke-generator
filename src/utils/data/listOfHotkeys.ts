@@ -42,6 +42,18 @@ export const listOfHotkeys: HotkeyList[] = [
         onKeyUp: "nextPokemon",
     },
     {
+        key: "J",
+        label: "shift+j",
+        comment: "Move Pok\xE9mon Up",
+        onKeyUp: "movePokemonUp",
+    },
+    {
+        key: "K",
+        label: "shift+k",
+        comment: "Move Pok\xE9mon Down",
+        onKeyUp: "movePokemonDown",
+    },
+    {
         key: "n",
         comment: "Add new Pok\xE9mon",
         onKeyUp: "addPokemon",
