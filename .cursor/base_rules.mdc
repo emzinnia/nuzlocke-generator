@@ -1,0 +1,8 @@
+---
+alwaysApply: true
+---
+
+- Generally do not make comments
+- Do not make comments unless the code pattern is difficult to understand or requires explanation---
+alwaysApply: true
+---
