@@ -3,19 +3,10 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ImageUpload } from "../ImageUpload";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 
-// Mock Toaster
-const mockToasterShow = vi.fn();
-vi.mock("@blueprintjs/core", async () => {
-    const actual = await vi.importActual<typeof import("@blueprintjs/core")>("@blueprintjs/core");
-    return {
-        ...actual,
-        Toaster: {
-            create: () => ({
-                show: mockToasterShow,
-            }),
-        },
-    };
-});
+const mockShowToast = vi.fn();
+vi.mock("../appToaster", () => ({
+    showToast: mockShowToast,
+}));
 
 describe("ImageUpload", () => {
     const mockOnSuccess = vi.fn();
@@ -24,7 +15,7 @@ describe("ImageUpload", () => {
     beforeEach(() => {
         mockOnSuccess.mockClear();
         mockOnError.mockClear();
-        mockToasterShow.mockClear();
+        mockShowToast.mockClear();
     });
 
     it("renders upload button", () => {
@@ -48,7 +39,7 @@ describe("ImageUpload", () => {
         fireEvent.change(fileInput, { target: { files: [] } });
 
         await waitFor(() => {
-            expect(mockToasterShow).toHaveBeenCalledWith(
+            expect(mockShowToast).toHaveBeenCalledWith(
                 expect.objectContaining({
                     message: "No file detected.",
                 })
@@ -69,7 +60,7 @@ describe("ImageUpload", () => {
         fireEvent.change(fileInput, { target: { files: [largeFile] } });
 
         await waitFor(() => {
-            expect(mockToasterShow).toHaveBeenCalledWith(
+            expect(mockShowToast).toHaveBeenCalledWith(
                 expect.objectContaining({
                     message: expect.stringContaining("File size of 500KB exceeded"),
                 })
