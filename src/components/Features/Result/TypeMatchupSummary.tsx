@@ -49,7 +49,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
 
     // This renders inside a Blueprint dialog, so use Blueprint's readable defaults.
     // (Using style.bgColor here can produce low-contrast text against the dialog background.)
-    const textColor = isDark ? "#F5F8FA" : "#182026";
+    const textColor = style?.editorDarkMode ? "#F5F8FA" : "#182026";
 
     const abilityToggle = (
         <div className={styles.typeMatchupsOptions}>
@@ -65,12 +65,18 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
         </div>
     );
 
-    const getTypeChipStyle = (type: Types) => {
-        const bg = typeToColor(type, customTypes) ?? style?.accentColor ?? "#394b59";
-        // Keep chip text readable regardless of type color by using a subtle outline + relying on bright base text.
-        // (Blueprint dark mode already uses a bright text default.)
-        const fg = isDark ? "#F5F8FA" : "#fff";
-        return { backgroundColor: bg, color: fg };
+    // Heatmap: opacity scales with count (max at teamSize)
+    const teamSize = teamPokemon.length || 1;
+    const getHeatmapStyle = (count: number, baseColor: string) => {
+        if (count === 0) return undefined;
+        // Scale opacity from 0.2 (min) to 0.9 (max) based on count relative to team size
+        const opacity = 0.2 + (count / teamSize) * 0.7;
+        const useWhiteText = opacity > 0.4;
+        return {
+            backgroundColor: baseColor.replace(')', `, ${opacity})`).replace('rgb', 'rgba'),
+            color: useWhiteText ? "#fff" : undefined,
+            fontWeight: 700 as const,
+        };
     };
 
     const renderMultiplier = (m: number) => {
