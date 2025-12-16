@@ -5,7 +5,6 @@ import {
     DrawerSize,
     Icon,
     Intent,
-    Toaster,
 } from "@blueprintjs/core";
 import { css, cx } from "emotion";
 import * as React from "react";
@@ -16,6 +15,7 @@ import { State } from "state";
 import { isDarkModeSelector } from "selectors";
 import { Skeleton } from "./Skeletons";
 import { toggleDialog } from "actions";
+import { getAppToaster } from "./appToaster";
 
 // 'p-1 m-1 w-40 h-40 relative flex justify-center align-center overflow-y-auto'
 
@@ -123,7 +123,7 @@ export function ImagesDrawerInner() {
     const [offset, setOffset] = React.useState(0);
     const [hasMore, setHasMore] = React.useState(true);
     const [isLoading, setIsLoading] = React.useState(false);
-    const toasterRef = React.useRef(Toaster.create());
+    const toaster = React.useMemo(() => getAppToaster(), []);
     const [layoutView, setLayoutView] = React.useState<ImagesDrawerLayout>(
         ImagesDrawerLayout.Grid,
     );
@@ -176,7 +176,7 @@ export function ImagesDrawerInner() {
             const _deletion = await db.images.where("id").equals(id).delete();
             setRefresh(id);
         } catch (e) {
-            toasterRef.current.show({
+            toaster?.show({
                 message: `Error deleting item ocurred. ${e}`,
                 intent: Intent.DANGER,
             });

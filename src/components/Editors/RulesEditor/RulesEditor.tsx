@@ -8,11 +8,11 @@ import {
     Classes,
     HTMLSelect,
     Divider,
-    Toaster,
     Spinner,
 } from "@blueprintjs/core";
 import { connect } from "react-redux";
 import { editRule, addRule, deleteRule, resetRules, setRules } from "actions";
+import { showToast } from "components/Common/Shared/appToaster";
 
 import "./RulesEditor.css";
 import { State } from "state";
@@ -192,15 +192,13 @@ export class RulesEditor extends React.Component<RulesEditorProps, RulesEditorSt
             .then((res) => res.json())
             .then((res) => {
                 if (res.status === 200 || res.status === 201) {
-                    const toaster = Toaster.create();
-                    toaster.show({
+                    showToast({
                         message: "Ruleset suggestion submitted! Thank you for contributing.",
                         intent: Intent.SUCCESS,
                     });
                     this.setState({ isSending: false }, this.closeSuggestDialog);
                 } else {
-                    const toaster = Toaster.create();
-                    toaster.show({
+                    showToast({
                         message: "Submission failed. Please try again.",
                         intent: Intent.DANGER,
                     });
@@ -208,8 +206,7 @@ export class RulesEditor extends React.Component<RulesEditorProps, RulesEditorSt
                 this.setState({ isSending: false });
             })
             .catch((err) => {
-                const toaster = Toaster.create();
-                toaster.show({
+                showToast({
                     message: `Submission failed. Please try again. ${err}`,
                     intent: Intent.DANGER,
                 });
