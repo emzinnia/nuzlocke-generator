@@ -1,5 +1,7 @@
 import { State } from "state";
 import { Pokemon } from "models";
+import { createSelector } from "reselect";
+import { sortPokes } from "utils";
 
 export const gameNameSelector = (state: State) => state.game.name;
 export const minimizedSelector = (state: State) => state.editor.minimized;
@@ -23,3 +25,8 @@ export const resultSelector = (state: State) => ({
     editor: state.editor,
     customTypes: state.customTypes,
 });
+
+export const sortedPokemonSelector = createSelector(
+    (state: State) => state.pokemon,
+    (pokemon) => [...pokemon].sort(sortPokes),
+);
