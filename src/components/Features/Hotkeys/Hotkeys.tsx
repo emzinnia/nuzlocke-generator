@@ -269,5 +269,6 @@ export const Hotkeys = connect(
         newNuzlocke,
         changeEditorSize,
         toggleDialog,
+        editPokemon,
     },
 )(HotkeysBase);
