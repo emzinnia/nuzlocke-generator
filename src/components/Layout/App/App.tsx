@@ -8,7 +8,8 @@ import { ErrorBoundary } from "components";
 import { Button } from "@blueprintjs/core";
 import { appSelector } from "selectors";
 import { Skeleton } from "components";
-import { listOfPokemon } from "utils/data/listOfPokemon";
+import { listOfPokemon, Species } from "utils/data/listOfPokemon";
+import { matchSpeciesToTypes } from "utils/formatters/matchSpeciesToTypes";
 
 import "./app.css";
 
@@ -62,10 +63,12 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
     }
 
     private addRandomPokemon = () => {
-        const species = choose(listOfPokemon);
+        const species = choose(listOfPokemon) as Species;
+        const types = matchSpeciesToTypes(species);
         const pokemon = generateEmptyPokemon(this.props.pokemon, {
             species,
             status: "Team",
+            types,
         });
         this.props.addPokemon(pokemon);
     };
