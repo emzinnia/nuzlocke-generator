@@ -344,33 +344,39 @@ export function TeamPokemonBaseMinimal(
             className="pokemon-container minimal"
             style={{ color: getContrastColor(props?.style?.bgColor) }}
         >
-            <PokemonImage
-                species={poke?.species}
-                gender={poke?.gender}
-                forme={poke?.forme}
-                customImage={poke?.customImage}
-                style={style}
-                editor={editor}
-                shiny={poke?.shiny}
-                egg={poke?.egg}
-                name={game.name}
+            <div
+                role="presentation"
+                onClick={() => props.selectPokemon?.(poke.id)}
+                style={{ cursor: "pointer" }}
             >
-                {(backgroundImage) => {
-                    return (
-                        <div
-                            style={{
-                                backgroundImage,
-                                ...(props.spriteStyle as React.CSSProperties),
-                            }}
-                            className={`pokemon-image ${(poke?.species || "missingno").toLowerCase()} ${
-                                props.style.imageStyle === "round"
-                                    ? "round"
-                                    : "square"
-                            }`}
-                        />
-                    );
-                }}
-            </PokemonImage>
+                <PokemonImage
+                    species={poke?.species}
+                    gender={poke?.gender}
+                    forme={poke?.forme}
+                    customImage={poke?.customImage}
+                    style={style}
+                    editor={editor}
+                    shiny={poke?.shiny}
+                    egg={poke?.egg}
+                    name={game.name}
+                >
+                    {(backgroundImage) => {
+                        return (
+                            <div
+                                style={{
+                                    backgroundImage,
+                                    ...(props.spriteStyle as React.CSSProperties),
+                                }}
+                                className={`pokemon-image ${(poke?.species || "missingno").toLowerCase()} ${
+                                    props.style.imageStyle === "round"
+                                        ? "round"
+                                        : "square"
+                                }`}
+                            />
+                        );
+                    }}
+                </PokemonImage>
+            </div>
             <div className="pokemon-info">
                 <div className="pokemon-info-inner">
                     <span className="pokemon-nickname">{pokemon.nickname}</span>
