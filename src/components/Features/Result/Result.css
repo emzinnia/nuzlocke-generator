@@ -539,6 +539,11 @@
     border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
+.bp5-dark .matchup-table th,
+.bp5-dark .matchup-table td {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
 .matchup-matrix {
     font-size: 12px;
 }
