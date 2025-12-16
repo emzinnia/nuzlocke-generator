@@ -9,7 +9,6 @@ import { AddPokemonButton } from "components";
 import { BaseEditor } from "components";
 import { Box, BoxForm } from "components";
 import { ErrorBoundary } from "components";
-import { cx } from "emotion";
 import { addPokemon, toggleDialog } from "actions";
 
 export interface PokemonEditorProps {
@@ -27,7 +26,6 @@ export interface PokemonEditorProps {
 }
 
 export interface PokemonEditorState {
-    isMassEditorOpen: boolean;
     searchTerm: string;
 }
 
@@ -64,8 +62,8 @@ export class BoxesComponent extends React.Component<BoxesComponentProps> {
     }
 }
 
-const MassEditor = React.lazy(
-    () => import("components/Editors/PokemonEditor/MassEditor"),
+const MassEditorTable = React.lazy(
+    () => import("components/Editors/PokemonEditor/MassEditorTable").then(module => ({ default: module.MassEditorTable })),
 );
 const PokemonLocationChecklist = React.lazy(
     () => import("components/Editors/PokemonEditor/PokemonLocationChecklist"),
@@ -78,16 +76,9 @@ export class PokemonEditorBase extends React.Component<
     public constructor(props: PokemonEditorProps) {
         super(props);
         this.state = {
-            isMassEditorOpen: false,
             searchTerm: "",
         };
     }
-
-    private openMassEditor = (_e) => {
-        this.setState({
-            isMassEditorOpen: true,
-        });
-    };
 
     public componentDidMount() {
         // @NOTE: refactor so that there's an easier way to auto-generate Pokemon data
@@ -137,14 +128,6 @@ export class PokemonEditorBase extends React.Component<
                             </Button>
                         </div>
                         <div style={{ marginLeft: "auto", width: "50%" }}>
-                            <Button
-                                icon={"heat-grid"}
-                                intent={Intent.PRIMARY}
-                                onClick={this.openMassEditor}
-                                className={cx(Classes.MINIMAL, Classes.FILL)}
-                            >
-                                Open Mass Editor
-                            </Button>
                             <input
                                 type="search"
                                 placeholder="Search..."
@@ -159,6 +142,13 @@ export class PokemonEditorBase extends React.Component<
                             />
                         </div>
                     </div>
+                    <BaseEditor name="Mass Editor" icon="heat-grid" defaultOpen={false}>
+                        <React.Suspense fallback={<Spinner />}>
+                            <ErrorBoundary>
+                                <MassEditorTable />
+                            </ErrorBoundary>
+                        </React.Suspense>
+                    </BaseEditor>
                     <BoxesComponent
                         searchTerm={this.state.searchTerm}
                         boxes={boxes}
@@ -179,21 +169,6 @@ export class PokemonEditorBase extends React.Component<
                         </React.Suspense>
                     </BaseEditor>
                 </BaseEditor>
-                <React.Suspense fallback={<Spinner />}>
-                    {this.state.isMassEditorOpen && (
-                        <ErrorBoundary>
-                            <MassEditor
-                                isOpen={this.state.isMassEditorOpen}
-                                toggleDialog={() =>
-                                    this.setState({
-                                        isMassEditorOpen:
-                                            !this.state.isMassEditorOpen,
-                                    })
-                                }
-                            />
-                        </ErrorBoundary>
-                    )}
-                </React.Suspense>
             </>
         );
     }
