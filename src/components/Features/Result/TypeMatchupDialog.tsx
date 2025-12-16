@@ -20,10 +20,54 @@ export function TypeMatchupDialog() {
         (state) => state.customTypes,
     );
 
+    // Track pokemon IDs that have been swapped out of team (locally, not yet saved)
+    const [removedFromTeam, setRemovedFromTeam] = React.useState<Set<string>>(new Set());
+    // Track pokemon IDs that have been swapped into team (locally, not yet saved)
+    const [addedToTeam, setAddedToTeam] = React.useState<Set<string>>(new Set());
+
     const onClose = React.useCallback(
-        () => dispatch(toggleDialog("typeMatchups")),
+        () => {
+            dispatch(toggleDialog("typeMatchups"));
+            // Reset local state on close
+            setRemovedFromTeam(new Set());
+            setAddedToTeam(new Set());
+        },
         [dispatch],
     );
+
+    const handleRemoveFromTeam = React.useCallback((id: string) => {
+        setRemovedFromTeam((prev) => new Set(prev).add(id));
+        setAddedToTeam((prev) => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+        });
+    }, []);
+
+    const handleAddToTeam = React.useCallback((id: string) => {
+        setAddedToTeam((prev) => new Set(prev).add(id));
+        setRemovedFromTeam((prev) => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+        });
+    }, []);
+
+    const handleConfirmTeam = React.useCallback(() => {
+        // Update removed pokemon to "Boxed" status
+        removedFromTeam.forEach((id) => {
+            dispatch(editPokemon({ status: "Boxed" }, id));
+        });
+        // Update added pokemon to "Team" status
+        addedToTeam.forEach((id) => {
+            dispatch(editPokemon({ status: "Team" }, id));
+        });
+        // Reset local state
+        setRemovedFromTeam(new Set());
+        setAddedToTeam(new Set());
+    }, [dispatch, removedFromTeam, addedToTeam]);
+
+    const hasChanges = removedFromTeam.size > 0 || addedToTeam.size > 0;
 
     const others = React.useMemo(
         () =>
