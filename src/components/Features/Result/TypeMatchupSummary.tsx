@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Card, Elevation, Tabs, Tab } from "@blueprintjs/core";
+import { Card, Elevation, Tabs, Tab, Checkbox } from "@blueprintjs/core";
 import { Pokemon, Game } from "models";
 import { State } from "state";
 import { getGameGeneration, typeToColor, getContrastColor } from "utils";
@@ -13,7 +13,6 @@ interface TypeMatchupSummaryProps {
     game: Game;
     customTypes: State["customTypes"];
     style: State["style"];
-    useAbilityMatchups?: boolean;
 }
 
 export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
@@ -21,8 +20,8 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
     game,
     customTypes,
     style,
-    useAbilityMatchups = false,
 }) => {
+    const [useAbilityMatchups, setUseAbilityMatchups] = React.useState(false);
     const isDark = !!style?.editorDarkMode;
     const generation: Generation = React.useMemo(
         () => getGameGeneration(game.name),
@@ -42,9 +41,41 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
         [teamPokemon, generation, useAbilityMatchups],
     );
 
+    const handleAbilityToggle = React.useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            setUseAbilityMatchups(e.target.checked);
+        },
+        [],
+    );
+
     // This renders inside a Blueprint dialog, so use Blueprint's readable defaults.
     // (Using style.bgColor here can produce low-contrast text against the dialog background.)
     const textColor = isDark ? "#F5F8FA" : "#182026";
+
+    const abilityToggle = (
+        <div
+            className="type-matchups-options"
+            style={{ marginBottom: "12px", display: "flex", alignItems: "center" }}
+        >
+            <Checkbox
+                checked={useAbilityMatchups}
+                onChange={handleAbilityToggle}
+                label="Include Ability Effects"
+                style={{ marginBottom: 0 }}
+            />
+            <span
+                className="type-matchups-options-hint"
+                style={{
+                    fontSize: "12px",
+                    color: textColor,
+                    opacity: 0.7,
+                    marginLeft: "8px",
+                }}
+            >
+                (e.g., Levitate, Flash Fire, Thick Fat)
+            </span>
+        </div>
+    );
 
     const getTypeChipStyle = (type: Types) => {
         const bg = typeToColor(type, customTypes) ?? style?.accentColor ?? "#394b59";
@@ -63,6 +94,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
 
     const summaryPanel = (
         <div className="team-matchups-summary">
+            {abilityToggle}
             {teamPokemon.length > 0 ? (
                 <>
                     <div className="type-matchups-caption" style={{ marginBottom: "8px" }}>

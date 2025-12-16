@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Dialog, Classes, Checkbox } from "@blueprintjs/core";
+import { Dialog, Classes } from "@blueprintjs/core";
 import { useDispatch, useSelector } from "react-redux";
 import { PokemonIconPlain } from "components";
 import { toggleDialog } from "actions";
@@ -19,18 +19,9 @@ export function TypeMatchupDialog() {
         (state) => state.customTypes,
     );
 
-    const [useAbilityMatchups, setUseAbilityMatchups] = React.useState(false);
-
     const onClose = React.useCallback(
         () => dispatch(toggleDialog("typeMatchups")),
         [dispatch],
-    );
-
-    const handleAbilityToggle = React.useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            setUseAbilityMatchups(e.target.checked);
-        },
-        [],
     );
 
     const others = React.useMemo(
@@ -90,31 +81,11 @@ export function TypeMatchupDialog() {
                             ))}
                     </div>
                     <div className="type-matchups-main">
-                        <div className="type-matchups-options" style={{ marginBottom: "12px" }}>
-                            <Checkbox
-                                checked={useAbilityMatchups}
-                                onChange={handleAbilityToggle}
-                                label="Include Ability Effects"
-                                style={{ marginBottom: 0 }}
-                            />
-                            <span
-                                className="type-matchups-options-hint"
-                                style={{
-                                    fontSize: "12px",
-                                    color: textColor,
-                                    opacity: 0.7,
-                                    marginLeft: "8px",
-                                }}
-                            >
-                                (e.g., Levitate, Flash Fire, Thick Fat)
-                            </span>
-                        </div>
                         <TypeMatchupSummary
                             pokemon={pokemon}
                             game={game}
                             customTypes={customTypes}
                             style={style}
-                            useAbilityMatchups={useAbilityMatchups}
                         />
                     </div>
                     <div className="type-matchups-other" style={{ color: textColor, minWidth: "200px", maxWidth: "280px" }}>
