@@ -1,6 +1,6 @@
 import * as React from "react";
 import { AppBase as App } from "..";
-import { styleDefaults } from "utils";
+import { styleDefaults, generateEmptyPokemon, noop } from "utils";
 import { render, screen } from "utils/testUtils";
 
 describe.skip("<App />", () => {
@@ -9,6 +9,8 @@ describe.skip("<App />", () => {
             <App
                 view={{ dialogs: { imageUploader: false } }}
                 style={styleDefaults}
+                pokemon={[generateEmptyPokemon()]}
+                addPokemon={noop}
             />,
         );
         expect(screen.getByTestId("app")).toBeDefined();
