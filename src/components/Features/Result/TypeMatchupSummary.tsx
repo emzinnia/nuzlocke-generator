@@ -92,12 +92,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
             {teamPokemon.length > 0 ? (
                 <>
                     <div className={styles.typeMatchupsCaption} style={{ marginBottom: "0.5rem" }}>
-                        Team coverage against each attacking type:
-                        {useAbilityMatchups && (
-                            <span style={{ fontWeight: "normal", opacity: 0.7 }}>
-                                (includes ability effects)
-                            </span>
-                        )}
+                        Team Coverage
                     </div>
                     <div className={styles.typeMatchupsTableWrapper}>
                         <table
