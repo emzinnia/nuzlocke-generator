@@ -64,8 +64,8 @@ export class BoxesComponent extends React.Component<BoxesComponentProps> {
     }
 }
 
-const MassEditorTable = React.lazy(
-    () => import("components/Editors/PokemonEditor/MassEditorTable").then(module => ({ default: module.MassEditorTable })),
+const MassEditor = React.lazy(
+    () => import("components/Editors/PokemonEditor/MassEditor"),
 );
 const PokemonLocationChecklist = React.lazy(
     () => import("components/Editors/PokemonEditor/PokemonLocationChecklist"),
@@ -78,9 +78,16 @@ export class PokemonEditorBase extends React.Component<
     public constructor(props: PokemonEditorProps) {
         super(props);
         this.state = {
+            isMassEditorOpen: false,
             searchTerm: "",
         };
     }
+
+    private openMassEditor = (_e) => {
+        this.setState({
+            isMassEditorOpen: true,
+        });
+    };
 
     public componentDidMount() {
         // @NOTE: refactor so that there's an easier way to auto-generate Pokemon data
@@ -142,15 +149,16 @@ export class PokemonEditorBase extends React.Component<
                                 }
                                 style={{ margin: "0.25rem", width: "100%" }}
                             />
+                            <Button
+                                icon={"heat-grid"}
+                                intent={Intent.PRIMARY}
+                                onClick={this.openMassEditor}
+                                className={cx(Classes.MINIMAL, Classes.FILL)}
+                            >
+                                Open Mass Editor
+                            </Button>
                         </div>
                     </div>
-                    <BaseEditor name="Mass Editor" icon="heat-grid" defaultOpen={false}>
-                        <React.Suspense fallback={<Spinner />}>
-                            <ErrorBoundary>
-                                <MassEditorTable />
-                            </ErrorBoundary>
-                        </React.Suspense>
-                    </BaseEditor>
                     <BoxesComponent
                         searchTerm={this.state.searchTerm}
                         boxes={boxes}
