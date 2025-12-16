@@ -64,8 +64,9 @@ function getSpriteStyle({ spritesMode, scaleSprites, teamImages }) {
 
 export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
     public render() {
-        const { pokemon, style, customTypes, linkedPokemon, game } = this.props;
-        const generation = getGameGeneration(game.name);
+        const { pokemon, style, customTypes, linkedPokemon, game, generation } =
+            this.props;
+        const effectiveGeneration = generation ?? getGameGeneration(game.name);
 
         if (!pokemon) {
             return null;
@@ -238,7 +239,7 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                                         {stat(pokemon?.extraData?.[key], key)}
                                     </React.Fragment>;
                                 })} */}
-                                {generation === Generation.Gen1 ? (
+                                {effectiveGeneration === Generation.Gen1 ? (
                                     <>
                                         {stat(
                                             pokemon.extraData["currentHp"],
