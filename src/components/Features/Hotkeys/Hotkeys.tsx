@@ -8,6 +8,7 @@ import {
     newNuzlocke,
     changeEditorSize,
     toggleDialog,
+    editPokemon,
 } from "actions";
 import { Pokemon } from "models";
 import { sortPokes, sortPokesReverse, noop, generateEmptyPokemon } from "utils";
@@ -26,6 +27,7 @@ export interface HotkeysProps {
     newNuzlocke: newNuzlocke;
     changeEditorSize: changeEditorSize;
     toggleDialog: toggleDialog;
+    editPokemon: typeof editPokemon;
     pokemon: Pokemon[];
     selectedId: string;
     editor: Editor;
