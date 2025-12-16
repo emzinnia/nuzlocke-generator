@@ -184,4 +184,4 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
     }
 }
 
-export const App = connect(appSelector)(AppBase);
+export const App = connect(appSelector, { addPokemon })(AppBase);
