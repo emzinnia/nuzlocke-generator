@@ -2,7 +2,7 @@ import * as React from "react";
 import { render, screen, fireEvent } from "utils/testUtils";
 import { ColorEditBase, rgbaOrHex } from "../ColorEdit";
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { Styles } from "models";
+import { Styles } from "utils/styleDefaults";
 
 describe("rgbaOrHex", () => {
     it("returns hex when alpha is 1", () => {
