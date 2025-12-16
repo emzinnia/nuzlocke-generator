@@ -665,9 +665,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    padding: 0.35rem 0.5rem;
-    border-radius: 4px;
-    background: var(--matchup-row-odd-bg);
+    padding: 0.35rem 0.5rem !important;
 }
 
 .type-matchups-layout {
