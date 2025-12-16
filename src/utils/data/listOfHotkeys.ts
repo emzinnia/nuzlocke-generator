@@ -44,13 +44,13 @@ export const listOfHotkeys: HotkeyList[] = [
     {
         key: "J",
         label: "shift+j",
-        comment: "Move Pok\xE9mon Up",
+        comment: "Move Pok\xE9mon Left",
         onKeyUp: "movePokemonUp",
     },
     {
         key: "K",
         label: "shift+k",
-        comment: "Move Pok\xE9mon Down",
+        comment: "Move Pok\xE9mon Right",
         onKeyUp: "movePokemonDown",
     },
     {
