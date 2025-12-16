@@ -127,25 +127,46 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                                             <td
                                                 className={styles.matchupCell}
                                                 data-highlight={row.weak > 0 ? "weak" : undefined}
-                                                style={{ color: row.weak > 0 ? "#e74c3c" : undefined }}
+                                                style={row.weak > 0 ? {
+                                                    backgroundColor: "#e74c3c",
+                                                    color: "#fff",
+                                                    fontWeight: 700,
+                                                } : undefined}
                                             >
                                                 {row.weak}
                                             </td>
                                             <td
                                                 className={styles.matchupCell}
                                                 data-highlight={row.resist > 0 ? "resist" : undefined}
-                                                style={{ color: row.resist > 0 ? "#2ecc71" : undefined }}
+                                                style={row.resist > 0 ? {
+                                                    backgroundColor: "#27ae60",
+                                                    color: "#fff",
+                                                    fontWeight: 700,
+                                                } : undefined}
                                             >
                                                 {row.resist}
                                             </td>
                                             <td
                                                 className={styles.matchupCell}
                                                 data-highlight={row.immune > 0 ? "immune" : undefined}
-                                                style={{ color: row.immune > 0 ? "#3498db" : undefined }}
+                                                style={row.immune > 0 ? {
+                                                    backgroundColor: "#9b59b6",
+                                                    color: "#fff",
+                                                    fontWeight: 700,
+                                                } : undefined}
                                             >
                                                 {row.immune}
                                             </td>
-                                            <td className={styles.matchupCell}>{row.neutral}</td>
+                                            <td
+                                                className={styles.matchupCell}
+                                                style={row.neutral > 0 ? {
+                                                    backgroundColor: "#7f8c8d",
+                                                    color: "#fff",
+                                                    fontWeight: 700,
+                                                } : undefined}
+                                            >
+                                                {row.neutral}
+                                            </td>
                                         </tr>
                                     );
                                 })}
