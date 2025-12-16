@@ -72,7 +72,9 @@ function applyBackwardDiff<T>(state: T, diff: DiffEntry): T {
     // Clone the state first since revertChange mutates
     const result = deepClone(state);
     for (const change of diff) {
-        revertChange(result, null, change);
+        // backwardDiffs are generated from (new -> old), so applyChange
+        // will move the current state back to the previous snapshot.
+        applyChange(result, null, change);
     }
     return result;
 }
