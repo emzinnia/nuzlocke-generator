@@ -161,6 +161,7 @@ export class RulesEditor extends React.Component<RulesEditorProps, RulesEditorSt
             suggestDialogOpen: false,
             suggestName: "",
             suggestDescription: "",
+            isSending: false,
         });
     };
 
@@ -196,7 +197,7 @@ export class RulesEditor extends React.Component<RulesEditorProps, RulesEditorSt
                         message: "Ruleset suggestion submitted! Thank you for contributing.",
                         intent: Intent.SUCCESS,
                     });
-                    this.closeSuggestDialog();
+                    this.setState({ isSending: false }, this.closeSuggestDialog);
                 } else {
                     const toaster = Toaster.create();
                     toaster.show({
