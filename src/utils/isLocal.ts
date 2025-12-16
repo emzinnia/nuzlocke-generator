@@ -1,2 +1,4 @@
 // Checks if it's the local build of the nuzlocke generator
-export const isLocal = () => window.location.host.includes("localhost");
+export const isLocal = () =>
+    typeof window !== "undefined" &&
+    ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
