@@ -88,7 +88,6 @@ const cellRenderer: (
 export function renderColumns(pokemon, editPokemon) {
     return Object.keys(PokemonKeys).map((key) => {
         return (
-            // @ts-expect-error - Blueprint Table Column type inference issue with React types
             <Column
                 key={key}
                 name={key}
