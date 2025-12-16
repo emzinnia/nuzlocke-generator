@@ -581,10 +581,10 @@
     letter-spacing: 0.5px;
 }
 
-/* Ensure type header colors are not overridden by Blueprint or inherited styles */
-.matchup-matrix th.type-header-cell,
-.bp5-dark .matchup-matrix th.type-header-cell {
-    /* Color is set via inline style from getContrastColor() */
+/* Reset any inherited or Blueprint text colors on type header cells */
+.matchup-matrix th.type-header-cell[style],
+.bp5-dark .matchup-matrix th.type-header-cell[style] {
+    color: inherit;
 }
 
 .matchup-matrix-cell[data-mult="2"] {
