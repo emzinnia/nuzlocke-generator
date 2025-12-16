@@ -18,7 +18,12 @@ import {
     replaceState,
     updateSwitchNuzlocke,
 } from "actions";
-import { feature, gameOfOriginToColor, getContrastColor } from "utils";
+import {
+    feature,
+    gameOfOriginToColor,
+    getContrastColor,
+    Styles,
+} from "utils";
 import { omit } from "ramda";
 import { createStore } from "redux";
 import { appReducers } from "reducers";
@@ -51,6 +56,20 @@ interface ContainsId {
 }
 
 const sort = (a: ContainsId, b: ContainsId) => a.id - b.id;
+
+const stripEditorDarkModeFromState = (state: State) => {
+    const baseState = omit(["nuzlockes", "editorHistory"], state) as {
+        style?: Styles;
+        [key: string]: unknown;
+    };
+    const { editorDarkMode: _omit, ...styleWithoutDarkMode } =
+        baseState.style || {};
+
+    return {
+        ...baseState,
+        style: styleWithoutDarkMode,
+    };
+};
 
 export class NuzlockeSaveBase extends React.Component<
     NuzlockeSaveControlsProps,
