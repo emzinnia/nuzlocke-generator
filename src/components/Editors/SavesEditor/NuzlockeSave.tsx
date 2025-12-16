@@ -127,7 +127,12 @@ export class NuzlockeSaveBase extends React.Component<
                     onClick={() => {
                         updateNuzlocke(currentId, state);
                         const data = createStore(appReducers)?.getState();
-                        newNuzlocke(JSON.stringify(data), { isCopy: false });
+                        const preparedData = stripEditorDarkModeFromState(
+                            data as unknown as State,
+                        );
+                        newNuzlocke(JSON.stringify(preparedData), {
+                            isCopy: false,
+                        });
                         replaceState(data);
                     }}
                 >
