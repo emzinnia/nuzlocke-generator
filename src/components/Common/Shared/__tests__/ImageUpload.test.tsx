@@ -3,7 +3,10 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ImageUpload } from "../ImageUpload";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 
-const mockShowToast = vi.fn();
+const { mockShowToast } = vi.hoisted(() => ({
+    mockShowToast: vi.fn(),
+}));
+
 vi.mock("../appToaster", () => ({
     showToast: mockShowToast,
 }));
