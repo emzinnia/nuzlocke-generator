@@ -12,7 +12,7 @@ const Skeleteon = (
 export function SuspenseBoundary({
     children,
 }: {
-    children?: React.LazyExoticComponent<() => JSX.Element>;
+    children?: React.ReactNode;
 }) {
     return (
         <ErrorBoundary>
