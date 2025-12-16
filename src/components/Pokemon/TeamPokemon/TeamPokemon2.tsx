@@ -182,6 +182,7 @@ export function TeamPokemon({
         ),
         icon: ReactDOMServer.renderToString(pokemonIcon),
         checkpoints: ReactDOMServer.renderToString(
+            // @ts-expect-error - React types version conflict between @types/react and @types/react-redux
             <Provider store={store}>
                 <TeamCheckpointsDisplay
                     game={game}
@@ -200,6 +201,7 @@ export function TeamPokemon({
         linkedPokemonData: linkedPokemon ?? null,
         extraData: "",
         movesColored: ReactDOMServer.renderToString(
+            // @ts-expect-error - MovesBase component type inference issue
             <MovesBase
                 style={style}
                 customMoveMap={customMoveMap}
@@ -211,6 +213,7 @@ export function TeamPokemon({
             />,
         ),
         movesColoredWithClasses: ReactDOMServer.renderToString(
+            // @ts-expect-error - MovesBase component type inference issue
             <MovesBase
                 style={style}
                 customMoveMap={customMoveMap}
