@@ -56,9 +56,10 @@ export function TypeMatchupDialog() {
                             ?.filter((p) => p?.status === "Team" && !p?.hidden)
                             .sort(sortPokes)
                             .map((poke) => (
-                                <div
+                                <Card
                                     key={poke.id}
                                     className="type-matchups-team-entry"
+                                    style={{ borderRadius: "8px" }}
                                 >
                                     <PokemonIconPlain
                                         {...poke}
@@ -77,7 +78,7 @@ export function TypeMatchupDialog() {
                                     <span>
                                         {poke.nickname || poke.species || "Unknown"}
                                     </span>
-                                </div>
+                                </Card>
                             ))}
                     </div>
                     <div className="type-matchups-main">
