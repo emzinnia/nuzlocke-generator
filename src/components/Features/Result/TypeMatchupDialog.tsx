@@ -5,7 +5,7 @@ import { PokemonIconPlain } from "components";
 import { toggleDialog } from "actions";
 import { State } from "state";
 import { TypeMatchupSummary } from "./TypeMatchupSummary";
-import { getContrastColor, sortPokes } from "utils";
+import { sortPokes } from "utils";
 import * as styles from "./TypeMatchupDialog.styles";
 
 export function TypeMatchupDialog() {
@@ -47,7 +47,8 @@ export function TypeMatchupDialog() {
         [others],
     );
 
-    const textColor = getContrastColor(style?.bgColor ?? "#383840");
+    // Use dark mode setting for proper text contrast in dialog
+    const textColor = style?.editorDarkMode ? "#F5F8FA" : "#182026";
 
     return (
         <Dialog
