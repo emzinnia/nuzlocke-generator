@@ -167,7 +167,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
 
     const chartPanel = (
         <div className={styles.sectionSpacing}>
-            <div className={styles.typeMatchupsCaption} style={{ marginBottom: "8px" }}>
+            <div className={styles.typeMatchupsCaption} style={{ marginBottom: "0.5rem" }}>
                 Each cell is the damage multiplier for the row&apos;s attacking type against the column&apos;s defending type.
             </div>
             <div className={styles.typeMatchupsTableWrapper}>
@@ -226,7 +226,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
     return (
         <Card className={styles.typeMatchupsCard} elevation={Elevation.ONE}>
             <div className={styles.typeMatchups} style={{ color: textColor }}>
-                <h3 style={{ color: textColor, marginBottom: "12px" }}>
+                <h3 style={{ color: textColor, marginBottom: "0.75rem" }}>
                     Type Matchups (Gen {generation})
                 </h3>
                 <Tabs id="type-matchups-tabs" defaultSelectedTabId="summary">
