@@ -107,7 +107,8 @@
     color: #111;
 }
 
-.bp5-dark .debug-panel {
+.bp5-dark .debug-panel,
+.debug-panel.bp5-dark {
     background: rgba(22, 27, 34, 0.95);
     border-color: #30363d;
     color: #f5f5f5;

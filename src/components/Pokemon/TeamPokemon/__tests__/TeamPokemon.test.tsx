@@ -88,9 +88,9 @@ describe("TeamPokemonBase", () => {
             />,
         );
 
-        expect(screen.getByText("Bulby")).toBeInTheDocument();
-        expect(screen.getByText("Bulbasaur")).toBeInTheDocument();
-        expect(screen.getByText(/lv\. 10/i)).toBeInTheDocument();
+        expect(screen.getByText("Bulby")).toBeTruthy();
+        expect(screen.getByText("Bulbasaur")).toBeTruthy();
+        expect(screen.getByText(/lv\. 10/i)).toBeTruthy();
     });
 
     it("invokes selectPokemon when the image wrapper is clicked", () => {
@@ -123,7 +123,7 @@ describe("TeamPokemonBase", () => {
             />,
         );
 
-        expect(screen.getByText("MVP")).toBeInTheDocument();
+        expect(screen.getByText("MVP")).toBeTruthy();
     });
 
     it("renders linked pokemon information", () => {
@@ -141,8 +141,8 @@ describe("TeamPokemonBase", () => {
             />,
         );
 
-        expect(screen.getByText(/Linked To\s+Partner/i)).toBeInTheDocument();
-        expect(screen.getByTestId("pokemon-icon")).toBeInTheDocument();
+        expect(screen.getByText(/Linked To\s+Partner/i)).toBeTruthy();
+        expect(screen.getByTestId("pokemon-icon")).toBeTruthy();
     });
 
     it("renders tera and alpha indicators when provided", () => {
@@ -161,8 +161,8 @@ describe("TeamPokemonBase", () => {
             />,
         );
 
-        expect(screen.getByAltText("alpha")).toBeInTheDocument();
-        expect(screen.getByAltText("Tera: Fire")).toBeInTheDocument();
+        expect(screen.getByAltText("alpha")).toBeTruthy();
+        expect(screen.getByAltText("Tera: Fire")).toBeTruthy();
     });
 
     it("uses minimal layout when enabled", () => {
@@ -179,10 +179,10 @@ describe("TeamPokemonBase", () => {
             />,
         );
 
-        expect(
-            screen.getByRole("presentation").parentElement,
-        ).toHaveClass("pokemon-container", "minimal");
-        expect(screen.queryByTestId("moves")).not.toBeInTheDocument();
+        const wrapper = screen.getByRole("presentation").parentElement;
+        expect(wrapper?.className ?? "").toContain("pokemon-container");
+        expect(wrapper?.className ?? "").toContain("minimal");
+        expect(screen.queryByTestId("moves")).toBeNull();
     });
 });
 
@@ -199,7 +199,7 @@ describe("TeamPokemonInfo", () => {
             />,
         );
 
-        expect(screen.getByTestId("moves")).toBeInTheDocument();
+        expect(screen.getByTestId("moves")).toBeTruthy();
     });
 
     it("omits moves when disabled", () => {
@@ -216,7 +216,7 @@ describe("TeamPokemonInfo", () => {
             />,
         );
 
-        expect(screen.queryByTestId("moves")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("moves")).toBeNull();
     });
 
     it("shows Gen 1 special stat label", () => {
@@ -242,8 +242,8 @@ describe("TeamPokemonInfo", () => {
             />,
         );
 
-        expect(screen.getByText("SPC")).toBeInTheDocument();
-        expect(screen.queryByText("SPATK")).not.toBeInTheDocument();
+        expect(screen.getByText("SPC")).toBeTruthy();
+        expect(screen.queryByText("SPATK")).toBeNull();
     });
 
     it("shows split special stats for later generations", () => {
@@ -270,8 +270,8 @@ describe("TeamPokemonInfo", () => {
             />,
         );
 
-        expect(screen.getByText("SPATK")).toBeInTheDocument();
-        expect(screen.getByText("SPDEF")).toBeInTheDocument();
+        expect(screen.getByText("SPATK")).toBeTruthy();
+        expect(screen.getByText("SPDEF")).toBeTruthy();
     });
 });
 
