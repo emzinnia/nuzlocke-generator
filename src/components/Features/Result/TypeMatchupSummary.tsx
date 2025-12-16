@@ -91,7 +91,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
             {abilityToggle}
             {teamPokemon.length > 0 ? (
                 <>
-                    <div className={styles.typeMatchupsCaption} style={{ marginBottom: "8px" }}>
+                    <div className={styles.typeMatchupsCaption} style={{ marginBottom: "0.5rem" }}>
                         Team coverage against each attacking type:
                         {useAbilityMatchups && (
                             <span style={{ fontWeight: "normal", opacity: 0.7 }}>
@@ -106,7 +106,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                         >
                             <thead>
                                 <tr>
-                                    <th style={{ width: "64px" }}>Type</th>
+                                    <th style={{ width: "4rem" }}>Type</th>
                                     <th title="Team members weak to this type">Weak</th>
                                     <th title="Team members that resist this type">Resist</th>
                                     <th title="Team members immune to this type">Immune</th>
