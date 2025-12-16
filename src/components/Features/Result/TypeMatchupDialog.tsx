@@ -101,9 +101,10 @@ export function TypeMatchupDialog() {
                                     </div>
                                     <div className="type-matchups-status-list">
                                         {list.map((poke) => (
-                                            <div
+                                            <Card
                                                 key={poke.id}
                                                 className="type-matchups-other-entry"
+                                                style={{ borderRadius: "8px" }}
                                             >
                                                 <PokemonIconPlain
                                                     {...poke}
@@ -124,7 +125,7 @@ export function TypeMatchupDialog() {
                                                         poke.species ||
                                                         "Unknown"}
                                                 </span>
-                                            </div>
+                                            </Card>
                                         ))}
                                     </div>
                                 </div>
