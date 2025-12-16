@@ -581,6 +581,12 @@
     letter-spacing: 0.5px;
 }
 
+/* Ensure type header colors are not overridden by Blueprint or inherited styles */
+.matchup-matrix th.type-header-cell,
+.bp5-dark .matchup-matrix th.type-header-cell {
+    /* Color is set via inline style from getContrastColor() */
+}
+
 .matchup-matrix-cell[data-mult="2"] {
     background: rgba(15, 153, 96, 0.18);
 }
