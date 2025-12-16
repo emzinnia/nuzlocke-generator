@@ -128,44 +128,25 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                                             </td>
                                             <td
                                                 className={styles.matchupCell}
-                                                data-highlight={row.weak > 0 ? "weak" : undefined}
-                                                style={row.weak > 0 ? {
-                                                    backgroundColor: "#e74c3c",
-                                                    color: "#fff",
-                                                    fontWeight: 700,
-                                                } : undefined}
+                                                style={getHeatmapStyle(row.weak, "rgb(231, 76, 60)")}
                                             >
                                                 {row.weak}
                                             </td>
                                             <td
                                                 className={styles.matchupCell}
-                                                data-highlight={row.resist > 0 ? "resist" : undefined}
-                                                style={row.resist > 0 ? {
-                                                    backgroundColor: "#27ae60",
-                                                    color: "#fff",
-                                                    fontWeight: 700,
-                                                } : undefined}
+                                                style={getHeatmapStyle(row.resist, "rgb(39, 174, 96)")}
                                             >
                                                 {row.resist}
                                             </td>
                                             <td
                                                 className={styles.matchupCell}
-                                                data-highlight={row.immune > 0 ? "immune" : undefined}
-                                                style={row.immune > 0 ? {
-                                                    backgroundColor: "#9b59b6",
-                                                    color: "#fff",
-                                                    fontWeight: 700,
-                                                } : undefined}
+                                                style={getHeatmapStyle(row.immune, "rgb(155, 89, 182)")}
                                             >
                                                 {row.immune}
                                             </td>
                                             <td
                                                 className={styles.matchupCell}
-                                                style={row.neutral > 0 ? {
-                                                    backgroundColor: "#7f8c8d",
-                                                    color: "#fff",
-                                                    fontWeight: 700,
-                                                } : undefined}
+                                                style={getHeatmapStyle(row.neutral, "rgb(127, 140, 141)")}
                                             >
                                                 {row.neutral}
                                             </td>
