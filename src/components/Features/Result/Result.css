@@ -574,6 +574,7 @@
     box-sizing: border-box;
 }
 
+/* Type header cells - color is set via inline style based on type background */
 .matchup-matrix .type-header-cell {
     font-weight: 700;
     font-size: 10px;
@@ -581,10 +582,9 @@
     letter-spacing: 0.5px;
 }
 
-/* Reset any inherited or Blueprint text colors on type header cells */
-.matchup-matrix th.type-header-cell[style],
-.bp5-dark .matchup-matrix th.type-header-cell[style] {
-    color: inherit;
+/* Prevent Blueprint dark mode from overriding type header text color */
+.bp5-dark .matchup-matrix .type-header-cell {
+    color: unset;
 }
 
 .matchup-matrix-cell[data-mult="2"] {
