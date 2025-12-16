@@ -326,7 +326,7 @@ export class NuzlockeSaveBase extends React.Component<
 export const NuzlockeSave = connect(
     (state: State) => ({
         nuzlockes: state.nuzlockes,
-        state: JSON.stringify(omit(["nuzlockes", "editorHistory"], state)),
+        state: JSON.stringify(stripEditorDarkModeFromState(state)),
         darkMode: state.style.editorDarkMode,
     }),
     {
