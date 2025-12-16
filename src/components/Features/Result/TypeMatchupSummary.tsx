@@ -54,24 +54,14 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
     const textColor = isDark ? "#F5F8FA" : "#182026";
 
     const abilityToggle = (
-        <div
-            className="type-matchups-options"
-            style={{ marginBottom: "12px", display: "flex", alignItems: "center" }}
-        >
+        <div className={styles.typeMatchupsOptions}>
             <Checkbox
                 checked={useAbilityMatchups}
                 onChange={handleAbilityToggle}
                 label="Include Ability Effects"
                 style={{ marginBottom: 0 }}
             />
-            <span
-                className="type-matchups-options-hint"
-                style={{
-                    color: textColor,
-                    opacity: 0.7,
-                    marginLeft: "8px",
-                }}
-            >
+            <span className={styles.typeMatchupsOptionsHint} style={{ color: textColor }}>
                 (e.g., Levitate, Flash Fire, Thick Fat)
             </span>
         </div>
@@ -93,11 +83,11 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
     };
 
     const summaryPanel = (
-        <div className="team-matchups-summary">
+        <div className={styles.sectionSpacing}>
             {abilityToggle}
             {teamPokemon.length > 0 ? (
                 <>
-                    <div className="type-matchups-caption" style={{ marginBottom: "8px" }}>
+                    <div className={styles.typeMatchupsCaption} style={{ marginBottom: "8px" }}>
                         Team coverage against each attacking type:
                         {useAbilityMatchups && (
                             <span style={{ fontWeight: "normal", opacity: 0.7 }}>
@@ -105,8 +95,11 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                             </span>
                         )}
                     </div>
-                    <div className="type-matchups-table-wrapper">
-                        <table className="matchup-table team-matchup-table" style={{ width: "100%" }}>
+                    <div className={styles.typeMatchupsTableWrapper}>
+                        <table
+                            className={`${styles.matchupTable} ${styles.teamMatchupTable}`}
+                            style={{ width: "100%" }}
+                        >
                             <thead>
                                 <tr>
                                     <th style={{ width: "80px" }}>Type</th>
@@ -125,34 +118,34 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                                         <tr key={row.type}>
                                             <td style={{ height: "2rem", width: "100%" }}>
                                                 <span
-                                                    className="type-chip"
+                                                    className={styles.typeChip}
                                                     style={{ ...chipStyle, color: chipTextColor }}
                                                 >
                                                     {row.type}
                                                 </span>
                                             </td>
                                             <td
-                                                className="matchup-cell"
+                                                className={styles.matchupCell}
                                                 data-highlight={row.weak > 0 ? "weak" : undefined}
                                                 style={{ color: row.weak > 0 ? "#e74c3c" : undefined }}
                                             >
                                                 {row.weak}
                                             </td>
                                             <td
-                                                className="matchup-cell"
+                                                className={styles.matchupCell}
                                                 data-highlight={row.resist > 0 ? "resist" : undefined}
                                                 style={{ color: row.resist > 0 ? "#2ecc71" : undefined }}
                                             >
                                                 {row.resist}
                                             </td>
                                             <td
-                                                className="matchup-cell"
+                                                className={styles.matchupCell}
                                                 data-highlight={row.immune > 0 ? "immune" : undefined}
                                                 style={{ color: row.immune > 0 ? "#3498db" : undefined }}
                                             >
                                                 {row.immune}
                                             </td>
-                                            <td className="matchup-cell">{row.neutral}</td>
+                                            <td className={styles.matchupCell}>{row.neutral}</td>
                                         </tr>
                                     );
                                 })}
@@ -161,7 +154,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                     </div>
                 </>
             ) : (
-                <div className="type-matchups-caption">
+                <div className={styles.typeMatchupsCaption}>
                     No team Pokémon to analyze. Add Pokémon to your team to see matchup coverage.
                 </div>
             )}
