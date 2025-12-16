@@ -61,120 +61,139 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
         return "1×";
     };
 
+    const summaryPanel = (
+        <div className="team-matchups-summary">
+            {teamPokemon.length > 0 ? (
+                <>
+                    <div className="type-matchups-caption" style={{ marginBottom: "8px" }}>
+                        Team coverage against each attacking type:
+                        {useAbilityMatchups && (
+                            <span style={{ fontSize: "11px", fontWeight: "normal", marginLeft: "8px", opacity: 0.7 }}>
+                                (includes ability effects)
+                            </span>
+                        )}
+                    </div>
+                    <div className="type-matchups-table-wrapper">
+                        <table className="matchup-table team-matchup-table" style={{ width: "100%" }}>
+                            <thead>
+                                <tr>
+                                    <th style={{ width: "80px" }}>Type</th>
+                                    <th title="Team members weak to this type">Weak</th>
+                                    <th title="Team members that resist this type">Resist</th>
+                                    <th title="Team members immune to this type">Immune</th>
+                                    <th title="Team members neutral to this type">Neutral</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {teamMatchups.map((row) => (
+                                    <tr key={row.type}>
+                                        <td>
+                                            <span className="type-chip" style={getTypeChipStyle(row.type)}>
+                                                {row.type}
+                                            </span>
+                                        </td>
+                                        <td
+                                            className="matchup-cell"
+                                            data-highlight={row.weak > 0 ? "weak" : undefined}
+                                            style={{ color: row.weak > 0 ? "#e74c3c" : undefined }}
+                                        >
+                                            {row.weak}
+                                        </td>
+                                        <td
+                                            className="matchup-cell"
+                                            data-highlight={row.resist > 0 ? "resist" : undefined}
+                                            style={{ color: row.resist > 0 ? "#2ecc71" : undefined }}
+                                        >
+                                            {row.resist}
+                                        </td>
+                                        <td
+                                            className="matchup-cell"
+                                            data-highlight={row.immune > 0 ? "immune" : undefined}
+                                            style={{ color: row.immune > 0 ? "#3498db" : undefined }}
+                                        >
+                                            {row.immune}
+                                        </td>
+                                        <td className="matchup-cell">{row.neutral}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </>
+            ) : (
+                <div className="type-matchups-caption">
+                    No team Pokémon to analyze. Add Pokémon to your team to see matchup coverage.
+                </div>
+            )}
+        </div>
+    );
+
+    const chartPanel = (
+        <div className="type-effectiveness-chart">
+            <div className="type-matchups-caption" style={{ marginBottom: "8px" }}>
+                Each cell is the damage multiplier for the row&apos;s attacking type against the column&apos;s defending type.
+            </div>
+            <div className="type-matchups-table-wrapper">
+                <table className="matchup-table matchup-matrix">
+                    <thead>
+                        <tr>
+                            <th className="matchup-matrix-corner">Atk \ Def</th>
+                            {POKEMON_TYPES.map((defType) => (
+                                <th key={defType}>
+                                    <span className="type-chip" style={getTypeChipStyle(defType)}>
+                                        {defType}
+                                    </span>
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {POKEMON_TYPES.map((atkType) => (
+                            <tr key={atkType}>
+                                <th>
+                                    <span className="type-chip" style={getTypeChipStyle(atkType)}>
+                                        {atkType}
+                                    </span>
+                                </th>
+                                {POKEMON_TYPES.map((defType) => {
+                                    const m = chart[defType]?.[atkType] ?? 1;
+                                    return (
+                                        <td
+                                            key={`${atkType}-${defType}`}
+                                            className="matchup-matrix-cell"
+                                            data-mult={m}
+                                            title={`${atkType} → ${defType}: ${m}×`}
+                                        >
+                                            {renderMultiplier(m)}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+
     return (
         <Card className="type-matchups-card" elevation={Elevation.ONE}>
             <div className="type-matchups" style={{ color: textColor }}>
-                <h3 style={{ color: textColor }}>
-                    Team Matchup Summary (Gen {generation})
-                    {useAbilityMatchups && (
-                        <span style={{ fontSize: "12px", fontWeight: "normal", marginLeft: "8px", opacity: 0.7 }}>
-                            + Abilities
-                        </span>
-                    )}
+                <h3 style={{ color: textColor, marginBottom: "12px" }}>
+                    Type Matchups (Gen {generation})
                 </h3>
-                {teamPokemon.length > 0 ? (
-                    <div className="team-matchups-summary" style={{ marginBottom: "16px" }}>
-                        <div className="type-matchups-caption" style={{ marginBottom: "8px" }}>
-                            Team coverage against each attacking type:
-                        </div>
-                        <div className="type-matchups-table-wrapper">
-                            <table className="matchup-table team-matchup-table">
-                                <thead>
-                                    <tr>
-                                        <th>Type</th>
-                                        <th title="Team members weak to this type">Weak</th>
-                                        <th title="Team members that resist this type">Resist</th>
-                                        <th title="Team members immune to this type">Immune</th>
-                                        <th title="Team members neutral to this type">Neutral</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {teamMatchups.map((row) => (
-                                        <tr key={row.type}>
-                                            <td>
-                                                <span className="type-chip" style={getTypeChipStyle(row.type)}>
-                                                    {row.type}
-                                                </span>
-                                            </td>
-                                            <td
-                                                className="matchup-cell"
-                                                data-highlight={row.weak > 0 ? "weak" : undefined}
-                                                style={{ color: row.weak > 0 ? "#e74c3c" : undefined }}
-                                            >
-                                                {row.weak}
-                                            </td>
-                                            <td
-                                                className="matchup-cell"
-                                                data-highlight={row.resist > 0 ? "resist" : undefined}
-                                                style={{ color: row.resist > 0 ? "#2ecc71" : undefined }}
-                                            >
-                                                {row.resist}
-                                            </td>
-                                            <td
-                                                className="matchup-cell"
-                                                data-highlight={row.immune > 0 ? "immune" : undefined}
-                                                style={{ color: row.immune > 0 ? "#3498db" : undefined }}
-                                            >
-                                                {row.immune}
-                                            </td>
-                                            <td className="matchup-cell">{row.neutral}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="type-matchups-caption" style={{ marginBottom: "16px" }}>
-                        No team Pokémon to analyze. Add Pokémon to your team to see matchup coverage.
-                    </div>
-                )}
-                <h4 style={{ color: textColor, marginTop: "16px" }}>
-                    Type Effectiveness Chart
-                </h4>
-                <div className="type-matchups-caption">
-                    Each cell is the damage multiplier for the row&apos;s attacking type against the column&apos;s defending type.
-                </div>
-                <div className="type-matchups-table-wrapper">
-                    <table className="matchup-table matchup-matrix">
-                        <thead>
-                            <tr>
-                                <th className="matchup-matrix-corner">Atk \ Def</th>
-                                {POKEMON_TYPES.map((defType) => (
-                                    <th key={defType}>
-                                        <span className="type-chip" style={getTypeChipStyle(defType)}>
-                                            {defType}
-                                        </span>
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {POKEMON_TYPES.map((atkType) => (
-                                <tr key={atkType}>
-                                    <th>
-                                        <span className="type-chip" style={getTypeChipStyle(atkType)}>
-                                            {atkType}
-                                        </span>
-                                    </th>
-                                    {POKEMON_TYPES.map((defType) => {
-                                        const m = chart[defType]?.[atkType] ?? 1;
-                                        return (
-                                            <td
-                                                key={`${atkType}-${defType}`}
-                                                className="matchup-matrix-cell"
-                                                data-mult={m}
-                                                title={`${atkType} → ${defType}: ${m}×`}
-                                            >
-                                                {renderMultiplier(m)}
-                                            </td>
-                                        );
-                                    })}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                <Tabs id="type-matchups-tabs" defaultSelectedTabId="summary">
+                    <Tab
+                        id="summary"
+                        title="Team Summary"
+                        panel={summaryPanel}
+                    />
+                    <Tab
+                        id="chart"
+                        title="Type Chart"
+                        panel={chartPanel}
+                    />
+                </Tabs>
             </div>
         </Card>
     );
