@@ -258,7 +258,7 @@ describe("RulesEditor", () => {
         await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
         const fetchCall = fetchMock.mock.calls[0];
         expect(fetchCall[0]).toContain("/suggest-ruleset");
-        const body = JSON.parse(fetchCall[1].body);
+        const body = JSON.parse((fetchCall[1] as any).body);
         expect(body.name).toBe("Ironmon");
         expect(body.rules).toEqual(defaultProps.rules);
 
