@@ -101,6 +101,11 @@ export const getImagesPage = async (offset: number, limit: number) => {
     return db.images.orderBy("id").reverse().offset(offset).limit(limit).toArray();
 };
 
+// Back-compat: other parts of the app expect an unpaginated list (e.g. custom image lookup).
+export const getImages = async () => {
+    return db.images.toArray();
+};
+
 export interface Image {
     id?: number;
     name?: string;

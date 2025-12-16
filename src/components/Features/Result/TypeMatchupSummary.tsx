@@ -66,7 +66,6 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
             <span
                 className="type-matchups-options-hint"
                 style={{
-                    fontSize: "12px",
                     color: textColor,
                     opacity: 0.7,
                     marginLeft: "8px",
@@ -100,7 +99,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                     <div className="type-matchups-caption" style={{ marginBottom: "8px" }}>
                         Team coverage against each attacking type:
                         {useAbilityMatchups && (
-                            <span style={{ fontSize: "11px", fontWeight: "normal", marginLeft: "8px", opacity: 0.7 }}>
+                            <span style={{ fontWeight: "normal", opacity: 0.7 }}>
                                 (includes ability effects)
                             </span>
                         )}

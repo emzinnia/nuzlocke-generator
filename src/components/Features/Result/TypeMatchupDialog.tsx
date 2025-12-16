@@ -44,7 +44,7 @@ export function TypeMatchupDialog() {
             isOpen={!!isOpen}
             onClose={onClose}
             title="Type Matchups"
-            className={style.editorDarkMode ? Classes.DARK : ""}
+            className={style.editorDarkMode ? Classes.DARK : "bp-3-dark"}
             canOutsideClickClose
             style={{ width: "98vw", maxWidth: "112.5rem" }}
         >
