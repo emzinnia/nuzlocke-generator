@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Dialog, Classes } from "@blueprintjs/core";
+import { Dialog, Classes, Card } from "@blueprintjs/core";
 import { useDispatch, useSelector } from "react-redux";
 import { PokemonIconPlain } from "components";
 import { toggleDialog } from "actions";
