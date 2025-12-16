@@ -72,13 +72,21 @@ export function TypeMatchupDialog() {
     const others = React.useMemo(
         () =>
             pokemon
-                ?.filter((p) => p?.status !== "Team" && p?.status !== "Dead" && !p?.hidden)
+                ?.filter((p) => {
+                    // Show pokemon that are NOT on team (and not added) OR removed from team
+                    const isOnTeam = p?.status === "Team";
+                    const isDead = p?.status === "Dead";
+                    const wasRemoved = removedFromTeam.has(p.id);
+                    const wasAdded = addedToTeam.has(p.id);
+                    return (!isOnTeam && !isDead && !p?.hidden && !wasAdded) || wasRemoved;
+                })
                 .reduce<Record<string, typeof pokemon>>((acc, poke) => {
-                    const key = poke.status || "Other";
+                    // If removed from team, show under "Swapped Out" group
+                    const key = removedFromTeam.has(poke.id) ? "Swapped Out" : (poke.status || "Other");
                     acc[key] = acc[key] ? [...acc[key], poke] : [poke];
                     return acc;
                 }, {}),
-        [pokemon],
+        [pokemon, removedFromTeam, addedToTeam],
     );
 
     const sortedOthers = React.useMemo(
