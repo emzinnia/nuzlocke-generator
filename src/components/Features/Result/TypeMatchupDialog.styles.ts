@@ -276,6 +276,19 @@ export const typeChip = css`
     }
 `;
 
+export const typeCell = css`
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 0.4rem 0.5rem !important;
+    transition: filter 0.15s ease-out;
+
+    &:hover {
+        filter: brightness(1.1);
+    }
+`;
+
 export const matchupCell = css`
     text-align: center;
 `;
