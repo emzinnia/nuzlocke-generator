@@ -107,6 +107,7 @@ export function TypeMatchupDialog() {
                         style={{ color: textColor, minWidth: "12.5rem", maxWidth: "17.5rem" }}
                     >
                         <h4>Other Pokémon</h4>
+                        <p>Select a Pokémon to swap it into type matchups.</p>
                         {!sortedOthers.length ? (
                             <div>No other Pokémon</div>
                         ) : (
