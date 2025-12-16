@@ -37,6 +37,10 @@ export interface HotkeysProps {
 
 export class HotkeysBase extends React.PureComponent<HotkeysProps> {
     public globalHotkeysEvents: any;
+    private keyUpActions: Map<string, Array<() => void>> = new Map();
+    private firstPokemonId: string | null = null;
+    private lastPokemonId: string | null = null;
+    private toaster = Toaster.create();
 
     public constructor(props) {
         super(props);
@@ -47,6 +51,8 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
     }
 
     public componentDidMount() {
+        this.rebuildHotkeyMaps();
+        this.recomputeFirstLastPokemonIds();
         document.addEventListener(
             "keydown",
             this.globalHotkeysEvents.handleKeyDown,
@@ -57,7 +63,16 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         );
     }
 
-    public UNSAFE_componentWillMount() {
+    public componentDidUpdate(prevProps: HotkeysProps) {
+        if (prevProps.customHotkeys !== this.props.customHotkeys) {
+            this.rebuildHotkeyMaps();
+        }
+        if (prevProps.pokemon !== this.props.pokemon) {
+            this.recomputeFirstLastPokemonIds();
+        }
+    }
+
+    public componentWillUnmount() {
         document.removeEventListener(
             "keydown",
             this.globalHotkeysEvents.handleKeyDown,
@@ -82,17 +97,29 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
     }
 
     private handleKeyUp = (e: KeyboardEvent) => {
-        listOfHotkeys.map((hotkey) => {
-            const effectiveKey = this.getEffectiveKey(hotkey);
-            if (e.key === effectiveKey) {
-                if (this.isTextInput(e)) {
-                    noop();
-                } else {
-                    if (hotkey?.onKeyUp) this[hotkey.onKeyUp]();
-                }
-            }
-        });
+        if (this.isTextInput(e)) return;
+        const actions = this.keyUpActions.get(e.key);
+        if (!actions?.length) return;
+        actions.forEach((fn) => fn());
     };
+
+    private rebuildHotkeyMaps() {
+        const next = new Map<string, Array<() => void>>();
+
+        for (const hotkey of listOfHotkeys) {
+            if (!hotkey?.onKeyUp) continue;
+            const effectiveKey = this.getEffectiveKey(hotkey);
+            const candidate = (this as any)[hotkey.onKeyUp];
+            if (typeof candidate !== "function") continue;
+
+            const arr = next.get(effectiveKey) ?? [];
+            // Bind once up front so keyup is O(1) dispatch.
+            arr.push(candidate.bind(this));
+            next.set(effectiveKey, arr);
+        }
+
+        this.keyUpActions = next;
+    }
 
     private isTextInput(e: KeyboardEvent) {
         const elem = e.target as HTMLElement;
@@ -121,27 +148,61 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         return true;
     }
 
+    private recomputeFirstLastPokemonIds() {
+        const pokemon = this.props.pokemon;
+        if (!pokemon?.length) {
+            this.firstPokemonId = null;
+            this.lastPokemonId = null;
+            return;
+        }
+
+        // Avoid sorting (and avoid mutating props via Array.sort()).
+        let minPos = Infinity;
+        let maxPos = -Infinity;
+        let minId: string | null = null;
+        let maxId: string | null = null;
+
+        for (const p of pokemon) {
+            const pos = p.position;
+            if (pos == null) continue;
+            if (pos < minPos) {
+                minPos = pos;
+                minId = p.id;
+            }
+            if (pos > maxPos) {
+                maxPos = pos;
+                maxId = p.id;
+            }
+        }
+
+        // Fallbacks if positions are missing.
+        this.firstPokemonId = minId ?? pokemon[0].id ?? null;
+        this.lastPokemonId = maxId ?? pokemon[pokemon.length - 1].id ?? null;
+    }
+
     private getFirstPokemonId() {
-        return this.props.pokemon.sort(sortPokes)[0].id;
+        if (this.firstPokemonId) return this.firstPokemonId;
+        this.recomputeFirstLastPokemonIds();
+        return this.firstPokemonId ?? this.props.pokemon?.[0]?.id;
     }
 
     private getLastPokemonId() {
-        return this.props.pokemon.sort(sortPokesReverse)[0].id;
+        if (this.lastPokemonId) return this.lastPokemonId;
+        this.recomputeFirstLastPokemonIds();
+        return this.lastPokemonId ?? this.props.pokemon?.[this.props.pokemon.length - 1]?.id;
     }
 
     private manualSave() {
         persistor
             .flush()
             .then((res) => {
-                const toaster = Toaster.create();
-                toaster.show({
+                this.toaster.show({
                     message: "Save successful!",
                     intent: Intent.SUCCESS,
                 });
             })
             .catch((err) => {
-                const toaster = Toaster.create();
-                toaster.show({
+                this.toaster.show({
                     message: "Saved failed. Please try again.",
                     intent: Intent.DANGER,
                 });
@@ -189,7 +250,6 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
     }
 
     private toggleEditor() {
-        console.log("pressed m");
         this.props.changeEditorSize(!this.props.editor.minimized);
     }
 
