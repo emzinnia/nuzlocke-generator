@@ -12,7 +12,7 @@ import {
     HTMLSelect,
 } from "@blueprintjs/core";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
-import { ErrorBoundary } from "components/Common/Shared";
+import { ErrorBoundary, HotkeyIndicator } from "components/Common/Shared";
 import { v4 as uuid } from "uuid";
 import { persistor } from "store";
 import { newNuzlocke, replaceState } from "actions";
@@ -482,7 +482,20 @@ export class DataEditorBase extends React.Component<
     };
 
     private writeAllData = () => {
-        persistor.flush();
+        Promise.resolve(persistor.flush())
+            .then(() => {
+                showToast({
+                    message: "Saved",
+                    intent: Intent.SUCCESS,
+                });
+            })
+            .catch((err) => {
+                console.error("Save failed", err);
+                showToast({
+                    message: "Save failed",
+                    intent: Intent.DANGER,
+                });
+            });
     };
 
     private toggleClearingData = () =>
@@ -786,7 +799,12 @@ export class DataEditorBase extends React.Component<
                         onClick={this.writeAllData}
                         icon="floppy-disk"
                     >
-                        Force Save
+                        Force Save{" "}
+                        <HotkeyIndicator
+                            hotkey="s"
+                            showModifier={false}
+                            style={{ marginLeft: "0.35rem" }}
+                        />
                     </Button>
                     <Button
                         icon="trash"
