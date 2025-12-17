@@ -19,7 +19,6 @@ export function EditorControls({ editorDarkMode, minimized }) {
 
     const canUndo = editorHistory?.past?.length > 0 && editorHistory?.present != null;
     const canRedo = editorHistory?.future?.length > 0 && editorHistory?.present != null;
-    const hasHistory = editorHistory?.past?.length > 0 || editorHistory?.future?.length > 0;
 
     const dispatchUndo = React.useCallback(() => {
         if (!canUndo) return;
@@ -79,7 +78,6 @@ export function EditorControls({ editorDarkMode, minimized }) {
         >
             <ButtonGroup fill className={editorStyles.buttonGroup}>
                 <Button
-                    disabled={!hasHistory}
                     onClick={() => setIsHistoryPanelOpen(!isHistoryPanelOpen)}
                     minimal
                     fill
