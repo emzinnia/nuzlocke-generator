@@ -15,6 +15,7 @@ describe("<PokemonEditor />", () => {
                 excludedAreas={[]}
                 customAreas={[]}
                 toggleDialog={vi.fn()}
+                isMassEditorOpen={false}
             />,
         );
         expect(screen.getByTestId("pokemon-editor")).toBeDefined();
