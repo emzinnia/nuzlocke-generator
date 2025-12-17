@@ -299,6 +299,22 @@ describe("Gen 3 Save Parser", () => {
             expect(result.pokemon).toBeDefined();
         });
 
+        it("should parse trainer IDs correctly", async () => {
+            const result = await parseGen3Save(saveData, {
+                boxMappings: [],
+                selectedGame: "Emerald",
+            });
+            expect(result.trainer.id).toBe("64784");
+        });
+
+        it("should parse playtime correctly", async () => {
+            const result = await parseGen3Save(saveData, {
+                boxMappings: [],
+                selectedGame: "Emerald",
+            });
+            expect(result.trainer.time).toBe("272:29:19");
+        });
+
         it("should parse Japanese nicknames correctly", async () => {
             // We know the save file contents of this and in this save file
             // Snorlax's nickname is カビゴン (which is actually just its regular

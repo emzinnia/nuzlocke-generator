@@ -8,7 +8,7 @@ import type { Species } from "utils/data/listOfPokemon";
 import type { GameSaveFormat } from "utils/gameSaveFormat";
 import { MOVES_ARRAY } from "./utils";
 import { ParserOptions } from "./utils/parserOptions";
-import { parseTime } from "./utils/parseTime";
+import { parseGen3Time } from "./utils/parseGen3Time";
 import {
     GEN3_SPECIES_MAP,
     ABILITY_MAP,
@@ -1067,8 +1067,11 @@ const parseTrainer = (
     const name = decodeGameText(
         section.slice(offsets.PLAYER_NAME[0], offsets.PLAYER_NAME[1]),
     );
-    const trainerId = section.readUInt32LE(offsets.PLAYER_ID[0]);
-    const time = parseTime(
+    // Gen 3 stores Trainer ID (TID) + Secret ID (SID) together as a u32.
+    // The app/test suite expects the visible in-game Trainer ID (low 16 bits).
+    const trainerIdCombined = section.readUInt32LE(offsets.PLAYER_ID[0]);
+    const trainerId = trainerIdCombined & 0xffff;
+    const time = parseGen3Time(
         section.slice(offsets.TIME_PLAYED[0], offsets.TIME_PLAYED[1]),
     );
     const moneyBytes = section.slice(offsets.MONEY[0], offsets.MONEY[1]);
