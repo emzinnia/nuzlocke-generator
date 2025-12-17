@@ -152,7 +152,7 @@ export class PokemonEditorBase extends React.Component<
                                 </Button>
                             </ButtonGroup>
                         </div>
-                        <div style={{ marginLeft: "auto", width: "50%" }}>
+                        <div style={{ marginLeft: "auto", width: "100%", paddingLeft: "0.5rem" }}>
                             <input
                                 type="search"
                                 placeholder="Search..."
