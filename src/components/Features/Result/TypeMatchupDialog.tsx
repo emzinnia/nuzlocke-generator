@@ -135,7 +135,6 @@ export function TypeMatchupDialog() {
                             <div
                                 style={{
                                     color: "orange",
-                                    fontWeight: "bold",
                                     marginBottom: "1rem",
                                     background: "rgba(255, 165, 0, 0.07)",
                                     padding: "0.5rem 1rem",
