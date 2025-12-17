@@ -13,6 +13,7 @@ export function EditorControls({ editorDarkMode, minimized }) {
     const editorHistory = useSelector<State, State["editorHistory"]>(
         (state) => state.editorHistory,
     );
+    const customHotkeys = useSelector<State, State["hotkeys"]>((state) => state.hotkeys);
     const dispatch = useDispatch();
     const [isHistoryPanelOpen, setIsHistoryPanelOpen] = React.useState(false);
 
@@ -85,7 +86,13 @@ export function EditorControls({ editorDarkMode, minimized }) {
                     icon="history"
                     active={isHistoryPanelOpen}
                     title="View History"
-                />
+                    data-testid="history-timeline-button"
+                >
+                    <HotkeyIndicator
+                        hotkey={customHotkeys?.toggleHistoryTimeline ?? "h"}
+                        showModifier={false}
+                    />
+                </Button>
                 <Button
                     disabled={!canUndo}
                     onClick={dispatchUndo}
