@@ -273,7 +273,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                                 return (
                                     <th
                                         key={defType}
-                                        className={`${styles.typeHeaderCell} ${styles.typeCell}`}
+                                        className={styles.typeCell}
                                         style={{ backgroundColor: cellBg, color: cellText }}
                                     >
                                         {defType}
@@ -289,7 +289,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                             return (
                             <tr key={atkType}>
                                 <th
-                                    className={`${styles.typeHeaderCell} ${styles.typeCell}`}
+                                    className={styles.typeCell}
                                     style={{ backgroundColor: rowCellBg, color: rowCellText }}
                                 >
                                     {atkType}

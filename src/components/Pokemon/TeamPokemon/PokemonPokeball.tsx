@@ -2,7 +2,12 @@ import * as React from "react";
 import { css, cx } from "emotion";
 import { Pokemon } from "models";
 import { State } from "state";
-import { formatBallText, getBackgroundGradient, typeToColor } from "utils";
+import {
+    formatBallText,
+    getBackgroundGradient,
+    normalizePokeballName,
+    typeToColor,
+} from "utils";
 
 const itemLabelStyle = {
     base: css`
@@ -78,7 +83,7 @@ export function PokemonPokeball({
             )}
         >
             <img
-                alt={pokemon.pokeball}
+                alt={normalizePokeballName(pokemon.pokeball)}
                 src={`icons/pokeball/${formatBallText(pokemon.pokeball)}.png`}
             />
         </div>

@@ -45,6 +45,7 @@ import { MoveEditor } from "components/Editors/MoveEditor/MoveEditor";
 import { PokemonIconPlain } from "components/Pokemon/PokemonIcon/PokemonIcon";
 import { CheckpointsInputList } from "components/Editors/TrainerEditor/BadgeInput";
 import { getImages, Image } from "components/Common/Shared/ImagesDrawer";
+import { normalizePokeballName } from "utils";
 
 const pokeball = "./assets/pokeball.png";
 
@@ -409,9 +410,9 @@ export class CurrentPokemonEditBase extends React.Component<
                     key={this.state.selectedId + "customItemImage"}
                 />
                 <CurrentPokemonInput
-                    labelName="Pokeball"
+                    labelName="Poké Ball"
                     inputName="pokeball"
-                    value={currentPokemon.pokeball}
+                    value={normalizePokeballName(currentPokemon.pokeball)}
                     type="select"
                     options={[
                         "None",

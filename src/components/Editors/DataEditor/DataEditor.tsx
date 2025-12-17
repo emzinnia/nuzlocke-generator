@@ -21,7 +21,12 @@ import { omit } from "ramda";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { State } from "state";
 import { noop } from "redux-saga/utils";
-import { gameOfOriginToColor, GameSaveFormat, Styles } from "utils";
+import {
+    gameOfOriginToColor,
+    GameSaveFormat,
+    Styles,
+    Game as GameName,
+} from "utils";
 import { DeleteAlert } from "./DeleteAlert";
 import { isEmpty } from "utils/isEmpty";
 import { showToast } from "components/Common/Shared/appToaster";
@@ -53,6 +58,9 @@ export interface DataEditorState {
 
 const getGameNumberOfBoxes = (game: GameSaveFormat) => {
     switch (game) {
+        case "Auto":
+            // Default to 14 so box mappings are available for Gen 2/3; Gen 1 will only read the first 12.
+            return 14;
         case "RBY":
             return 12;
         case "GS":
@@ -252,7 +260,7 @@ export class DataEditorBase extends React.Component<
             mode: "export",
             data: "",
             href: "",
-            selectedGame: "RBY",
+            selectedGame: "Auto",
             mergeDataMode: true,
             showSaveFileUI: false,
             overrideImport: true,
@@ -432,6 +440,7 @@ export class DataEditorBase extends React.Component<
                 selectedGame: componentState.selectedGame,
                 save,
                 boxMappings: componentState.boxMappings,
+                fileName: file.name,
             });
 
             worker.onmessage = (
@@ -439,6 +448,8 @@ export class DataEditorBase extends React.Component<
                     pokemon: Pokemon[];
                     isYellow?: boolean;
                     trainer: Trainer;
+                    detectedGame?: Game;
+                    detectedSaveFormat?: GameSaveFormat;
                 }>,
             ) => {
                 const result = e.data;
@@ -448,17 +459,41 @@ export class DataEditorBase extends React.Component<
                           result.pokemon as Pokemon[],
                       )
                     : result.pokemon;
-                const data = {
-                    game: DataEditorBase.determineGame({
+                const game =
+                    result.detectedGame ??
+                    DataEditorBase.determineGame({
                         isYellow: result.isYellow,
                         selectedGame: componentState.selectedGame,
-                    }),
+                    });
+                const bgColor = gameOfOriginToColor(game.name as GameName);
+                const data = {
+                    game,
                     pokemon: mergedPokemon,
                     trainer: result.trainer,
                 };
                 console.log("data", data);
-                const newState = { ...state, ...data };
+                const nextStyle: Styles = bgColor
+                    ? {
+                          ...state.style,
+                          bgColor,
+                      }
+                    : state.style;
+
+                // Back-compat for older saves that may have used `style.backgroundColor`.
+                // `Styles` doesn't include it, but we can preserve/overwrite it if present.
+                type LegacyStyle = Styles & { backgroundColor?: string };
+                if (bgColor && "backgroundColor" in (state.style as LegacyStyle)) {
+                    (nextStyle as LegacyStyle).backgroundColor = bgColor;
+                }
+
+                const newState = { ...state, ...data, style: nextStyle };
                 replaceState(newState);
+                if (result.detectedGame) {
+                    showToast({
+                        message: `Detected game: ${result.detectedGame.name}`,
+                        intent: Intent.PRIMARY,
+                    });
+                }
             };
 
             worker.onmessageerror = (err) => {
@@ -549,6 +584,9 @@ export class DataEditorBase extends React.Component<
                                 });
                             }}
                         >
+                            <option key={"Auto"} value={"Auto"}>
+                                Auto
+                            </option>
                             {allowedGames.map((game) => (
                                 <option key={game} value={game}>
                                     {game}

@@ -225,7 +225,7 @@ describe("Gen 3 Save Parser", () => {
             expect(firstBoxedPokemon.moves).toEqual(["Tackle", "Growl"]);
         });
 
-        it.skip("should parse the first three dead Pokemon correctly as Nidoqueen, Nidoran♂, and Nidorino", async () => {
+        it("should parse the first three dead Pokemon correctly as Nidoqueen, Nidoran♂, and Nidorino", async () => {
             const result = await parseGen3Save(saveData, {
                 boxMappings: [
                     { key: 1, status: "Boxed" },
@@ -299,6 +299,41 @@ describe("Gen 3 Save Parser", () => {
             expect(result.pokemon).toBeDefined();
         });
 
+        it("should parse Japanese nicknames correctly", async () => {
+            // We know the save file contents of this and in this save file
+            // Snorlax's nickname is カビゴン (which is actually just its regular
+            //  Japanese name but in Gen 3 this gets treated as a nickname by the game engine)
+            const result = await parseGen3Save(saveData, {
+                boxMappings: [],
+                selectedGame: "Emerald",
+            });
+
+            const snorlax = result.pokemon.find((p) => p.species === "Snorlax");
+            expect(snorlax?.nickname).toBe("カビゴン");
+        });
+
+        it("should parse Item names correctly", async () => {
+            const result = await parseGen3Save(saveData, {
+                boxMappings: [],
+                selectedGame: "Emerald",
+            });
+
+            const pokemon = result.pokemon.find((p) => p.species === "Rayquaza");
+            expect(pokemon?.item).toBe("Amulet Coin");
+        });
+
+        it("should treat hatched Pokemon as if they were met at level 5", async () => {
+            const result = await parseGen3Save(saveData, {
+                boxMappings: [],
+                selectedGame: "Emerald",
+            });
+
+            // We know from this save file that Abras in Box 2 were hatched
+            const pokemon = result.pokemon.find((p) => p.species === "Abra");
+            expect(pokemon?.metLevel).toBe(5);
+            expect(pokemon?.level).toBe(5);
+        });
+
         it("should parse the first five party Pokemon", async () => {
             const result = await parseGen3Save(saveData, {
                 boxMappings: [],
@@ -314,23 +349,6 @@ describe("Gen 3 Save Parser", () => {
             expect(partyPokemon[2].species).toBe("Aipom");
             expect(partyPokemon[3].species).toBe("Aipom");
             expect(partyPokemon[4].species).toBe("Wailord");
-        });
-
-        it.skip("should parse the first set of boxed pokemon correct", async () => {
-            const result = await parseGen3Save(saveData, {
-                boxMappings: [],
-                selectedGame: "Emerald",
-            });
-
-            const boxedPokemon = result.pokemon.filter(
-                (p) => p.status === "Boxed",
-            );
-            expect(boxedPokemon[0].species).toBe("Spheal");
-            expect(boxedPokemon[1].species).toBe("Magcargo");
-            expect(boxedPokemon[2].species).toBe("Walrein");
-            expect(boxedPokemon[3].species).toBe("Relicanth");
-            expect(boxedPokemon[4].species).toBe("Groudon");
-            expect(boxedPokemon[5].species).toBe("Jirachi");
         });
     });
 });

@@ -29,9 +29,12 @@ const ogerpon = "./assets/icons/pokemon/regular/ogerpon.png";
 const zygarde = "./assets/icons/pokemon/regular/zygarde.png";
 const floette = "./assets/icons/pokemon/regular/floette-eternal.png";
 const hoopa = "./assets/icons/pokemon/regular/hoopa.png";
+const rayquaza = "./assets/icons/pokemon/regular/rayquaza.png";
 
 export const getMascot = (v) => {
     switch (v) {
+        case "1.21":
+            return rayquaza;
         case "1.20":
             return hoopa;
         case "1.19":

@@ -352,7 +352,6 @@
     filter: drop-shadow(0 0 1px #111);
     padding-left: 4rem;
     border-radius: 0.25rem;
-    overflow: hidden;
 }
 .pokemon-info span {
     margin: 0 0.25rem;
@@ -445,7 +444,11 @@
     align-items: center;
     border-radius: 0.25rem;
 }
-
+.pokemon-checkpoints {
+    display: flex;
+    max-width: 14rem;
+    flex-wrap: wrap;
+}
 .pokemon-checkpoint {
     height: 24px;
     margin: 0 2px 0 0;
