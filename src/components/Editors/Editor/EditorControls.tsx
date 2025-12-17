@@ -94,16 +94,22 @@ export function EditorControls({ editorDarkMode, minimized }) {
                     minimal
                     fill
                     icon="undo"
-                    title="Undo (Ctrl+Z)"
-                />
+                    title="Undo"
+                    style={{ fontSize: "11px" }}
+                >
+                    <kbd style={{ opacity: 0.6, fontFamily: "inherit", fontSize: "10px" }}>{modKey}Z</kbd>
+                </Button>
                 <Button
                     disabled={!canRedo}
                     onClick={dispatchRedo}
                     minimal
                     fill
                     icon="redo"
-                    title="Redo (Ctrl+Y)"
-                />
+                    title="Redo"
+                    style={{ fontSize: "11px" }}
+                >
+                    <kbd style={{ opacity: 0.6, fontFamily: "inherit", fontSize: "10px" }}>{modKey}Y</kbd>
+                </Button>
             </ButtonGroup>
             <HistoryPanel
                 isOpen={isHistoryPanelOpen}
