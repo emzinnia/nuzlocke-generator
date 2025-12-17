@@ -92,7 +92,7 @@ export function TrainerInfoEditor() {
                         }
                     >
                         <span>
-                            Trainer Image <Icon icon="info-sign" />
+                            Trainer Image <Icon style={{ verticalAlign: "top" }} size={12} icon="info-sign" />
                         </span>
                     </Popover>
                 }
