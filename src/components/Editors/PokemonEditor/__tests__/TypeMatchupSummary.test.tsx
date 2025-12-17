@@ -76,12 +76,12 @@ describe("<TypeMatchupSummary />", () => {
 
             render(<TypeMatchupSummary {...defaultProps} pokemon={teamPokemon} />);
 
-            // Should have type rows for each type
-            expect(screen.getByText("Normal")).toBeDefined();
-            expect(screen.getByText("Fire")).toBeDefined();
-            expect(screen.getByText("Water")).toBeDefined();
-            expect(screen.getByText("Electric")).toBeDefined();
-            expect(screen.getByText("Grass")).toBeDefined();
+            // Should have type rows for each type (use getAllByText since types appear in multiple places)
+            expect(screen.getAllByText("Normal").length).toBeGreaterThan(0);
+            expect(screen.getAllByText("Fire").length).toBeGreaterThan(0);
+            expect(screen.getAllByText("Water").length).toBeGreaterThan(0);
+            expect(screen.getAllByText("Electric").length).toBeGreaterThan(0);
+            expect(screen.getAllByText("Grass").length).toBeGreaterThan(0);
         });
 
         it("only shows Team status pokemon", () => {
