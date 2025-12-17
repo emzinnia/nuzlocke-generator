@@ -24,6 +24,16 @@ export function TypeMatchupDialog() {
     const [removedFromTeam, setRemovedFromTeam] = React.useState<Set<string>>(new Set());
     // Track pokemon IDs that have been swapped into team (locally, not yet saved)
     const [addedToTeam, setAddedToTeam] = React.useState<Set<string>>(new Set());
+    // Track if other pokemon list is scrolled to bottom
+    const [otherScrolledToBottom, setOtherScrolledToBottom] = React.useState(false);
+    const otherListRef = React.useRef<HTMLDivElement>(null);
+
+    const handleOtherScroll = React.useCallback(() => {
+        const el = otherListRef.current;
+        if (!el) return;
+        const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 10;
+        setOtherScrolledToBottom(isAtBottom);
+    }, []);
 
     const onClose = React.useCallback(
         () => {
