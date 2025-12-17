@@ -312,7 +312,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
     return (
         <Card className={styles.typeMatchupsCard} elevation={Elevation.ONE}>
             <div className={styles.typeMatchups} style={{ color: textColor }}>
-                <h3 style={{ color: textColor, marginBottom: "0.75rem" }}>
+                <h3 style={{ color: textColor, margin: "0", }}>
                     Type Matchups (Gen {generation})
                 </h3>
                 <Tabs id="type-matchups-tabs" defaultSelectedTabId="summary">
