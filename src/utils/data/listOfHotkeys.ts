@@ -69,6 +69,11 @@ export const listOfHotkeys: HotkeyList[] = [
         onKeyUp: "addPokemon",
     },
     {
+        key: "t",
+        comment: "Toggle Type Matchups",
+        onKeyUp: "toggleTypeMatchups",
+    },
+    {
         key: "s",
         comment: "Manual Save",
         onKeyUp: "manualSave",
