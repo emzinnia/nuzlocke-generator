@@ -20,6 +20,7 @@ export interface PokemonEditorProps {
     style: State["style"];
     excludedAreas: State["excludedAreas"];
     customAreas: State["customAreas"];
+    isMassEditorOpen: boolean;
     toggleDialog: toggleDialog;
 
     // @NOTE: uncomment this if you need to auto-generate Pokemon
@@ -28,7 +29,6 @@ export interface PokemonEditorProps {
 }
 
 export interface PokemonEditorState {
-    isMassEditorOpen: boolean;
     searchTerm: string;
 }
 
@@ -79,15 +79,12 @@ export class PokemonEditorBase extends React.Component<
     public constructor(props: PokemonEditorProps) {
         super(props);
         this.state = {
-            isMassEditorOpen: false,
             searchTerm: "",
         };
     }
 
     private openMassEditor = (_e) => {
-        this.setState({
-            isMassEditorOpen: true,
-        });
+        this.props.toggleDialog("massEditor");
     };
 
     public componentDidMount() {
@@ -161,7 +158,12 @@ export class PokemonEditorBase extends React.Component<
                                 onClick={this.openMassEditor}
                                 className={cx(Classes.MINIMAL, Classes.FILL)}
                             >
-                                Open Mass Editor
+                                Open Mass Editor{" "}
+                                <HotkeyIndicator
+                                    hotkey="shift+m"
+                                    showModifier={false}
+                                    style={{ marginLeft: "0.35rem" }}
+                                />
                             </Button>
                         </div>
                     </div>
@@ -186,15 +188,12 @@ export class PokemonEditorBase extends React.Component<
                     </BaseEditor>
                 </BaseEditor>
                 <React.Suspense fallback={<Spinner />}>
-                    {this.state.isMassEditorOpen && (
+                    {this.props.isMassEditorOpen && (
                         <ErrorBoundary>
                             <MassEditor
-                                isOpen={this.state.isMassEditorOpen}
+                                isOpen={this.props.isMassEditorOpen}
                                 toggleDialog={() =>
-                                    this.setState({
-                                        isMassEditorOpen:
-                                            !this.state.isMassEditorOpen,
-                                    })
+                                    this.props.toggleDialog("massEditor")
                                 }
                             />
                         </ErrorBoundary>
@@ -213,6 +212,7 @@ export const PokemonEditor = connect(
         style: state.style,
         excludedAreas: state.excludedAreas,
         customAreas: state.customAreas,
+        isMassEditorOpen: !!state.view?.dialogs?.massEditor,
     }),
     {
         addPokemon: addPokemon,
