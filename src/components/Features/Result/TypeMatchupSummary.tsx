@@ -167,6 +167,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                                 {teamMatchups.map((row) => {
                                     const cellBg = typeToColor(row.type, customTypes) ?? style?.accentColor ?? "#394b59";
                                     const cellText = getContrastColor(cellBg);
+                                    const original = originalMatchupsMap.get(row.type);
 
                                     return (
                                         <tr key={row.type}>
@@ -181,18 +182,21 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                                                 style={getHeatmapStyle(row.weak, "rgb(231, 76, 60)")}
                                             >
                                                 {row.weak}
+                                                {hasSwaps && renderDelta(row.weak, original?.weak ?? 0)}
                                             </td>
                                             <td
                                                 className={styles.matchupCell}
                                                 style={getHeatmapStyle(row.resist, "rgb(39, 174, 96)")}
                                             >
                                                 {row.resist}
+                                                {hasSwaps && renderDeltaInverse(row.resist, original?.resist ?? 0)}
                                             </td>
                                             <td
                                                 className={styles.matchupCell}
                                                 style={getHeatmapStyle(row.immune, "rgb(155, 89, 182)")}
                                             >
                                                 {row.immune}
+                                                {hasSwaps && renderDeltaInverse(row.immune, original?.immune ?? 0)}
                                             </td>
                                             <td
                                                 className={styles.matchupCell}
