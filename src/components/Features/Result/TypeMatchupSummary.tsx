@@ -194,7 +194,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                         >
                             <thead>
                                 <tr>
-                                    <th style={{  width: "8rem"}}>Type</th>
+                                    <th style={{  width: "8rem", textAlign: "center" }}>Type</th>
                                     <th title="Team members weak to this type">Weak</th>
                                     <th title="Team members that resist this type">Resist</th>
                                     <th title="Team members immune to this type">Immune</th>
