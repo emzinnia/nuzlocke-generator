@@ -3,13 +3,14 @@ import { connect } from "react-redux";
 
 import { State } from "state";
 import { addPokemon } from "actions";
-import { feature, isLocal, noop, choose, generateEmptyPokemon } from "utils";
+import { feature, isLocal, choose, generateEmptyPokemon } from "utils";
 import { ErrorBoundary } from "components";
 import { Button } from "@blueprintjs/core";
 import { appSelector } from "selectors";
 import { Skeleton } from "components";
 import { listOfPokemon, Species } from "utils/data/listOfPokemon";
 import { matchSpeciesToTypes } from "utils/formatters/matchSpeciesToTypes";
+import { DebugDialog } from "./DebugDialog";
 
 import "./app.css";
 
@@ -89,9 +90,6 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
         const { result2 } = this.state;
         const isDarkMode = style.editorDarkMode;
         const showDebugPanel = isLocal();
-        const debugPanelClassName = ["debug-panel", isDarkMode ? "bp5-dark" : ""]
-            .filter(Boolean)
-            .join(" ");
         console.log("features", feature);
 
         return (
@@ -160,20 +158,10 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
                     )}
 
                     {showDebugPanel && (
-                        <div
-                            className={debugPanelClassName}
-                            aria-label="Debug Panel"
-                        >
-                            <div className="debug-panel__title">Debug Panel</div>
-                            <div className="debug-panel__actions">
-                                <Button fill small onClick={this.addRandomPokemon}>
-                                    Add Random Pokemon
-                                </Button>
-                                <Button fill small onClick={noop}>
-                                    Create a new box of 30 Pokemon
-                                </Button>
-                            </div>
-                        </div>
+                        <DebugDialog
+                            isDarkMode={isDarkMode}
+                            onAddRandomPokemon={this.addRandomPokemon}
+                        />
                     )}
 
                     <ErrorBoundary key={4}>
