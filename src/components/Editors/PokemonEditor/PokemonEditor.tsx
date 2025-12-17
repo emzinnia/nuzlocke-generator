@@ -9,6 +9,7 @@ import { AddPokemonButton } from "components";
 import { BaseEditor } from "components";
 import { Box, BoxForm } from "components";
 import { ErrorBoundary } from "components";
+import { HotkeyIndicator } from "components/Common/Shared";
 import { cx } from "emotion";
 import { addPokemon, toggleDialog } from "actions";
 
@@ -133,7 +134,12 @@ export class PokemonEditorBase extends React.Component<
                                 intent={Intent.PRIMARY}
                                 onClick={() => this.props.toggleDialog("typeMatchups")}
                             >
-                                Type Matchups
+                                Type Matchups{" "}
+                                <HotkeyIndicator
+                                    hotkey="t"
+                                    showModifier={false}
+                                    style={{ marginLeft: "0.35rem" }}
+                                />
                             </Button>
                         </div>
                         <div style={{ marginLeft: "auto", width: "50%" }}>
