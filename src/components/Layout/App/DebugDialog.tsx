@@ -13,7 +13,7 @@ const debugPanelClassName = `
     bottom: 1rem;
     right: 1rem;
     width: 240px;
-    padding: 0.75rem;
+    padding: 2rem;
 `;
 
 export const DebugDialog: React.FC<DebugDialogProps> = ({
@@ -24,7 +24,7 @@ export const DebugDialog: React.FC<DebugDialogProps> = ({
     return (
         <div className={debugPanelClassName} aria-label="Debug Panel">
             <div className="debug-panel__title">Debug Panel</div>
-            <div className="debug-panel__actions">
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                 <Button fill onClick={onAddRandomPokemon}>
                     Add Random Pokemon
                 </Button>
