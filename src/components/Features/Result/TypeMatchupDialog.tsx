@@ -198,8 +198,10 @@ export function TypeMatchupDialog() {
                         />
                     </div>
                     <div
-                        className={styles.typeMatchupsOther}
+                        ref={otherListRef}
+                        className={`${styles.typeMatchupsOther} ${otherScrolledToBottom ? styles.typeMatchupsOtherScrolledToBottom : ""}`}
                         style={{ color: textColor, minWidth: "12.5rem", maxWidth: "17.5rem" }}
+                        onScroll={handleOtherScroll}
                     >
                         <h4>Other Pokémon</h4>
                         <p>Select a Pokémon to swap it into type matchups.</p>
