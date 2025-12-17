@@ -218,25 +218,6 @@ input[name="metLevel"] {
 .bp5-dialog.wide-dialog {
     width: 90% !important;
 }
-
-/* Hotkeys editor: render remappable hotkeys in two columns on wider screens */
-.hotkeys-editor .hotkey-list--remappable {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 12px;
-    row-gap: 6px;
-}
-
-/* The HotkeysEditor uses inline marginBottom on <li>, so we must override it */
-.hotkeys-editor .hotkey-list--remappable > li {
-    margin-bottom: 0 !important;
-}
-
-@media screen and (max-width: 720px) {
-    .hotkeys-editor .hotkey-list--remappable {
-        grid-template-columns: 1fr;
-    }
-}
 .hide-scrollbars::-webkit-scrollbar {
     width: 0;
     height: 0;
