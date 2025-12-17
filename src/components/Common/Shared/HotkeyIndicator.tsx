@@ -20,6 +20,7 @@ const defaultStyle: React.CSSProperties = {
     fontFamily: "inherit",
     fontSize: "0.625rem",
     border: "1px solid rgba(0, 0, 0, 0.18)",
+    padding: "0.125rem 0.25rem",
 };
 
 /**
