@@ -93,6 +93,36 @@
     margin-bottom: 0 !important;
 }
 
+/* ------------------------------------------------------------
+   Blueprint input border overrides (match app look & feel)
+
+   Goal: single 1px stroke (theme-aware), no Blueprint inset multi-shadow.
+------------------------------------------------------------ */
+html {
+    --app-bp-input-border: #d0d7de;
+    --app-bp-input-border-focus: #187daf;
+}
+
+html.bp5-dark {
+    --app-bp-input-border: #30363d;
+    --app-bp-input-border-focus: #58a6ff;
+}
+
+.bp5-input:not(.bp5-input-ghost),
+.bp5-tag-input,
+.bp5-html-select select {
+    border: 1px solid var(--app-bp-input-border) !important;
+    box-shadow: none !important;
+}
+
+.bp5-input:not(.bp5-input-ghost):focus,
+.bp5-input:not(.bp5-input-ghost).bp5-active,
+.bp5-tag-input:focus-within,
+.bp5-html-select select:focus {
+    border-color: var(--app-bp-input-border-focus) !important;
+    box-shadow: none !important;
+}
+
 .debug-panel {
     position: fixed;
     bottom: 1rem;
