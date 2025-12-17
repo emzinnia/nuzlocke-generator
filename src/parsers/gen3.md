@@ -621,12 +621,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
 ---
 
-If you want, I can extend the same TS module to:
-
-* parse all **420 PC slots** (and box names/wallpapers),
-* parse **items** (4-byte item entries) and decode bag pockets,
-* handle **R/S vs Emerald vs FR/LG variant differences** more rigorously (some offsets differ per title), using the same “table-driven offsets” style you see above.
-
 [1]: https://bulbapedia.bulbagarden.net/wiki/Save_data_structure_%28Generation_III%29 "Save data structure (Generation III) - Bulbapedia, the community-driven Pokémon encyclopedia"
 [2]: https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_data_structure_%28Generation_III%29 "Pokémon data structure (Generation III) - Bulbapedia, the community-driven Pokémon encyclopedia"
 [3]: https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_data_substructures_%28Generation_III%29 "Pokémon data substructures (Generation III) - Bulbapedia, the community-driven Pokémon encyclopedia"

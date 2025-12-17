@@ -194,6 +194,22 @@ for (let i = 0; i < listOfPokemon.length; i++) {
     SPECIES_MAP[i + 1] = listOfPokemon[i];
 }
 
+// O(1) species -> National Dex number (1-indexed), avoiding per-Pokémon linear scans.
+const DEX_NUMBER_BY_SPECIES = new Map<Species, number>(
+    listOfPokemon.map((s, i) => [s, i + 1] as const),
+);
+
+// Memoized species -> unique type list (mono-types collapse to a single entry).
+const TYPES_BY_SPECIES = new Map<Species, Types[]>();
+const getTypesForSpecies = (species: Species): Types[] => {
+    const cached = TYPES_BY_SPECIES.get(species);
+    if (cached) return cached;
+    const tuple = matchSpeciesToTypes(species);
+    const unique = Array.from(new Set(tuple)) as Types[];
+    TYPES_BY_SPECIES.set(species, unique);
+    return unique;
+};
+
 const decodeCharacter = (code: number): string => {
     // When decoding Gen 3 strings, which charset applies depends on the language.
     // For Japanese Pokémon, many byte values map to Hiragana/Katakana instead of Latin.
@@ -473,11 +489,13 @@ const computeChecksum = (buffer: Buffer, size: number) => {
 
 const isSectionValid = (section: SaveSection) => {
     if (section.signature !== SECTION_SIGNATURE) {
-        log("signature", `Section ${section.id} failed signature`, {
-            expected: `0x${SECTION_SIGNATURE.toString(16)}`,
-            actual: `0x${section.signature.toString(16)}`,
-            saveIndex: section.saveIndex,
-        });
+        if (DEBUG) {
+            log("signature", `Section ${section.id} failed signature`, {
+                expected: `0x${SECTION_SIGNATURE.toString(16)}`,
+                actual: `0x${section.signature.toString(16)}`,
+                saveIndex: section.saveIndex,
+            });
+        }
         return false;
     }
     const size = SECTION_SAVE_SIZES[section.id];
@@ -485,11 +503,13 @@ const isSectionValid = (section: SaveSection) => {
     const computed = computeChecksum(section.data, size);
     const isValid = computed === section.checksum;
     if (!isValid) {
-        log("checksum", `Section ${section.id} failed checksum`, {
-            expected: `0x${section.checksum.toString(16)}`,
-            computed: `0x${computed.toString(16)}`,
-            saveIndex: section.saveIndex,
-        });
+        if (DEBUG) {
+            log("checksum", `Section ${section.id} failed checksum`, {
+                expected: `0x${section.checksum.toString(16)}`,
+                computed: `0x${computed.toString(16)}`,
+                saveIndex: section.saveIndex,
+            });
+        }
     }
     return isValid;
 };
@@ -506,16 +526,18 @@ const readSection = (file: Buffer, sectionIndex: number): SaveSection => {
     const signature = footer.readUInt32LE(4);
     const saveIndex = footer.readUInt32LE(8);
 
-    log(
-        "readSection",
-        `Section ${sectionIndex}: ID=${id}, checksum=0x${checksum.toString(16)}, signature=0x${signature.toString(
-            16,
-        )}, saveIndex=${saveIndex}`,
-        {
-            offset: `0x${offset.toString(16)}`,
-            dataSize: SECTION_DATA_SIZE,
-        },
-    );
+    if (DEBUG) {
+        log(
+            "readSection",
+            `Section ${sectionIndex}: ID=${id}, checksum=0x${checksum.toString(16)}, signature=0x${signature.toString(
+                16,
+            )}, saveIndex=${saveIndex}`,
+            {
+                offset: `0x${offset.toString(16)}`,
+                dataSize: SECTION_DATA_SIZE,
+            },
+        );
+    }
 
     return {
         id,
@@ -532,10 +554,12 @@ const readBlock = (file: Buffer, blockOffset: number): SaveSection[] => {
     const blockBuffer = file.slice(start, start + BLOCK_SIZE);
     const sections: SaveSection[] = [];
 
-    log(
-        "readBlock",
-        `Reading block at offset 0x${start.toString(16)}, size=${BLOCK_SIZE}`,
-    );
+    if (DEBUG) {
+        log(
+            "readBlock",
+            `Reading block at offset 0x${start.toString(16)}, size=${BLOCK_SIZE}`,
+        );
+    }
 
     for (let i = 0; i < SECTION_COUNT; i++) {
         sections.push(readSection(blockBuffer, i));
@@ -599,16 +623,10 @@ const getSpeciesName = (
     speciesId: number,
     nickname?: string,
 ): Species | undefined => {
-    // Convert Gen 3 internal species ID to National Dex number
-    const nationalDexId =
-            GEN3_SPECIES_MAP[speciesId];
-    if (
-        nationalDexId &&
-        nationalDexId.length > 0 &&
-        nationalDexId.length <= MAX_SUPPORTED_SPECIES
-    ) {
-        return nationalDexId;
-    }
+    // Convert Gen 3 internal species ID to our canonical Species string.
+    // Note: `GEN3_SPECIES_MAP` used to return a National Dex number; it now returns a Species string.
+    const speciesFromMap = GEN3_SPECIES_MAP[speciesId];
+    if (speciesFromMap) return speciesFromMap;
     if (nickname) {
         const match = listOfPokemon.find(
             (name) => name.toLowerCase() === nickname.toLowerCase(),
@@ -665,9 +683,7 @@ const shinyCheck = (personality: number, otId: number) => {
 };
 
 const getNationalDexNumber = (species: Species): number | undefined => {
-    const idx = listOfPokemon.findIndex((s) => s === species);
-    if (idx === -1) return undefined;
-    return idx + 1;
+    return DEX_NUMBER_BY_SPECIES.get(species);
 };
 
 const parseIvs = (value: number) => ({
@@ -711,20 +727,22 @@ const decodePokemon = (
         SUBSTRUCTURE_ORDERS[personality % SUBSTRUCTURE_ORDERS.length];
     const sub = splitSubstructures(orderKey, decrypted);
 
-    log(
-        "decodePokemon",
-        `Decoding Pokemon at ${context.status} position ${context.position}`,
-        {
-            personality: `0x${personality.toString(16)}`,
-            otId: `0x${otId.toString(16)}`,
-            encryptionKey: `0x${key.toString(16)}`,
-            substructureOrder: orderKey,
-            nickname,
-            checksumStored: `0x${checksum.toString(16)}`,
-            checksumComputed: `0x${checksumComputed.toString(16)}`,
-            isChecksumValid,
-        },
-    );
+    if (DEBUG) {
+        log(
+            "decodePokemon",
+            `Decoding Pokemon at ${context.status} position ${context.position}`,
+            {
+                personality: `0x${personality.toString(16)}`,
+                otId: `0x${otId.toString(16)}`,
+                encryptionKey: `0x${key.toString(16)}`,
+                substructureOrder: orderKey,
+                nickname,
+                checksumStored: `0x${checksum.toString(16)}`,
+                checksumComputed: `0x${checksumComputed.toString(16)}`,
+                isChecksumValid,
+            },
+        );
+    }
 
     // If the decrypted data checksum doesn't match, this record is effectively invalid ("Bad Egg" guard).
     if (!isChecksumValid) return null;
@@ -751,14 +769,16 @@ const decodePokemon = (
         sub.A.readUInt8(11),
     ];
 
-    log("decodePokemon", `Species data extracted`, {
-        internalSpeciesId: speciesId,
-        nationalDexId: GEN3_SPECIES_MAP[speciesId],
-        itemId,
-        exp,
-        friendship,
-        moveIds,
-    });
+    if (DEBUG) {
+        log("decodePokemon", `Species data extracted`, {
+            internalSpeciesId: speciesId,
+            speciesFromMap: GEN3_SPECIES_MAP[speciesId],
+            itemId,
+            exp,
+            friendship,
+            moveIds,
+        });
+    }
 
     const evs = {
         hp: sub.E.readUInt8(0),
@@ -812,20 +832,22 @@ const decodePokemon = (
     const forme =
         speciesName === "Unown" ? determineUnownForme(personality) : undefined;
 
-    log(
-        "decodePokemon",
-        `Decoded: ${speciesName || `Species #${speciesId}`} Lv.${level || "?"}`,
-        {
-            species: speciesName,
-            level,
-            moves,
-            shiny,
-            forme,
-            ability,
-            ivs,
-            evs,
-        },
-    );
+    if (DEBUG) {
+        log(
+            "decodePokemon",
+            `Decoded: ${speciesName || `Species #${speciesId}`} Lv.${level || "?"}`,
+            {
+                species: speciesName,
+                level,
+                moves,
+                shiny,
+                forme,
+                ability,
+                ivs,
+                evs,
+            },
+        );
+    }
 
     const stats = context.isParty
         ? {
@@ -839,11 +861,8 @@ const decodePokemon = (
           }
         : undefined;
 
-    const typeTuple = speciesName
-        ? matchSpeciesToTypes(speciesName as Species)
-        : undefined;
-    const types = typeTuple
-        ? (Array.from(new Set(typeTuple)) as [Types, Types])
+    const types = speciesName
+        ? (getTypesForSpecies(speciesName) as [Types, Types])
         : undefined;
 
     // Look up location name from GEN_3_LOCATIONS map
@@ -917,10 +936,16 @@ const parseParty = (
     const start = offsets.TEAM_POKEMON_LIST;
     const party: Pokemon[] = [];
 
-    log("parseParty", `Parsing party: team size=${size}, capped at ${count}`, {
-        teamSizeOffset: `0x${offsets.TEAM_SIZE.toString(16)}`,
-        pokemonListOffset: `0x${start.toString(16)}`,
-    });
+    if (DEBUG) {
+        log(
+            "parseParty",
+            `Parsing party: team size=${size}, capped at ${count}`,
+            {
+                teamSizeOffset: `0x${offsets.TEAM_SIZE.toString(16)}`,
+                pokemonListOffset: `0x${start.toString(16)}`,
+            },
+        );
+    }
 
     for (let i = 0; i < count; i++) {
         const slice = section.slice(
@@ -941,7 +966,9 @@ const parseParty = (
         }
     }
 
-    log("parseParty", `Found ${party.length} Pokemon in party`);
+    if (DEBUG) {
+        log("parseParty", `Found ${party.length} Pokemon in party`);
+    }
 
     return party;
 };
@@ -961,16 +988,20 @@ const parseBoxes = (
         }
     });
 
-    log("parseBoxes", `Found ${buffers.length} PC storage sections`, {
-        expectedSections: PC_SECTION_IDS.length,
-        sectionIds: PC_SECTION_IDS,
-    });
+    if (DEBUG) {
+        log("parseBoxes", `Found ${buffers.length} PC storage sections`, {
+            expectedSections: PC_SECTION_IDS.length,
+            sectionIds: PC_SECTION_IDS,
+        });
+    }
 
     if (!buffers.length) {
-        log(
-            "parseBoxes",
-            "No PC storage sections found, returning empty array",
-        );
+        if (DEBUG) {
+            log(
+                "parseBoxes",
+                "No PC storage sections found, returning empty array",
+            );
+        }
         return [];
     }
 
@@ -979,14 +1010,16 @@ const parseBoxes = (
     const pokemonArea = storage.slice(0, pokemonBytes);
     const boxed: Pokemon[] = [];
 
-    log(
-        "parseBoxes",
-        `Parsing ${BOX_COUNT} boxes with ${BOX_CAPACITY} slots each`,
-        {
-            totalSlots: BOX_COUNT * BOX_CAPACITY,
-            pokemonAreaSize: pokemonBytes,
-        },
-    );
+    if (DEBUG) {
+        log(
+            "parseBoxes",
+            `Parsing ${BOX_COUNT} boxes with ${BOX_CAPACITY} slots each`,
+            {
+                totalSlots: BOX_COUNT * BOX_CAPACITY,
+                pokemonAreaSize: pokemonBytes,
+            },
+        );
+    }
 
     for (let boxIndex = 0; boxIndex < BOX_COUNT; boxIndex++) {
         let boxCount = 0;
@@ -1010,11 +1043,18 @@ const parseBoxes = (
             }
         }
         if (boxCount > 0) {
-            log("parseBoxes", `Box ${boxIndex + 1}: found ${boxCount} Pokemon`);
+            if (DEBUG) {
+                log(
+                    "parseBoxes",
+                    `Box ${boxIndex + 1}: found ${boxCount} Pokemon`,
+                );
+            }
         }
     }
 
-    log("parseBoxes", `Total boxed Pokemon: ${boxed.length}`);
+    if (DEBUG) {
+        log("parseBoxes", `Total boxed Pokemon: ${boxed.length}`);
+    }
 
     return boxed;
 };
@@ -1034,11 +1074,13 @@ const parseTrainer = (
     const moneyBytes = section.slice(offsets.MONEY[0], offsets.MONEY[1]);
     const money = formatMoney(moneyBytes);
 
-    log("parseTrainer", `Trainer: ${name} (ID: ${trainerId})`, {
-        time,
-        money,
-        game: options.selectedGame,
-    });
+    if (DEBUG) {
+        log("parseTrainer", `Trainer: ${name} (ID: ${trainerId})`, {
+            time,
+            money,
+            game: options.selectedGame,
+        });
+    }
 
     return {
         name,
@@ -1051,16 +1093,18 @@ const parseTrainer = (
 };
 
 export const parseGen3Save = async (file: Buffer, options: ParserOptions) => {
-    const startTime = performance.now();
+    const startTime = DEBUG ? performance.now() : 0;
 
     // Ensure file is a Buffer (might be Uint8Array in worker context)
     const buffer = Buffer.isBuffer(file) ? file : Buffer.from(file);
 
-    log("parseGen3Save", "=== Starting Gen 3 save file parsing ===", {
-        fileSize: buffer.length,
-        expectedSize: SAVE_SIZE,
-        selectedGame: options.selectedGame,
-    });
+    if (DEBUG) {
+        log("parseGen3Save", "=== Starting Gen 3 save file parsing ===", {
+            fileSize: buffer.length,
+            expectedSize: SAVE_SIZE,
+            selectedGame: options.selectedGame,
+        });
+    }
 
     if (buffer.length !== SAVE_SIZE && buffer.length !== BLOCK_SIZE * 2) {
         throw new Error(
@@ -1073,27 +1117,33 @@ export const parseGen3Save = async (file: Buffer, options: ParserOptions) => {
     }
 
     const active = selectActiveBlock(buffer);
-    log("parseGen3Save", "Selected active save block", {
-        activeBlock: active.label,
-        saveIndex: active.saveIndex,
-    });
+    if (DEBUG) {
+        log("parseGen3Save", "Selected active save block", {
+            activeBlock: active.label,
+            saveIndex: active.saveIndex,
+        });
+    }
     const sectionMap = active.byId;
     const offsets = getOffsets(options.selectedGame as GameSaveFormat);
 
-    log("parseGen3Save", "Offsets determined", {
-        game: options.selectedGame,
-        teamSize: `0x${offsets.TEAM_SIZE.toString(16)}`,
-        teamList: `0x${offsets.TEAM_POKEMON_LIST.toString(16)}`,
-    });
+    if (DEBUG) {
+        log("parseGen3Save", "Offsets determined", {
+            game: options.selectedGame,
+            teamSize: `0x${offsets.TEAM_SIZE.toString(16)}`,
+            teamList: `0x${offsets.TEAM_POKEMON_LIST.toString(16)}`,
+        });
+    }
 
     const trainerSection = sectionMap.get(0);
     const teamSection = sectionMap.get(1);
 
     if (!trainerSection || !teamSection) {
-        log("parseGen3Save", "ERROR: Missing critical sections", {
-            hasTrainerSection: !!trainerSection,
-            hasTeamSection: !!teamSection,
-        });
+        if (DEBUG) {
+            log("parseGen3Save", "ERROR: Missing critical sections", {
+                hasTrainerSection: !!trainerSection,
+                hasTeamSection: !!teamSection,
+            });
+        }
         throw new Error("Unable to locate trainer or party data in save file.");
     }
 
@@ -1104,16 +1154,16 @@ export const parseGen3Save = async (file: Buffer, options: ParserOptions) => {
     const party = parseParty(teamSection.data, offsets, pidTracker);
     const boxed = parseBoxes(sectionMap, options, pidTracker);
 
-    const endTime = performance.now();
-    const parseTime = endTime - startTime;
-
-    log("parseGen3Save", "=== Parsing complete ===", {
-        parseTimeMs: parseTime.toFixed(2),
-        trainerName: trainer.name,
-        partyCount: party.length,
-        boxedCount: boxed.length,
-        totalPokemon: party.length + boxed.length,
-    });
+    const parseTimeMs = DEBUG ? performance.now() - startTime : undefined;
+    if (DEBUG) {
+        log("parseGen3Save", "=== Parsing complete ===", {
+            parseTimeMs: parseTimeMs!.toFixed(2),
+            trainerName: trainer.name,
+            partyCount: party.length,
+            boxedCount: boxed.length,
+            totalPokemon: party.length + boxed.length,
+        });
+    }
 
     const result = {
         trainer,
@@ -1125,7 +1175,7 @@ export const parseGen3Save = async (file: Buffer, options: ParserOptions) => {
                   selectedBlock: active.label,
                   saveIndex: active.saveIndex,
                   sectionCount: sectionMap.size,
-                  parseTimeMs: parseTime,
+                  parseTimeMs: parseTimeMs!,
                   counts: {
                       party: party.length,
                       boxed: boxed.length,
