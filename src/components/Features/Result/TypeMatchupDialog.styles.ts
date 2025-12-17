@@ -234,6 +234,7 @@ export const typeMatchupsOther = css`
     /* Subtle fade at bottom to indicate more content */
     mask-image: linear-gradient(to bottom, black 0%, black 90%, transparent 100%);
     -webkit-mask-image: linear-gradient(to bottom, black 0%, black 90%, transparent 100%);
+    transition: mask-image 0.2s ease-out, -webkit-mask-image 0.2s ease-out;
 
     /* Hide scrollbar by default, show on hover */
     &::-webkit-scrollbar {
@@ -253,6 +254,11 @@ export const typeMatchupsOther = css`
     :global(.bp-3-dark) &:hover::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.3);
     }
+`;
+
+export const typeMatchupsOtherScrolledToBottom = css`
+    mask-image: none;
+    -webkit-mask-image: none;
 `;
 
 export const typeMatchupsStatus = css`
