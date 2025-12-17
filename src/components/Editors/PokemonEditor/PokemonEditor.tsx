@@ -116,7 +116,7 @@ export class PokemonEditorBase extends React.Component<
                             style={{
                                 display: "flex",
                                 flexDirection: "column",
-                                gap: "0.35rem",
+                                gap: "0.5rem",
                             }}
                         >
                             <AddPokemonButton
