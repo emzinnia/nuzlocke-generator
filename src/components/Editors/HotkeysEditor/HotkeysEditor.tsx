@@ -117,10 +117,18 @@ export class HotkeysEditorBase extends React.Component<
                         Press a key...
                     </kbd>
                 ) : (
-            
-                        <HotkeyIndicator style={{ backgroundColor: isCustomized
-                                    ? "#0d8050"
-                                    : undefined, minWidth: "5rem", textAlign: "center"}} hotkey={effectiveLabel} />
+                    <HotkeyIndicator
+                        hotkey={effectiveLabel}
+                        showModifier={false}
+                        className={Classes.CODE}
+                        style={{
+                            margin: "4px",
+                            minWidth: "5rem",
+                            textAlign: "center",
+                            backgroundColor: isCustomized ? "#0d8050" : undefined,
+                            color: isCustomized ? "white" : undefined,
+                        }}
+                    />
                 )}
                 <div style={{ margin: "4px", flex: 1 }}>{item.comment}</div>
                 {isRemappable && (
