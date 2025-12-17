@@ -229,6 +229,7 @@ export const typeMatchupsOther = css`
     flex-shrink: 0;
     max-height: 70vh;
     overflow-y: auto;
+    overflow-x: hidden;
 `;
 
 export const typeMatchupsStatus = css`
