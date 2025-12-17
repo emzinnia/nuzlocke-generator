@@ -98,6 +98,7 @@ export class HotkeysEditorBase extends React.Component<
                 key={item.onKeyUp || item.key}
                 style={{
                     display: "flex",
+                    flexDirection: "column",
                     alignItems: "center",
                     marginBottom: "4px",
                     gap: "4px",
