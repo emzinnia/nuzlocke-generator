@@ -354,10 +354,10 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         const currentPoke = this.props.pokemon.find(
             (p) => p.id === this.props.selectedId,
         );
-        if (!currentPoke || !currentPoke.status) return;
+        if (!currentPoke) return;
 
         const orderedBoxNames = this.getOrderedBoxNames();
-        const currentStatusIndex = orderedBoxNames.indexOf(currentPoke.status);
+        const currentStatusIndex = orderedBoxNames.indexOf(currentPoke.status ?? "");
         
         if (currentStatusIndex < 0) return;
 
