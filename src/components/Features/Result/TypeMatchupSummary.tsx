@@ -318,6 +318,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                 </div>
                 <Tabs id="type-matchups-tabs" defaultSelectedTabId="summary">
                     <Tab
+                        style={{ marginBottom: "0.5rem" }}
                         id="summary"
                         title="Team Summary"
                         panel={summaryPanel}
