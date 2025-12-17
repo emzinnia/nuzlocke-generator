@@ -7,9 +7,7 @@ import { redoEditorHistory, syncStateFromHistory, undoEditorHistory } from "acti
 import { useEvent } from "utils/hooks";
 import { HistoryPanel } from "./HistoryPanel";
 import { reconstructPreviousState, reconstructNextState } from "reducers/editorHistory";
-
-const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-const modKey = isMac ? "⌘" : "Ctrl+";
+import { HotkeyIndicator } from "components/Common/Shared";
 
 export function EditorControls({ editorDarkMode, minimized }) {
     const editorHistory = useSelector<State, State["editorHistory"]>(
@@ -97,7 +95,7 @@ export function EditorControls({ editorDarkMode, minimized }) {
                     title="Undo"
                     style={{ fontSize: "0.6875rem" }}
                 >
-                    <kbd style={{ opacity: 0.6, fontFamily: "inherit", fontSize: "0.625rem" }}>{modKey}Z</kbd>
+                    <HotkeyIndicator hotkey="Z" />
                 </Button>
                 <Button
                     disabled={!canRedo}
@@ -108,7 +106,7 @@ export function EditorControls({ editorDarkMode, minimized }) {
                     title="Redo"
                     style={{ fontSize: "0.6875rem" }}
                 >
-                    <kbd style={{ opacity: 0.6, fontFamily: "inherit", fontSize: "0.625rem" }}>{modKey}Y</kbd>
+                    <HotkeyIndicator hotkey="Y" />
                 </Button>
             </ButtonGroup>
             <HistoryPanel
