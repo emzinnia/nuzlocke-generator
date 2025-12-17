@@ -32,6 +32,11 @@ export const listOfHotkeys: HotkeyList[] = [
         comment: "Redo",
     },
     {
+        key: "h",
+        comment: "Toggle History Timeline",
+        onKeyUp: "toggleHistoryTimeline",
+    },
+    {
         key: "j",
         comment: "Previous Pok\xE9mon",
         onKeyUp: "previousPokemon",
