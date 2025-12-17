@@ -45,7 +45,6 @@
     display: flex;
 }
 .release-notes-wrapper p img {
-    max-height: 15rem;
     margin: 0 auto;
     max-width: 100%;
 }
