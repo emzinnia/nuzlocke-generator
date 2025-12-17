@@ -718,7 +718,9 @@ const parseBoxes = (
     PC_SECTION_IDS.forEach((id) => {
         const section = sectionMap.get(id);
         if (section) {
-            buffers.push(section.data);
+            // Only use valid save data, not the full section buffer (which includes padding)
+            const validSize = SECTION_SAVE_SIZES[id] || section.data.length;
+            buffers.push(section.data.slice(0, validSize));
         }
     });
 
