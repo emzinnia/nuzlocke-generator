@@ -320,7 +320,25 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
             <div className={styles.typeMatchups} style={{ color: textColor }}>
                 <div style={{ color: textColor, marginBottom: "0.5rem", display: "flex", alignItems: "center", justifyContent: "space-between"}}>
                     <h3 style={{ margin: 0 }}>Type Matchups</h3>
-                    <span style={{ fontSize: "0.875rem", color: textColor }}>Gen {generation}</span>
+                    <HTMLSelect
+                        value={selectedGeneration ?? "auto"}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            setSelectedGeneration(val === "auto" ? null : Number(val) as Generation);
+                        }}
+                        style={{ fontSize: "0.875rem" }}
+                    >
+                        <option value="auto">Auto (Gen {autoGeneration})</option>
+                        <option value={Generation.Gen1}>Gen 1</option>
+                        <option value={Generation.Gen2}>Gen 2</option>
+                        <option value={Generation.Gen3}>Gen 3</option>
+                        <option value={Generation.Gen4}>Gen 4</option>
+                        <option value={Generation.Gen5}>Gen 5</option>
+                        <option value={Generation.Gen6}>Gen 6</option>
+                        <option value={Generation.Gen7}>Gen 7</option>
+                        <option value={Generation.Gen8}>Gen 8</option>
+                        <option value={Generation.Gen9}>Gen 9</option>
+                    </HTMLSelect>
                 </div>
                 <Tabs id="type-matchups-tabs" defaultSelectedTabId="summary">
                     <Tab
