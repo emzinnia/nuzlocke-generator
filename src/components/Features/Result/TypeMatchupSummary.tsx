@@ -35,10 +35,15 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
 
     const chart = React.useMemo(() => getTypeChartForGeneration(generation), [generation]);
 
-    // Build team-specific matchups
+    // Build team-specific matchups (accounting for local swap state)
     const teamPokemon = React.useMemo(
-        () => pokemon?.filter((p) => p?.status === "Team" && !p?.hidden) ?? [],
-        [pokemon],
+        () => pokemon?.filter((p) => {
+            const isOnTeam = p?.status === "Team" && !p?.hidden;
+            const wasRemoved = removedFromTeam?.has(p.id);
+            const wasAdded = addedToTeam?.has(p.id);
+            return (isOnTeam && !wasRemoved) || wasAdded;
+        }) ?? [],
+        [pokemon, removedFromTeam, addedToTeam],
     );
 
     const teamMatchups = React.useMemo(
