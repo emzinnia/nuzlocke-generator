@@ -99,7 +99,7 @@
    Goal: single 1px stroke (theme-aware), no Blueprint inset multi-shadow.
 ------------------------------------------------------------ */
 html {
-    --app-bp-input-border: #d0d7de;
+    --app-bp-input-border: #262B31;
     --app-bp-input-border-focus: #187daf;
 }
 
