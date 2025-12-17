@@ -221,4 +221,4 @@ export const PokemonEditor = connect(
     },
     null,
     { pure: true },
-)(PokemonEditorBase as any);
+)(PokemonEditorBase);
