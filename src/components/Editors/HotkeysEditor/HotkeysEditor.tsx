@@ -197,7 +197,7 @@ export class HotkeysEditorBase extends React.Component<
                         paddingLeft: "1rem",
                         margin: 0,
                     }}
-                    className="hotkey-list"
+                    className="hotkey-list hotkey-list--remappable"
                 >
                     {remappableHotkeys.map(this.renderHotkeyItem)}
                 </ul>
@@ -221,7 +221,7 @@ export class HotkeysEditorBase extends React.Component<
                                 margin: 0,
                                 opacity: 0.8,
                             }}
-                            className="hotkey-list"
+                            className="hotkey-list hotkey-list--static"
                         >
                             {nonRemappableHotkeys.map((item) => (
                                 <li
