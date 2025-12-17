@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Button } from "@blueprintjs/core";
 import { noop } from "utils";
+import { css } from "emotion";
 
 interface DebugDialogProps {
     isDarkMode: boolean;
@@ -8,7 +9,7 @@ interface DebugDialogProps {
     onCreateBox?: () => void;
 }
 
-const debugPanelClassName = `
+const debugPanelClassName = css`
     position: fixed;
     bottom: 1rem;
     right: 1rem;
