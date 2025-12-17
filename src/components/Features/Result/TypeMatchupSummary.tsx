@@ -28,10 +28,16 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
     addedToTeam,
 }) => {
     const [useAbilityMatchups, setUseAbilityMatchups] = React.useState(false);
-    const generation: Generation = React.useMemo(
+    // null = use auto-detected generation from game
+    const [selectedGeneration, setSelectedGeneration] = React.useState<Generation | null>(null);
+    
+    const autoGeneration: Generation = React.useMemo(
         () => getGameGeneration(game.name),
         [game.name],
     );
+    
+    // Effective generation: user override or auto-detected
+    const generation = selectedGeneration ?? autoGeneration;
 
     const chart = React.useMemo(() => getTypeChartForGeneration(generation), [generation]);
 
