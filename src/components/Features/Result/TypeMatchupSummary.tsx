@@ -117,6 +117,30 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
         return "1×";
     };
 
+    // Render delta indicator for matchup changes
+    const renderDelta = (current: number, original: number) => {
+        const delta = current - original;
+        if (delta === 0) return null;
+        const color = delta > 0 ? "#e74c3c" : "#27ae60"; // red for increase (bad for weak), green for decrease
+        return (
+            <span style={{ fontSize: "0.7em", marginLeft: "0.25rem", color, fontWeight: 700 }}>
+                {delta > 0 ? `+${delta}` : delta}
+            </span>
+        );
+    };
+
+    // For resist/immune, increasing is good (green), decreasing is bad (red)
+    const renderDeltaInverse = (current: number, original: number) => {
+        const delta = current - original;
+        if (delta === 0) return null;
+        const color = delta > 0 ? "#27ae60" : "#e74c3c"; // green for increase (good), red for decrease
+        return (
+            <span style={{ fontSize: "0.7em", marginLeft: "0.25rem", color, fontWeight: 700 }}>
+                {delta > 0 ? `+${delta}` : delta}
+            </span>
+        );
+    };
+
     const summaryPanel = (
         <div className={styles.sectionSpacing}>
             {abilityToggle}
