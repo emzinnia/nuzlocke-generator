@@ -25,7 +25,7 @@ export const DebugDialog: React.FC<DebugDialogProps> = ({
 }) => {
     return (
         <div className={debugPanelClassName} aria-label="Debug Panel">
-            <div className="debug-panel__title">Debug Panel</div>
+            <h3>Debug Panel</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                 <Button fill onClick={onAddRandomPokemon}>
                     Add Random Pokemon
