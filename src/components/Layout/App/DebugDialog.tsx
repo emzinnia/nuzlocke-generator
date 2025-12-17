@@ -15,7 +15,6 @@ const debugPanelClassName = css`
     right: 1rem;
     width: 20rem;
     padding: 2rem;
-    color: ${props => props.isDarkMode ? "white" : "black"};
 `;
 
 export const DebugDialog: React.FC<DebugDialogProps> = ({
