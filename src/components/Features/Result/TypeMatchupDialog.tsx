@@ -131,6 +131,21 @@ export function TypeMatchupDialog() {
                     <div className={styles.typeMatchupsTeamPreview} style={{ color: textColor }}>
                         <h4>Team Preview</h4>
                         <p>Click a Pokémon to swap it out.</p>
+                        {displayedTeam.length > 6 && (
+                            <div
+                                style={{
+                                    color: "orange",
+                                    fontWeight: "bold",
+                                    marginBottom: "1rem",
+                                    background: "rgba(255, 165, 0, 0.07)",
+                                    padding: "0.5rem 1rem",
+                                    borderRadius: "0.5rem",
+                                    border: "1px solid #ffae42",
+                                }}
+                            >
+                                Warning: Team has more than 6 Pokémon!
+                            </div>
+                        )}
                         
                         {displayedTeam.map((poke) => (
                                 <Card
