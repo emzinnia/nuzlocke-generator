@@ -8,15 +8,19 @@ interface DebugDialogProps {
     onCreateBox?: () => void;
 }
 
+const debugPanelClassName = `
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    width: 240px;
+    padding: 0.75rem;
+`;
+
 export const DebugDialog: React.FC<DebugDialogProps> = ({
     isDarkMode,
     onAddRandomPokemon,
     onCreateBox = noop,
 }) => {
-    const debugPanelClassName = ["debug-panel", isDarkMode ? "bp5-dark" : ""]
-        .filter(Boolean)
-        .join(" ");
-
     return (
         <div className={debugPanelClassName} aria-label="Debug Panel">
             <div className="debug-panel__title">Debug Panel</div>
