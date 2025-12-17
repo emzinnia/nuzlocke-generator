@@ -265,6 +265,21 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         this.props.toggleDialog("massEditor");
     }
 
+    private focusPokemonSearch() {
+        const el = document.querySelector<HTMLInputElement>(
+            '[data-testid="pokemon-search"]',
+        );
+        if (!el) return;
+        el.focus();
+        // Put caret at end for convenience
+        const len = el.value?.length ?? 0;
+        try {
+            el.setSelectionRange(len, len);
+        } catch {
+            // ignore (some input types may not support selection)
+        }
+    }
+
     private movePokemonLeft() {
         if (!this.props.selectedId || !this.props.pokemon?.length) return;
         
