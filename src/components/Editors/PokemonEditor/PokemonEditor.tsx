@@ -125,19 +125,32 @@ export class PokemonEditorBase extends React.Component<
                                     gameOfOrigin: this.props.game.name || "None",
                                 }}
                             />
-                            <Button
-                                icon="layout-group-by"
-                                className={Classes.MINIMAL}
-                                intent={Intent.PRIMARY}
-                                onClick={() => this.props.toggleDialog("typeMatchups")}
-                            >
-                                Type Matchups{" "}
-                                <HotkeyIndicator
-                                    hotkey="t"
-                                    showModifier={false}
-                                    style={{ marginLeft: "0.35rem" }}
-                                />
-                            </Button>
+                            <ButtonGroup className={Classes.MINIMAL}>
+                                <Button
+                                    icon="layout-group-by"
+                                    intent={Intent.PRIMARY}
+                                    onClick={() => this.props.toggleDialog("typeMatchups")}
+                                >
+                                    Type Matchups{" "}
+                                    <HotkeyIndicator
+                                        hotkey="t"
+                                        showModifier={false}
+                                        style={{ marginLeft: "0.35rem" }}
+                                    />
+                                </Button>
+                                <Button
+                                    icon={"heat-grid"}
+                                    intent={Intent.PRIMARY}
+                                    onClick={this.openMassEditor}
+                                >
+                                    Mass Editor{" "}
+                                    <HotkeyIndicator
+                                        hotkey="shift+m"
+                                        showModifier={false}
+                                        style={{ marginLeft: "0.35rem" }}
+                                    />
+                                </Button>
+                            </ButtonGroup>
                         </div>
                         <div style={{ marginLeft: "auto", width: "50%" }}>
                             <input
@@ -152,19 +165,6 @@ export class PokemonEditorBase extends React.Component<
                                 }
                                 style={{ margin: "0.25rem", width: "100%" }}
                             />
-                            <Button
-                                icon={"heat-grid"}
-                                intent={Intent.PRIMARY}
-                                onClick={this.openMassEditor}
-                                className={cx(Classes.MINIMAL, Classes.FILL)}
-                            >
-                                Open Mass Editor{" "}
-                                <HotkeyIndicator
-                                    hotkey="shift+m"
-                                    showModifier={false}
-                                    style={{ marginLeft: "0.35rem" }}
-                                />
-                            </Button>
                         </div>
                     </div>
                     <BoxesComponent
