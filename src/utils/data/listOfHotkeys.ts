@@ -74,6 +74,12 @@ export const listOfHotkeys: HotkeyList[] = [
         onKeyUp: "toggleTypeMatchups",
     },
     {
+        key: "M",
+        label: "shift+m",
+        comment: "Toggle Mass Editor",
+        onKeyUp: "toggleMassEditor",
+    },
+    {
         key: "s",
         comment: "Manual Save",
         onKeyUp: "manualSave",
