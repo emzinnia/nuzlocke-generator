@@ -12,7 +12,7 @@ const debugPanelClassName = `
     position: fixed;
     bottom: 1rem;
     right: 1rem;
-    width: 240px;
+    width: 20rem;
     padding: 2rem;
 `;
 
