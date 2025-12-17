@@ -1297,7 +1297,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Tropius": [],
   },
   {
-    "Chimecho": [],
+    "Chimecho": [
+      "Mega",
+    ],
   },
   {
     "Absol": [
@@ -1439,7 +1441,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Staravia": [],
   },
   {
-    "Staraptor": [],
+    "Staraptor": [
+      "Mega",
+    ],
   },
   {
     "Bidoof": [],
@@ -1732,7 +1736,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Palkia": [],
   },
   {
-    "Heatran": [],
+    "Heatran": [
+      "Mega",
+    ],
   },
   {
     "Regigigas": [],
@@ -2196,7 +2202,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Golett": [],
   },
   {
-    "Golurk": [],
+    "Golurk": [
+      "Mega",
+    ],
   },
   {
     "Pawniard": [],
@@ -2420,7 +2428,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Espurr": [],
   },
   {
-    "Meowstic": [],
+    "Meowstic": [
+      "Mega",
+    ],
   },
   {
     "Honedge": [],
@@ -2624,7 +2634,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Crabrawler": [],
   },
   {
-    "Crabominable": [],
+    "Crabominable": [
+      "Mega",
+    ],
   },
   {
     "Oricorio": [
@@ -2720,7 +2732,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Wimpod": [],
   },
   {
-    "Golisopod": [],
+    "Golisopod": [
+      "Mega",
+    ],
   },
   {
     "Sandygast": [],
@@ -2825,7 +2839,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     ],
   },
   {
-    "Magearna": [],
+    "Magearna": [
+      "Mega",
+    ],
   },
   {
     "Marshadow": [],
@@ -3335,7 +3351,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Capsakid": [],
   },
   {
-    "Scovillain": [],
+    "Scovillain": [
+      "Mega",
+    ],
   },
   {
     "Rellor": [],
@@ -3389,7 +3407,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Glimmet": [],
   },
   {
-    "Glimmora": [],
+    "Glimmora": [
+      "Mega",
+    ],
   },
   {
     "Greavard": [],
@@ -3413,7 +3433,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Dondozo": [],
   },
   {
-    "Tatsugiri": [],
+    "Tatsugiri": [
+      "Mega",
+    ],
   },
   {
     "Annihilape": [],
@@ -3475,7 +3497,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Arctibax": [],
   },
   {
-    "Baxcalibur": [],
+    "Baxcalibur": [
+      "Mega",
+    ],
   },
   {
     "Gimmighoul": [
