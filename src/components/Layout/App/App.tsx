@@ -159,7 +159,6 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
 
                     {showDebugPanel && (
                         <DebugDialog
-                            isDarkMode={isDarkMode}
                             onAddRandomPokemon={this.addRandomPokemon}
                         />
                     )}
