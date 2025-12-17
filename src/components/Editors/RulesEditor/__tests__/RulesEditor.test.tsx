@@ -1,6 +1,7 @@
 import * as React from "react";
 import { render, screen, fireEvent, waitFor } from "utils/testUtils";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import { feature } from "utils/feature";
 import { RulesEditor, RulesEditorDialogBase, presetRules } from "../RulesEditor";
 
 const originalFetch = global.fetch;
@@ -9,6 +10,18 @@ afterEach(() => {
     vi.restoreAllMocks();
     global.fetch = originalFetch;
 });
+
+const getCommunityRulesetButton = () => {
+    const button = screen.queryByText("Suggest as Community Ruleset");
+
+    if (feature.rulesetSubmission) {
+        expect(button).not.toBeNull();
+        return button;
+    }
+
+    expect(button).toBeNull();
+    return null;
+};
 
 describe("presetRules", () => {
     it("contains expected rulesets", () => {
@@ -204,7 +217,10 @@ describe("RulesEditor", () => {
     it("opens and closes the suggest dialog", async () => {
         render(<RulesEditor {...defaultProps} />);
 
-        fireEvent.click(screen.getByText("Suggest as Community Ruleset"));
+        const trigger = getCommunityRulesetButton();
+        if (!trigger) return;
+
+        fireEvent.click(trigger);
         expect(screen.getByText("Ruleset Name")).toBeDefined();
 
         fireEvent.click(screen.getByText("Cancel"));
@@ -213,7 +229,10 @@ describe("RulesEditor", () => {
 
     it("enforces submit button disabled states", () => {
         render(<RulesEditor {...defaultProps} rules={[]} />);
-        fireEvent.click(screen.getByText("Suggest as Community Ruleset"));
+        const trigger = getCommunityRulesetButton();
+        if (!trigger) return;
+
+        fireEvent.click(trigger);
 
         const submitButton = screen.getByText("Submit Suggestion").closest("button") as HTMLButtonElement;
         expect(submitButton.disabled).toBe(true);
@@ -226,7 +245,10 @@ describe("RulesEditor", () => {
 
     it("enables submit when a name is provided and rules exist", () => {
         render(<RulesEditor {...defaultProps} />);
-        fireEvent.click(screen.getByText("Suggest as Community Ruleset"));
+        const trigger = getCommunityRulesetButton();
+        if (!trigger) return;
+
+        fireEvent.click(trigger);
 
         fireEvent.change(screen.getByPlaceholderText("e.g., Ironmon Challenge"), {
             target: { value: "Ironmon" },
@@ -243,7 +265,10 @@ describe("RulesEditor", () => {
         global.fetch = fetchMock as any;
 
         render(<RulesEditor {...defaultProps} />);
-        fireEvent.click(screen.getByText("Suggest as Community Ruleset"));
+        const trigger = getCommunityRulesetButton();
+        if (!trigger) return;
+
+        fireEvent.click(trigger);
 
         fireEvent.change(screen.getByPlaceholderText("e.g., Ironmon Challenge"), {
             target: { value: "Ironmon" },
@@ -270,7 +295,10 @@ describe("RulesEditor", () => {
         global.fetch = fetchMock as any;
 
         render(<RulesEditor {...defaultProps} />);
-        fireEvent.click(screen.getByText("Suggest as Community Ruleset"));
+        const trigger = getCommunityRulesetButton();
+        if (!trigger) return;
+
+        fireEvent.click(trigger);
 
         fireEvent.change(screen.getByPlaceholderText("e.g., Ironmon Challenge"), {
             target: { value: "Ironmon" },
