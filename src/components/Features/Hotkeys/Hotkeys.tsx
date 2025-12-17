@@ -18,6 +18,8 @@ import { createStore } from "redux";
 import { appReducers } from "reducers";
 import { Editor } from "models";
 import { HotkeyBindings } from "reducers/hotkeys";
+import { Intent } from "@blueprintjs/core";
+import { showToast } from "components/Common/Shared/appToaster";
 
 export interface HotkeysProps {
     selectPokemon: selectPokemon;
@@ -191,10 +193,20 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
     }
 
     private manualSave() {
-        // Manual save without overlay toaster feedback (deprecated)
-        persistor.flush().catch((err) => {
-            console.error("Manual save failed", err);
-        });
+        Promise.resolve(persistor.flush())
+            .then(() => {
+                showToast({
+                    message: "Saved",
+                    intent: Intent.SUCCESS,
+                });
+            })
+            .catch((err) => {
+                console.error("Manual save failed", err);
+                showToast({
+                    message: "Save failed",
+                    intent: Intent.DANGER,
+                });
+            });
     }
 
     private previousPokemon() {
