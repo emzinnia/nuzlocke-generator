@@ -74,7 +74,18 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
         this.props.addPokemon(pokemon);
     };
 
+    private updateDarkModeClass = () => {
+        const isDarkMode = this.props.style.editorDarkMode;
+        if (isDarkMode) {
+            document.documentElement.classList.add("dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+        }
+    };
+
     public componentDidMount() {
+        this.updateDarkModeClass();
+
         if (feature.resultv2) {
             // TOP SECRET
             if (this.props.style.customCSS.includes("resultv2")) {
@@ -82,6 +93,12 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
             } else {
                 this.setState({ result2: false });
             }
+        }
+    }
+
+    public componentDidUpdate(prevProps: AppProps) {
+        if (prevProps.style.editorDarkMode !== this.props.style.editorDarkMode) {
+            this.updateDarkModeClass();
         }
     }
 

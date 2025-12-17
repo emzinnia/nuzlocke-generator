@@ -98,11 +98,9 @@ html {
     --app-bp-input-border-focus: #187daf;
 }
 
-@media (prefers-color-scheme: dark) {
-    html {
-        --app-bp-input-border: #30363d;
-        --app-bp-input-border-focus: #58a6ff;
-    }
+html.dark {
+    --app-bp-input-border: #30363d;
+    --app-bp-input-border-focus: #58a6ff;
 }
 
 .bp5-input:not(.bp5-input-ghost),
