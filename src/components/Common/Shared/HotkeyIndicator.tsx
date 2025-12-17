@@ -34,8 +34,10 @@ export function HotkeyIndicator({
     style,
     className,
 }: HotkeyIndicatorProps) {
+    // uppercase the hotkey for legibility
+    const upppercaseHotkey = hotkey.toUpperCase();
     const modKey = modifier ?? (isMac ? "⌘" : "Ctrl+");
-    const displayText = showModifier ? `${modKey}${hotkey}` : hotkey;
+    const displayText = showModifier ? `${modKey}${upppercaseHotkey}` : upppercaseHotkey;
 
     return (
         <kbd
