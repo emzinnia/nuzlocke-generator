@@ -134,9 +134,8 @@ export function TypeMatchupDialog() {
                         {displayedTeam.length > 6 && (
                             <Callout
                                 intent={Intent.WARNING}
-                                title="Warning"
                                 icon="warning-sign"
-                                style={{ padding: "0.5rem" }}
+                                style={{  }}
                             >
                                 <p>
                                     Team has more than 6 Pokémon!
