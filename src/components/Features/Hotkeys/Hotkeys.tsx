@@ -261,6 +261,10 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         this.props.toggleDialog("typeMatchups");
     }
 
+    private toggleMassEditor() {
+        this.props.toggleDialog("massEditor");
+    }
+
     private movePokemonLeft() {
         if (!this.props.selectedId || !this.props.pokemon?.length) return;
         
