@@ -10,9 +10,7 @@ import { MOVES_ARRAY } from "./utils";
 import { ParserOptions } from "./utils/parserOptions";
 import { parseTime } from "./utils/parseTime";
 import {
-    GEN_3_POKEMON_MAP,
-    GEN3_ALT_SPECIES_MAP,
-    GEN3_INTERNAL_ID_OVERRIDES,
+    GEN3_SPECIES_MAP,
     ABILITY_MAP,
     GEN_3_LOCATIONS,
 } from "./utils/gen3";
@@ -376,15 +374,13 @@ const getSpeciesName = (
 ): Species | undefined => {
     // Convert Gen 3 internal species ID to National Dex number
     const nationalDexId =
-        GEN3_INTERNAL_ID_OVERRIDES[speciesId] ||
-        GEN3_ALT_SPECIES_MAP[speciesId] ||
-        GEN_3_POKEMON_MAP[speciesId];
+            GEN3_SPECIES_MAP[speciesId];
     if (
         nationalDexId &&
-        nationalDexId > 0 &&
-        nationalDexId <= MAX_SUPPORTED_SPECIES
+        nationalDexId.length > 0 &&
+        nationalDexId.length <= MAX_SUPPORTED_SPECIES
     ) {
-        return SPECIES_MAP[nationalDexId];
+        return nationalDexId;
     }
     if (nickname) {
         const match = listOfPokemon.find(
@@ -516,7 +512,7 @@ const decodePokemon = (
 
     log("decodePokemon", `Species data extracted`, {
         internalSpeciesId: speciesId,
-        nationalDexId: GEN_3_POKEMON_MAP[speciesId],
+        nationalDexId: GEN3_SPECIES_MAP[speciesId],
         itemId,
         exp,
         friendship,
@@ -560,19 +556,16 @@ const decodePokemon = (
     const pokeball = BALL_MAP[ballId] || `Ball #${ballId}`;
 
     // Get ability from ABILITY_MAP
-    let nationalDexId =
-        GEN3_INTERNAL_ID_OVERRIDES[speciesId] ||
-        GEN3_ALT_SPECIES_MAP[speciesId] ||
-        GEN_3_POKEMON_MAP[speciesId];
+    let nationalDexId = GEN3_SPECIES_MAP[speciesId];
 
     // If that also fails but we have a valid species name, find the national dex ID from SPECIES_MAP
-    if ((!nationalDexId || nationalDexId === 0) && speciesName) {
+    if ((!nationalDexId || nationalDexId.length === 0) && speciesName) {
         // Search SPECIES_MAP to find the national dex ID for this species name
         const foundKey = Object.keys(SPECIES_MAP).find(
-            (key) => SPECIES_MAP[parseInt(key)] === speciesName,
+            (key) => SPECIES_MAP[key as unknown as number] === speciesName,
         );
         if (foundKey) {
-            nationalDexId = parseInt(foundKey);
+            nationalDexId = SPECIES_MAP[parseInt(foundKey as unknown as string)];
         }
     }
 

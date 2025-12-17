@@ -1,3 +1,5 @@
+import { Species } from "utils/data/listOfPokemon";
+
 export const GEN_3_HELD_ITEM_MAP = [];
 
 export const GEN_3_CHARACTER_MAP = [];
@@ -232,424 +234,6 @@ export const GEN_3_LOCATIONS: Record<number, string> = {
     0xfd: "Gift Egg",
     0xfe: "In-game Trade",
     0xff: "Fateful Encounter",
-};
-
-// Gen 3 internal species ID to National Dex number mapping
-// Based on National Pokédex order (https://bulbapedia.bulbagarden.net/wiki/List_of_Pokémon_by_National_Pokédex_number)
-// Direct 1:1 mapping for Gen 1-3 Pokemon (National Dex #1-386)
-export const GEN_3_POKEMON_MAP: Record<number, number> = {
-    0: 0, // None/Egg
-    1: 1, // Bulbasaur
-    2: 2, // Ivysaur
-    3: 3, // Venusaur
-    4: 4, // Charmander
-    5: 5, // Charmeleon
-    6: 6, // Charizard
-    7: 7, // Squirtle
-    8: 8, // Wartortle
-    9: 9, // Blastoise
-    10: 10, // Caterpie
-    11: 11, // Metapod
-    12: 12, // Butterfree
-    13: 13, // Weedle
-    14: 14, // Kakuna
-    15: 15, // Beedrill
-    16: 16, // Pidgey
-    17: 17, // Pidgeotto
-    18: 18, // Pidgeot
-    19: 19, // Rattata
-    20: 20, // Raticate
-    21: 21, // Spearow
-    22: 22, // Fearow
-    23: 23, // Ekans
-    24: 24, // Arbok
-    25: 25, // Pikachu
-    26: 26, // Raichu
-    27: 27, // Sandshrew
-    28: 28, // Sandslash
-    29: 29, // Nidoran♀
-    30: 30, // Nidorina
-    31: 31, // Nidoqueen
-    32: 32, // Nidoran♂
-    33: 33, // Nidorino
-    34: 34, // Nidoking
-    35: 35, // Clefairy
-    36: 36, // Clefable
-    37: 37, // Vulpix
-    38: 38, // Ninetales
-    39: 39, // Jigglypuff
-    40: 40, // Wigglytuff
-    41: 41, // Zubat
-    42: 42, // Golbat
-    43: 43, // Oddish
-    44: 44, // Gloom
-    45: 45, // Vileplume
-    46: 46, // Paras
-    47: 47, // Parasect
-    48: 48, // Venonat
-    49: 49, // Venomoth
-    50: 50, // Diglett
-    51: 51, // Dugtrio
-    52: 52, // Meowth
-    53: 53, // Persian
-    54: 54, // Psyduck
-    55: 55, // Golduck
-    56: 56, // Mankey
-    57: 57, // Primeape
-    58: 58, // Growlithe
-    59: 59, // Arcanine
-    60: 60, // Poliwag
-    61: 61, // Poliwhirl
-    62: 62, // Poliwrath
-    63: 63, // Abra
-    64: 64, // Kadabra
-    65: 65, // Alakazam
-    66: 66, // Machop
-    67: 67, // Machoke
-    68: 68, // Machamp
-    69: 69, // Bellsprout
-    70: 70, // Weepinbell
-    71: 71, // Victreebel
-    72: 72, // Tentacool
-    73: 73, // Tentacruel
-    74: 74, // Geodude
-    75: 75, // Graveler
-    76: 76, // Golem
-    77: 77, // Ponyta
-    78: 78, // Rapidash
-    79: 79, // Slowpoke
-    80: 80, // Slowbro
-    81: 81, // Magnemite
-    82: 82, // Magneton
-    83: 83, // Farfetch'd
-    84: 84, // Doduo
-    85: 85, // Dodrio
-    86: 86, // Seel
-    87: 87, // Dewgong
-    88: 88, // Grimer
-    89: 89, // Muk
-    90: 90, // Shellder
-    91: 91, // Cloyster
-    92: 92, // Gastly
-    93: 93, // Haunter
-    94: 94, // Gengar
-    95: 95, // Onix
-    96: 96, // Drowzee
-    97: 97, // Hypno
-    98: 98, // Krabby
-    99: 99, // Kingler
-    100: 100, // Voltorb
-    101: 101, // Electrode
-    102: 102, // Exeggcute
-    103: 103, // Exeggutor
-    104: 104, // Cubone
-    105: 105, // Marowak
-    106: 106, // Hitmonlee
-    107: 107, // Hitmonchan
-    108: 108, // Lickitung
-    109: 109, // Koffing
-    110: 110, // Weezing
-    111: 111, // Rhyhorn
-    112: 112, // Rhydon
-    113: 113, // Chansey
-    114: 114, // Tangela
-    115: 115, // Kangaskhan
-    116: 116, // Horsea
-    117: 117, // Seadra
-    118: 118, // Goldeen
-    119: 119, // Seaking
-    120: 120, // Staryu
-    121: 121, // Starmie
-    122: 122, // Mr. Mime
-    123: 123, // Scyther
-    124: 124, // Jynx
-    125: 125, // Electabuzz
-    126: 126, // Magmar
-    127: 127, // Pinsir
-    128: 128, // Tauros
-    129: 129, // Magikarp
-    130: 130, // Gyarados
-    131: 131, // Lapras
-    132: 132, // Ditto
-    133: 133, // Eevee
-    134: 134, // Vaporeon
-    135: 135, // Jolteon
-    136: 136, // Flareon
-    137: 137, // Porygon
-    138: 138, // Omanyte
-    139: 139, // Omastar
-    140: 140, // Kabuto
-    141: 141, // Kabutops
-    142: 142, // Aerodactyl
-    143: 143, // Snorlax
-    144: 144, // Articuno
-    145: 145, // Zapdos
-    146: 146, // Moltres
-    147: 147, // Dratini
-    148: 148, // Dragonair
-    149: 149, // Dragonite
-    150: 150, // Mewtwo
-    151: 151, // Mew
-    152: 152, // Chikorita
-    153: 153, // Bayleef
-    154: 154, // Meganium
-    155: 155, // Cyndaquil
-    156: 156, // Quilava
-    157: 157, // Typhlosion
-    158: 158, // Totodile
-    159: 159, // Croconaw
-    160: 160, // Feraligatr
-    161: 161, // Sentret
-    162: 162, // Furret
-    163: 163, // Hoothoot
-    164: 164, // Noctowl
-    165: 165, // Ledyba
-    166: 166, // Ledian
-    167: 167, // Spinarak
-    168: 168, // Ariados
-    169: 169, // Crobat
-    170: 170, // Chinchou
-    171: 171, // Lanturn
-    172: 172, // Pichu
-    173: 173, // Cleffa
-    174: 174, // Igglybuff
-    175: 175, // Togepi
-    176: 176, // Togetic
-    177: 177, // Natu
-    178: 178, // Xatu
-    179: 179, // Mareep
-    180: 180, // Flaaffy
-    181: 181, // Ampharos
-    182: 182, // Bellossom
-    183: 183, // Marill
-    184: 184, // Azumarill
-    185: 185, // Sudowoodo
-    186: 186, // Politoed
-    187: 187, // Hoppip
-    188: 188, // Skiploom
-    189: 189, // Jumpluff
-    190: 190, // Aipom
-    191: 191, // Sunkern
-    192: 192, // Sunflora
-    193: 193, // Yanma
-    194: 194, // Wooper
-    195: 195, // Quagsire
-    196: 196, // Espeon
-    197: 197, // Umbreon
-    198: 198, // Murkrow
-    199: 199, // Slowking
-    200: 200, // Misdreavus
-    201: 201, // Unown
-    202: 202, // Wobbuffet
-    203: 203, // Girafarig
-    204: 204, // Pineco
-    205: 205, // Forretress
-    206: 206, // Dunsparce
-    207: 207, // Gligar
-    208: 208, // Steelix
-    209: 209, // Snubbull
-    210: 210, // Granbull
-    211: 211, // Qwilfish
-    212: 212, // Scizor
-    213: 213, // Shuckle
-    214: 214, // Heracross
-    215: 215, // Sneasel
-    216: 216, // Teddiursa
-    217: 217, // Ursaring
-    218: 218, // Slugma
-    219: 219, // Magcargo
-    220: 220, // Swinub
-    221: 221, // Piloswine
-    222: 222, // Corsola
-    223: 223, // Remoraid
-    224: 224, // Octillery
-    225: 225, // Delibird
-    226: 226, // Mantine
-    227: 227, // Skarmory
-    228: 228, // Houndour
-    229: 229, // Houndoom
-    230: 230, // Kingdra
-    231: 231, // Phanpy
-    232: 232, // Donphan
-    233: 233, // Porygon2
-    234: 234, // Stantler
-    235: 235, // Smeargle
-    236: 236, // Tyrogue
-    237: 237, // Hitmontop
-    238: 238, // Smoochum
-    239: 239, // Elekid
-    240: 240, // Magby
-    241: 241, // Miltank
-    242: 242, // Blissey
-    243: 243, // Raikou
-    244: 244, // Entei
-    245: 245, // Suicune
-    246: 246, // Larvitar
-    247: 247, // Pupitar
-    248: 248, // Tyranitar
-    249: 249, // Lugia
-    250: 250, // Ho-Oh
-    251: 251, // Celebi
-    252: 252, // Treecko
-    253: 253, // Grovyle
-    254: 254, // Sceptile
-    255: 255, // Torchic
-    256: 256, // Combusken
-    257: 257, // Blaziken
-    258: 258, // Mudkip
-    259: 259, // Marshtomp
-    260: 260, // Swampert
-    261: 261, // Poochyena
-    262: 262, // Mightyena
-    263: 263, // Zigzagoon
-    264: 264, // Linoone
-    265: 265, // Wurmple
-    266: 266, // Silcoon
-    267: 267, // Beautifly
-    268: 268, // Cascoon
-    269: 269, // Dustox
-    270: 270, // Lotad
-    271: 271, // Lombre
-    272: 272, // Ludicolo
-    273: 273, // Seedot
-    274: 274, // Nuzleaf
-    275: 275, // Shiftry
-    276: 276, // Taillow
-    277: 277, // Swellow
-    278: 278, // Wingull
-    279: 279, // Pelipper
-    280: 280, // Ralts
-    281: 281, // Kirlia
-    282: 282, // Gardevoir
-    283: 283, // Surskit
-    284: 284, // Masquerain
-    285: 285, // Shroomish
-    286: 286, // Breloom
-    287: 287, // Slakoth
-    288: 288, // Vigoroth
-    289: 289, // Slaking
-    290: 290, // Nincada
-    291: 291, // Ninjask
-    292: 292, // Shedinja
-    293: 293, // Whismur
-    294: 294, // Loudred
-    295: 295, // Exploud
-    296: 296, // Makuhita
-    297: 297, // Hariyama
-    298: 298, // Azurill
-    299: 299, // Nosepass
-    300: 300, // Skitty
-    301: 301, // Delcatty
-    302: 302, // Sableye
-    303: 303, // Mawile
-    304: 304, // Aron
-    305: 305, // Lairon
-    306: 306, // Aggron
-    307: 307, // Meditite
-    308: 308, // Medicham
-    309: 309, // Electrike
-    310: 310, // Manectric
-    311: 311, // Plusle
-    312: 312, // Minun
-    313: 313, // Volbeat
-    314: 314, // Illumise
-    315: 315, // Roselia
-    316: 316, // Gulpin
-    317: 317, // Swalot
-    318: 318, // Carvanha
-    319: 319, // Sharpedo
-    320: 320, // Wailmer
-    321: 321, // Wailord
-    322: 322, // Numel
-    323: 323, // Camerupt
-    324: 324, // Torkoal
-    325: 325, // Spoink
-    326: 326, // Grumpig
-    327: 327, // Spinda
-    328: 328, // Trapinch
-    329: 329, // Vibrava
-    330: 330, // Flygon
-    331: 331, // Cacnea
-    332: 332, // Cacturne
-    333: 333, // Swablu
-    334: 334, // Altaria
-    335: 335, // Zangoose
-    336: 336, // Seviper
-    337: 337, // Lunatone
-    338: 338, // Solrock
-    339: 339, // Barboach
-    340: 340, // Whiscash
-    341: 341, // Corphish
-    342: 342, // Crawdaunt
-    343: 343, // Baltoy
-    344: 344, // Claydol
-    345: 345, // Lileep
-    346: 346, // Cradily
-    347: 347, // Anorith
-    348: 348, // Armaldo
-    349: 349, // Feebas
-    350: 350, // Milotic
-    351: 351, // Castform
-    352: 352, // Kecleon
-    353: 353, // Shuppet
-    354: 354, // Banette
-    355: 355, // Duskull
-    356: 356, // Dusclops
-    357: 357, // Tropius
-    358: 358, // Chimecho
-    359: 359, // Absol
-    360: 360, // Wynaut
-    361: 361, // Snorunt
-    362: 362, // Glalie
-    363: 363, // Spheal
-    364: 364, // Sealeo
-    365: 365, // Walrein
-    366: 366, // Clamperl
-    367: 367, // Huntail
-    368: 368, // Gorebyss
-    369: 369, // Relicanth
-    370: 370, // Luvdisc
-    371: 371, // Bagon
-    372: 372, // Shelgon
-    373: 373, // Salamence
-    374: 374, // Beldum
-    375: 375, // Metang
-    376: 376, // Metagross
-    377: 377, // Regirock
-    378: 378, // Regice
-    379: 379, // Registeel
-    380: 380, // Latias
-    381: 381, // Latios
-    382: 382, // Kyogre
-    383: 383, // Groudon
-    384: 384, // Rayquaza
-    385: 385, // Jirachi
-    386: 386, // Deoxys
-    387: 0, // Old Unown B
-    388: 0, // Old Unown C
-    389: 0, // Old Unown D
-    390: 0, // Old Unown E
-    391: 0, // Old Unown F
-    392: 0, // Old Unown G
-    393: 0, // Old Unown H
-    394: 0, // Old Unown I
-    395: 0, // Old Unown J
-    396: 0, // Old Unown K
-    397: 0, // Old Unown L
-    398: 0, // Old Unown M
-    399: 0, // Old Unown N
-    400: 0, // Old Unown O
-    401: 0, // Old Unown P
-    402: 0, // Old Unown Q
-    403: 0, // Old Unown R
-    404: 0, // Old Unown S
-    405: 0, // Old Unown T
-    406: 0, // Old Unown U
-    407: 0, // Old Unown V
-    408: 0, // Old Unown W
-    409: 0, // Old Unown X
-    410: 0, // Old Unown Y
-    411: 0, // Old Unown Z
 };
 
 // Gen 3 Pokémon ability mapping by species ID (1: Bulbasaur, etc.)
@@ -1264,414 +848,426 @@ export const ABILITY_MAP: { [speciesId: number]: string[] } = {
 };
 
 // Alternate species mapping using the Pokémon hex index numbers from Gen 3 internal order
-export const GEN3_ALT_SPECIES_MAP: { [hexIndex: number]: number } = {
-    0x00: 0, //   --- (None)
-    0x01: 1, //   Bulbasaur
-    0x02: 2, //   Ivysaur
-    0x03: 3, //   Venusaur
-    0x04: 4, //   Charmander
-    0x05: 5, //   Charmeleon
-    0x06: 6, //   Charizard
-    0x07: 7, //   Squirtle
-    0x08: 8, //   Wartortle
-    0x09: 9, //   Blastoise
-    0x0a: 10, //   Caterpie
-    0x0b: 11, //   Metapod
-    0x0c: 12, //   Butterfree
-    0x0d: 13, //   Weedle
-    0x0e: 14, //   Kakuna
-    0x0f: 15, //   Beedrill
-    0x10: 16, //   Pidgey
-    0x11: 17, //   Pidgeotto
-    0x12: 18, //   Pidgeot
-    0x13: 19, //   Rattata
-    0x14: 20, //   Raticate
-    0x15: 21, //   Spearow
-    0x16: 22, //   Fearow
-    0x17: 23, //   Ekans
-    0x18: 24, //   Arbok
-    0x19: 25, //   Pikachu
-    0x1a: 26, //   Raichu
-    0x1b: 27, //   Sandshrew
-    0x1c: 28, //   Sandslash
-    0x1d: 29, //   Nidoran♀
-    0x1e: 30, //   Nidorina
-    0x1f: 31, //   Nidoqueen
-    0x20: 32, //   Nidoran♂
-    0x21: 33, //   Nidorino
-    0x22: 34, //   Nidoking
-    0x23: 35, //   Clefairy
-    0x24: 36, //   Clefable
-    0x25: 37, //   Vulpix
-    0x26: 38, //   Ninetales
-    0x27: 39, //   Jigglypuff
-    0x28: 40, //   Wigglytuff
-    0x29: 41, //   Zubat
-    0x2a: 42, //   Golbat
-    0x2b: 43, //   Oddish
-    0x2c: 44, //   Gloom
-    0x2d: 45, //   Vileplume
-    0x2e: 46, //   Paras
-    0x2f: 47, //   Parasect
-    0x30: 48, //   Venonat
-    0x31: 49, //   Venomoth
-    0x32: 50, //   Diglett
-    0x33: 51, //   Dugtrio
-    0x34: 52, //   Meowth
-    0x35: 53, //   Persian
-    0x36: 54, //   Psyduck
-    0x37: 55, //   Golduck
-    0x38: 56, //   Mankey
-    0x39: 57, //   Primeape
-    0x3a: 58, //   Growlithe
-    0x3b: 59, //   Arcanine
-    0x3c: 60, //   Poliwag
-    0x3d: 61, //   Poliwhirl
-    0x3e: 62, //   Poliwrath
-    0x3f: 63, //   Abra
-    0x40: 64, //   Kadabra
-    0x41: 65, //   Alakazam
-    0x42: 66, //   Machop
-    0x43: 67, //   Machoke
-    0x44: 68, //   Machamp
-    0x45: 69, //   Bellsprout
-    0x46: 70, //   Weepinbell
-    0x47: 71, //   Victreebel
-    0x48: 72, //   Tentacool
-    0x49: 73, //   Tentacruel
-    0x4a: 74, //   Geodude
-    0x4b: 75, //   Graveler
-    0x4c: 76, //   Golem
-    0x4d: 77, //   Ponyta
-    0x4e: 78, //   Rapidash
-    0x4f: 79, //   Slowpoke
-    0x50: 80, //   Slowbro
-    0x51: 81, //   Magnemite
-    0x52: 82, //   Magneton
-    0x53: 83, //   Farfetch’d
-    0x54: 84, //   Doduo
-    0x55: 85, //   Dodrio
-    0x56: 86, //   Seel
-    0x57: 87, //   Dewgong
-    0x58: 88, //   Grimer
-    0x59: 89, //   Muk
-    0x5a: 90, //   Shellder
-    0x5b: 91, //   Cloyster
-    0x5c: 92, //   Gastly
-    0x5d: 93, //   Haunter
-    0x5e: 94, //   Gengar
-    0x5f: 95, //   Onix
-    0x60: 96, //   Drowzee
-    0x61: 97, //   Hypno
-    0x62: 98, //   Krabby
-    0x63: 99, //   Kingler
-    0x64: 100, //   Voltorb
-    0x65: 101, //   Electrode
-    0x66: 102, //   Exeggcute
-    0x67: 103, //   Exeggutor
-    0x68: 104, //   Cubone
-    0x69: 105, //   Marowak
-    0x6a: 106, //   Hitmonlee
-    0x6b: 107, //   Hitmonchan
-    0x6c: 108, //   Lickitung
-    0x6d: 109, //   Koffing
-    0x6e: 110, //   Weezing
-    0x6f: 111, //   Rhyhorn
-    0x70: 112, //   Rhydon
-    0x71: 113, //   Chansey
-    0x72: 114, //   Tangela
-    0x73: 115, //   Kangaskhan
-    0x74: 116, //   Horsea
-    0x75: 117, //   Seadra
-    0x76: 118, //   Goldeen
-    0x77: 119, //   Seaking
-    0x78: 120, //   Staryu
-    0x79: 121, //   Starmie
-    0x7a: 122, //   Mr. Mime
-    0x7b: 123, //   Scyther
-    0x7c: 124, //   Jynx
-    0x7d: 125, //   Electabuzz
-    0x7e: 126, //   Magmar
-    0x7f: 127, //   Pinsir
-    0x80: 128, //   Tauros
-    0x81: 129, //   Magikarp
-    0x82: 130, //   Gyarados
-    0x83: 131, //   Lapras
-    0x84: 132, //   Ditto
-    0x85: 133, //   Eevee
-    0x86: 134, //   Vaporeon
-    0x87: 135, //   Jolteon
-    0x88: 136, //   Flareon
-    0x89: 137, //   Porygon
-    0x8a: 138, //   Omanyte
-    0x8b: 139, //   Omastar
-    0x8c: 140, //   Kabuto
-    0x8d: 141, //   Kabutops
-    0x8e: 142, //   Aerodactyl
-    0x8f: 143, //   Snorlax
-    0x90: 144, //   Articuno
-    0x91: 145, //   Zapdos
-    0x92: 146, //   Moltres
-    0x93: 147, //   Dratini
-    0x94: 148, //   Dragonair
-    0x95: 149, //   Dragonite
-    0x96: 150, //   Mewtwo
-    0x97: 151, //   Mew
-    0x98: 152, //   Chikorita
-    0x99: 153, //   Bayleef
-    0x9a: 154, //   Meganium
-    0x9b: 155, //   Cyndaquil
-    0x9c: 156, //   Quilava
-    0x9d: 157, //   Typhlosion
-    0x9e: 158, //   Totodile
-    0x9f: 159, //   Croconaw
-    0xa0: 160, //   Feraligatr
-    0xa1: 161, //   Sentret
-    0xa2: 162, //   Furret
-    0xa3: 163, //   Hoothoot
-    0xa4: 164, //   Noctowl
-    0xa5: 165, //   Ledyba
-    0xa6: 166, //   Ledian
-    0xa7: 167, //   Spinarak
-    0xa8: 168, //   Ariados
-    0xa9: 169, //   Crobat
-    0xaa: 170, //   Chinchou
-    0xab: 171, //   Lanturn
-    0xac: 172, //   Pichu
-    0xad: 173, //   Cleffa
-    0xae: 174, //   Igglybuff
-    0xaf: 175, //   Togepi
-    0xb0: 176, //   Togetic
-    0xb1: 177, //   Natu
-    0xb2: 178, //   Xatu
-    0xb3: 179, //   Mareep
-    0xb4: 180, //   Flaaffy
-    0xb5: 181, //   Ampharos
-    0xb6: 182, //   Bellossom
-    0xb7: 183, //   Marill
-    0xb8: 184, //   Azumarill
-    0xb9: 185, //   Sudowoodo
-    0xba: 186, //   Politoed
-    0xbb: 187, //   Hoppip
-    0xbc: 188, //   Skiploom
-    0xbd: 189, //   Jumpluff
-    0xbe: 190, //   Aipom
-    0xbf: 191, //   Sunkern
-    0xc0: 192, //   Sunflora
-    0xc1: 193, //   Yanma
-    0xc2: 194, //   Wooper
-    0xc3: 195, //   Quagsire
-    0xc4: 196, //   Espeon
-    0xc5: 197, //   Umbreon
-    0xc6: 198, //   Murkrow
-    0xc7: 199, //   Slowking
-    0xc8: 200, //   Misdreavus
-    0xc9: 201, //   Unown
-    0xca: 202, //   Wobbuffet
-    0xcb: 203, //   Girafarig
-    0xcc: 204, //   Pineco
-    0xcd: 205, //   Forretress
-    0xce: 206, //   Dunsparce
-    0xcf: 207, //   Gligar
-    0xd0: 208, //   Steelix
-    0xd1: 209, //   Snubbull
-    0xd2: 210, //   Granbull
-    0xd3: 211, //   Qwilfish
-    0xd4: 212, //   Scizor
-    0xd5: 213, //   Shuckle
-    0xd6: 214, //   Heracross
-    0xd7: 215, //   Sneasel
-    0xd8: 216, //   Teddiursa
-    0xd9: 217, //   Ursaring
-    0xda: 218, //   Slugma
-    0xdb: 219, //   Magcargo
-    0xdc: 220, //   Swinub
-    0xdd: 221, //   Piloswine
-    0xde: 222, //   Corsola
-    0xdf: 223, //   Remoraid
-    0xe0: 224, //   Octillery
-    0xe1: 225, //   Delibird
-    0xe2: 226, //   Mantine
-    0xe3: 227, //   Skarmory
-    0xe4: 228, //   Houndour
-    0xe5: 229, //   Houndoom
-    0xe6: 230, //   Kingdra
-    0xe7: 231, //   Phanpy
-    0xe8: 232, //   Donphan
-    0xe9: 233, //   Porygon2
-    0xea: 234, //   Stantler
-    0xeb: 235, //   Smeargle
-    0xec: 236, //   Tyrogue
-    0xed: 237, //   Hitmontop
-    0xee: 238, //   Smoochum
-    0xef: 239, //   Elekid
-    0xf0: 240, //   Magby
-    0xf1: 241, //   Miltank
-    0xf2: 242, //   Blissey
-    0xf3: 243, //   Raikou
-    0xf4: 244, //   Entei
-    0xf5: 245, //   Suicune
-    0xf6: 246, //   Larvitar
-    0xf7: 247, //   Pupitar
-    0xf8: 248, //   Tyranitar
-    0xf9: 249, //   Lugia
-    0xfa: 250, //   Ho-oh
-    0xfb: 251, //   Celebi
-    0xfc: 252, //   Treecko
-    0xfd: 253, //   Grovyle
-    0xfe: 254, //   Sceptile
-    0xff: 255, //   Torchic
-    0x100: 256, //   Combusken
-    0x101: 257, //   Blaziken
-    0x102: 258, //   Mudkip
-    0x103: 259, //   Marshtomp
-    0x104: 260, //   Swampert
-    0x105: 261, //   Poochyena
-    0x106: 262, //   Mightyena
-    0x107: 263, //   Zigzagoon
-    0x108: 264, //   Linoone
-    0x109: 265, //   Wurmple
-    0x10a: 266, //   Silcoon
-    0x10b: 267, //   Beautifly
-    0x10c: 268, //   Cascoon
-    0x10d: 269, //   Dustox
-    0x10e: 270, //   Lotad
-    0x10f: 271, //   Lombre
-    0x110: 272, //   Ludicolo
-    0x111: 273, //   Seedot
-    0x112: 274, //   Nuzleaf
-    0x113: 275, //   Shiftry
-    0x114: 276, //   Taillow
-    0x115: 277, //   Swellow
-    0x116: 278, //   Wingull
-    0x117: 279, //   Pelipper
-    0x118: 280, //   Ralts
-    0x119: 281, //   Kirlia
-    0x11a: 282, //   Gardevoir
-    0x11b: 283, //   Surskit
-    0x11c: 284, //   Masquerain
-    0x11d: 285, //   Shroomish
-    0x11e: 286, //   Breloom
-    0x11f: 287, //   Slakoth
-    0x120: 288, //   Vigoroth
-    0x121: 289, //   Slaking
-    0x122: 290, //   Nincada
-    0x123: 291, //   Ninjask
-    0x124: 292, //   Shedinja
-    0x125: 293, //   Whismur
-    0x126: 294, //   Loudred
-    0x127: 295, //   Exploud
-    0x128: 296, //   Makuhita
-    0x129: 297, //   Hariyama
-    0x12a: 298, //   Azurill
-    0x12b: 299, //   Nosepass
-    0x12c: 300, //   Skitty
-    0x12d: 301, //   Delcatty
-    0x12e: 302, //   Sableye
-    0x12f: 303, //   Mawile
-    0x130: 304, //   Aron
-    0x131: 305, //   Lairon
-    0x132: 306, //   Aggron
-    0x133: 307, //   Meditite
-    0x134: 308, //   Medicham
-    0x135: 309, //   Electrike
-    0x136: 310, //   Manectric
-    0x137: 311, //   Plusle
-    0x138: 312, //   Minun
-    0x139: 313, //   Volbeat
-    0x13a: 314, //   Illumise
-    0x13b: 315, //   Roselia
-    0x13c: 316, //   Gulpin
-    0x13d: 317, //   Swalot
-    0x13e: 318, //   Carvanha
-    0x13f: 319, //   Sharpedo
-    0x140: 320, //   Wailmer
-    0x141: 321, //   Wailord
-    0x142: 322, //   Numel
-    0x143: 323, //   Camerupt
-    0x144: 324, //   Torkoal
-    0x145: 325, //   Spoink
-    0x146: 326, //   Grumpig
-    0x147: 327, //   Spinda
-    0x148: 328, //   Trapinch
-    0x149: 329, //   Vibrava
-    0x14a: 330, //   Flygon
-    0x14b: 331, //   Cacnea
-    0x14c: 332, //   Cacturne
-    0x14d: 333, //   Swablu
-    0x14e: 334, //   Altaria
-    0x14f: 335, //   Zangoose
-    0x150: 336, //   Seviper
-    0x151: 337, //   Lunatone
-    0x152: 338, //   Solrock
-    0x153: 339, //   Barboach
-    0x154: 340, //   Whiscash
-    0x155: 341, //   Corphish
-    0x156: 342, //   Crawdaunt
-    0x157: 343, //   Baltoy
-    0x158: 344, //   Claydol
-    0x159: 345, //   Lileep
-    0x15a: 346, //   Cradily
-    0x15b: 347, //   Anorith
-    0x15c: 348, //   Armaldo
-    0x15d: 349, //   Feebas
-    0x15e: 350, //   Milotic
-    0x15f: 351, //   Castform
-    0x160: 352, //   Kecleon
-    0x161: 353, //   Shuppet
-    0x162: 354, //   Banette
-    0x163: 355, //   Duskull
-    0x164: 356, //   Dusclops
-    0x165: 357, //   Tropius
-    0x166: 358, //   Chimecho
-    0x167: 359, //   Absol
-    0x168: 360, //   Wynaut
-    0x169: 361, //   Snorunt
-    0x16a: 362, //   Glalie
-    0x16b: 363, //   Spheal
-    0x16c: 364, //   Sealeo
-    0x16d: 365, //   Walrein
-    0x16e: 366, //   Clamperl
-    0x16f: 367, //   Huntail
-    0x170: 368, //   Gorebyss
-    0x171: 369, //   Relicanth
-    0x172: 370, //   Luvdisc
-    0x173: 371, //   Bagon
-    0x174: 372, //   Shelgon
-    0x175: 373, //   Salamence
-    0x176: 374, //   Beldum
-    0x177: 375, //   Metang
-    0x178: 376, //   Metagross
-    0x179: 377, //   Regirock
-    0x17a: 378, //   Regice
-    0x17b: 379, //   Registeel
-    0x17c: 380, //   Latias
-    0x17d: 381, //   Latios
-    0x17e: 382, //   Kyogre
-    0x17f: 383, //   Groudon
-    0x180: 384, //   Rayquaza
-    0x181: 385, //   Jirachi
-    0x182: 386, //   Deoxys
-};
+// Based on https://bulbapedia.bulbagarden.net/wiki/List_of_Pokémon_by_index_number_in_Generation_III
+export const GEN3_SPECIES_MAP: { [hexIndex: number]: Species } = {
+    // Gen 1 & 2 Pokémon (indices 1-251 match National Dex numbers)
+    0x001: "Bulbasaur",
+    0x002: "Ivysaur",
+    0x003: "Venusaur",
+    0x004: "Charmander",
+    0x005: "Charmeleon",
+    0x006: "Charizard",
+    0x007: "Squirtle",
+    0x008: "Wartortle",
+    0x009: "Blastoise",
+    0x00A: "Caterpie",
+    0x00B: "Metapod",
+    0x00C: "Butterfree",
+    0x00D: "Weedle",
+    0x00E: "Kakuna",
+    0x00F: "Beedrill",
+    0x010: "Pidgey",
+    0x011: "Pidgeotto",
+    0x012: "Pidgeot",
+    0x013: "Rattata",
+    0x014: "Raticate",
+    0x015: "Spearow",
+    0x016: "Fearow",
+    0x017: "Ekans",
+    0x018: "Arbok",
+    0x019: "Pikachu",
+    0x01A: "Raichu",
+    0x01B: "Sandshrew",
+    0x01C: "Sandslash",
+    0x01D: "Nidoran♀",
+    0x01E: "Nidorina",
+    0x01F: "Nidoqueen",
+    0x020: "Nidoran♂",
+    0x021: "Nidorino",
+    0x022: "Nidoking",
+    0x023: "Clefairy",
+    0x024: "Clefable",
+    0x025: "Vulpix",
+    0x026: "Ninetales",
+    0x027: "Jigglypuff",
+    0x028: "Wigglytuff",
+    0x029: "Zubat",
+    0x02A: "Golbat",
+    0x02B: "Oddish",
+    0x02C: "Gloom",
+    0x02D: "Vileplume",
+    0x02E: "Paras",
+    0x02F: "Parasect",
+    0x030: "Venonat",
+    0x031: "Venomoth",
+    0x032: "Diglett",
+    0x033: "Dugtrio",
+    0x034: "Meowth",
+    0x035: "Persian",
+    0x036: "Psyduck",
+    0x037: "Golduck",
+    0x038: "Mankey",
+    0x039: "Primeape",
+    0x03A: "Growlithe",
+    0x03B: "Arcanine",
+    0x03C: "Poliwag",
+    0x03D: "Poliwhirl",
+    0x03E: "Poliwrath",
+    0x03F: "Abra",
+    0x040: "Kadabra",
+    0x041: "Alakazam",
+    0x042: "Machop",
+    0x043: "Machoke",
+    0x044: "Machamp",
+    0x045: "Bellsprout",
+    0x046: "Weepinbell",
+    0x047: "Victreebel",
+    0x048: "Tentacool",
+    0x049: "Tentacruel",
+    0x04A: "Geodude",
+    0x04B: "Graveler",
+    0x04C: "Golem",
+    0x04D: "Ponyta",
+    0x04E: "Rapidash",
+    0x04F: "Slowpoke",
+    0x050: "Slowbro",
+    0x051: "Magnemite",
+    0x052: "Magneton",
+    0x053: "Farfetch'd",
+    0x054: "Doduo",
+    0x055: "Dodrio",
+    0x056: "Seel",
+    0x057: "Dewgong",
+    0x058: "Grimer",
+    0x059: "Muk",
+    0x05A: "Shellder",
+    0x05B: "Cloyster",
+    0x05C: "Gastly",
+    0x05D: "Haunter",
+    0x05E: "Gengar",
+    0x05F: "Onix",
+    0x060: "Drowzee",
+    0x061: "Hypno",
+    0x062: "Krabby",
+    0x063: "Kingler",
+    0x064: "Voltorb",
+    0x065: "Electrode",
+    0x066: "Exeggcute",
+    0x067: "Exeggutor",
+    0x068: "Cubone",
+    0x069: "Marowak",
+    0x06A: "Hitmonlee",
+    0x06B: "Hitmonchan",
+    0x06C: "Lickitung",
+    0x06D: "Koffing",
+    0x06E: "Weezing",
+    0x06F: "Rhyhorn",
+    0x070: "Rhydon",
+    0x071: "Chansey",
+    0x072: "Tangela",
+    0x073: "Kangaskhan",
+    0x074: "Horsea",
+    0x075: "Seadra",
+    0x076: "Goldeen",
+    0x077: "Seaking",
+    0x078: "Staryu",
+    0x079: "Starmie",
+    0x07A: "Mr. Mime",
+    0x07B: "Scyther",
+    0x07C: "Jynx",
+    0x07D: "Electabuzz",
+    0x07E: "Magmar",
+    0x07F: "Pinsir",
+    0x080: "Tauros",
+    0x081: "Magikarp",
+    0x082: "Gyarados",
+    0x083: "Lapras",
+    0x084: "Ditto",
+    0x085: "Eevee",
+    0x086: "Vaporeon",
+    0x087: "Jolteon",
+    0x088: "Flareon",
+    0x089: "Porygon",
+    0x08A: "Omanyte",
+    0x08B: "Omastar",
+    0x08C: "Kabuto",
+    0x08D: "Kabutops",
+    0x08E: "Aerodactyl",
+    0x08F: "Snorlax",
+    0x090: "Articuno",
+    0x091: "Zapdos",
+    0x092: "Moltres",
+    0x093: "Dratini",
+    0x094: "Dragonair",
+    0x095: "Dragonite",
+    0x096: "Mewtwo",
+    0x097: "Mew",
+    0x098: "Chikorita",
+    0x099: "Bayleef",
+    0x09A: "Meganium",
+    0x09B: "Cyndaquil",
+    0x09C: "Quilava",
+    0x09D: "Typhlosion",
+    0x09E: "Totodile",
+    0x09F: "Croconaw",
+    0x0A0: "Feraligatr",
+    0x0A1: "Sentret",
+    0x0A2: "Furret",
+    0x0A3: "Hoothoot",
+    0x0A4: "Noctowl",
+    0x0A5: "Ledyba",
+    0x0A6: "Ledian",
+    0x0A7: "Spinarak",
+    0x0A8: "Ariados",
+    0x0A9: "Crobat",
+    0x0AA: "Chinchou",
+    0x0AB: "Lanturn",
+    0x0AC: "Pichu",
+    0x0AD: "Cleffa",
+    0x0AE: "Igglybuff",
+    0x0AF: "Togepi",
+    0x0B0: "Togetic",
+    0x0B1: "Natu",
+    0x0B2: "Xatu",
+    0x0B3: "Mareep",
+    0x0B4: "Flaaffy",
+    0x0B5: "Ampharos",
+    0x0B6: "Bellossom",
+    0x0B7: "Marill",
+    0x0B8: "Azumarill",
+    0x0B9: "Sudowoodo",
+    0x0BA: "Politoed",
+    0x0BB: "Hoppip",
+    0x0BC: "Skiploom",
+    0x0BD: "Jumpluff",
+    0x0BE: "Aipom",
+    0x0BF: "Sunkern",
+    0x0C0: "Sunflora",
+    0x0C1: "Yanma",
+    0x0C2: "Wooper",
+    0x0C3: "Quagsire",
+    0x0C4: "Espeon",
+    0x0C5: "Umbreon",
+    0x0C6: "Murkrow",
+    0x0C7: "Slowking",
+    0x0C8: "Misdreavus",
+    0x0C9: "Unown",
+    0x0CA: "Wobbuffet",
+    0x0CB: "Girafarig",
+    0x0CC: "Pineco",
+    0x0CD: "Forretress",
+    0x0CE: "Dunsparce",
+    0x0CF: "Gligar",
+    0x0D0: "Steelix",
+    0x0D1: "Snubbull",
+    0x0D2: "Granbull",
+    0x0D3: "Qwilfish",
+    0x0D4: "Scizor",
+    0x0D5: "Shuckle",
+    0x0D6: "Heracross",
+    0x0D7: "Sneasel",
+    0x0D8: "Teddiursa",
+    0x0D9: "Ursaring",
+    0x0DA: "Slugma",
+    0x0DB: "Magcargo",
+    0x0DC: "Swinub",
+    0x0DD: "Piloswine",
+    0x0DE: "Corsola",
+    0x0DF: "Remoraid",
+    0x0E0: "Octillery",
+    0x0E1: "Delibird",
+    0x0E2: "Mantine",
+    0x0E3: "Skarmory",
+    0x0E4: "Houndour",
+    0x0E5: "Houndoom",
+    0x0E6: "Kingdra",
+    0x0E7: "Phanpy",
+    0x0E8: "Donphan",
+    0x0E9: "Porygon2",
+    0x0EA: "Stantler",
+    0x0EB: "Smeargle",
+    0x0EC: "Tyrogue",
+    0x0ED: "Hitmontop",
+    0x0EE: "Smoochum",
+    0x0EF: "Elekid",
+    0x0F0: "Magby",
+    0x0F1: "Miltank",
+    0x0F2: "Blissey",
+    0x0F3: "Raikou",
+    0x0F4: "Entei",
+    0x0F5: "Suicune",
+    0x0F6: "Larvitar",
+    0x0F7: "Pupitar",
+    0x0F8: "Tyranitar",
+    0x0F9: "Lugia",
+    0x0FA: "Ho-Oh",
+    0x0FB: "Celebi",
 
-// Some save editors/games (e.g., Pokémon Box) use extended internal IDs for late Hoenn Pokémon.
-// Source: https://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_by_index_number_in_Generation_III
-export const GEN3_INTERNAL_ID_OVERRIDES: Record<number, number> = {
-    314: 321, // Wailord (alternate internal ID in some Box saves)
-    395: 371, // Bagon
-    396: 372, // Shelgon
-    397: 373, // Salamence
-    398: 374, // Beldum
-    399: 375, // Metang
-    400: 376, // Metagross
-    401: 377, // Regirock
-    402: 378, // Regice
-    403: 379, // Registeel
-    404: 382, // Kyogre
-    405: 383, // Groudon
-    406: 384, // Rayquaza
-    407: 380, // Latias (alternate internal ID)
-    408: 381, // Latios (alternate internal ID)
-    409: 385, // Jirachi
-    410: 386, // Deoxys
+    // Gen 3 Pokémon (indices 277-411) - internal order differs from National Dex
+    // Chimecho (0x19B) was added late in development and placed at the end
+    0x115: "Treecko",
+    0x116: "Grovyle",
+    0x117: "Sceptile",
+    0x118: "Torchic",
+    0x119: "Combusken",
+    0x11A: "Blaziken",
+    0x11B: "Mudkip",
+    0x11C: "Marshtomp",
+    0x11D: "Swampert",
+    0x11E: "Poochyena",
+    0x11F: "Mightyena",
+    0x120: "Zigzagoon",
+    0x121: "Linoone",
+    0x122: "Wurmple",
+    0x123: "Silcoon",
+    0x124: "Beautifly",
+    0x125: "Cascoon",
+    0x126: "Dustox",
+    0x127: "Lotad",
+    0x128: "Lombre",
+    0x129: "Ludicolo",
+    0x12A: "Seedot",
+    0x12B: "Nuzleaf",
+    0x12C: "Shiftry",
+    0x12D: "Nincada",
+    0x12E: "Ninjask",
+    0x12F: "Shedinja",
+    0x130: "Taillow",
+    0x131: "Swellow",
+    0x132: "Shroomish",
+    0x133: "Breloom",
+    0x134: "Spinda",
+    0x135: "Wingull",
+    0x136: "Pelipper",
+    0x137: "Surskit",
+    0x138: "Masquerain",
+    0x139: "Wailmer",
+    0x13A: "Wailord",
+    0x13B: "Skitty",
+    0x13C: "Delcatty",
+    0x13D: "Kecleon",
+    0x13E: "Baltoy",
+    0x13F: "Claydol",
+    0x140: "Nosepass",
+    0x141: "Torkoal",
+    0x142: "Sableye",
+    0x143: "Barboach",
+    0x144: "Whiscash",
+    0x145: "Luvdisc",
+    0x146: "Corphish",
+    0x147: "Crawdaunt",
+    0x148: "Feebas",
+    0x149: "Milotic",
+    0x14A: "Carvanha",
+    0x14B: "Sharpedo",
+    0x14C: "Trapinch",
+    0x14D: "Vibrava",
+    0x14E: "Flygon",
+    0x14F: "Makuhita",
+    0x150: "Hariyama",
+    0x151: "Electrike",
+    0x152: "Manectric",
+    0x153: "Numel",
+    0x154: "Camerupt",
+    0x155: "Spheal",
+    0x156: "Sealeo",
+    0x157: "Walrein",
+    0x158: "Cacnea",
+    0x159: "Cacturne",
+    0x15A: "Snorunt",
+    0x15B: "Glalie",
+    0x15C: "Lunatone",
+    0x15D: "Solrock",
+    0x15E: "Azurill",
+    0x15F: "Spoink",
+    0x160: "Grumpig",
+    0x161: "Plusle",
+    0x162: "Minun",
+    0x163: "Mawile",
+    0x164: "Meditite",
+    0x165: "Medicham",
+    0x166: "Swablu",
+    0x167: "Altaria",
+    0x168: "Wynaut",
+    0x169: "Duskull",
+    0x16A: "Dusclops",
+    0x16B: "Roselia",
+    0x16C: "Slakoth",
+    0x16D: "Vigoroth",
+    0x16E: "Slaking",
+    0x16F: "Gulpin",
+    0x170: "Swalot",
+    0x171: "Tropius",
+    0x172: "Whismur",
+    0x173: "Loudred",
+    0x174: "Exploud",
+    0x175: "Clamperl",
+    0x176: "Huntail",
+    0x177: "Gorebyss",
+    0x178: "Absol",
+    0x179: "Shuppet",
+    0x17A: "Banette",
+    0x17B: "Seviper",
+    0x17C: "Zangoose",
+    0x17D: "Relicanth",
+    0x17E: "Aron",
+    0x17F: "Lairon",
+    0x180: "Aggron",
+    0x181: "Castform",
+    0x182: "Volbeat",
+    0x183: "Illumise",
+    0x184: "Lileep",
+    0x185: "Cradily",
+    0x186: "Anorith",
+    0x187: "Armaldo",
+    0x188: "Ralts",
+    0x189: "Kirlia",
+    0x18A: "Gardevoir",
+    0x18B: "Bagon",
+    0x18C: "Shelgon",
+    0x18D: "Salamence",
+    0x18E: "Beldum",
+    0x18F: "Metang",
+    0x190: "Metagross",
+    0x191: "Regirock",
+    0x192: "Regice",
+    0x193: "Registeel",
+    0x194: "Kyogre",
+    0x195: "Groudon",
+    0x196: "Rayquaza",
+    0x197: "Latias",
+    0x198: "Latios",
+    0x199: "Jirachi",
+    0x19A: "Deoxys",
+    0x19B: "Chimecho",
+    0x19C: "Egg" as Species,
+
+    // Unown form indices (0x19D-0x1B7) - forms handled separately
+    0x19D: "Unown",
+    0x19E: "Unown",
+    0x19F: "Unown",
+    0x1A0: "Unown",
+    0x1A1: "Unown",
+    0x1A2: "Unown",
+    0x1A3: "Unown",
+    0x1A4: "Unown",
+    0x1A5: "Unown",
+    0x1A6: "Unown",
+    0x1A7: "Unown",
+    0x1A8: "Unown",
+    0x1A9: "Unown",
+    0x1AA: "Unown",
+    0x1AB: "Unown",
+    0x1AC: "Unown",
+    0x1AD: "Unown",
+    0x1AE: "Unown",
+    0x1AF: "Unown",
+    0x1B0: "Unown",
+    0x1B1: "Unown",
+    0x1B2: "Unown",
+    0x1B3: "Unown",
+    0x1B4: "Unown",
+    0x1B5: "Unown",
+    0x1B6: "Unown",
+    0x1B7: "Unown",
 };

@@ -17,6 +17,7 @@ const debugPanelClassName = css`
     background: #222;
     color: #fff;
     border-radius: .25rem;
+    z-index: 1000;
 `;
 
 export const DebugDialog: React.FC<DebugDialogProps> = ({
