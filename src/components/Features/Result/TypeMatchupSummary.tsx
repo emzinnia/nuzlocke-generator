@@ -117,14 +117,30 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
         return "1×";
     };
 
-    // Render delta indicator for matchup changes
+    // Render delta indicator for matchup changes (weakness: increase is bad)
     const renderDelta = (current: number, original: number) => {
         const delta = current - original;
         if (delta === 0) return null;
-        const color = delta > 0 ? "#e74c3c" : "#27ae60"; // red for increase (bad for weak), green for decrease
+        const isIncrease = delta > 0;
+        const bgColor = isIncrease ? "rgba(231, 76, 60, 0.9)" : "rgba(39, 174, 96, 0.9)";
+        const arrow = isIncrease ? "▲" : "▼";
         return (
-            <span style={{ fontSize: "0.7em", marginLeft: "0.25rem", color, fontWeight: 700 }}>
-                {delta > 0 ? `+${delta}` : delta}
+            <span
+                style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "2px",
+                    marginLeft: "0.35rem",
+                    padding: "2px 6px",
+                    borderRadius: "4px",
+                    backgroundColor: bgColor,
+                    color: "#fff",
+                    fontSize: "0.75em",
+                    fontWeight: 700,
+                    lineHeight: 1,
+                }}
+            >
+                {arrow} {Math.abs(delta)}
             </span>
         );
     };
@@ -133,10 +149,26 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
     const renderDeltaInverse = (current: number, original: number) => {
         const delta = current - original;
         if (delta === 0) return null;
-        const color = delta > 0 ? "#27ae60" : "#e74c3c"; // green for increase (good), red for decrease
+        const isIncrease = delta > 0;
+        const bgColor = isIncrease ? "rgba(39, 174, 96, 0.9)" : "rgba(231, 76, 60, 0.9)";
+        const arrow = isIncrease ? "▲" : "▼";
         return (
-            <span style={{ fontSize: "0.7em", marginLeft: "0.25rem", color, fontWeight: 700 }}>
-                {delta > 0 ? `+${delta}` : delta}
+            <span
+                style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "2px",
+                    marginLeft: "0.35rem",
+                    padding: "2px 6px",
+                    borderRadius: "4px",
+                    backgroundColor: bgColor,
+                    color: "#fff",
+                    fontSize: "0.75em",
+                    fontWeight: 700,
+                    lineHeight: 1,
+                }}
+            >
+                {arrow} {Math.abs(delta)}
             </span>
         );
     };
