@@ -280,6 +280,14 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         }
     }
 
+    private toggleHistoryTimeline() {
+        const btn = document.querySelector<HTMLButtonElement>(
+            '[data-testid="history-timeline-button"]',
+        );
+        if (!btn || btn.disabled) return;
+        btn.click();
+    }
+
     private movePokemonLeft() {
         if (!this.props.selectedId || !this.props.pokemon?.length) return;
         
