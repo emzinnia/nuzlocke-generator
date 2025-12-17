@@ -331,11 +331,9 @@ export const typeChip = css`
 
 export const typeCell = css`
     font-weight: 700;
-    
     padding: 0.4rem 0.6rem !important;
     min-width: 56px;
     transition: filter 0.15s ease-out;
-
 `;
 
 export const matchupCell = css`
