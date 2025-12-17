@@ -13,6 +13,10 @@ interface TypeMatchupSummaryProps {
     game: Game;
     customTypes: State["customTypes"];
     style: State["style"];
+    /** IDs of pokemon temporarily removed from team (local state) */
+    removedFromTeam?: Set<string>;
+    /** IDs of pokemon temporarily added to team (local state) */
+    addedToTeam?: Set<string>;
 }
 
 export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
@@ -20,6 +24,8 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
     game,
     customTypes,
     style,
+    removedFromTeam,
+    addedToTeam,
 }) => {
     const [useAbilityMatchups, setUseAbilityMatchups] = React.useState(false);
     const generation: Generation = React.useMemo(
