@@ -10,6 +10,7 @@ interface MessageData {
         save?: Buffer | Uint8Array;
         selectedGame?: GameSaveFormat;
         boxMappings: BoxMappings;
+        fileName?: string;
     };
 }
 
@@ -30,6 +31,36 @@ const makeGame = (name: GameName): GameModel => ({ name, customName: "" });
 
 const normalizeGen1Gen2Buffer = (buf: Buffer) =>
     buf.length >= SAVE_SIZE_GEN1_GEN2 ? buf.subarray(0, SAVE_SIZE_GEN1_GEN2) : buf;
+
+const normalizeForTokenSearch = (s: string) => {
+    // "Case and spacing insensitive": remove whitespace and uppercase.
+    // For filenames we also strip punctuation to make matching more forgiving.
+    return s.toUpperCase().replace(/\s+/g, "").replace(/[^A-Z]/g, "");
+};
+
+const detectGen3GameNameFromString = (text: string): GameName | undefined => {
+    const s = normalizeForTokenSearch(text);
+
+    // Prefer longer/more-specific tokens first, then short abbreviations.
+    if (s.includes("EMER")) return "Emerald";
+
+    if (s.includes("FIRERED") || s.includes("FR")) return "FireRed";
+    if (s.includes("LEAFGREEN") || s.includes("LG")) return "LeafGreen";
+
+    if (s.includes("RUBY") || s.includes("RB")) return "Ruby";
+    if (s.includes("SAPPHIRE") || s.includes("SP")) return "Sapphire";
+
+    return undefined;
+};
+
+const detectGen3SaveFormatFromString = (text: string): GameSaveFormat | undefined => {
+    const name = detectGen3GameNameFromString(text);
+    if (!name) return undefined;
+    if (name === "FireRed" || name === "LeafGreen") return "FRLG";
+    if (name === "Emerald") return "Emerald";
+    if (name === "Ruby" || name === "Sapphire") return "RS";
+    return undefined;
+};
 
 // Matches the checksum logic used in `src/parsers/gen1.ts`.
 const isLikelyGen1Save = (buf: Buffer) => {
@@ -131,7 +162,7 @@ const parseGen3WithBestVariant = async (
 };
 
 self.onmessage = async ({
-    data: { save, selectedGame, boxMappings },
+    data: { save, selectedGame, boxMappings, fileName },
 }: MessageData) => {
     let result;
 
@@ -141,11 +172,15 @@ self.onmessage = async ({
 
     const buf = toBuffer(save);
     const gen1Gen2Buf = normalizeGen1Gen2Buffer(buf);
+    const gen3SaveFormatHint =
+        buf.length === SAVE_SIZE_GEN3 || buf.length === SAVE_SIZE_GEN3_TRIMMED
+            ? (fileName ? detectGen3SaveFormatFromString(fileName) : undefined)
+            : undefined;
     const gameChoice: GameSaveFormat =
         selectedGame && selectedGame !== "Auto"
             ? selectedGame
             : buf.length === SAVE_SIZE_GEN3 || buf.length === SAVE_SIZE_GEN3_TRIMMED
-              ? "Emerald"
+              ? gen3SaveFormatHint ?? "Emerald"
               : buf.length >= SAVE_SIZE_GEN1_GEN2 &&
                   buf.length <= SAVE_SIZE_GEN1_GEN2_MAX_WITH_PADDING
                 ? isLikelyGen1Save(gen1Gen2Buf)
@@ -168,7 +203,15 @@ self.onmessage = async ({
         // If the user picked "Auto", we still need the correct gen3 variant (FRLG vs RSE) for party offsets.
         if (!selectedGame || selectedGame === "Auto") {
             try {
-                result = await parseGen3WithBestVariant(buf, boxMappings);
+                // If the save itself contains a strong hint, trust it.
+                if (gen3SaveFormatHint) {
+                    result = await parseGen3Save(buf, {
+                        boxMappings,
+                        selectedGame: gen3SaveFormatHint,
+                    });
+                } else {
+                    result = await parseGen3WithBestVariant(buf, boxMappings);
+                }
             } catch (err) {
                 // Some Gen1/2 saves come with tiny padding (e.g. 0x802c) which can trick Auto into Gen3.
                 // If Gen3 rejects the size, fall back to Gen1/2 parsing on the normalized 32KiB buffer.
@@ -209,12 +252,17 @@ self.onmessage = async ({
     } else if (gameChoice === "GS") {
         detectedGame = makeGame("Gold");
     } else {
+        const hinted = fileName ? detectGen3GameNameFromString(fileName) : undefined;
+        if (hinted) {
+            detectedGame = makeGame(hinted);
+        } else {
         // Gen 3: infer exact title (Ruby vs Sapphire, FireRed vs LeafGreen, etc.) from origin-game majority.
-        const inferred = inferGen3GameFromPokemon(result.pokemon);
-        if (inferred) detectedGame = makeGame(inferred);
-        else if (gameChoice === "FRLG") detectedGame = makeGame("FireRed");
-        else if (gameChoice === "Emerald") detectedGame = makeGame("Emerald");
-        else detectedGame = makeGame("Ruby");
+            const inferred = inferGen3GameFromPokemon(result.pokemon);
+            if (inferred) detectedGame = makeGame(inferred);
+            else if (gameChoice === "FRLG") detectedGame = makeGame("FireRed");
+            else if (gameChoice === "Emerald") detectedGame = makeGame("Emerald");
+            else detectedGame = makeGame("Ruby");
+        }
     }
 
     self.postMessage({

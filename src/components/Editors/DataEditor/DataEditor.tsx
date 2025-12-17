@@ -260,7 +260,7 @@ export class DataEditorBase extends React.Component<
             mode: "export",
             data: "",
             href: "",
-            selectedGame: "RBY",
+            selectedGame: "Auto",
             mergeDataMode: true,
             showSaveFileUI: false,
             overrideImport: true,
@@ -440,6 +440,7 @@ export class DataEditorBase extends React.Component<
                 selectedGame: componentState.selectedGame,
                 save,
                 boxMappings: componentState.boxMappings,
+                fileName: file.name,
             });
 
             worker.onmessage = (
@@ -480,8 +481,9 @@ export class DataEditorBase extends React.Component<
 
                 // Back-compat for older saves that may have used `style.backgroundColor`.
                 // `Styles` doesn't include it, but we can preserve/overwrite it if present.
-                if (bgColor && "backgroundColor" in (state.style as any)) {
-                    (nextStyle as any).backgroundColor = bgColor;
+                type LegacyStyle = Styles & { backgroundColor?: string };
+                if (bgColor && "backgroundColor" in (state.style as LegacyStyle)) {
+                    (nextStyle as LegacyStyle).backgroundColor = bgColor;
                 }
 
                 const newState = { ...state, ...data, style: nextStyle };

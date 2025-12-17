@@ -20,13 +20,26 @@ const debugPanelClassName = css`
     z-index: 1000;
 `;
 
+const debugPanelHeader = css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+`;
+
 export const DebugDialog: React.FC<DebugDialogProps> = ({
     onAddRandomPokemon,
     onCreateBox = noop,
 }) => {
+
+    const [isOpen, setIsOpen] = React.useState(true);
+    if (!isOpen) return null;
     return (
         <div className={debugPanelClassName} aria-label="Debug Panel">
-            <h3 style={{ margin: 0, marginBottom: "0.5rem" }}>Debug Panel</h3>
+            <div className={debugPanelHeader}>
+                <h3 style={{ margin: 0, marginBottom: "0.5rem" }}>Debug Panel</h3>
+                <Button minimal icon="cross" onClick={() => setIsOpen(false)} />
+            </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                 <Button fill onClick={onAddRandomPokemon}>
                     Add Random Pokemon

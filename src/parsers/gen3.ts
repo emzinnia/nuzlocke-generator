@@ -785,12 +785,18 @@ const decodePokemon = (
     const ribbons = sub.M.readUInt32LE(8);
 
     const ivs = parseIvs(ivData);
-    const metLevel = originInfo & 0x7f;
+    const metLevelRaw = originInfo & 0x7f;
     const originGame = (originInfo >> 7) & 0xf;
     const ballId = (originInfo >> 11) & 0xf;
     const otGender = (originInfo >> 15) & 0x1 ? "F" : "M";
 
-    // For party Pokemon, use the stored level. For boxed Pokemon, use metLevel as fallback
+    // Gen 3 stores "met level" in the origin-info bitfield.
+    // For hatched Pokémon, many saves store metLevel as 0; the game treats hatched Pokémon as met at level 5.
+    // We normalize this for boxed Pokémon so level/metLevel are usable (see gen3 tests).
+    const metLevel =
+        !context.isParty && !ivs.isEgg && metLevelRaw === 0 ? 5 : metLevelRaw;
+
+    // For party Pokémon, use the stored level. For boxed Pokémon, use metLevel as a fallback.
     const level = context.isParty ? context.level : metLevel || undefined;
     const speciesName = getSpeciesName(speciesId, nickname);
     const moves = moveIds.map((id) => MOVES_ARRAY?.[id]).filter(Boolean);
