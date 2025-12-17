@@ -18,10 +18,15 @@ type FeatureObject = {
     [K in keyof typeof featuresFromEnv]: boolean;
 };
 
+const toBool = (v: unknown) => {
+    if (typeof v === "string") return v.trim().toLowerCase() === "true";
+    return Boolean(v);
+};
+
 const featuresToBooleans = (f: typeof featuresFromEnv): FeatureObject => {
     const obj: Partial<FeatureObject> = {};
     for (const feature in f) {
-        obj[feature] = Boolean(f[feature]);
+        obj[feature] = toBool(f[feature]);
     }
     return obj as FeatureObject;
 };
