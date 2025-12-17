@@ -99,6 +99,20 @@ export function TypeMatchupDialog() {
         [others],
     );
 
+    // Memoized displayed team (accounting for local swaps)
+    const displayedTeam = React.useMemo(
+        () =>
+            pokemon
+                ?.filter((p) => {
+                    const isOnTeam = p?.status === "Team" && !p?.hidden;
+                    const wasRemoved = removedFromTeam.has(p.id);
+                    const wasAdded = addedToTeam.has(p.id);
+                    return (isOnTeam && !wasRemoved) || wasAdded;
+                })
+                .sort(sortPokes) ?? [],
+        [pokemon, removedFromTeam, addedToTeam],
+    );
+
     // Use dark mode setting for proper text contrast in dialog
     const textColor = style?.editorDarkMode ? "#F5F8FA" : "#182026";
 
@@ -117,16 +131,8 @@ export function TypeMatchupDialog() {
                     <div className={styles.typeMatchupsTeamPreview} style={{ color: textColor }}>
                         <h4>Team Preview</h4>
                         <p>Click a Pokémon to swap it out.</p>
-                        {pokemon
-                            ?.filter((p) => {
-                                // Show pokemon that are on team (not removed) OR added from others
-                                const isOnTeam = p?.status === "Team" && !p?.hidden;
-                                const wasRemoved = removedFromTeam.has(p.id);
-                                const wasAdded = addedToTeam.has(p.id);
-                                return (isOnTeam && !wasRemoved) || wasAdded;
-                            })
-                            .sort(sortPokes)
-                            .map((poke) => (
+                        
+                        {displayedTeam.map((poke) => (
                                 <Card
                                     key={poke.id}
                                     className={styles.typeMatchupsTeamEntryRemove}
