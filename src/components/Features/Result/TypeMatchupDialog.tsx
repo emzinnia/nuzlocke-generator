@@ -167,6 +167,8 @@ export function TypeMatchupDialog() {
                             game={game}
                             customTypes={customTypes}
                             style={style}
+                            removedFromTeam={removedFromTeam}
+                            addedToTeam={addedToTeam}
                         />
                     </div>
                     <div
