@@ -158,10 +158,7 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                                         </div>
                                     }
                                 >
-                                    <Icon
-                                        style={{ marginLeft: ".25rem" }}
-                                        icon="info-sign"
-                                    />
+                                    <Icon style={{ marginLeft: ".25rem", verticalAlign: "top" }} size={12} icon="info-sign" />
                                 </Popover>
                             </label>
                             <input
