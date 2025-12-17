@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Dialog, Classes, Card, Button, Intent, Alert } from "@blueprintjs/core";
+import { Dialog, Classes, Card, Button, Intent, Alert, Callout } from "@blueprintjs/core";
 import { useDispatch, useSelector } from "react-redux";
 import { PokemonIconPlain } from "components";
 import { toggleDialog, editPokemon } from "actions";
@@ -132,14 +132,15 @@ export function TypeMatchupDialog() {
                         <h4>Team Preview</h4>
                         <p>Click a Pokémon to swap it out.</p>
                         {displayedTeam.length > 6 && (
-                            <Alert
+                            <Callout
                                 intent={Intent.WARNING}
+                                title="Warning"
                                 icon="warning-sign"
                             >
                                 <p>
                                     Team has more than 6 Pokémon!
                                 </p>
-                            </Alert>
+                            </Callout>
                         )}
                         
                         {displayedTeam.map((poke) => (
