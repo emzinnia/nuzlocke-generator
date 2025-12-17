@@ -5,6 +5,7 @@ export function view(
     state: View = {
         dialogs: {
             imageUploader: false,
+            typeMatchups: false,
         },
     },
     action: Action<TOGGLE_DIALOG>,

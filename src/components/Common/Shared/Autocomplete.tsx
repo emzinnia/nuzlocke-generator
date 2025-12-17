@@ -90,7 +90,7 @@ export function Autocomplete({
     const openList = (_e) => {
         setIsOpen(true);
     };
-    const closeList = (_e) => {
+    const closeList = (e) => {
         setTimeout(() => {
             setIsOpen(false);
             setVisibleItems(items);

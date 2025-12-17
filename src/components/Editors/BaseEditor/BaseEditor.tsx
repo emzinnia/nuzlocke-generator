@@ -9,6 +9,7 @@ export interface BaseEditorProps {
     name: string;
     icon?: IconName;
     defaultOpen?: boolean;
+    children?: React.ReactNode;
 }
 
 export class BaseEditor extends React.Component<

@@ -1,4 +1,4 @@
-import { Game } from "models";
+import { Game } from "../data/listOfGames";
 
 export enum Generation {
     Gen1 = 1,

@@ -12,6 +12,8 @@ import storage from "redux-persist/lib/storage";
 import { version } from "../../package.json";
 import { reducers } from "../reducers";
 import { State } from "state";
+import { historyMiddleware } from "../middleware/historyMiddleware";
+import { setEditorDarkModePreference } from "utils";
 
 const migrations = {
     "0.0.6-beta": (state) => {
@@ -99,7 +101,7 @@ export const history = createBrowserHistory();
 
 export const persistReducers = persistCombineReducers(config, reducers as any);
 
-export const middlewares: Middleware[] = [];
+export const middlewares: Middleware[] = [historyMiddleware];
 
 if (import.meta.env.PROD) {
     // No additional middlewares in production
@@ -112,5 +114,22 @@ export const store = createStore(
     persistReducers,
     applyMiddleware(...middlewares),
 );
+
+let lastEditorDarkMode = (store.getState() as unknown as State).style?.editorDarkMode;
+if (typeof lastEditorDarkMode === "boolean") {
+    setEditorDarkModePreference(lastEditorDarkMode);
+}
+
+store.subscribe(() => {
+    const currentEditorDarkMode = (store.getState() as unknown as State).style?.editorDarkMode;
+    if (
+        typeof currentEditorDarkMode !== "boolean" ||
+        currentEditorDarkMode === lastEditorDarkMode
+    ) {
+        return;
+    }
+    lastEditorDarkMode = currentEditorDarkMode;
+    setEditorDarkModePreference(currentEditorDarkMode);
+});
 
 export const persistor = persistStore(store, undefined);

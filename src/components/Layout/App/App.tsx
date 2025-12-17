@@ -2,21 +2,23 @@ import * as React from "react";
 import { connect } from "react-redux";
 
 import { State } from "state";
-import { updateEditorHistory } from "actions";
-import { feature, isLocal } from "utils";
-import { History } from "reducers/editorHistory";
+import { addPokemon } from "actions";
+import { feature, isLocal, choose, generateEmptyPokemon } from "utils";
 import { ErrorBoundary } from "components";
 import { Button } from "@blueprintjs/core";
-import { updaterSelector, appSelector } from "selectors";
+import { appSelector } from "selectors";
 import { Skeleton } from "components";
-import { isEqual } from "utils/isEqual";
+import { listOfPokemon, Species } from "utils/data/listOfPokemon";
+import { matchSpeciesToTypes } from "utils/formatters/matchSpeciesToTypes";
+import { DebugDialog } from "./DebugDialog";
 
 import "./app.css";
 
 export interface AppProps {
     style: State["style"];
     view: State["view"];
-    editor: State["editor"];
+    pokemon: State["pokemon"];
+    addPokemon: typeof addPokemon;
 }
 
 const Editor = React.lazy(() =>
@@ -55,44 +57,22 @@ const Hotkeys = React.lazy(() =>
     })),
 );
 
-export class UpdaterBase extends React.Component<{
-    present: Omit<State, "editorHistory">;
-    updateEditorHistory: updateEditorHistory;
-    lrt: History<any>["lastRevisionType"];
-}> {
-    public componentDidMount() {
-        // initial history record
-        this.props.updateEditorHistory(this.props.present);
-    }
-
-    public UNSAFE_componentWillReceiveProps(prev) {
-        if (
-            prev.lrt === "update" &&
-            this.props.present != null &&
-            this.props.present != null &&
-            !isEqual(this.props.present, prev.present)
-        ) {
-            const t0 = performance.now();
-            this.props.updateEditorHistory(prev.present);
-            const t1 = performance.now();
-            console.log(`Updated history in ${t1 - t0}ms`);
-        }
-    }
-
-    public render() {
-        return <div />;
-    }
-}
-
-export const Updater = connect(updaterSelector, { updateEditorHistory }, null, {
-    pure: false,
-})(UpdaterBase);
-
 export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
     public constructor(props: AppProps) {
         super(props);
         this.state = { result2: false };
     }
+
+    private addRandomPokemon = () => {
+        const species = choose([...listOfPokemon]) as Species;
+        const types = matchSpeciesToTypes(species);
+        const pokemon = generateEmptyPokemon(this.props.pokemon, {
+            species,
+            status: "Team",
+            types,
+        });
+        this.props.addPokemon(pokemon);
+    };
 
     public componentDidMount() {
         if (feature.resultv2) {
@@ -106,12 +86,11 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
     }
 
     public render() {
-        const { style, view, editor } = this.props;
+        const { style, view } = this.props;
         const { result2 } = this.state;
         const isDarkMode = style.editorDarkMode;
+        const showDebugPanel = isLocal();
         console.log("features", feature);
-
-        const UpdaterComponent = !editor.editorHistoryDisabled && <Updater />;
 
         return (
             <ErrorBoundary
@@ -138,7 +117,6 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
                             : "#fff",
                     }}
                 >
-                    {UpdaterComponent}
                     <ErrorBoundary key={1}>
                         <React.Suspense fallback={Skeleton}>
                             <Hotkeys />
@@ -163,7 +141,7 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
                         </ErrorBoundary>
                     )}
 
-                    {isLocal() && feature.resultv2 && (
+                    {showDebugPanel && feature.resultv2 && (
                         <Button
                             style={{
                                 position: "absolute",
@@ -179,6 +157,12 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
                         </Button>
                     )}
 
+                    {showDebugPanel && (
+                        <DebugDialog
+                            onAddRandomPokemon={this.addRandomPokemon}
+                        />
+                    )}
+
                     <ErrorBoundary key={4}>
                         <React.Suspense fallback={Skeleton}>
                             <ImagesDrawer />
@@ -190,4 +174,4 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
     }
 }
 
-export const App = connect(appSelector)(AppBase);
+export const App = connect(appSelector, { addPokemon })(AppBase);

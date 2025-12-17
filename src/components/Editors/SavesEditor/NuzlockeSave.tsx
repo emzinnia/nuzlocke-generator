@@ -7,7 +7,6 @@ import {
     MenuItem,
     Intent,
     Icon,
-    Toaster,
 } from "@blueprintjs/core";
 import { connect } from "react-redux";
 import { State } from "state";
@@ -19,13 +18,20 @@ import {
     replaceState,
     updateSwitchNuzlocke,
 } from "actions";
-import { feature, gameOfOriginToColor, getContrastColor } from "utils";
+import {
+    feature,
+    gameOfOriginToColor,
+    getContrastColor,
+    Styles,
+} from "utils";
 import { omit } from "ramda";
 import { createStore } from "redux";
 import { appReducers } from "reducers";
 import { NuzlockeGameTags } from "./NuzlockeGameTags";
 import { DeleteAlert } from "components/Editors/DataEditor/DeleteAlert";
 import { HallOfFameDialog } from "./HallOfFameDialog";
+import { showToast } from "components/Common/Shared/appToaster";
+import { HotkeyIndicator } from "components/Common/Shared";
 
 export interface NuzlockeSaveControlsProps {
     nuzlockes: State["nuzlockes"];
@@ -51,6 +57,20 @@ interface ContainsId {
 }
 
 const sort = (a: ContainsId, b: ContainsId) => a.id - b.id;
+
+const stripEditorDarkModeFromState = (state: State) => {
+    const baseState = omit(["nuzlockes", "editorHistory"], state) as {
+        style?: Styles;
+        [key: string]: unknown;
+    };
+    const { editorDarkMode: _omit, ...styleWithoutDarkMode } =
+        baseState.style || {};
+
+    return {
+        ...baseState,
+        style: styleWithoutDarkMode,
+    };
+};
 
 export class NuzlockeSaveBase extends React.Component<
     NuzlockeSaveControlsProps,
@@ -108,11 +128,21 @@ export class NuzlockeSaveBase extends React.Component<
                     onClick={() => {
                         updateNuzlocke(currentId, state);
                         const data = createStore(appReducers)?.getState();
-                        newNuzlocke(JSON.stringify(data), { isCopy: false });
+                        const preparedData = stripEditorDarkModeFromState(
+                            data as unknown as State,
+                        );
+                        newNuzlocke(JSON.stringify(preparedData), {
+                            isCopy: false,
+                        });
                         replaceState(data);
                     }}
                 >
-                    New Nuzlocke
+                    New Nuzlocke{" "}
+                    <HotkeyIndicator
+                        hotkey="shift+n"
+                        showModifier={false}
+                        style={{ marginLeft: "0.35rem" }}
+                    />
                 </Button>
                 {saves.map((nuzlocke) => {
                     const id = nuzlocke.id;
@@ -200,9 +230,7 @@ export class NuzlockeSaveBase extends React.Component<
                                                     );
                                                     replaceState(parsedData);
                                                 } catch (e) {
-                                                    const toaster =
-                                                        Toaster.create();
-                                                    toaster.show({
+                                                    showToast({
                                                         message: `Failed to switch nuzlockes. ${e}`,
                                                         intent: Intent.DANGER,
                                                     });
@@ -226,9 +254,7 @@ export class NuzlockeSaveBase extends React.Component<
                                                         isCopy: true,
                                                     });
                                                 } catch (e) {
-                                                    const toaster =
-                                                        Toaster.create();
-                                                    toaster.show({
+                                                    showToast({
                                                         message: `Failed to copy nuzlocke. ${e}`,
                                                         intent: Intent.DANGER,
                                                     });
@@ -266,9 +292,7 @@ export class NuzlockeSaveBase extends React.Component<
                                                         }
                                                         this.toggleIsDeletingNuzlocke();
                                                     } catch (e) {
-                                                        const toaster =
-                                                            Toaster.create();
-                                                        toaster.show({
+                                                        showToast({
                                                             message: `Failed to delete nuzlocke. ${e}`,
                                                             intent: Intent.DANGER,
                                                         });
@@ -308,7 +332,7 @@ export class NuzlockeSaveBase extends React.Component<
 export const NuzlockeSave = connect(
     (state: State) => ({
         nuzlockes: state.nuzlockes,
-        state: JSON.stringify(omit(["nuzlockes", "editorHistory"], state)),
+        state: JSON.stringify(stripEditorDarkModeFromState(state)),
         darkMode: state.style.editorDarkMode,
     }),
     {

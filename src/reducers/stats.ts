@@ -4,12 +4,13 @@ import {
     EDIT_STAT,
     DELETE_STAT,
     REPLACE_STATE,
+    SYNC_STATE_FROM_HISTORY,
 } from "actions";
 import { v4 as uuid } from "uuid";
 
 export function stats(
     initState = [{ id: "a-1", key: "", value: "" }],
-    action: Action<ADD_STAT | EDIT_STAT | DELETE_STAT | REPLACE_STATE>,
+    action: Action<ADD_STAT | EDIT_STAT | DELETE_STAT | REPLACE_STATE | SYNC_STATE_FROM_HISTORY>,
 ) {
     switch (action.type) {
         case ADD_STAT:
@@ -33,6 +34,8 @@ export function stats(
             ];
         case REPLACE_STATE:
             return action.replaceWith.stats || [];
+        case SYNC_STATE_FROM_HISTORY:
+            return action.syncWith.stats || [];
         default:
             return initState;
     }

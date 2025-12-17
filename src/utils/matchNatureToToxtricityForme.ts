@@ -1,30 +1,22 @@
 import { Forme } from "./Forme";
 import { Nature } from "./Nature";
 
-export const matchNatureToToxtricityForme = (
-    nature: Nature,
-): keyof typeof Forme => {
-    console.log(nature);
+export const matchNatureToToxtricityForme = (nature: Nature): keyof typeof Forme => {
+    const ampedNatures: Nature[] = [
+        Nature.Adamant,
+        Nature.Brave,
+        Nature.Docile,
+        Nature.Hardy,
+        Nature.Hasty,
+        Nature.Impish,
+        Nature.Jolly,
+        Nature.Lax,
+        Nature.Naive,
+        Nature.Naughty,
+        Nature.Quirky,
+        Nature.Rash,
+        Nature.Sassy,
+    ];
 
-    if (
-        [
-            "Adamant",
-            "Brave",
-            "Docile",
-            "Hardy",
-            "Hasty",
-            "Impish",
-            "Jolly",
-            "Lax",
-            "Naive",
-            "Naughty",
-            "Quirky",
-            "Rash",
-            "Sassy",
-        ].includes(nature)
-    ) {
-        return "Amped";
-    } else {
-        return "Lowkey";
-    }
+    return ampedNatures.includes(nature) ? "AmpedUp" : "Lowkey";
 };

@@ -6,7 +6,7 @@ describe("Pokemon Editor", () => {
         cy.get(
             ":nth-child(2) > :nth-child(1) > .bp5-html-select > select",
         ).select("Red");
-        cy.get('[data-testid="pokemon-editor"] > .bp5-intent-success').click();
+        cy.get('[data-testid="add-pokemon-button"]').click();
         cy.get(
             ':nth-child(2) > .autocomplete > [data-testid="autocomplete"]',
         ).click();

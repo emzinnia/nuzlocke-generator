@@ -2,6 +2,7 @@ import {
     CREATE_CUSTOM_TYPE,
     Action,
     REPLACE_STATE,
+    SYNC_STATE_FROM_HISTORY,
     DELETE_CUSTOM_TYPE,
     EDIT_CUSTOM_TYPE,
 } from "actions";
@@ -14,6 +15,7 @@ export function customTypes(
         | CREATE_CUSTOM_TYPE
         | DELETE_CUSTOM_TYPE
         | REPLACE_STATE
+        | SYNC_STATE_FROM_HISTORY
         | EDIT_CUSTOM_TYPE
     >,
 ) {
@@ -40,6 +42,8 @@ export function customTypes(
             });
         case REPLACE_STATE:
             return action.replaceWith.customTypes || [];
+        case SYNC_STATE_FROM_HISTORY:
+            return action.syncWith.customTypes || [];
         default:
             return state;
     }

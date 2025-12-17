@@ -1,4 +1,4 @@
-import { Button, Classes, Intent, Spinner } from "@blueprintjs/core";
+import { Button, ButtonGroup, Classes, Intent, Spinner } from "@blueprintjs/core";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Pokemon, Box as BoxModel, Boxes, Game } from "models";
@@ -9,8 +9,9 @@ import { AddPokemonButton } from "components";
 import { BaseEditor } from "components";
 import { Box, BoxForm } from "components";
 import { ErrorBoundary } from "components";
+import { HotkeyIndicator } from "components/Common/Shared";
 import { cx } from "emotion";
-import { addPokemon } from "actions";
+import { addPokemon, toggleDialog } from "actions";
 
 export interface PokemonEditorProps {
     team: Pokemon[];
@@ -19,6 +20,8 @@ export interface PokemonEditorProps {
     style: State["style"];
     excludedAreas: State["excludedAreas"];
     customAreas: State["customAreas"];
+    isMassEditorOpen: boolean;
+    toggleDialog: toggleDialog;
 
     // @NOTE: uncomment this if you need to auto-generate Pokemon
     // will create failing tests as a warning to not push this :]
@@ -26,7 +29,6 @@ export interface PokemonEditorProps {
 }
 
 export interface PokemonEditorState {
-    isMassEditorOpen: boolean;
     searchTerm: string;
 }
 
@@ -77,15 +79,12 @@ export class PokemonEditorBase extends React.Component<
     public constructor(props: PokemonEditorProps) {
         super(props);
         this.state = {
-            isMassEditorOpen: false,
             searchTerm: "",
         };
     }
 
     private openMassEditor = (_e) => {
-        this.setState({
-            isMassEditorOpen: true,
-        });
+        this.props.toggleDialog("massEditor");
     };
 
     public componentDidMount() {
@@ -113,25 +112,52 @@ export class PokemonEditorBase extends React.Component<
                         className="button-row"
                         style={{ display: "flex", alignItems: "flex-start" }}
                     >
-                        <AddPokemonButton
-                            pokemon={{
-                                ...generateEmptyPokemon(team),
-                                gameOfOrigin: this.props.game.name || "None",
+                        <div
+                            style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "0.5rem",
                             }}
-                        />
-                        <div style={{ marginLeft: "auto", width: "50%" }}>
-                            <Button
-                                icon={"heat-grid"}
-                                intent={Intent.PRIMARY}
-                                onClick={this.openMassEditor}
-                                className={cx(Classes.MINIMAL, Classes.FILL)}
-                            >
-                                Open Mass Editor
-                            </Button>
+                        >
+                            <AddPokemonButton
+                                pokemon={{
+                                    ...generateEmptyPokemon(team),
+                                    gameOfOrigin: this.props.game.name || "None",
+                                }}
+                            />
+                            <ButtonGroup className={Classes.MINIMAL}>
+                                <Button
+                                    icon="layout-group-by"
+                                    intent={Intent.PRIMARY}
+                                    onClick={() => this.props.toggleDialog("typeMatchups")}
+                                >
+                                    Type Matchups{" "}
+                                    <HotkeyIndicator
+                                        hotkey="t"
+                                        showModifier={false}
+                                        style={{ marginLeft: "0.35rem" }}
+                                    />
+                                </Button>
+                                <Button
+                                    icon={"heat-grid"}
+                                    intent={Intent.PRIMARY}
+                                    onClick={this.openMassEditor}
+                                >
+                                    Mass Editor{" "}
+                                    <HotkeyIndicator
+                                        hotkey="shift+m"
+                                        showModifier={false}
+                                        style={{ marginLeft: "0.35rem" }}
+                                    />
+                                </Button>
+                            </ButtonGroup>
+                        </div>
+                        <div style={{ marginLeft: "auto", width: "100%", paddingLeft: "2rem", paddingRight: "1rem" }}>
                             <input
                                 type="search"
                                 placeholder="Search..."
                                 className={Classes.INPUT}
+                                data-testid="pokemon-search"
                                 value={this.state.searchTerm}
                                 onChange={(e) =>
                                     this.setState({
@@ -163,15 +189,12 @@ export class PokemonEditorBase extends React.Component<
                     </BaseEditor>
                 </BaseEditor>
                 <React.Suspense fallback={<Spinner />}>
-                    {this.state.isMassEditorOpen && (
+                    {this.props.isMassEditorOpen && (
                         <ErrorBoundary>
                             <MassEditor
-                                isOpen={this.state.isMassEditorOpen}
+                                isOpen={this.props.isMassEditorOpen}
                                 toggleDialog={() =>
-                                    this.setState({
-                                        isMassEditorOpen:
-                                            !this.state.isMassEditorOpen,
-                                    })
+                                    this.props.toggleDialog("massEditor")
                                 }
                             />
                         </ErrorBoundary>
@@ -190,10 +213,12 @@ export const PokemonEditor = connect(
         style: state.style,
         excludedAreas: state.excludedAreas,
         customAreas: state.customAreas,
+        isMassEditorOpen: !!state.view?.dialogs?.massEditor,
     }),
     {
         addPokemon: addPokemon,
+        toggleDialog,
     },
     null,
     { pure: true },
-)(PokemonEditorBase as any);
+)(PokemonEditorBase);

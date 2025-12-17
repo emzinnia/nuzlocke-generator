@@ -1,6 +1,7 @@
 import { State } from "state";
-import { omit } from "ramda";
 import { Pokemon } from "models";
+import { createSelector } from "reselect";
+import { sortPokes } from "utils";
 
 export const gameNameSelector = (state: State) => state.game.name;
 export const minimizedSelector = (state: State) => state.editor.minimized;
@@ -9,18 +10,13 @@ export const linkedPokemonSelector = (pokemon: Pokemon) => (state: State) =>
     state.pokemon.find((p) => p.id === pokemon?.linkedTo);
 export const isDarkModeSelector = (state: State) => state.style.editorDarkMode;
 
-export const updaterSelector = (state: State) => ({
-    present: omit(["editorHistory"], state),
-    lrt: state?.editorHistory?.lastRevisionType,
-});
-
 export const appSelector = (state: State) => ({
     style: state.style,
     view: state.view,
-    editor: state.editor,
+    pokemon: state.pokemon,
 });
 
-export const resultSelector = (state: Partial<State>) => ({
+export const resultSelector = (state: State) => ({
     pokemon: state.pokemon,
     game: state.game,
     trainer: state.trainer,
@@ -28,4 +24,10 @@ export const resultSelector = (state: Partial<State>) => ({
     box: state.box,
     rules: state.rules,
     editor: state.editor,
+    customTypes: state.customTypes,
 });
+
+export const sortedPokemonSelector = createSelector(
+    (state: State) => state.pokemon,
+    (pokemon) => [...pokemon].sort(sortPokes),
+);

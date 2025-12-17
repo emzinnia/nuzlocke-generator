@@ -1,5 +1,6 @@
 import * as React from "react";
 import { injectGlobal } from "emotion";
+import { createRoot } from "react-dom/client";
 
 import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 import "@blueprintjs/core/lib/css/blueprint.css";
@@ -12,6 +13,7 @@ import "normalize.css/normalize.css";
 
 import { isLocal } from "utils";
 import { ErrorBoundary } from "components";
+import { AppToasterHost } from "components/Common/Shared/appToaster";
 
 (window as any).global = window;
 
@@ -22,7 +24,6 @@ import { ErrorBoundary } from "components";
 // window.path = window.path || require('path').path;
 
 async function getRollbar() {
-    // @ts-expect-error - Rollbar types are incomplete for dynamic imports
     const { default: Rollbar } = await import("rollbar");
 
     const rollbarConfig = new Rollbar({
@@ -92,7 +93,6 @@ void injectGlobal`
 const mountNode = document.getElementById("app");
 
 async function createRender() {
-    const { render } = await import("react-dom");
     const { Provider } = await import("react-redux");
 
     const { DndProvider } = await import("react-dnd");
@@ -108,8 +108,15 @@ async function createRender() {
 
     const ReduxProvider = Provider as any;
 
-    render(
+    if (!mountNode) {
+        throw new Error("Failed to locate app mount node");
+    }
+
+    const root = createRoot(mountNode);
+
+    root.render(
         <ReduxProvider store={store}>
+            <AppToasterHost />
             {isTest ? (
                 <PersistGate
                     loading={<div>Loading...</div>}
@@ -134,7 +141,6 @@ async function createRender() {
                 </DndProvider>
             )}
         </ReduxProvider>,
-        mountNode,
     );
 }
 

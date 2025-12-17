@@ -112,17 +112,15 @@ export function PokemonAutocompleteInput({
     inputName,
     edit,
     disabled,
-    _onChange,
     setEdit,
     items,
 }: PokemonInputProps) {
-    const [_isOpen, _setIsOpen] = React.useState(false);
-    const [_visibleItems, _setVisibleItems] = React.useState(items);
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [visibleItems, setVisibleItems] = React.useState(items);
     const [selectedItem, setSelectedItem] = React.useState();
     const handleKeyDown = () => {};
-    const _updateItems = () => {};
-    const closeList = () => {};
-    const openList = () => {};
+    const closeList = () => setIsOpen(false);
+    const openList = () => setIsOpen(true);
 
     return (
         <>
@@ -137,7 +135,12 @@ export function PokemonAutocompleteInput({
                 type="text"
                 value={edit[inputName]}
                 disabled={disabled}
-                onInput={(e) => setEdit({ [inputName]: e.currentTarget.value })}
+                onInput={(e) => {
+                    setEdit({ [inputName]: e.currentTarget.value });
+                    setVisibleItems(items?.filter(item => 
+                        item.toLowerCase().includes(e.currentTarget.value.toLowerCase())
+                    ));
+                }}
             />
             {isOpen ? (
                 <ul className="autocomplete-items has-nice-scrollbars">
@@ -151,10 +154,8 @@ export function PokemonAutocompleteInput({
 export function PokemonTextInput({
     inputName,
     type,
-    _value,
     placeholder,
     disabled,
-    _selectedId,
     edit,
     setEdit,
     onChange,
@@ -177,8 +178,6 @@ export function PokemonTextInput({
 
 export function PokemonTextAreaInput({
     inputName,
-    _type,
-    _value,
     placeholder,
     disabled,
     onChange,
@@ -206,7 +205,7 @@ export function PokemonTextAreaInput({
 export function PokemonNumberInput({
     inputName,
     type,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     value,
     placeholder,
     disabled,
@@ -230,12 +229,9 @@ export function PokemonNumberInput({
 export function PokemonSelectInput({
     inputName,
     value,
-    _type,
     usesKeyValue,
     options,
-    _placeholder,
     onChange,
-    _edit,
     setEdit,
 }: PokemonInputProps) {
     const _pokeball =
@@ -332,11 +328,7 @@ export function PokemonDoubleSelectInput({
 
 export function PokemonCheckboxInput({
     inputName,
-    _value,
     type,
-    _usesKeyValue,
-    _options,
-    _placeholder,
     onChange,
     edit,
     setEdit,
@@ -358,15 +350,7 @@ export function PokemonCheckboxInput({
 }
 
 export function PokemonMoveInput({
-    _inputName,
     value,
-    _type,
-    _usesKeyValue,
-    _options,
-    _placeholder,
-    _onChange,
-    _edit,
-    _setEdit,
     customTypes,
     customMoveMap,
     selectedId,

@@ -32,6 +32,11 @@ export const listOfHotkeys: HotkeyList[] = [
         comment: "Redo",
     },
     {
+        key: "h",
+        comment: "Toggle History Timeline",
+        onKeyUp: "toggleHistoryTimeline",
+    },
+    {
         key: "j",
         comment: "Previous Pok\xE9mon",
         onKeyUp: "previousPokemon",
@@ -42,9 +47,42 @@ export const listOfHotkeys: HotkeyList[] = [
         onKeyUp: "nextPokemon",
     },
     {
+        key: "J",
+        label: "shift+j",
+        comment: "Move Pok\xE9mon Left",
+        onKeyUp: "movePokemonLeft",
+    },
+    {
+        key: "K",
+        label: "shift+k",
+        comment: "Move Pok\xE9mon Right",
+        onKeyUp: "movePokemonRight",
+    },
+    {
+        key: "u",
+        comment: "Move Pok\xE9mon Up (Previous Status)",
+        onKeyUp: "movePokemonStatusUp",
+    },
+    {
+        key: "d",
+        comment: "Move Pok\xE9mon Down (Next Status)",
+        onKeyUp: "movePokemonStatusDown",
+    },
+    {
         key: "n",
         comment: "Add new Pok\xE9mon",
         onKeyUp: "addPokemon",
+    },
+    {
+        key: "t",
+        comment: "Toggle Type Matchups",
+        onKeyUp: "toggleTypeMatchups",
+    },
+    {
+        key: "M",
+        label: "shift+m",
+        comment: "Toggle Mass Editor",
+        onKeyUp: "toggleMassEditor",
     },
     {
         key: "s",
@@ -55,6 +93,11 @@ export const listOfHotkeys: HotkeyList[] = [
         key: "Backspace",
         comment: "Delete Pok\xE9mon",
         onKeyUp: "deletePokemon",
+    },
+    {
+        key: "/",
+        comment: "Focus Pokémon search",
+        onKeyUp: "focusPokemonSearch",
     },
     {
         key: "N",

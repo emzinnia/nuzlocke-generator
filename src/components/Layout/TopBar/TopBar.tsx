@@ -33,6 +33,7 @@ export interface TopBarProps {
     pokemon: Pokemon[];
 
     isDownloading?: boolean;
+    children?: React.ReactNode;
 }
 
 export interface TopBarState {

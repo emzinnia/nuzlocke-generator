@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { v4 as uuid } from "uuid";
 import { cx } from "emotion";
 
-import { selectPokemon, toggleMobileResultView } from "actions";
+import { selectPokemon, toggleMobileResultView, toggleDialog } from "actions";
 import {
     TeamPokemon,
     TeamPokemonBaseProps,
@@ -16,6 +16,7 @@ import { TrainerResult } from "components/Features/Result/TrainerResult"; // Sel
 import { TopBar } from "components/Layout/TopBar/TopBar";
 import { ErrorBoundary } from "components/Common/Shared";
 import { Stats } from "./Stats";
+import { TypeMatchupDialog } from "components/Editors/PokemonEditor";
 import { Pokemon, Trainer, Editor, Box } from "models";
 import { reducers } from "reducers";
 import {
@@ -27,6 +28,7 @@ import {
     feature,
     getIconFormeSuffix,
     Species,
+    Forme,
 } from "utils";
 
 import * as Styles from "./styles";
@@ -49,14 +51,16 @@ async function load() {
 
 interface ResultProps {
     pokemon: Pokemon[];
-    game: any;
+    game: State["game"];
     trainer: Trainer;
     box: State["box"];
     editor: Editor;
     selectPokemon: selectPokemon;
     toggleMobileResultView: typeof toggleMobileResultView;
+    toggleDialog: toggleDialog;
     style: State["style"];
     rules: string[];
+    customTypes: State["customTypes"];
 }
 
 interface ResultState {
@@ -65,13 +69,6 @@ interface ResultState {
     panningCoordinates: [number?, number?];
     zoomLevel: number;
 }
-
-const getNumberOf = (status?: string, pokemon?: Pokemon[]) =>
-    status
-        ? pokemon
-              ?.filter((v) => v.hasOwnProperty("id"))
-              .filter((poke) => poke.status === status && !poke.hidden).length
-        : 0;
 
 const ZoomValues = [
     { key: 0.25, value: "25%" },
@@ -131,7 +128,7 @@ export function BackspriteMontage({ pokemon }: { pokemon: Pokemon[] }) {
             {pokemon.map((poke, idx) => {
                 const image = `https://img.pokemondb.net/sprites/platinum/back-normal/${(
                     normalizeSpeciesName(poke.species as Species) || ""
-                ).toLowerCase()}${getIconFormeSuffix(poke.forme as any)}.png`;
+                ).toLowerCase()}${getIconFormeSuffix(poke.forme as keyof typeof Forme)}.png`;
 
                 return (
                     <PokemonImage key={poke.id} url={image}>
@@ -171,22 +168,10 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
         };
     }
 
-    private renderTeamPokemon() {
-        return this.props.pokemon
-            .filter((v) => v.hasOwnProperty("id"))
-            .filter((poke) => poke.status === "Team")
-            .filter((poke) => !poke.hidden)
-            .sort(sortPokes)
-            .map((poke, index) => {
-                return <TeamPokemon key={index} pokemon={poke} />;
-            });
-    }
-
-    private getPokemonByStatus(status: string) {
-        return this.props.pokemon
-            .filter((v) => v.hasOwnProperty("id"))
-            .filter((poke) => poke.status === status)
-            .filter((poke) => !poke.hidden);
+    private renderTeamPokemon(teamPokemon: Pokemon[]) {
+        return teamPokemon.sort(sortPokes).map((poke) => {
+            return <TeamPokemon key={poke.id} pokemon={poke} />;
+        });
     }
 
     private getCorrectStatusWrapper(
@@ -201,26 +186,19 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
         );
     }
 
-    private renderOtherPokemonStatuses(paddingForVerticalTrainerSection) {
-        return this.props.box
-            .filter((box) => !["Team"].includes(box.name))
-            .sort((a, b) => {
-                const posA = a.position || 0;
-                const posB = b.position || 1;
-
-                return posA - posB;
-            })
-            .map((box) => {
-                const pokes = this.props.pokemon
-                    .filter((v) => v.hasOwnProperty("id"))
-                    .filter((poke) => poke.status === box.name)
-                    .filter((poke) => !poke.hidden);
-                return this.getCorrectStatusWrapper(
-                    pokes,
-                    box,
-                    paddingForVerticalTrainerSection,
-                );
-            });
+    private renderOtherPokemonStatuses(
+        paddingForVerticalTrainerSection,
+        pokemonByStatus: Map<string, Pokemon[]>,
+        orderedBoxes: Box[],
+    ) {
+        return orderedBoxes.map((box) => {
+            const pokes = pokemonByStatus.get(box.name) ?? [];
+            return this.getCorrectStatusWrapper(
+                pokes,
+                box,
+                paddingForVerticalTrainerSection,
+            );
+        });
     }
 
     private async toImage() {
@@ -284,10 +262,10 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
 
     private renderContainer = (
         pokemon: Pokemon[],
-        paddingForVerticalTrainerSection: any,
+        paddingForVerticalTrainerSection: React.CSSProperties,
         box?: Box,
     ) =>
-        box && pokemon && getNumberOf(box?.name, pokemon)! > 0 ? (
+        box && pokemon && pokemon.length > 0 ? (
             <div
                 key={box.id}
                 style={paddingForVerticalTrainerSection}
@@ -302,14 +280,14 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                         }}
                     >
                         {box?.name}
-                        {this.getH3(box, getNumberOf(box?.name, pokemon) ?? 0)}
+                        {this.getH3(box, pokemon.length)}
                     </h3>
                 )}
                 <div
                     className="boxed-container-inner"
                     style={this.getBoxStyle(box?.name || box?.inheritFrom)}
                 >
-                    {pokemon.map((poke, index) => {
+                    {pokemon.map((poke) => {
                         if (
                             box?.name === "Boxed" ||
                             box?.inheritFrom === "Boxed"
@@ -395,7 +373,6 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
     };
 
     private onZoom = (e?: React.WheelEvent<HTMLElement>) => {
-        // @ts-expect-error - e may be undefined but we check shiftKey
         if (e?.shiftKey) {
             const deltaY = e?.deltaY ?? -3;
             this.setState({ zoomLevel: clamp(0.1, 5, -deltaY / 3) });
@@ -407,8 +384,28 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
     };
 
     public render() {
-        const { style, box, trainer, pokemon, editor } = this.props;
-        const numberOfTeam = getNumberOf("Team", pokemon);
+        const {
+            style,
+            box,
+            trainer,
+            pokemon,
+            editor,
+            game,
+            customTypes,
+            toggleDialog,
+        } = this.props;
+        const pokemonWithId = (pokemon ?? [])
+            .filter((v): v is Pokemon => typeof (v as Pokemon).id === "string")
+            .filter((p) => !p.hidden);
+        const pokemonByStatus = new Map<string, Pokemon[]>();
+        for (const p of pokemonWithId) {
+            const status = p.status ?? "";
+            const arr = pokemonByStatus.get(status) ?? [];
+            arr.push(p);
+            pokemonByStatus.set(status, arr);
+        }
+        const teamPokemon = pokemonByStatus.get("Team") ?? [];
+        const numberOfTeam = teamPokemon.length;
         const bgColor = style ? style.bgColor : "#383840";
         const topHeaderColor = style ? style.topHeaderColor : "#333333";
         const accentColor = style ? style.accentColor : "#111111";
@@ -420,12 +417,20 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                       paddingLeft: style.trainerWidth,
                   }
                 : {};
+        const orderedBoxes = (box ?? [])
+            .filter((b) => !["Team"].includes(b.name))
+            .slice()
+            .sort((a, b) => {
+                const posA = a.position || 0;
+                const posB = b.position || 1;
+                return posA - posB;
+            });
         const teamContainer = (
             <div
                 style={paddingForVerticalTrainerSection}
                 className="team-container"
             >
-                {this.renderTeamPokemon()}
+                {this.renderTeamPokemon(teamPokemon)}
             </div>
         );
 
@@ -438,10 +443,6 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                     })}
                 </ol>
             </div>
-        );
-        const others = pokemon.filter(
-            (poke) =>
-                !["Team", "Boxed", "Dead", "Champs"].includes(poke.status!),
         );
         const enableStats = style.displayStats;
         const enableChampImage = feature.emmaMode;
@@ -456,11 +457,11 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                 className="hide-scrollbars"
                 style={{ width: "100%", overflowY: "scroll" }}
             >
+                <TypeMatchupDialog />
                 {isMobile() && editor.showResultInMobile && (
                     <div className={Classes.OVERLAY_BACKDROP}></div>
                 )}
                 <ErrorBoundary>
-                    {/* @ts-expect-error suppress typing error */}
                     <TopBar
                         isDownloading={this.state.isDownloading}
                         onClickDownload={() => this.toImage()}
@@ -604,6 +605,8 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                                     )} */}
                                 {this.renderOtherPokemonStatuses(
                                     paddingForVerticalTrainerSection,
+                                    pokemonByStatus,
+                                    orderedBoxes,
                                 )}
                             </div>
                         ) : (
@@ -625,6 +628,8 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                                     )} */}
                                 {this.renderOtherPokemonStatuses(
                                     paddingForVerticalTrainerSection,
+                                    pokemonByStatus,
+                                    orderedBoxes,
                                 )}
                             </>
                         )}
@@ -648,7 +653,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
 
                         {enableBackSpriteMontage && (
                             <BackspriteMontage
-                                pokemon={this.getPokemonByStatus("Team")}
+                                pokemon={teamPokemon}
                             />
                         )}
                     </div>
@@ -661,4 +666,5 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
 export const Result = connect(resultSelector, {
     selectPokemon,
     toggleMobileResultView,
-})(ResultBase as any);
+    toggleDialog,
+})(ResultBase);

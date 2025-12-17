@@ -31,6 +31,8 @@ const gameSubEditorStyle: any = {
     paddingBottom: ".25rem",
 };
 
+const controlWidth = "170px";
+
 export class GameEditorBase extends React.Component<
     GameEditorProps,
     { isOpen: boolean }
@@ -75,6 +77,7 @@ export class GameEditorBase extends React.Component<
                             <HTMLSelect
                                 value={game.name}
                                 onChange={this.onChange}
+                                style={{ width: controlWidth }}
                             >
                                 {listOfGames.map((game) => (
                                     <option key={game}>{game}</option>
@@ -102,6 +105,7 @@ export class GameEditorBase extends React.Component<
                                 value={game.customName}
                                 autoComplete={"false"}
                                 size={20}
+                                style={{ width: controlWidth }}
                                 className={Classes.INPUT}
                                 type="text"
                                 placeholder={game.name}

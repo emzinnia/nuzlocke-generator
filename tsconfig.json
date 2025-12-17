@@ -9,6 +9,7 @@
         "strictNullChecks": true,
         "noImplicitReturns": true,
         "strictFunctionTypes": true,
+        "skipLibCheck": true,
         "noLib": false,
         "jsx": "react",
         "experimentalDecorators": true,

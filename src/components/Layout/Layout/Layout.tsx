@@ -44,6 +44,7 @@ export interface LayoutProps {
     wrap: LayoutWrap;
     style: React.CSSProperties;
     name: string;
+    children?: React.ReactNode;
 }
 
 export class Layout extends React.PureComponent<Partial<LayoutProps>> {

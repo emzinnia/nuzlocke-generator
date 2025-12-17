@@ -1,6 +1,6 @@
 import { Badge, Game } from "models";
 
-export function getBadges(name: Game): Badge[] {
+export function getBadges(name: Game["name"]): Badge[] {
     if (
         name === "Red" ||
         name === "Blue" ||

@@ -6,7 +6,6 @@ import {
     Icon,
     PopoverInteractionKind,
     Classes,
-    Toaster,
     HTMLSelect,
 } from "@blueprintjs/core";
 import { State } from "state";
@@ -14,6 +13,7 @@ import { connect } from "react-redux";
 import { addBox, AddBoxArgs } from "actions";
 import { Autocomplete } from "components";
 import { wallpapers } from "./Box";
+import { showToast } from "components/Common/Shared/appToaster";
 
 export interface NewBox {
     name: string;
@@ -53,8 +53,7 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
             this.props.addBox(this.state.newBox as AddBoxArgs);
             this.setState({ newBox: baseBox });
         } catch (e) {
-            const toaster = Toaster.create();
-            toaster.show({
+            showToast({
                 message: "Cannot name a box the same as a current one.",
                 intent: Intent.DANGER,
             });
@@ -159,10 +158,7 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                                         </div>
                                     }
                                 >
-                                    <Icon
-                                        style={{ marginLeft: ".25rem" }}
-                                        icon="info-sign"
-                                    />
+                                    <Icon style={{ marginLeft: ".25rem", verticalAlign: "top" }} size={12} icon="info-sign" />
                                 </Popover>
                             </label>
                             <input

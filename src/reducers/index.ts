@@ -19,6 +19,7 @@ import { customTypes } from "./customTypes";
 import { editorHistory } from "./editorHistory";
 import { excludedAreas, customAreas } from "./areas";
 import { view } from "./view";
+import { hotkeys } from "./hotkeys";
 
 export const reducers = {
     box,
@@ -30,6 +31,7 @@ export const reducers = {
     editorHistory,
     excludedAreas,
     game,
+    hotkeys,
     nuzlockes,
     pokemon,
     editor,

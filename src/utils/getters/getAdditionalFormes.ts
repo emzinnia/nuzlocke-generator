@@ -262,14 +262,29 @@ export const getAdditionalFormes = (species: string | undefined): string[] => {
         s === "dragalage" ||
         s === "hawlucha" ||
         s === "drampa" ||
-        s === "falinks"
+        s === "falinks" ||
+        s === "chimecho" ||
+        s === "staraptor" ||
+        s === "heatran" ||
+        s === "golurk" ||
+        s === "meowstic" ||
+        s === "crabominable" ||
+        s === "golisopod" ||
+        s === "magearna" ||
+        s === "scovillain" ||
+        s === "glimmora" ||
+        s === "tatsugiri" ||
+        s === "baxcalibur"
     ) {
         return ["Mega"];
+    }
+    if (s === "absol" || s === "lucario" || s === "garchomp") {
+        return ["Mega", "Mega-Z"]
     }
     if (s === "gengar") {
         return ["Mega", "Gigantamax"];
     }
-    if (s === "mewtwo") {
+    if (s === "mewtwo" || s === "raichu") {
         return ["Mega-X", "Mega-Y"];
     }
     if (s === "charizard") {

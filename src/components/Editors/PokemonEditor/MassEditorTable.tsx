@@ -9,22 +9,28 @@ import {
     JSONFormat,
 } from "@blueprintjs/table";
 import { State } from "state";
-import { sortPokes, generateEmptyPokemon } from "utils";
+import { generateEmptyPokemon } from "utils";
 import { PokemonKeys, Pokemon } from "models";
 import { editPokemon as editPokemonType } from "actions";
 import { AddPokemonButton } from "components/Pokemon/AddPokemonButton/AddPokemonButton";
 import { Button } from "@blueprintjs/core";
+import { sortedPokemonSelector } from "selectors";
 
 export interface MassEditorTableProps {
     pokemon: State["pokemon"];
     editPokemon: editPokemonType;
 }
 
-const determineCell = (key: keyof Pokemon, value: any, id, editPokemon) => {
+const determineCell = (
+    key: keyof Pokemon,
+    value: unknown,
+    id: Pokemon["id"],
+    editPokemon: editPokemonType,
+) => {
     if (key === "extraData") {
         return (
             <Cell>
-                <JSONFormat>{value}</JSONFormat>
+                <JSONFormat>{value as object}</JSONFormat>
             </Cell>
         );
     }
@@ -34,10 +40,22 @@ const determineCell = (key: keyof Pokemon, value: any, id, editPokemon) => {
     if (key === "checkpoints") {
         return (
             <Cell>
-                <JSONFormat>{value}</JSONFormat>
+                <JSONFormat>{value as object}</JSONFormat>
             </Cell>
         );
     }
+    const displayValue =
+        value == null
+            ? ""
+            : Array.isArray(value)
+              ? value.join(", ")
+              : typeof value === "string"
+                ? value
+                : typeof value === "number" || typeof value === "boolean"
+                  ? String(value)
+                  : typeof value === "object"
+                    ? JSON.stringify(value)
+                    : String(value);
     return (
         <EditableCell
             onConfirm={(value) => {
@@ -47,7 +65,7 @@ const determineCell = (key: keyof Pokemon, value: any, id, editPokemon) => {
                 }
                 editPokemon({ [key]: transformedValue }, id);
             }}
-            value={value}
+            value={displayValue}
         />
     );
 };
@@ -55,9 +73,10 @@ const determineCell = (key: keyof Pokemon, value: any, id, editPokemon) => {
 const cellRenderer: (
     pokemon: Pokemon[],
     key: keyof Pokemon,
-    editPokemon,
+    editPokemon: editPokemonType,
 ) => CellRenderer =
-    (pokemon: Pokemon[], key: string, editPokemon) => (rowIndex: number) => {
+    (pokemon: Pokemon[], key: string, editPokemon: editPokemonType) =>
+    (rowIndex: number) => {
         return determineCell(
             key as keyof Pokemon,
             pokemon[rowIndex][key],
@@ -69,7 +88,6 @@ const cellRenderer: (
 export function renderColumns(pokemon, editPokemon) {
     return Object.keys(PokemonKeys).map((key) => {
         return (
-            // @ts-expect-error react return type nonsense
             <Column
                 key={key}
                 name={key}
@@ -168,7 +186,7 @@ export function MassEditorTableBase({
 }
 
 export const MassEditorTable = connect(
-    (state: State) => ({ pokemon: state.pokemon.sort(sortPokes) }),
+    (state: State) => ({ pokemon: sortedPokemonSelector(state) }),
     {
         editPokemon: editPokemonType,
     },

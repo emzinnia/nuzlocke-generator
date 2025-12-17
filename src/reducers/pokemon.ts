@@ -4,6 +4,7 @@ import {
     DELETE_POKEMON,
     EDIT_POKEMON,
     REPLACE_STATE,
+    SYNC_STATE_FROM_HISTORY,
     CLEAR_BOX,
 } from "../actions";
 import { generateEmptyPokemon } from "utils";
@@ -15,7 +16,7 @@ export function pokemon(
     action:
         | Action<ADD_POKEMON>
         | Action<DELETE_POKEMON>
-        | Action<EDIT_POKEMON | REPLACE_STATE | CLEAR_BOX>,
+        | Action<EDIT_POKEMON | REPLACE_STATE | SYNC_STATE_FROM_HISTORY | CLEAR_BOX>,
 ) {
     switch (action.type) {
         case ADD_POKEMON:
@@ -49,6 +50,8 @@ export function pokemon(
         }
         case REPLACE_STATE:
             return action.replaceWith.pokemon;
+        case SYNC_STATE_FROM_HISTORY:
+            return action.syncWith?.pokemon ?? state;
         default:
             return state;
     }

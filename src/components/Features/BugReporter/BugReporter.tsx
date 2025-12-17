@@ -5,12 +5,12 @@ import {
     Intent,
     TextArea,
     Checkbox,
-    Toaster,
     Classes,
     Spinner,
 } from "@blueprintjs/core";
 import { connect } from "react-redux";
 import { css } from "emotion";
+import { showToast } from "components/Common/Shared/appToaster";
 
 export interface BugReporterProps {
     reportingUrl?: string;
@@ -162,8 +162,7 @@ export class BugReporterBase extends React.Component<
             .then((res) => res.json())
             .then((res) => {
                 if (res.status === 200 || res.status === 201) {
-                    const toaster = Toaster.create();
-                    toaster.show({
+                    showToast({
                         message: "Bug report sent!",
                         intent: Intent.SUCCESS,
                     });
@@ -174,8 +173,7 @@ export class BugReporterBase extends React.Component<
                         isSending: false,
                     });
                 } else {
-                    const toaster = Toaster.create();
-                    toaster.show({
+                    showToast({
                         message: "Bug report failed. Please try again.",
                         intent: Intent.DANGER,
                     });
@@ -183,8 +181,7 @@ export class BugReporterBase extends React.Component<
                 }
             })
             .catch((err) => {
-                const toaster = Toaster.create();
-                toaster.show({
+                showToast({
                     message: `Bug report failed. Please try again. ${err}`,
                     intent: Intent.DANGER,
                 });

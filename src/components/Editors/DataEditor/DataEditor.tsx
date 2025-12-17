@@ -7,28 +7,24 @@ import {
     Callout,
     TextArea,
     Intent,
-    Toaster,
     Switch,
     Classes,
-    Checkbox,
-    Icon,
-    Popover,
-    PopoverInteractionKind,
     HTMLSelect,
 } from "@blueprintjs/core";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
-import { ErrorBoundary } from "components/Common/Shared";
+import { ErrorBoundary, HotkeyIndicator } from "components/Common/Shared";
 import { v4 as uuid } from "uuid";
 import { persistor } from "store";
-import { newNuzlocke, replaceState, setEditorHistoryDisabled } from "actions";
+import { newNuzlocke, replaceState } from "actions";
 import { Game, Pokemon, Trainer } from "models";
 import { omit } from "ramda";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { State } from "state";
 import { noop } from "redux-saga/utils";
-import { gameOfOriginToColor, GameSaveFormat } from "utils";
+import { gameOfOriginToColor, GameSaveFormat, Styles } from "utils";
 import { DeleteAlert } from "./DeleteAlert";
 import { isEmpty } from "utils/isEmpty";
+import { showToast } from "components/Common/Shared/appToaster";
 // @TODO: fix codegen imports
 // import codegen from 'codegen.macro';
 import { BoxMappings } from "parsers/utils/boxMappings";
@@ -39,7 +35,6 @@ export interface DataEditorProps {
     state: State;
     replaceState: replaceState;
     newNuzlocke: newNuzlocke;
-    setEditorHistoryDisabled: setEditorHistoryDisabled;
 }
 
 export interface DataEditorState {
@@ -87,8 +82,7 @@ const handleExceptions = (data: State | Record<string, unknown>) => {
     let updated: Partial<State> = {};
 
     if (typeof (data as State).pokemon === "string") {
-        const toaster = Toaster.create();
-        toaster.show({
+        showToast({
             message: "Issue with data detected. Attempting to fix...",
             intent: Intent.DANGER,
         });
@@ -105,6 +99,20 @@ const handleExceptions = (data: State | Record<string, unknown>) => {
     }
 
     return isEmpty(updated) ? data : updated;
+};
+
+const stripEditorDarkModeForExport = (state: State) => {
+    const baseState = omit(["router", "._persist", "editorHistory"], state) as {
+        style?: Styles;
+        [key: string]: unknown;
+    };
+    const { editorDarkMode: _omit, ...styleWithoutDarkMode } =
+        baseState.style || {};
+
+    return {
+        ...baseState,
+        style: styleWithoutDarkMode,
+    };
 };
 
 export interface SaveGameSettingsDialogProps {
@@ -263,8 +271,7 @@ export class DataEditorBase extends React.Component<
         if (isValidJSON(e.target.value)) {
             this.setState({ data: e.target.value });
         } else {
-            const toaster = Toaster.create();
-            toaster.show({
+            showToast({
                 message: "Failed to parse invalid JSON",
                 intent: Intent.DANGER,
             });
@@ -325,11 +332,10 @@ export class DataEditorBase extends React.Component<
             mode: "export",
         });
         this.setState({ isOpen: true });
+        const stateForExport = stripEditorDarkModeForExport(state);
         this.setState({
             href: `data:text/plain;charset=utf-8,${encodeURIComponent(
-                JSON.stringify(
-                    omit(["router", "._persist", "editorHistory"], state),
-                ),
+                JSON.stringify(stateForExport),
             )}`,
         });
     };
@@ -456,8 +462,7 @@ export class DataEditorBase extends React.Component<
             };
 
             worker.onmessageerror = (err) => {
-                const toaster = Toaster.create();
-                toaster.show({
+                showToast({
                     message: `Failed to parse save file. ${err}`,
                     intent: Intent.DANGER,
                 });
@@ -477,7 +482,20 @@ export class DataEditorBase extends React.Component<
     };
 
     private writeAllData = () => {
-        persistor.flush();
+        Promise.resolve(persistor.flush())
+            .then(() => {
+                showToast({
+                    message: "Saved",
+                    intent: Intent.SUCCESS,
+                });
+            })
+            .catch((err) => {
+                console.error("Save failed", err);
+                showToast({
+                    message: "Save failed",
+                    intent: Intent.DANGER,
+                });
+            });
     };
 
     private toggleClearingData = () =>
@@ -781,7 +799,12 @@ export class DataEditorBase extends React.Component<
                         onClick={this.writeAllData}
                         icon="floppy-disk"
                     >
-                        Force Save
+                        Force Save{" "}
+                        <HotkeyIndicator
+                            hotkey="s"
+                            showModifier={false}
+                            style={{ marginLeft: "0.35rem" }}
+                        />
                     </Button>
                     <Button
                         icon="trash"
@@ -792,39 +815,6 @@ export class DataEditorBase extends React.Component<
                         Clear All Data
                     </Button>
                 </ButtonGroup>
-                <div style={{ marginLeft: "0.825rem" }}>
-                    <Checkbox
-                        checked={this.props.state.editor.editorHistoryDisabled}
-                        onChange={(e) =>
-                            this.props.setEditorHistoryDisabled(
-                                e.currentTarget.checked,
-                            )
-                        }
-                        labelElement={
-                            <>
-                                Disable Editor History{" "}
-                                <Popover
-                                    content={
-                                        <div
-                                            style={{
-                                                width: "8rem",
-                                                padding: ".25rem",
-                                            }}
-                                        >
-                                            Can be used to achieve better editor
-                                            performance on larger saves
-                                        </div>
-                                    }
-                                    interactionKind={
-                                        PopoverInteractionKind.HOVER
-                                    }
-                                >
-                                    <Icon icon="info-sign" />
-                                </Popover>
-                            </>
-                        }
-                    />
-                </div>
             </BaseEditor>
         );
     }
@@ -833,5 +823,4 @@ export class DataEditorBase extends React.Component<
 export const DataEditor = connect((state: State) => ({ state: state }), {
     replaceState,
     newNuzlocke,
-    setEditorHistoryDisabled,
 })(DataEditorBase);

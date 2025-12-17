@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Button, Intent, Toaster } from "@blueprintjs/core";
+import { Button, Intent } from "@blueprintjs/core";
+import { showToast } from "./appToaster";
 
 const toBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -18,12 +19,11 @@ const onUpload =
     ({ onSuccess, onError }: ImageUploadProps) =>
     async (e: any) => {
         const file = e?.target?.files?.[0];
-        const toaster = Toaster.create();
         if (!file) {
             if (onError) {
                 onError(e);
             }
-            toaster.show({
+            showToast({
                 message: "No file detected.",
                 intent: Intent.DANGER,
             });
@@ -31,7 +31,7 @@ const onUpload =
         }
         const size = file?.size / 1024 / 1024;
         if (size > 0.5) {
-            toaster.show({
+            showToast({
                 message: `File size of 500KB exceeded. File was ${size.toFixed(2)}MB`,
                 intent: Intent.DANGER,
             });
@@ -43,7 +43,7 @@ const onUpload =
                 }
 
                 console.log(image);
-                toaster.show({
+                showToast({
                     message: "Upload successful!",
                     intent: Intent.SUCCESS,
                 });
@@ -51,7 +51,7 @@ const onUpload =
                 if (onError) {
                     onError(e);
                 }
-                toaster.show({
+                showToast({
                     message: `Error in parsing file. ${e}`,
                     intent: Intent.DANGER,
                 });

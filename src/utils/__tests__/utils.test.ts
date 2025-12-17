@@ -364,12 +364,12 @@ describe(capitalize.name, () => {
 describe(matchNatureToToxtricityForme.name, () => {
     it("returns amped correctly", () => {
         const subject = matchNatureToToxtricityForme(Nature.Adamant);
-        expect(subject).toBe("Amped");
+        expect(subject).toBe("AmpedUp");
     });
 
     it("returns lowkey correctly", () => {
         const subject = matchNatureToToxtricityForme(Nature.Docile);
-        expect(subject).toBe("Amped");
+        expect(subject).toBe("AmpedUp");
     });
 
     it("returns lowkey in null case", () => {
