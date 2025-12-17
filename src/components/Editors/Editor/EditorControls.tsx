@@ -8,6 +8,9 @@ import { useEvent } from "utils/hooks";
 import { HistoryPanel } from "./HistoryPanel";
 import { reconstructPreviousState, reconstructNextState } from "reducers/editorHistory";
 
+const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+const modKey = isMac ? "⌘" : "Ctrl+";
+
 export function EditorControls({ editorDarkMode, minimized }) {
     const editorHistory = useSelector<State, State["editorHistory"]>(
         (state) => state.editorHistory,
