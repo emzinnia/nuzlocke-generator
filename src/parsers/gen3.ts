@@ -13,6 +13,7 @@ import {
     GEN3_SPECIES_MAP,
     ABILITY_MAP,
     GEN_3_LOCATIONS,
+    GEN_3_HELD_ITEM_MAP,
 } from "./utils/gen3";
 
 const DEBUG = import.meta.env.VITE_DEBUG_PARSER === "true";
@@ -119,7 +120,7 @@ const BALL_MAP: Record<number, string> = {
     1: "Master Ball",
     2: "Ultra Ball",
     3: "Great Ball",
-    4: "Poke Ball",
+    4: "Poké Ball",
     5: "Safari Ball",
     6: "Net Ball",
     7: "Dive Ball",
@@ -860,7 +861,9 @@ const decodePokemon = (
         moves,
         shiny,
         forme,
-        item: itemId ? `Item #${itemId}` : undefined,
+        item: itemId
+            ? (GEN_3_HELD_ITEM_MAP[itemId] ?? `Item #${itemId}`)
+            : undefined,
         met,
         metLevel: metLevel || undefined,
         position: context.position,

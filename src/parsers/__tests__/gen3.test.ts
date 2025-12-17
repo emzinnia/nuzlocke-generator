@@ -312,6 +312,16 @@ describe("Gen 3 Save Parser", () => {
             expect(snorlax?.nickname).toBe("カビゴン");
         });
 
+        it("should parse Item names correctly", async () => {
+            const result = await parseGen3Save(saveData, {
+                boxMappings: [],
+                selectedGame: "Emerald",
+            });
+
+            const pokemon = result.pokemon.find((p) => p.species === "Rayquaza");
+            expect(pokemon?.item).toBe("Amulet Coin");
+        });
+
         it("should parse the first five party Pokemon", async () => {
             const result = await parseGen3Save(saveData, {
                 boxMappings: [],
