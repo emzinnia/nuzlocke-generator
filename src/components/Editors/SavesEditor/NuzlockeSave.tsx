@@ -31,6 +31,7 @@ import { NuzlockeGameTags } from "./NuzlockeGameTags";
 import { DeleteAlert } from "components/Editors/DataEditor/DeleteAlert";
 import { HallOfFameDialog } from "./HallOfFameDialog";
 import { showToast } from "components/Common/Shared/appToaster";
+import { HotkeyIndicator } from "components/Common/Shared";
 
 export interface NuzlockeSaveControlsProps {
     nuzlockes: State["nuzlockes"];
@@ -136,7 +137,12 @@ export class NuzlockeSaveBase extends React.Component<
                         replaceState(data);
                     }}
                 >
-                    New Nuzlocke
+                    New Nuzlocke{" "}
+                    <HotkeyIndicator
+                        hotkey="shift+n"
+                        showModifier={false}
+                        style={{ marginLeft: "0.35rem" }}
+                    />
                 </Button>
                 {saves.map((nuzlocke) => {
                     const id = nuzlocke.id;
