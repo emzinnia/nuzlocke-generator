@@ -19,6 +19,7 @@ const defaultStyle: React.CSSProperties = {
     opacity: 0.6,
     fontFamily: "inherit",
     fontSize: "0.625rem",
+    border: "1px solid rgba(0, 0, 0, 0.18)",
 };
 
 /**
