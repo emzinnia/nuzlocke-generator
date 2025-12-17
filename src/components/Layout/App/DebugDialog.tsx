@@ -4,7 +4,6 @@ import { noop } from "utils";
 import { css } from "emotion";
 
 interface DebugDialogProps {
-    isDarkMode: boolean;
     onAddRandomPokemon: () => void;
     onCreateBox?: () => void;
 }
@@ -18,7 +17,6 @@ const debugPanelClassName = css`
 `;
 
 export const DebugDialog: React.FC<DebugDialogProps> = ({
-    isDarkMode,
     onAddRandomPokemon,
     onCreateBox = noop,
 }) => {
