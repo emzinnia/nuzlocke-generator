@@ -16,7 +16,7 @@ import { TrainerResult } from "components/Features/Result/TrainerResult"; // Sel
 import { TopBar } from "components/Layout/TopBar/TopBar";
 import { ErrorBoundary } from "components/Common/Shared";
 import { Stats } from "./Stats";
-import { TypeMatchupDialog } from "./TypeMatchupDialog";
+import { TypeMatchupDialog } from "components/Editors/PokemonEditor";
 import { Pokemon, Trainer, Editor, Box } from "models";
 import { reducers } from "reducers";
 import {
