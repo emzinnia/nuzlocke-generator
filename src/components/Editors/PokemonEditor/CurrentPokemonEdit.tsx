@@ -410,7 +410,7 @@ export class CurrentPokemonEditBase extends React.Component<
                     key={this.state.selectedId + "customItemImage"}
                 />
                 <CurrentPokemonInput
-                    labelName="Pokeball"
+                    labelName="Poké Ball"
                     inputName="pokeball"
                     value={normalizePokeballName(currentPokemon.pokeball)}
                     type="select"
