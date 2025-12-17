@@ -6,6 +6,7 @@ import { Classes, Button, Intent } from "@blueprintjs/core";
 import { State } from "state";
 import { editHotkey, resetHotkey, resetAllHotkeys } from "actions";
 import { HotkeyBindings } from "reducers/hotkeys";
+import { HotkeyIndicator } from "components/Common/Shared/HotkeyIndicator";
 
 export interface HotkeysEditorProps {
     customHotkeys: HotkeyBindings;
@@ -128,7 +129,7 @@ export class HotkeysEditorBase extends React.Component<
                         }}
                         className={Classes.CODE}
                     >
-                        {effectiveLabel}
+                        <HotkeyIndicator hotkey={effectiveLabel} />
                     </kbd>
                 )}
                 <div style={{ margin: "4px", flex: 1 }}>{item.comment}</div>
