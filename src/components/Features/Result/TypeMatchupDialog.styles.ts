@@ -336,9 +336,6 @@ export const typeCell = css`
     min-width: 56px;
     transition: filter 0.15s ease-out;
 
-    &:hover {
-        filter: brightness(1.1);
-    }
 `;
 
 export const matchupCell = css`
