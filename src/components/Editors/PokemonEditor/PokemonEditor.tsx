@@ -157,6 +157,7 @@ export class PokemonEditorBase extends React.Component<
                                 type="search"
                                 placeholder="Search..."
                                 className={Classes.INPUT}
+                                data-testid="pokemon-search"
                                 value={this.state.searchTerm}
                                 onChange={(e) =>
                                     this.setState({
