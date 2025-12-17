@@ -245,6 +245,10 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         this.props.toggleDialog("imageUploader");
     }
 
+    private toggleTypeMatchups() {
+        this.props.toggleDialog("typeMatchups");
+    }
+
     private movePokemonLeft() {
         if (!this.props.selectedId || !this.props.pokemon?.length) return;
         
