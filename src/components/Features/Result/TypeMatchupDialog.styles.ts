@@ -230,6 +230,25 @@ export const typeMatchupsOther = css`
     max-height: 70vh;
     overflow-y: auto;
     overflow-x: hidden;
+
+    /* Hide scrollbar by default, show on hover */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: transparent;
+        border-radius: 3px;
+    }
+    &:hover::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.3);
+    }
+    :global(.bp5-dark) &:hover::-webkit-scrollbar-thumb,
+    :global(.bp-3-dark) &:hover::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+    }
 `;
 
 export const typeMatchupsStatus = css`

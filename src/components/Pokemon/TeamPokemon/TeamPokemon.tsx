@@ -333,11 +333,12 @@ export function TeamPokemonBaseMinimal(
     props: TeamPokemonBaseProps & { spriteStyle?: object },
 ) {
     const { pokemon, style, game, editor } = props;
-    const poke = pokemon;
 
     if (!pokemon) {
         return <div>A Pokémon could not be rendered.</div>;
     }
+
+    const poke = pokemon;
 
     return (
         <div
