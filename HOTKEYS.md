@@ -47,6 +47,7 @@ Defined in `utils/data/listOfHotkeys.ts` and executed by `Features/Hotkeys/Hotke
 - [x] **Move Pokémon up (previous status)**: `u`
 - [x] **Move Pokémon down (next status)**: `d`
 - [x] **Add new Pokémon**: `n`
+- [x] **Toggle Type Matchups**: `t`
 - [x] **Manual save**: `s`
 - [x] **Delete Pokémon**: `Backspace`
 - [x] **Create new Nuzlocke**: `Shift+N` (reported as `N`)
