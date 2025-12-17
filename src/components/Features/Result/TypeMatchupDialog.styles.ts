@@ -231,6 +231,10 @@ export const typeMatchupsOther = css`
     overflow-y: auto;
     overflow-x: hidden;
 
+    /* Subtle fade at bottom to indicate more content */
+    mask-image: linear-gradient(to bottom, black 0%, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 90%, transparent 100%);
+
     /* Hide scrollbar by default, show on hover */
     &::-webkit-scrollbar {
         width: 6px;
