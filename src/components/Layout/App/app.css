@@ -93,11 +93,6 @@
     margin-bottom: 0 !important;
 }
 
-/* ------------------------------------------------------------
-   Blueprint input border overrides (match app look & feel)
-
-   Goal: single 1px stroke (theme-aware), no Blueprint inset multi-shadow.
------------------------------------------------------------- */
 html {
     --app-bp-input-border: #BFC2C6;
     --app-bp-input-border-focus: #187daf;
