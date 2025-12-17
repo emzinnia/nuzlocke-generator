@@ -21,8 +21,8 @@
 .release-notes-wrapper h4 {
     background: rgba(244, 244, 244, 0.1);
     border-radius: 0.25rem;
-    margin: 2px;
-    padding: 2px 4px;
+    margin: 0.125rem;
+    padding: 0.125rem 0.25rem;
     font-size: 80%;
     font-weight: normal;
     width: 8rem;
@@ -54,10 +54,10 @@
 }
 .release-notes-wrapper ul {
     list-style-type: disc;
-    margin-left: 20px;
+    margin-left: 1.25rem;
 }
 .release-notes-wrapper li > ul {
-    margin-left: 40px;
+    margin-left: 2.5rem;
 }
 
 .bp5-dark .release-dialog h1,
@@ -67,9 +67,9 @@
     color: #fff !important;
 }
 .release-dialog {
-    width: 620px !important;
+    width: 38.75rem !important;
 }
-@media screen and (max-width: 720px) {
+@media screen and (max-width: 45rem) {
     .release-dialog {
         margin-top: 4rem !important;
         width: 88vw !important;
@@ -87,7 +87,7 @@
 }
 .bp5-tag-input-icon {
     margin: 0 !important;
-    margin-right: 4px !important;
+    margin-right: 0.25rem !important;
 }
 .bp5-switch {
     margin-bottom: 0 !important;
@@ -119,4 +119,3 @@ html {
     border-color: var(--app-bp-input-border-focus) !important;
     box-shadow: none !important;
 }
-
