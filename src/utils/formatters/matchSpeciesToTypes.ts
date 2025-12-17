@@ -236,6 +236,15 @@ export const handleSpeciesTypeEdgeCases = ({
     )
         return [Types.Ghost, Types.Fire];
 
+        if (
+            match({
+                ...data,
+                species: ["Slowpoke"],
+                forme: ["Galarian"],
+            })
+        )
+            return [Types.Psychic, Types.Psychic];
+
     if (
         match({
             ...data,
