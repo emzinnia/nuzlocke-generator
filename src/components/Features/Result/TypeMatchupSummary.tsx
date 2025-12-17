@@ -316,7 +316,7 @@ export const TypeMatchupSummary: React.FC<TypeMatchupSummaryProps> = ({
                     <h3 style={{ margin: 0 }}>Type Matchups</h3>
                     <span style={{ fontSize: "0.875rem", color: textColor }}>Gen {generation}</span>
                 </div>
-                <Tabs id="type-matchups-tabs" defaultSelectedTabId="summary" style={{ marginTop: "0.5rem" }}>
+                <Tabs id="type-matchups-tabs" defaultSelectedTabId="summary">
                     <Tab
                         id="summary"
                         title="Team Summary"
