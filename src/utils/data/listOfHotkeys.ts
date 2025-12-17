@@ -90,6 +90,11 @@ export const listOfHotkeys: HotkeyList[] = [
         onKeyUp: "deletePokemon",
     },
     {
+        key: "/",
+        comment: "Focus Pokémon search",
+        onKeyUp: "focusPokemonSearch",
+    },
+    {
         key: "N",
         label: "shift+n",
         comment: "Create New Nuzlocke",
