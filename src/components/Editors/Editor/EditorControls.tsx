@@ -95,9 +95,9 @@ export function EditorControls({ editorDarkMode, minimized }) {
                     fill
                     icon="undo"
                     title="Undo"
-                    style={{ fontSize: "11px" }}
+                    style={{ fontSize: "0.6875rem" }}
                 >
-                    <kbd style={{ opacity: 0.6, fontFamily: "inherit", fontSize: "10px" }}>{modKey}Z</kbd>
+                    <kbd style={{ opacity: 0.6, fontFamily: "inherit", fontSize: "0.625rem" }}>{modKey}Z</kbd>
                 </Button>
                 <Button
                     disabled={!canRedo}
@@ -106,9 +106,9 @@ export function EditorControls({ editorDarkMode, minimized }) {
                     fill
                     icon="redo"
                     title="Redo"
-                    style={{ fontSize: "11px" }}
+                    style={{ fontSize: "0.6875rem" }}
                 >
-                    <kbd style={{ opacity: 0.6, fontFamily: "inherit", fontSize: "10px" }}>{modKey}Y</kbd>
+                    <kbd style={{ opacity: 0.6, fontFamily: "inherit", fontSize: "0.625rem" }}>{modKey}Y</kbd>
                 </Button>
             </ButtonGroup>
             <HistoryPanel
