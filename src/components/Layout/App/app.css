@@ -119,3 +119,7 @@ html {
     border-color: var(--app-bp-input-border-focus) !important;
     box-shadow: none !important;
 }
+
+.bp5-tab-panel {
+    margin-top: 0;
+}
