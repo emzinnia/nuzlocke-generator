@@ -299,6 +299,19 @@ describe("Gen 3 Save Parser", () => {
             expect(result.pokemon).toBeDefined();
         });
 
+        it("should parse Japanese nicknames correctly", async () => {
+            // We know the save file contents of this and in this save file
+            // Snorlax's nickname is カビゴン (which is actually just its regular
+            //  Japanese name but in Gen 3 this gets treated as a nickname by the game engine)
+            const result = await parseGen3Save(saveData, {
+                boxMappings: [],
+                selectedGame: "Emerald",
+            });
+
+            const snorlax = result.pokemon.find((p) => p.species === "Snorlax");
+            expect(snorlax?.nickname).toBe("カビゴン");
+        });
+
         it("should parse the first five party Pokemon", async () => {
             const result = await parseGen3Save(saveData, {
                 boxMappings: [],

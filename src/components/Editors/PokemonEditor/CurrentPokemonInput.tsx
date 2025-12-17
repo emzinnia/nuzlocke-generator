@@ -9,6 +9,7 @@ import {
     getContrastColor,
     matchNatureToToxtricityForme,
     Species,
+    normalizePokeballName,
 } from "utils";
 import { editPokemon } from "actions";
 
@@ -234,12 +235,17 @@ export function PokemonSelectInput({
     onChange,
     setEdit,
 }: PokemonInputProps) {
+    const normalizedValue =
+        inputName === "pokeball" ? normalizePokeballName(value) : value;
+
     const _pokeball =
-        inputName === "pokeball" && value && value !== "None" ? (
+        inputName === "pokeball" &&
+        normalizedValue &&
+        normalizedValue !== "None" ? (
             <img
                 style={{ position: "absolute" }}
-                alt={value}
-                src={`icons/pokeball/${formatBallText(value)}.png`}
+                alt={normalizedValue}
+                src={`icons/pokeball/${formatBallText(normalizedValue)}.png`}
             />
         ) : null;
 
@@ -250,7 +256,7 @@ export function PokemonSelectInput({
                 onChange(e);
                 setEdit({ [inputName]: e.currentTarget.value });
             }}
-            value={value}
+            value={normalizedValue}
             name={inputName}
         >
             {!usesKeyValue

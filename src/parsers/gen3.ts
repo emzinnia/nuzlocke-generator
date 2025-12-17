@@ -30,6 +30,7 @@ interface SaveSection {
     id: number;
     data: Buffer;
     checksum: number;
+    signature: number;
     saveIndex: number;
     order: number;
 }
@@ -48,6 +49,8 @@ const SECTION_SIZE = 0x1000;
 const SECTION_DATA_SIZE = 0x0ff4;
 const SECTION_COUNT = 14;
 const BLOCK_SIZE = SECTION_SIZE * SECTION_COUNT;
+const SAVE_SIZE = 0x20000;
+const SECTION_SIGNATURE = 0x08012025;
 const PARTY_POKEMON_SIZE = 100;
 const BOX_POKEMON_SIZE = 80;
 const TEAM_CAPACITY = 6;
@@ -98,7 +101,7 @@ const EMERALD_OFFSETS = {
 const FRLG_OFFSETS = {
     ...COMMON_OFFSETS,
     TEAM_SIZE: 0x0034,
-    TEAM_POKEMON_LIST: 0x0238,
+    TEAM_POKEMON_LIST: 0x0038,
     MONEY: [0x0490, 0x0494],
 };
 
@@ -116,7 +119,7 @@ const BALL_MAP: Record<number, string> = {
     1: "Master Ball",
     2: "Ultra Ball",
     3: "Great Ball",
-    4: "Poké Ball",
+    4: "Poke Ball",
     5: "Safari Ball",
     6: "Net Ball",
     7: "Dive Ball",
@@ -191,6 +194,216 @@ for (let i = 0; i < listOfPokemon.length; i++) {
 }
 
 const decodeCharacter = (code: number): string => {
+    // When decoding Gen 3 strings, which charset applies depends on the language.
+    // For Japanese Pokémon, many byte values map to Hiragana/Katakana instead of Latin.
+    // This mapping is based on the pokeemerald disassembly `charmap.txt` and aligns with
+    // the "Gen 3 charset" description in `src/parsers/gen3.md`.
+    //
+    // Source: https://raw.githubusercontent.com/pret/pokeemerald/master/charmap.txt
+    return decodeCharacterWithLanguage(code);
+};
+
+const HIRAGANA_TABLE: string[] = [
+    "あ",
+    "い",
+    "う",
+    "え",
+    "お",
+    "か",
+    "き",
+    "く",
+    "け",
+    "こ",
+    "さ",
+    "し",
+    "す",
+    "せ",
+    "そ",
+    "た",
+    "ち",
+    "つ",
+    "て",
+    "と",
+    "な",
+    "に",
+    "ぬ",
+    "ね",
+    "の",
+    "は",
+    "ひ",
+    "ふ",
+    "へ",
+    "ほ",
+    "ま",
+    "み",
+    "む",
+    "め",
+    "も",
+    "や",
+    "ゆ",
+    "よ",
+    "ら",
+    "り",
+    "る",
+    "れ",
+    "ろ",
+    "わ",
+    "を",
+    "ん",
+    "ぁ",
+    "ぃ",
+    "ぅ",
+    "ぇ",
+    "ぉ",
+    "ゃ",
+    "ゅ",
+    "ょ",
+    "が",
+    "ぎ",
+    "ぐ",
+    "げ",
+    "ご",
+    "ざ",
+    "じ",
+    "ず",
+    "ぜ",
+    "ぞ",
+    "だ",
+    "ぢ",
+    "づ",
+    "で",
+    "ど",
+    "ば",
+    "び",
+    "ぶ",
+    "べ",
+    "ぼ",
+    "ぱ",
+    "ぴ",
+    "ぷ",
+    "ぺ",
+    "ぽ",
+    "っ",
+];
+
+const KATAKANA_TABLE: string[] = [
+    "ア",
+    "イ",
+    "ウ",
+    "エ",
+    "オ",
+    "カ",
+    "キ",
+    "ク",
+    "ケ",
+    "コ",
+    "サ",
+    "シ",
+    "ス",
+    "セ",
+    "ソ",
+    "タ",
+    "チ",
+    "ツ",
+    "テ",
+    "ト",
+    "ナ",
+    "ニ",
+    "ヌ",
+    "ネ",
+    "ノ",
+    "ハ",
+    "ヒ",
+    "フ",
+    "ヘ",
+    "ホ",
+    "マ",
+    "ミ",
+    "ム",
+    "メ",
+    "モ",
+    "ヤ",
+    "ユ",
+    "ヨ",
+    "ラ",
+    "リ",
+    "ル",
+    "レ",
+    "ロ",
+    "ワ",
+    "ヲ",
+    "ン",
+    "ァ",
+    "ィ",
+    "ゥ",
+    "ェ",
+    "ォ",
+    "ャ",
+    "ュ",
+    "ョ",
+    "ガ",
+    "ギ",
+    "グ",
+    "ゲ",
+    "ゴ",
+    "ザ",
+    "ジ",
+    "ズ",
+    "ゼ",
+    "ゾ",
+    "ダ",
+    "ヂ",
+    "ヅ",
+    "デ",
+    "ド",
+    "バ",
+    "ビ",
+    "ブ",
+    "ベ",
+    "ボ",
+    "パ",
+    "ピ",
+    "プ",
+    "ペ",
+    "ポ",
+    "ッ",
+];
+
+const decodeJapaneseCharacter = (code: number): string => {
+    if (code >= 0x01 && code <= 0x50) return HIRAGANA_TABLE[code - 0x01] ?? "";
+    if (code >= 0x51 && code <= 0xa0)
+        return KATAKANA_TABLE[code - 0x51] ?? "";
+    switch (code) {
+        case 0x00:
+            return " ";
+        case 0xe0:
+            return "'";
+        case 0xe1:
+            return "-";
+        case 0xe2:
+            return "!";
+        case 0xe3:
+            return "?";
+        case 0xe6:
+            return ".";
+        case 0xe8:
+            return "…";
+        case 0xab:
+            return "♂";
+        case 0xac:
+            return "♀";
+        default:
+            return "";
+    }
+};
+
+const decodeCharacterWithLanguage = (
+    code: number,
+    language?: number,
+): string => {
+    // Gen 3 language codes: 1 = Japanese; other values use the Latin table.
+    if (language === 1) return decodeJapaneseCharacter(code);
+
     if (code >= 0xbb && code <= 0xd4) {
         return String.fromCharCode(65 + (code - 0xbb));
     }
@@ -224,11 +437,13 @@ const decodeCharacter = (code: number): string => {
     }
 };
 
-const decodeGameText = (buffer: Buffer): string => {
+const decodeGameText = (buffer: Buffer, language?: number): string => {
     let result = "";
     for (const code of buffer) {
-        if (code === 0xff || code === 0x00) break;
-        result += decodeCharacter(code);
+        // Gen 3 fixed-size strings: terminator 0xFF, often padded with 0x00
+        if (code === 0xff) break;
+        if (code === 0x00) continue;
+        result += decodeCharacterWithLanguage(code, language);
     }
     return result.trim();
 };
@@ -249,23 +464,23 @@ const computeChecksum = (buffer: Buffer, size: number) => {
     let sum = 0;
     const limit = Math.min(size, buffer.length);
     for (let i = 0; i < limit; i += 4) {
-        const remaining = Math.min(4, limit - i);
-        let value = 0;
-        if (remaining === 4) {
-            value = buffer.readUInt32LE(i);
-        } else {
-            for (let b = 0; b < remaining; b++) {
-                value |= buffer[i + b] << (8 * b);
-            }
-        }
-        sum = (sum + value) >>> 0;
+        // All checksum sizes we use are multiples of 4 (per Bulbapedia), so read u32 words.
+        sum = (sum + buffer.readUInt32LE(i)) >>> 0;
     }
     return ((sum & 0xffff) + (sum >>> 16)) & 0xffff;
 };
 
 const isSectionValid = (section: SaveSection) => {
+    if (section.signature !== SECTION_SIGNATURE) {
+        log("signature", `Section ${section.id} failed signature`, {
+            expected: `0x${SECTION_SIGNATURE.toString(16)}`,
+            actual: `0x${section.signature.toString(16)}`,
+            saveIndex: section.saveIndex,
+        });
+        return false;
+    }
     const size = SECTION_SAVE_SIZES[section.id];
-    if (!size) return true;
+    if (!size) return false;
     const computed = computeChecksum(section.data, size);
     const isValid = computed === section.checksum;
     if (!isValid) {
@@ -287,11 +502,14 @@ const readSection = (file: Buffer, sectionIndex: number): SaveSection => {
 
     const id = footer.readUInt16LE(0);
     const checksum = footer.readUInt16LE(2);
+    const signature = footer.readUInt32LE(4);
     const saveIndex = footer.readUInt32LE(8);
 
     log(
         "readSection",
-        `Section ${sectionIndex}: ID=${id}, checksum=0x${checksum.toString(16)}, saveIndex=${saveIndex}`,
+        `Section ${sectionIndex}: ID=${id}, checksum=0x${checksum.toString(16)}, signature=0x${signature.toString(
+            16,
+        )}, saveIndex=${saveIndex}`,
         {
             offset: `0x${offset.toString(16)}`,
             dataSize: SECTION_DATA_SIZE,
@@ -301,20 +519,21 @@ const readSection = (file: Buffer, sectionIndex: number): SaveSection => {
     return {
         id,
         checksum,
+        signature,
         saveIndex,
         order: sectionIndex,
         data: file.slice(dataStart, dataEnd),
     };
 };
 
-const readBlock = (file: Buffer, blockIndex: number): SaveSection[] => {
-    const start = blockIndex * BLOCK_SIZE;
+const readBlock = (file: Buffer, blockOffset: number): SaveSection[] => {
+    const start = blockOffset;
     const blockBuffer = file.slice(start, start + BLOCK_SIZE);
     const sections: SaveSection[] = [];
 
     log(
         "readBlock",
-        `Reading block ${blockIndex} at offset 0x${start.toString(16)}, size=${BLOCK_SIZE}`,
+        `Reading block at offset 0x${start.toString(16)}, size=${BLOCK_SIZE}`,
     );
 
     for (let i = 0; i < SECTION_COUNT; i++) {
@@ -324,48 +543,55 @@ const readBlock = (file: Buffer, blockIndex: number): SaveSection[] => {
     return sections;
 };
 
-const buildSectionMap = (blockA: SaveSection[], blockB: SaveSection[]) => {
-    const map = new Map<number, SaveSection>();
-    const sectionsByIdA = new Map<number, SaveSection>();
-    const sectionsByIdB = new Map<number, SaveSection>();
+const validateAndIndexBlock = (sections: SaveSection[]) => {
+    // Per gen3.md (Bulbapedia): a valid block has 14 unique section IDs (0..13),
+    // all signatures match 0x08012025, all checksums match, and all sections share a saveIndex.
+    const byId = new Map<number, SaveSection>();
+    let expectedSaveIndex: number | undefined;
 
-    blockA.forEach((section) => sectionsByIdA.set(section.id, section));
-    blockB.forEach((section) => sectionsByIdB.set(section.id, section));
-
-    for (let id = 0; id < SECTION_COUNT; id++) {
-        const sectionA = sectionsByIdA.get(id);
-        const sectionB = sectionsByIdB.get(id);
-        const validA = sectionA ? isSectionValid(sectionA) : false;
-        const validB = sectionB ? isSectionValid(sectionB) : false;
-
-        let selected: SaveSection | undefined;
-
-        if (validA && validB) {
-            selected =
-                sectionA!.saveIndex >= sectionB!.saveIndex
-                    ? sectionA
-                    : sectionB;
-        } else if (validA) {
-            selected = sectionA;
-        } else if (validB) {
-            selected = sectionB;
-        } else if (sectionA && sectionB) {
-            selected =
-                sectionA.saveIndex >= sectionB.saveIndex ? sectionA : sectionB;
-        } else {
-            selected = sectionA || sectionB;
-        }
-
-        if (selected) {
-            map.set(id, selected);
-        }
+    for (const s of sections) {
+        if (!(s.id in SECTION_SAVE_SIZES)) return { ok: false as const };
+        if (byId.has(s.id)) return { ok: false as const };
+        if (!isSectionValid(s)) return { ok: false as const };
+        if (expectedSaveIndex === undefined) expectedSaveIndex = s.saveIndex;
+        if (s.saveIndex !== expectedSaveIndex) return { ok: false as const };
+        byId.set(s.id, s);
     }
 
-    log("buildSectionMap", `Built section map with ${map.size} sections`, {
-        sectionIds: Array.from(map.keys()),
-    });
+    if (byId.size !== SECTION_COUNT) return { ok: false as const };
+    return { ok: true as const, saveIndex: expectedSaveIndex!, byId };
+};
 
-    return map;
+type ActiveBlock = {
+    label: "A" | "B";
+    saveIndex: number;
+    byId: Map<number, SaveSection>;
+};
+
+const selectActiveBlock = (buffer: Buffer): ActiveBlock => {
+    const a = validateAndIndexBlock(readBlock(buffer, 0x000000));
+    const b = validateAndIndexBlock(readBlock(buffer, 0x00e000));
+
+    if (a.ok && b.ok) {
+        return a.saveIndex >= b.saveIndex
+            ? { label: "A", saveIndex: a.saveIndex, byId: a.byId }
+            : { label: "B", saveIndex: b.saveIndex, byId: b.byId };
+    }
+    if (a.ok) return { label: "A", saveIndex: a.saveIndex, byId: a.byId };
+    if (b.ok) return { label: "B", saveIndex: b.saveIndex, byId: b.byId };
+
+    throw new Error(
+        "Both save blocks failed validation (signature/checksum/index).",
+    );
+};
+
+const sumPokemonSubstructsChecksum = (decrypted48: Buffer) => {
+    // Sum 16-bit little-endian words across 48 bytes; truncate to 16 bits.
+    let sum = 0;
+    for (let i = 0; i < 48; i += 2) {
+        sum = (sum + decrypted48.readUInt16LE(i)) & 0xffff;
+    }
+    return sum;
 };
 
 const getSpeciesName = (
@@ -437,6 +663,12 @@ const shinyCheck = (personality: number, otId: number) => {
     return value < 8;
 };
 
+const getNationalDexNumber = (species: Species): number | undefined => {
+    const idx = listOfPokemon.findIndex((s) => s === species);
+    if (idx === -1) return undefined;
+    return idx + 1;
+};
+
 const parseIvs = (value: number) => ({
     hp: value & 0x1f,
     attack: (value >> 5) & 0x1f,
@@ -465,13 +697,15 @@ const decodePokemon = (
     if (personality === 0) return null;
 
     const otId = buffer.readUInt32LE(4);
-    const nickname = decodeGameText(buffer.slice(0x08, 0x08 + 10));
-    const language = buffer.readUInt16LE(0x12);
-    const markings = buffer.readUInt8(0x14);
+    const language = buffer.readUInt8(0x12);
+    const nickname = decodeGameText(buffer.slice(0x08, 0x08 + 10), language);
+    const markings = buffer.readUInt8(0x1b);
     const checksum = buffer.readUInt16LE(0x1c);
     const encryptedData = buffer.slice(0x20, 0x20 + 48);
     const key = (personality ^ otId) >>> 0;
     const decrypted = xorBufferWithKey(encryptedData, key);
+    const checksumComputed = sumPokemonSubstructsChecksum(decrypted);
+    const isChecksumValid = checksumComputed === checksum;
     const orderKey =
         SUBSTRUCTURE_ORDERS[personality % SUBSTRUCTURE_ORDERS.length];
     const sub = splitSubstructures(orderKey, decrypted);
@@ -485,8 +719,14 @@ const decodePokemon = (
             encryptionKey: `0x${key.toString(16)}`,
             substructureOrder: orderKey,
             nickname,
+            checksumStored: `0x${checksum.toString(16)}`,
+            checksumComputed: `0x${checksumComputed.toString(16)}`,
+            isChecksumValid,
         },
     );
+
+    // If the decrypted data checksum doesn't match, this record is effectively invalid ("Bad Egg" guard).
+    if (!isChecksumValid) return null;
 
     const speciesId = sub.G.readUInt16LE(0);
     // Validate species ID - filter out corrupted data from empty slots
@@ -546,7 +786,7 @@ const decodePokemon = (
     const ivs = parseIvs(ivData);
     const metLevel = originInfo & 0x7f;
     const originGame = (originInfo >> 7) & 0xf;
-    const ballId = (originInfo >> 11) & 0x3;
+    const ballId = (originInfo >> 11) & 0xf;
     const otGender = (originInfo >> 15) & 0x1 ? "F" : "M";
 
     // For party Pokemon, use the stored level. For boxed Pokemon, use metLevel as fallback
@@ -555,24 +795,9 @@ const decodePokemon = (
     const moves = moveIds.map((id) => MOVES_ARRAY?.[id]).filter(Boolean);
     const pokeball = BALL_MAP[ballId] || `Ball #${ballId}`;
 
-    // Get ability from ABILITY_MAP
-    let nationalDexId = GEN3_SPECIES_MAP[speciesId];
-
-    // If that also fails but we have a valid species name, find the national dex ID from SPECIES_MAP
-    if ((!nationalDexId || nationalDexId.length === 0) && speciesName) {
-        // Search SPECIES_MAP to find the national dex ID for this species name
-        const foundKey = Object.keys(SPECIES_MAP).find(
-            (key) => SPECIES_MAP[key as unknown as number] === speciesName,
-        );
-        if (foundKey) {
-            nationalDexId = SPECIES_MAP[parseInt(foundKey as unknown as string)];
-        }
-    }
-
-    const abilities =
-        nationalDexId && ABILITY_MAP[nationalDexId]
-            ? ABILITY_MAP[nationalDexId]
-            : [];
+    // Get ability from ABILITY_MAP (keyed by National Dex number).
+    const dexNo = speciesName ? getNationalDexNumber(speciesName) : undefined;
+    const abilities = dexNo ? ABILITY_MAP[dexNo] ?? [] : [];
     const abilityIndex = ivs.abilitySlot === 1 ? 1 : 0;
     const ability = abilities[abilityIndex] || abilities[0] || undefined;
 
@@ -647,6 +872,7 @@ const decodePokemon = (
             language,
             markings,
             checksum,
+            checksumComputed,
             movePP,
             ppBonuses,
             friendship,
@@ -675,6 +901,8 @@ const parseParty = (
     offsets: ReturnType<typeof getOffsets>,
     pidTracker: Map<string, number>,
 ): Pokemon[] => {
+    // RSE stores party size in a u32 where the low byte is the count; FRLG stores a u8.
+    // Reading a u8 works for both, but keep the doc rule explicit for clarity.
     const size = section.readUInt8(offsets.TEAM_SIZE) || 0;
     const count = Math.min(size, TEAM_CAPACITY);
     const start = offsets.TEAM_POKEMON_LIST;
@@ -790,7 +1018,7 @@ const parseTrainer = (
     const name = decodeGameText(
         section.slice(offsets.PLAYER_NAME[0], offsets.PLAYER_NAME[1]),
     );
-    const trainerId = section.readUInt16LE(offsets.PLAYER_ID[0]);
+    const trainerId = section.readUInt32LE(offsets.PLAYER_ID[0]);
     const time = parseTime(
         section.slice(offsets.TIME_PLAYED[0], offsets.TIME_PLAYED[1]),
     );
@@ -821,17 +1049,26 @@ export const parseGen3Save = async (file: Buffer, options: ParserOptions) => {
 
     log("parseGen3Save", "=== Starting Gen 3 save file parsing ===", {
         fileSize: buffer.length,
-        expectedSize: BLOCK_SIZE * 2,
+        expectedSize: SAVE_SIZE,
         selectedGame: options.selectedGame,
     });
 
-    const blockA = readBlock(buffer, 0);
-    const blockB = readBlock(buffer, 1);
-    log("parseGen3Save", "Merging save blocks", {
-        blockA_saveIndex: blockA[SECTION_COUNT - 1].saveIndex,
-        blockB_saveIndex: blockB[SECTION_COUNT - 1].saveIndex,
+    if (buffer.length !== SAVE_SIZE && buffer.length !== BLOCK_SIZE * 2) {
+        throw new Error(
+            `Unexpected Gen 3 save size: got 0x${buffer.length.toString(
+                16,
+            )} bytes, expected 0x${SAVE_SIZE.toString(
+                16,
+            )} (typical) or 0x${(BLOCK_SIZE * 2).toString(16)} (trimmed).`,
+        );
+    }
+
+    const active = selectActiveBlock(buffer);
+    log("parseGen3Save", "Selected active save block", {
+        activeBlock: active.label,
+        saveIndex: active.saveIndex,
     });
-    const sectionMap = buildSectionMap(blockA, blockB);
+    const sectionMap = active.byId;
     const offsets = getOffsets(options.selectedGame as GameSaveFormat);
 
     log("parseGen3Save", "Offsets determined", {
@@ -876,7 +1113,8 @@ export const parseGen3Save = async (file: Buffer, options: ParserOptions) => {
             ? {
                   fileSize: buffer.length,
                   game: options.selectedGame,
-                  selectedBlock: blockA[SECTION_COUNT - 1].saveIndex,
+                  selectedBlock: active.label,
+                  saveIndex: active.saveIndex,
                   sectionCount: sectionMap.size,
                   parseTimeMs: parseTime,
                   counts: {

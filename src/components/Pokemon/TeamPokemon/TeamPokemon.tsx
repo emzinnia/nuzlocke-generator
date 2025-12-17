@@ -25,6 +25,7 @@ import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { PokemonItem } from "./PokemonItem";
 import { PokemonPokeball } from "./PokemonPokeball";
 import { PokemonFriendship } from "./PokemonFriendship";
+import { normalizePokeballName } from "utils";
 
 export interface TeamPokemonInfoProps {
     generation: Generation;
@@ -189,7 +190,7 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                                     style.oldMetLocationFormat,
                             })}
                             {pokemon.pokeball && style.pokeballStyle === "text"
-                                ? ` (in ${pokemon.pokeball})`
+                                ? ` (in ${normalizePokeballName(pokemon.pokeball)})`
                                 : null}
                         </div>
                         {pokemon.nature && pokemon.nature !== "None" ? (
