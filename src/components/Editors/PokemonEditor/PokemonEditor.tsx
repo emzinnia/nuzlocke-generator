@@ -1,18 +1,17 @@
-import { Button, ButtonGroup, Classes, Intent, Spinner, Tooltip, Position, Icon } from "@blueprintjs/core";
+import { Button, ButtonGroup, Classes, Intent, Spinner } from "@blueprintjs/core";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Pokemon, Box as BoxModel, Boxes, Game } from "models";
 import { State } from "state";
 import { generateEmptyPokemon } from "utils";
-import { searchPokemon, SearchResult } from "utils/search";
+import { searchPokemon } from "utils/search";
 import { CurrentPokemonEdit } from ".";
 import { AddPokemonButton } from "components";
 import { BaseEditor } from "components";
 import { Box, BoxForm } from "components";
 import { ErrorBoundary } from "components";
 import { HotkeyIndicator } from "components/Common/Shared";
-import { SearchHelpPopover } from "./SearchHelpPopover";
-import { cx } from "emotion";
+import { PokemonSearchBar, SearchFeedback } from "./PokemonSearchBar";
 import { addPokemon, toggleDialog } from "actions";
 
 export interface PokemonEditorProps {
@@ -100,54 +99,17 @@ export class PokemonEditorBase extends React.Component<
         const hasSearchQuery = searchTerm.trim().length > 0;
 
         // Compute matched IDs using the search engine
-        const { matchedIds, errors, warnings } = searchPokemon(team, searchTerm);
+        const searchResult = searchPokemon(team, searchTerm);
 
         return (
             <>
-                {errors.length > 0 && (
-                    <div
-                        className="search-error"
-                        style={{
-                            color: "#c23030",
-                            fontSize: "0.85rem",
-                            padding: "0.25rem 0.5rem",
-                            marginBottom: "0.5rem",
-                        }}
-                    >
-                        <Icon icon="warning-sign" style={{ marginRight: "0.5rem" }} />
-                        {errors[0].message}
-                    </div>
-                )}
-                {warnings.length > 0 && warnings[0].suggestion && (
-                    <div
-                        className="search-warning"
-                        style={{
-                            color: "#bf7326",
-                            fontSize: "0.85rem",
-                            padding: "0.25rem 0.5rem",
-                            marginBottom: "0.5rem",
-                        }}
-                    >
-                        Did you mean <code>{warnings[0].suggestion}</code>?
-                    </div>
-                )}
-                {hasSearchQuery && matchedIds.size === 0 && (
-                    <div
-                        className="search-no-results"
-                        style={{
-                            color: "#5c7080",
-                            fontSize: "0.9rem",
-                            padding: "0.5rem",
-                            textAlign: "center",
-                            fontStyle: "italic",
-                        }}
-                    >
-                        No Pokémon match your search
-                    </div>
-                )}
+                <SearchFeedback
+                    searchResult={searchResult}
+                    hasSearchQuery={hasSearchQuery}
+                />
                 <BoxesComponent
                     searchTerm={searchTerm}
-                    matchedIds={matchedIds}
+                    matchedIds={searchResult.matchedIds}
                     hasSearchQuery={hasSearchQuery}
                     boxes={boxes}
                     team={team}
@@ -221,29 +183,10 @@ export class PokemonEditorBase extends React.Component<
                                 </Button>
                             </ButtonGroup>
                         </div>
-                        <div style={{ marginLeft: "auto", width: "100%", paddingLeft: "2rem", paddingRight: "1rem", display: "flex", alignItems: "center" }}>
-                            <div style={{ position: "relative", flex: 1 }}>
-                                <input
-                                    type="search"
-                                    placeholder="Search... (type:dark, gender:f, etc.)"
-                                    className={Classes.INPUT}
-                                    data-testid="pokemon-search"
-                                    value={this.state.searchTerm}
-                                    onChange={(e) =>
-                                        this.setState({
-                                            searchTerm: e.target.value,
-                                        })
-                                    }
-                                    style={{ margin: "0.25rem", width: "100%", paddingRight: "2rem" }}
-                                />
-                                <HotkeyIndicator
-                                    hotkey="/"
-                                    showModifier={false}
-                                    style={{ position: "absolute", right: "0.5rem", top: "50%", transform: "translateY(-50%)" }}
-                                />
-                            </div>
-                            <SearchHelpPopover style={{ marginLeft: "0.5rem" }} />
-                        </div>
+                        <PokemonSearchBar
+                            value={this.state.searchTerm}
+                            onChange={(value) => this.setState({ searchTerm: value })}
+                        />
                     </div>
                     {this.renderBoxesWithSearch(boxes, team)}
                     <BoxForm boxes={boxes} />
