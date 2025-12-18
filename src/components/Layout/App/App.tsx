@@ -2,7 +2,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 
 import { State } from "state";
-import { addPokemon } from "actions";
+import { addPokemon, addBox } from "actions";
 import { feature, isLocal, choose, generateEmptyPokemon } from "utils";
 import { ErrorBoundary } from "components";
 import { Button } from "@blueprintjs/core";
@@ -19,6 +19,7 @@ export interface AppProps {
     view: State["view"];
     pokemon: State["pokemon"];
     addPokemon: typeof addPokemon;
+    addBox: typeof addBox;
 }
 
 const Editor = React.lazy(() =>
