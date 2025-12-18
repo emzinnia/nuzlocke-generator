@@ -13,7 +13,7 @@ import {
 import { version } from "package";
 import { cx } from "emotion";
 import { Pokemon, Editor } from "models";
-import { ErrorBoundary, ReleaseDialog } from "components/Common/Shared";
+import { ErrorBoundary, HotkeyIndicator, ReleaseDialog } from "components/Common/Shared";
 import { State } from "state";
 import { isMobile } from "is-mobile";
 
@@ -122,6 +122,7 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                 {shouldShow && (
                     <>
                         <Button
+                            data-testid="toggle-editor-size-button"
                             style={darkModeStyle(
                                 this.props.style.editorDarkMode,
                             )}
@@ -140,7 +141,12 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                             {this.props.editor.minimized
                                 ? "Maximize"
                                 : "Minimize"}{" "}
-                            Editor
+                            Editor{" "}
+                            <HotkeyIndicator
+                                hotkey="m"
+                                showModifier={false}
+                                style={{ marginLeft: "0.35rem" }}
+                            />
                         </Button>
                         {isDownloading ? (
                             <Button
@@ -157,6 +163,7 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                             </Button>
                         ) : (
                             <Button
+                                data-testid="download-image-button"
                                 style={darkModeStyle(
                                     this.props.style.editorDarkMode,
                                 )}
@@ -164,10 +171,16 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                                 className={Classes.MINIMAL}
                                 icon="download"
                             >
-                                Download Image
+                                Download Image{" "}
+                                <HotkeyIndicator
+                                    hotkey="shift+d"
+                                    showModifier={false}
+                                    style={{ marginLeft: "0.35rem" }}
+                                />
                             </Button>
                         )}
                         <Button
+                            data-testid="toggle-dark-mode-button"
                             style={darkModeStyle(
                                 this.props.style.editorDarkMode,
                             )}
@@ -185,10 +198,16 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                             }
                         >
                             {this.props.style.editorDarkMode ? "Light" : "Dark"}{" "}
-                            Mode
+                            Mode{" "}
+                            <HotkeyIndicator
+                                hotkey="shift+l"
+                                showModifier={false}
+                                style={{ marginLeft: "0.35rem" }}
+                            />
                         </Button>
                         {this.props.children}
                         <Button
+                            data-testid="release-dialog-button"
                             style={darkModeStyle(
                                 this.props.style.editorDarkMode,
                             )}
@@ -196,7 +215,12 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                             className={Classes.MINIMAL}
                             icon="star"
                         >
-                            {version}
+                            {version}{" "}
+                            <HotkeyIndicator
+                                hotkey="shift+v"
+                                showModifier={false}
+                                style={{ marginLeft: "0.35rem" }}
+                            />
                         </Button>
                     </>
                 )}
