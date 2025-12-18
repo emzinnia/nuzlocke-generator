@@ -12,30 +12,66 @@ function fileToBase64(file: Blob) {
 }
 
 export async function wrapImageInCORS(url: string) {
-    const response = await fetch(
-        `${import.meta.env.VITE_CORS_ANYWHERE_URL ?? "https://cors-anywhere-nuzgen.herokuapp.com"}/${url}`,
-        {
+    // Primary path: fetch the remote image via a CORS proxy and inline as base64.
+    // This allows downstream uses (e.g. canvas/export) that require CORS-safe image data.
+    //
+    // In production, the proxy may be unavailable/rate-limited/blocked; in that case we
+    // fall back to the direct URL so the image still renders in the browser.
+    try {
+        const proxyBase =
+            import.meta.env.VITE_CORS_ANYWHERE_URL ??
+            "https://cors-anywhere-nuzgen.herokuapp.com";
+        const response = await fetch(`${proxyBase}/${url}`, {
             mode: "cors",
             // origin: location.origin,
             // @ts-expect-error valid for cors-anywhere
             "X-Requested-With": "XMLHttpRequest",
-        },
-    );
-    const img = await response.blob();
+        });
 
-    return `url(${await fileToBase64(img)})`;
+        if (!response.ok) {
+            throw new Error(
+                `CORS proxy request failed (${response.status} ${response.statusText})`,
+            );
+        }
+
+        const img = await response.blob();
+        return `url(${await fileToBase64(img)})`;
+    } catch (e) {
+        console.warn(
+            "[wrapImageInCORS] Falling back to direct image URL (proxy failed):",
+            url,
+            e,
+        );
+        return `url(${url})`;
+    }
 }
 
 export async function wrapImageInCORSPlain(url: string) {
-    const response = await fetch(
-        `${import.meta.env.VITE_CORS_ANYWHERE_URL ?? "https://cors-anywhere-nuzgen.herokuapp.com"}/${url}`,
-        {
+    // Same as wrapImageInCORS(), but returns a plain src string for <img src="..."/>.
+    try {
+        const proxyBase =
+            import.meta.env.VITE_CORS_ANYWHERE_URL ??
+            "https://cors-anywhere-nuzgen.herokuapp.com";
+        const response = await fetch(`${proxyBase}/${url}`, {
             mode: "cors",
             // @ts-expect-error valid for cors-anywhere
             "X-Requested-With": "XMLHttpRequest",
-        },
-    );
-    const img = await response.blob();
+        });
 
-    return `${await fileToBase64(img)}`;
+        if (!response.ok) {
+            throw new Error(
+                `CORS proxy request failed (${response.status} ${response.statusText})`,
+            );
+        }
+
+        const img = await response.blob();
+        return `${await fileToBase64(img)}`;
+    } catch (e) {
+        console.warn(
+            "[wrapImageInCORSPlain] Falling back to direct image URL (proxy failed):",
+            url,
+            e,
+        );
+        return url;
+    }
 }
