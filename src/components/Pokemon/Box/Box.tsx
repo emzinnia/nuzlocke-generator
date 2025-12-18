@@ -288,6 +288,9 @@ export const Box: React.FC<BoxProps> = (props) => {
             style={{
                 backgroundImage: getBoxBackground(),
                 opacity: isDragging ? 0.5 : 1,
+                outline: isOverBox ? "2px dashed #48aff0" : "none",
+                outlineOffset: "-2px",
+                cursor: isDragging ? "grabbing" : "grab",
                 ...collapsedStyle,
             }}
             className={`box ${name.replace(/\s/g, "-")}-box`}
