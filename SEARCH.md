@@ -475,4 +475,45 @@ Create tests covering:
 - **Group**: `(type:dark | type:ghost) gender:f`
 - **Level**: `level>=20`, `level:10..20`
 
+---
+
+## Implementation details
+
+### Files created
+
+```
+src/utils/search/
+├── types.ts       # AST nodes, tokens, NormalizedPokemon, field aliases
+├── tokenize.ts    # Query string → Token stream
+├── parse.ts       # Token stream → AST
+├── compile.ts     # AST → Predicate function
+├── normalize.ts   # Pokemon → NormalizedPokemon (with caching)
+├── index.ts       # High-level API: searchPokemon(), searchPokemonMemoized()
+└── __tests__/
+    └── search.test.ts  # 39 comprehensive tests
+```
+
+### Files modified
+
+- `src/components/Editors/PokemonEditor/PokemonEditor.tsx` - Computes `matchedIds` and displays errors/warnings
+- `src/components/Pokemon/Box/Box.tsx` - Passes `matchedIds` and `hasSearchQuery` to children
+- `src/components/Common/Shared/PokemonByFilter.tsx` - Filters Pokémon by `matchedIds`
+- `src/utils/index.ts` - Exports search module
+
+### Usage
+
+```typescript
+import { searchPokemon } from 'utils/search';
+
+// Simple usage
+const { matchedIds, errors, warnings } = searchPokemon(team, "Br");
+
+// Advanced usage (parse + compile separately for reuse)
+import { parseQuery, compileQuery, getNormalizedPokemon } from 'utils/search';
+
+const { ast, errors, warnings } = parseQuery("type:dark | type:ghost");
+const predicate = compileQuery(ast);
+const matches = team.filter(p => predicate(p, getNormalizedPokemon(p)));
+```
+
 
