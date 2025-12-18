@@ -252,6 +252,7 @@ export class DataEditorBase extends React.Component<
     public textarea: HTMLTextAreaElement | null;
     public fileInput: HTMLInputElement | null;
     public nuzlockeJsonFileInput: HTMLInputElement | null;
+    public advancedImportRef = React.createRef<import("./AdvancedImportOptions").AdvancedImportOptionsHandle>();
 
     public constructor(props) {
         super(props);
