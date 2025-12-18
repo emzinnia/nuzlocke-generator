@@ -4,11 +4,9 @@ import {
     ButtonGroup,
     Classes,
     Dialog,
-    FileInput,
     HTMLSelect,
     Intent,
 } from "@blueprintjs/core";
-import { cx } from "emotion";
 import { GameSaveFormat } from "utils";
 import { State } from "state";
 import { BoxMappings } from "parsers/utils/boxMappings";
@@ -129,6 +127,17 @@ export const AdvancedImportOptions = React.forwardRef<
                 Advanced Import Options
             </Button>
 
+            {/* Single hidden file input - always available for both panel button and parent's Import Save button */}
+            <input
+                style={{ display: "none" }}
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                type="file"
+                id="file-hidden"
+                name="file-hidden"
+                accept=".sav"
+            />
+
             {isOpen && (
                 <div
                     className="data-editor-save-file-form"
@@ -166,30 +175,15 @@ export const AdvancedImportOptions = React.forwardRef<
                         >
                             Options
                         </Button>
+                        <Button
+                            onClick={() => fileInputRef.current?.click()}
+                            icon="document-open"
+                        >
+                            {fileName || "Choose .sav file..."}
+                        </Button>
                     </ButtonGroup>
-
-                    <FileInput
-                        text={fileName || "Choose .sav file..."}
-                        buttonText="Browse"
-                        inputProps={{
-                            accept: ".sav",
-                            onChange: handleFileChange,
-                        }}
-                        fill={false}
-                    />
                 </div>
             )}
-
-            {/* Hidden file input for programmatic access when panel is collapsed */}
-            <input
-                style={{ display: "none" }}
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                type="file"
-                id="file-hidden"
-                name="file-hidden"
-                accept=".sav"
-            />
 
             <Dialog
                 isOpen={isSettingsOpen}
