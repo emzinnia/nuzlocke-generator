@@ -210,7 +210,6 @@ export class DataEditorBase extends React.Component<
     DataEditorState
 > {
     public textarea: HTMLTextAreaElement | null;
-    public fileInput: HTMLInputElement | null;
     public nuzlockeJsonFileInput: HTMLInputElement | null;
     public advancedImportRef = React.createRef<import("./AdvancedImportOptions").AdvancedImportOptionsHandle>();
 
@@ -222,19 +221,8 @@ export class DataEditorBase extends React.Component<
             mode: "export",
             data: "",
             href: "",
-            selectedGame: "Auto",
-            mergeDataMode: true,
-            showSaveFileUI: false,
             overrideImport: true,
-            isSettingsOpen: false,
-            boxMappings: [],
         };
-    }
-
-    public componentDidMount() {
-        this.setState((state) => ({
-            boxMappings: generateBoxMappingsDefault(state.selectedGame),
-        }));
     }
 
     private uploadJSON = (e) => {
