@@ -198,6 +198,7 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
                     {showDebugPanel && (
                         <DebugDialog
                             onAddRandomPokemon={this.addRandomPokemon}
+                            onCreateRandomBox={this.createRandomBox}
                         />
                     )}
 
@@ -212,4 +213,4 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
     }
 }
 
-export const App = connect(appSelector, { addPokemon })(AppBase);
+export const App = connect(appSelector, { addPokemon, addBox })(AppBase);
