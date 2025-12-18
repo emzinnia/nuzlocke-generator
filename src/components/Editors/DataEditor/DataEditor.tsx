@@ -699,10 +699,10 @@ export class DataEditorBase extends React.Component<
                                 style={{ marginLeft: "0.35rem" }}
                             />
                         </Button>
-                         <Button
+                        <Button
                             icon="folder-open"
                             data-testid="import-save-file-button"
-                            onClick={() => this.fileInput?.click()}
+                            onClick={() => this.advancedImportRef.current?.openFileDialog()}
                         >
                             Import Save{" "}
                             <HotkeyIndicator
@@ -736,7 +736,12 @@ export class DataEditorBase extends React.Component<
                     </ButtonGroup>
                 </div>
 
-                {this.renderSaveFileUI()}
+                <AdvancedImportOptions
+                    ref={this.advancedImportRef}
+                    boxes={this.props.state.box}
+                    isDarkMode={this.props.state.style.editorDarkMode ?? false}
+                    onFileSelect={this.handleFileSelect}
+                />
             </BaseEditor>
         );
     }
