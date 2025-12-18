@@ -5,6 +5,7 @@ import { Pokemon, Box as BoxModel, Boxes, Game } from "models";
 import { State } from "state";
 import { generateEmptyPokemon } from "utils";
 import { searchPokemon } from "utils/search";
+import { getPersistedSearchTerm, setPersistedSearchTerm } from "utils/searchTermStorage";
 import { CurrentPokemonEdit } from ".";
 import { AddPokemonButton } from "components";
 import { BaseEditor } from "components";
