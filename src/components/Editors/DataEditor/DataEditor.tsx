@@ -851,7 +851,7 @@ export class DataEditorBase extends React.Component<
                         data-testid="import-save-file-button"
                         onClick={() => this.fileInput?.click()}
                     >
-                        Import Save File{" "}
+                        Advanced Import{" "}
                         <HotkeyIndicator
                             hotkey="o"
                             showModifier={false}
