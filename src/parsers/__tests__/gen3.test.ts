@@ -29,6 +29,19 @@ describe("Gen 3 Save Parser", () => {
             expect(result.pokemon).toBeDefined();
         });
 
+        it("should parse a save file that has an extra 16-byte trailer (by trimming it)", async () => {
+            const withTrailer = Buffer.concat([saveData, Buffer.alloc(16)]);
+
+            const result = await parseGen3Save(withTrailer, {
+                boxMappings: [],
+                selectedGame: "Emerald",
+            });
+
+            expect(result).toBeDefined();
+            expect(result.trainer).toBeDefined();
+            expect(result.pokemon).toBeDefined();
+        });
+
         it("should parse the first three party Pokemon correctly as Salamence, Magcargo, and Smeargle", async () => {
             const result = await parseGen3Save(saveData, {
                 boxMappings: [],

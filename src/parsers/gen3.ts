@@ -1099,7 +1099,14 @@ export const parseGen3Save = async (file: Buffer, options: ParserOptions) => {
     const startTime = DEBUG ? performance.now() : 0;
 
     // Ensure file is a Buffer (might be Uint8Array in worker context)
-    const buffer = Buffer.isBuffer(file) ? file : Buffer.from(file);
+    let buffer = Buffer.isBuffer(file) ? file : Buffer.from(file);
+
+    // Some Gen 3 exports include an extra 16-byte footer/trailer beyond the expected size.
+    // If shaving 16 bytes makes the file match a known expected size, do so before parsing.
+    const expectedSizes = new Set([SAVE_SIZE, BLOCK_SIZE * 2]);
+    if (!expectedSizes.has(buffer.length) && expectedSizes.has(buffer.length - 16)) {
+        buffer = buffer.subarray(0, buffer.length - 16);
+    }
 
     if (DEBUG) {
         log("parseGen3Save", "=== Starting Gen 3 save file parsing ===", {
