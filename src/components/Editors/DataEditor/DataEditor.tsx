@@ -551,7 +551,7 @@ export class DataEditorBase extends React.Component<
                         });
                     }}
                 >
-                    Import From Save File
+                    Advanced Import
                 </Button>
                 <div
                     className="data-editor-save-file-form"
