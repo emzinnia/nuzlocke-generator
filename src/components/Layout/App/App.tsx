@@ -75,6 +75,26 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
         this.props.addPokemon(pokemon);
     };
 
+    private createRandomBox = (count: number) => {
+        const boxName = `Random Box ${Date.now()}`;
+        this.props.addBox({
+            name: boxName,
+            background: "",
+            inheritFrom: "Boxed",
+        });
+
+        for (let i = 0; i < count; i++) {
+            const species = choose([...listOfPokemon]) as Species;
+            const types = matchSpeciesToTypes(species);
+            const pokemon = generateEmptyPokemon(this.props.pokemon, {
+                species,
+                status: boxName,
+                types,
+            });
+            this.props.addPokemon(pokemon);
+        }
+    };
+
     private updateDarkModeClass = () => {
         const isDarkMode = this.props.style.editorDarkMode;
         if (isDarkMode) {
