@@ -11,6 +11,7 @@ import { BaseEditor } from "components";
 import { Box, BoxForm } from "components";
 import { ErrorBoundary } from "components";
 import { HotkeyIndicator } from "components/Common/Shared";
+import { SearchHelpPopover } from "./SearchHelpPopover";
 import { cx } from "emotion";
 import { addPokemon, toggleDialog } from "actions";
 
@@ -220,25 +221,28 @@ export class PokemonEditorBase extends React.Component<
                                 </Button>
                             </ButtonGroup>
                         </div>
-                        <div style={{ marginLeft: "auto", width: "100%", paddingLeft: "2rem", paddingRight: "1rem", position: "relative" }}>
-                            <input
-                                type="search"
-                                placeholder="Search..."
-                                className={Classes.INPUT}
-                                data-testid="pokemon-search"
-                                value={this.state.searchTerm}
-                                onChange={(e) =>
-                                    this.setState({
-                                        searchTerm: e.target.value,
-                                    })
-                                }
-                                style={{ margin: "0.25rem", width: "100%", paddingRight: "2rem" }}
-                            />
-                            <HotkeyIndicator
-                                hotkey="/"
-                                showModifier={false}
-                                style={{ position: "absolute", right: "1.5rem", top: "50%", transform: "translateY(-50%)" }}
-                            />
+                        <div style={{ marginLeft: "auto", width: "100%", paddingLeft: "2rem", paddingRight: "1rem", display: "flex", alignItems: "center" }}>
+                            <div style={{ position: "relative", flex: 1 }}>
+                                <input
+                                    type="search"
+                                    placeholder="Search... (type:dark, gender:f, etc.)"
+                                    className={Classes.INPUT}
+                                    data-testid="pokemon-search"
+                                    value={this.state.searchTerm}
+                                    onChange={(e) =>
+                                        this.setState({
+                                            searchTerm: e.target.value,
+                                        })
+                                    }
+                                    style={{ margin: "0.25rem", width: "100%", paddingRight: "2rem" }}
+                                />
+                                <HotkeyIndicator
+                                    hotkey="/"
+                                    showModifier={false}
+                                    style={{ position: "absolute", right: "0.5rem", top: "50%", transform: "translateY(-50%)" }}
+                                />
+                            </div>
+                            <SearchHelpPopover style={{ marginLeft: "0.5rem" }} />
                         </div>
                     </div>
                     {this.renderBoxesWithSearch(boxes, team)}
