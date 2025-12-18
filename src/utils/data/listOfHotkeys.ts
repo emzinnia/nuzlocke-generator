@@ -96,7 +96,7 @@ export const listOfHotkeys: HotkeyList[] = [
     },
     {
         key: "o",
-        comment: "Advanced Import",
+        comment: "Import save file",
         onKeyUp: "importSaveFile",
     },
     {
