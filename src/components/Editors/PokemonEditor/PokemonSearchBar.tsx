@@ -38,12 +38,33 @@ const styles = {
         font-size: 0.85rem;
         padding: 0.25rem 0.5rem;
         margin-bottom: 0.5rem;
+
+        .bp5-dark & {
+            color: #ff6b6b;
+        }
     `,
     warning: css`
         color: #bf7326;
         font-size: 0.85rem;
         padding: 0.25rem 0.5rem;
         margin-bottom: 0.5rem;
+
+        .bp5-dark & {
+            color: #ffc107;
+        }
+
+        code {
+            background: rgba(92, 112, 128, 0.15);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            font-family: "SF Mono", "Consolas", "Monaco", monospace;
+            font-size: 0.8rem;
+        }
+
+        .bp5-dark & code {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffc107;
+        }
     `,
     noResults: css`
         color: #5c7080;
@@ -51,6 +72,10 @@ const styles = {
         padding: 0.5rem;
         text-align: center;
         font-style: italic;
+
+        .bp5-dark & {
+            color: #a7b6c2;
+        }
     `,
 };
 
@@ -169,4 +194,3 @@ export function usePokemonSearch(team: Pokemon[]): UseSearchResult {
         searchResult,
     };
 }
-
