@@ -24,7 +24,7 @@ function missingByGeneration(list) {
         { start: 649, end: 721 },
         { start: 721, end: 807 },
         { start: 808, end: 905 },
-        { start: 906, end: 1008 },
+        { start: 906, end: 1025 },
     ];
 
     const resultMap = generationPoints.map((point, idx) => {
