@@ -543,30 +543,31 @@ export class DataEditorBase extends React.Component<
             : ["RBY", "GS", "Crystal"];
 
         return (
-            <>
+            <div style={{ margin: "0.25rem" }}>
                 <Button
                     onClick={() => {
                         this.setState({
                             showSaveFileUI: !this.state.showSaveFileUI,
                         });
                     }}
+                    icon={this.state.showSaveFileUI ? "chevron-down" : "chevron-right"}
+                    minimal
                 >
-                    Advanced Import
+                    Advanced Import Options
                 </Button>
-                <div
-                    className="data-editor-save-file-form"
-                    style={{
-                        alignItems: "center",
-                        flexWrap: "wrap",
-                        margin: "0.25rem",
-                        display: this.state.showSaveFileUI ? "flex" : "none",
-                        borderRadius: "0.25rem",
-                        padding: "0.25rem",
-                    }}
-                >
+                {this.state.showSaveFileUI && (
                     <div
-                        className={cx(Classes.LABEL, Classes.INLINE)}
-                        style={{ padding: ".25rem 0", paddingBottom: ".5rem" }}
+                        className="data-editor-save-file-form"
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                            gap: "0.5rem",
+                            marginTop: "0.5rem",
+                            padding: "0.5rem",
+                            borderRadius: "0.25rem",
+                            background: "rgba(0, 0, 0, 0.05)",
+                        }}
                     >
                         <HTMLSelect
                             value={this.state.selectedGame}
@@ -589,18 +590,8 @@ export class DataEditorBase extends React.Component<
                                 </option>
                             ))}
                         </HTMLSelect>
-                    </div>
 
-                    <div
-                        className={cx(Classes.LABEL, Classes.INLINE)}
-                        style={{
-                            padding: ".25rem 0",
-                            paddingBottom: ".5rem",
-                            marginLeft: ".25rem",
-                        }}
-                    >
                         <input
-                            style={{ padding: ".25rem" }}
                             className={Classes.FILE_INPUT}
                             ref={(ref) => (this.fileInput = ref)}
                             onChange={this.uploadFile(
@@ -612,64 +603,80 @@ export class DataEditorBase extends React.Component<
                             name="file"
                             accept=".sav"
                         />
+
+                        <Button
+                            onClick={() => this.setState({ isSettingsOpen: true })}
+                            minimal
+                            intent={Intent.PRIMARY}
+                            icon="cog"
+                        >
+                            Options
+                        </Button>
                     </div>
+                )}
 
-                    <Button
-                        onClick={() => this.setState({ isSettingsOpen: true })}
-                        minimal
-                        intent={Intent.PRIMARY}
-                        icon="cog"
-                    >
-                        Options
-                    </Button>
+                {/* Hidden file input ref when panel is collapsed */}
+                {!this.state.showSaveFileUI && (
+                    <input
+                        style={{ display: "none" }}
+                        ref={(ref) => (this.fileInput = ref)}
+                        onChange={this.uploadFile(
+                            this.props.replaceState,
+                            this.props.state,
+                        )}
+                        type="file"
+                        id="file-hidden"
+                        name="file-hidden"
+                        accept=".sav"
+                    />
+                )}
 
-                    <Dialog
-                        isOpen={this.state.isSettingsOpen}
-                        onClose={() => this.setState({ isSettingsOpen: false })}
-                        title={"Save Upload Settings"}
-                        className={
-                            this.props.state.style.editorDarkMode
-                                ? Classes.DARK
-                                : ""
+                <Dialog
+                    isOpen={this.state.isSettingsOpen}
+                    onClose={() => this.setState({ isSettingsOpen: false })}
+                    title={"Save Upload Settings"}
+                    className={
+                        this.props.state.style.editorDarkMode
+                            ? Classes.DARK
+                            : ""
+                    }
+                    icon="floppy-disk"
+                >
+                    <SaveGameSettingsDialog
+                        mergeDataMode={this.state.mergeDataMode}
+                        onMergeDataChange={() =>
+                            this.setState({
+                                mergeDataMode: !this.state.mergeDataMode,
+                            })
                         }
-                        icon="floppy-disk"
-                    >
-                        <SaveGameSettingsDialog
-                            mergeDataMode={this.state.mergeDataMode}
-                            onMergeDataChange={() =>
-                                this.setState({
-                                    mergeDataMode: !this.state.mergeDataMode,
-                                })
-                            }
-                            boxes={this.props.state.box}
-                            selectedGame={this.state.selectedGame}
-                            boxMappings={this.state.boxMappings}
-                            setBoxMappings={({ key, status }) => {
-                                console.log("setBoxMappings:", key, status);
-                                this.setState(({ boxMappings }) => {
-                                    const newBoxMappings = boxMappings.map(
-                                        ({
+                        boxes={this.props.state.box}
+                        selectedGame={this.state.selectedGame}
+                        boxMappings={this.state.boxMappings}
+                        setBoxMappings={({ key, status }) => {
+                            console.log("setBoxMappings:", key, status);
+                            this.setState(({ boxMappings }) => {
+                                const newBoxMappings = boxMappings.map(
+                                    ({
+                                        key: boxKey,
+                                        status: boxStatus,
+                                    }) => {
+                                        if (key === boxKey) {
+                                            return { key, status };
+                                        }
+                                        return {
                                             key: boxKey,
                                             status: boxStatus,
-                                        }) => {
-                                            if (key === boxKey) {
-                                                return { key, status };
-                                            }
-                                            return {
-                                                key: boxKey,
-                                                status: boxStatus,
-                                            };
-                                        },
-                                    );
-                                    return {
-                                        boxMappings: newBoxMappings,
-                                    };
-                                });
-                            }}
-                        />
-                    </Dialog>
-                </div>
-            </>
+                                        };
+                                    },
+                                );
+                                return {
+                                    boxMappings: newBoxMappings,
+                                };
+                            });
+                        }}
+                    />
+                </Dialog>
+            </div>
         );
     }
 
