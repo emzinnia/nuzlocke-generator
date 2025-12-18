@@ -141,9 +141,9 @@ Provide fast switching between editor sections.
 ### Data / Saves / Import-Export
 - [ ] **New Nuzlocke**: `Mod+Shift+N` (keep `Shift+N` if desired, but avoid accidental triggers)
 - [ ] **Force save**: `Mod+S` (intercept and prevent browser Save)
-- [ ] **Export data**: `Mod+E`
-- [ ] **Import data**: `Mod+I`
-- [ ] **Import from save file**: `Mod+O`
+- [x] **Export data**: `E` (global single-key; via `Hotkeys.tsx`)
+- [x] **Import data**: `I` (global single-key; via `Hotkeys.tsx`)
+- [x] **Import from save file**: `O` (global single-key; via `Hotkeys.tsx`)
 - [ ] **Clear all data (dangerous)**: require chord + confirmation (e.g., `Mod+Shift+Backspace` then confirm)
 
 ### Location checklist

@@ -814,17 +814,29 @@ export class DataEditorBase extends React.Component<
 
                 <ButtonGroup style={{ margin: ".25rem" }}>
                     <Button
+                        data-testid="import-data-button"
                         onClick={() => this.importState()}
                         icon="import"
                         intent={Intent.PRIMARY}
                     >
-                        Import Data
+                        Import Data{" "}
+                        <HotkeyIndicator
+                            hotkey="i"
+                            showModifier={false}
+                            style={{ marginLeft: "0.35rem" }}
+                        />
                     </Button>
                     <Button
+                        data-testid="export-data-button"
                         onClick={() => this.exportState(this.props.state)}
                         icon="export"
                     >
-                        Export Data
+                        Export Data{" "}
+                        <HotkeyIndicator
+                            hotkey="e"
+                            showModifier={false}
+                            style={{ marginLeft: "0.35rem" }}
+                        />
                     </Button>
                     {/* <Button icon='add' intent={Intent.SUCCESS}>
                         New Nuzlocke
@@ -832,6 +844,20 @@ export class DataEditorBase extends React.Component<
                 </ButtonGroup>
                 {this.renderSaveFileUI()}
                 <ButtonGroup style={{ margin: ".25rem" }}>
+                    <Button
+                        minimal
+                        intent={Intent.PRIMARY}
+                        icon="folder-open"
+                        data-testid="import-save-file-button"
+                        onClick={() => this.fileInput?.click()}
+                    >
+                        Import Save File{" "}
+                        <HotkeyIndicator
+                            hotkey="o"
+                            showModifier={false}
+                            style={{ marginLeft: "0.35rem" }}
+                        />
+                    </Button>
                     <Button
                         minimal
                         intent={Intent.SUCCESS}
