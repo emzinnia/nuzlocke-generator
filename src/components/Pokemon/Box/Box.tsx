@@ -41,50 +41,6 @@ import {
 } from "components/Pokemon/PokemonIcon/PokemonIcon";
 import { showToast } from "components/Common/Shared/appToaster";
 
-const boxSource = {
-    drop(props, monitor, component) {
-        const newStatus = props.name;
-        store.dispatch(
-            editPokemon({ status: newStatus }, monitor.getItem().id),
-        );
-        return {};
-    },
-
-    hover(props, monitor) {
-        return { isHovering: monitor.isOver({ shallow: true }) };
-    },
-};
-
-const boxSourceDrop = {
-    drop(props, monitor, component) {
-        const item = monitor.getItem();
-
-        if (props.id == null || item.id == null) {
-            showToast({
-                message: "Failed to move Boxes",
-                intent: Intent.DANGER,
-            });
-            return;
-        }
-
-        store.dispatch(
-            editBox(props.id, {
-                position: item.position,
-            }),
-        );
-        store.dispatch(
-            editBox(item.id, {
-                position: props.position,
-            }),
-        );
-
-        return {};
-    },
-    hover(props, monitor) {
-        return { isHovering: monitor.isOver({ shallow: true }) };
-    },
-};
-
 export type BoxProps = {
     pokemon: Pokemon[];
     connectDropTarget?: ConnectDropTarget;
