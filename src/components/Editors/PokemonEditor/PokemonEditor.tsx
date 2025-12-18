@@ -87,12 +87,17 @@ export class PokemonEditorBase extends React.Component<
     public constructor(props: PokemonEditorProps) {
         super(props);
         this.state = {
-            searchTerm: "",
+            searchTerm: getPersistedSearchTerm(),
         };
     }
 
     private openMassEditor = (_e) => {
         this.props.toggleDialog("massEditor");
+    };
+
+    private handleSearchChange = (value: string) => {
+        this.setState({ searchTerm: value });
+        setPersistedSearchTerm(value);
     };
 
     private renderBoxesWithSearch(boxes: Boxes, team: Pokemon[]) {
@@ -186,7 +191,7 @@ export class PokemonEditorBase extends React.Component<
                         </div>
                         <PokemonSearchBar
                             value={this.state.searchTerm}
-                            onChange={(value) => this.setState({ searchTerm: value })}
+                            onChange={this.handleSearchChange}
                         />
                     </div>
                     {this.renderBoxesWithSearch(boxes, team)}
