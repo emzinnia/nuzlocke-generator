@@ -1,6 +1,6 @@
 {
     "name": "nuzlocke-generator",
-    "version": "1.21.0",
+    "version": "1.21.2",
     "description": "A tool for generating nuzlocke team pics from data",
     "main": "dist/bundle.js",
     "type": "module",
