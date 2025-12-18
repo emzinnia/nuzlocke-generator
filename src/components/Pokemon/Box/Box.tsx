@@ -347,10 +347,11 @@ export const Box: React.FC<BoxProps> = (props) => {
                         padding: ".25rem",
                         textAlign: "center",
                         minWidth: "5rem",
-                        cursor: "pointer",
+                        cursor: "grab",
                         userSelect: "none",
                     }}
                 >
+                    <Icon style={{ marginRight: "0.25rem", opacity: 0.6 }} icon="drag-handle-vertical" />
                     <Icon style={{ transform: "rotate(90deg)" }} icon="more" />
                     {name}
                 </span>
