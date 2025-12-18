@@ -550,10 +550,6 @@ export class DataEditorBase extends React.Component<
                             showSaveFileUI: !this.state.showSaveFileUI,
                         });
                     }}
-                    style={{
-                        // @TODO: find a more sensible hack
-                        transform: "translateY(-5px)",
-                    }}
                 >
                     Import From Save File
                 </Button>
