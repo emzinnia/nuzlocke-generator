@@ -262,13 +262,20 @@ function wildcardToRegex(pattern: string, anchorStart: boolean): RegExp {
     // Escape regex metacharacters except * and ?
     let escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&");
 
+    // Track if we have wildcards to determine anchoring
+    const hasStarWildcard = pattern.includes("*");
+    const hasQuestionWildcard = pattern.includes("?");
+
     // Replace wildcards
     escaped = escaped.replace(/\*/g, ".*").replace(/\?/g, ".");
 
     // Anchor to start if specified (and pattern doesn't start with .*)
     const prefix = anchorStart && !escaped.startsWith(".*") ? "^" : "";
 
-    return new RegExp(prefix + escaped, "i");
+    // Anchor to end if pattern uses ? but doesn't end with * (for exact length matching)
+    const suffix = hasQuestionWildcard && !hasStarWildcard && !escaped.endsWith(".*") ? "$" : "";
+
+    return new RegExp(prefix + escaped + suffix, "i");
 }
 
 /**
