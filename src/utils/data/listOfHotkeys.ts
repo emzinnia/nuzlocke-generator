@@ -85,6 +85,21 @@ export const listOfHotkeys: HotkeyList[] = [
         onKeyUp: "toggleMassEditor",
     },
     {
+        key: "i",
+        comment: "Import data",
+        onKeyUp: "importData",
+    },
+    {
+        key: "e",
+        comment: "Export data",
+        onKeyUp: "exportData",
+    },
+    {
+        key: "o",
+        comment: "Import save file",
+        onKeyUp: "importSaveFile",
+    },
+    {
         key: "D",
         label: "shift+d",
         comment: "Download image",
