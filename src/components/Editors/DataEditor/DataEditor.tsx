@@ -49,32 +49,8 @@ export interface DataEditorState {
     mode: "import" | "export";
     data: string;
     href: string;
-    selectedGame: GameSaveFormat;
-    mergeDataMode: boolean;
-    showSaveFileUI: boolean;
     overrideImport: boolean;
-    isSettingsOpen: boolean;
-    boxMappings: BoxMappings;
 }
-
-const getGameNumberOfBoxes = (game: GameSaveFormat) => {
-    switch (game) {
-        case "Auto":
-            // Default to 14 so box mappings are available for Gen 2/3; Gen 1 will only read the first 12.
-            return 14;
-        case "RBY":
-            return 12;
-        case "GS":
-        case "Crystal":
-            return 14;
-        case "Emerald":
-        case "RS":
-        case "FRLG":
-            return 14;
-        default:
-            return 12;
-    }
-};
 
 const isValidJSON = (data: string): boolean => {
     try {
