@@ -419,19 +419,17 @@ export class DataEditorBase extends React.Component<
         });
     };
 
-    private uploadFile = (replaceState, state) => () => {
+    private handleFileSelect = (
+        file: File,
+        settings: import("./AdvancedImportOptions").AdvancedImportSettings
+    ) => {
         const t0 = performance.now();
-        // @NOTE: this is a gross work-around a bug with tests and import.meta.url
-        // const worker = new Worker(new URL('parsers/worker.ts', codegen`module.exports = import.meta.env.MODE === "test" ? "" : "import.meta.url"`));
-
         const worker = new SaveFileWorker();
-
-        if (!this.fileInput?.files?.[0]) return;
-        const file = this.fileInput.files[0];
         const reader = new FileReader();
-        const componentState = this.state;
+        const { replaceState, state } = this.props;
+        const { selectedGame, boxMappings, mergeDataMode } = settings;
 
-        console.log(file, reader, componentState, worker);
+        console.log(file, reader, settings, worker);
 
         reader.readAsArrayBuffer(file);
 
@@ -439,9 +437,9 @@ export class DataEditorBase extends React.Component<
             const save = new Uint8Array(this.result as ArrayBuffer);
 
             worker.postMessage({
-                selectedGame: componentState.selectedGame,
+                selectedGame,
                 save,
-                boxMappings: componentState.boxMappings,
+                boxMappings,
                 fileName: file.name,
             });
 
@@ -455,7 +453,7 @@ export class DataEditorBase extends React.Component<
                 }>,
             ) => {
                 const result = e.data;
-                const mergedPokemon = componentState.mergeDataMode
+                const mergedPokemon = mergeDataMode
                     ? DataEditorBase.pokeMerge(
                           state.pokemon,
                           result.pokemon as Pokemon[],
@@ -465,7 +463,7 @@ export class DataEditorBase extends React.Component<
                     result.detectedGame ??
                     DataEditorBase.determineGame({
                         isYellow: result.isYellow,
-                        selectedGame: componentState.selectedGame,
+                        selectedGame,
                     });
                 const bgColor = gameOfOriginToColor(game.name as GameName);
                 const data = {
@@ -508,7 +506,7 @@ export class DataEditorBase extends React.Component<
 
             const t1 = performance.now();
             console.info(
-                `Call: ${t1 - t0} ms on ${componentState.selectedGame} save file type`,
+                `Call: ${t1 - t0} ms on ${selectedGame} save file type`,
             );
         });
     };
