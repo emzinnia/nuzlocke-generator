@@ -4,7 +4,7 @@
 import * as fs from "fs";
 import * as chalk from "chalk";
 
-import { listOfPokemon } from "./src/utils/listOfPokemon";
+import { listOfPokemon } from "./src/utils/data/listOfPokemon";
 
 const targetFile = `./images.md`;
 const buildFile: string[] = [];
