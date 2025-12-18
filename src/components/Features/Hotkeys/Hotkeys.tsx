@@ -277,6 +277,18 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         this.props.toggleDialog("massEditor");
     }
 
+    private importData() {
+        this.clickButtonByTestId("import-data-button");
+    }
+
+    private exportData() {
+        this.clickButtonByTestId("export-data-button");
+    }
+
+    private importSaveFile() {
+        this.clickButtonByTestId("import-save-file-button");
+    }
+
     private downloadImage() {
         this.clickButtonByTestId("download-image-button");
     }
