@@ -19,8 +19,6 @@ import {
     useDrag,
     useDrop,
 } from "react-dnd";
-
-import { store } from "store";
 import {
     Icon,
     Popover,
