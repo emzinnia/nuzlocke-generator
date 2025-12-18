@@ -4,3 +4,5 @@ export * from "./CurrentPokemonEdit";
 export * from "./CurrentPokemonInput";
 export * from "./MassEditorTable";
 export * from "./TypeMatchupDialog";
+export * from "./PokemonSearchBar";
+export * from "./SearchHelpPopover";
