@@ -624,7 +624,7 @@ export class DataEditorBase extends React.Component<
                         intent={Intent.PRIMARY}
                         icon="cog"
                     >
-                        Options
+                        Advanced Import
                     </Button>
 
                     <Dialog
