@@ -622,6 +622,7 @@ export class DataEditorBase extends React.Component<
                         onClick={() => this.setState({ isSettingsOpen: true })}
                         minimal
                         intent={Intent.PRIMARY}
+                        icon="cog"
                     >
                         Options
                     </Button>

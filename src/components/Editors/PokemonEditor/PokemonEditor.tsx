@@ -1,9 +1,10 @@
-import { Button, ButtonGroup, Classes, Intent, Spinner } from "@blueprintjs/core";
+import { Button, ButtonGroup, Classes, Intent, Spinner, Tooltip, Position, Icon } from "@blueprintjs/core";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Pokemon, Box as BoxModel, Boxes, Game } from "models";
 import { State } from "state";
 import { generateEmptyPokemon } from "utils";
+import { searchPokemon, SearchResult } from "utils/search";
 import { CurrentPokemonEdit } from ".";
 import { AddPokemonButton } from "components";
 import { BaseEditor } from "components";
@@ -36,10 +37,14 @@ export interface BoxesComponentProps {
     boxes: Boxes;
     team: Pokemon[];
     searchTerm: string;
+    matchedIds: Set<string>;
+    hasSearchQuery: boolean;
 }
 
 export class BoxesComponent extends React.Component<BoxesComponentProps> {
-    private renderBoxes(boxes, team) {
+    private renderBoxes(boxes: Boxes, team: Pokemon[]) {
+        const { matchedIds, hasSearchQuery, searchTerm } = this.props;
+
         return boxes
             .sort((a: BoxModel, b: BoxModel) => {
                 const positionA = a.position || 0;
@@ -49,7 +54,9 @@ export class BoxesComponent extends React.Component<BoxesComponentProps> {
             .map((box) => {
                 return (
                     <Box
-                        searchTerm={this.props.searchTerm || ""}
+                        searchTerm={searchTerm || ""}
+                        matchedIds={matchedIds}
+                        hasSearchQuery={hasSearchQuery}
                         {...box}
                         key={box.id}
                         pokemon={team}
@@ -86,6 +93,67 @@ export class PokemonEditorBase extends React.Component<
     private openMassEditor = (_e) => {
         this.props.toggleDialog("massEditor");
     };
+
+    private renderBoxesWithSearch(boxes: Boxes, team: Pokemon[]) {
+        const { searchTerm } = this.state;
+        const hasSearchQuery = searchTerm.trim().length > 0;
+
+        // Compute matched IDs using the search engine
+        const { matchedIds, errors, warnings } = searchPokemon(team, searchTerm);
+
+        return (
+            <>
+                {errors.length > 0 && (
+                    <div
+                        className="search-error"
+                        style={{
+                            color: "#c23030",
+                            fontSize: "0.85rem",
+                            padding: "0.25rem 0.5rem",
+                            marginBottom: "0.5rem",
+                        }}
+                    >
+                        <Icon icon="warning-sign" style={{ marginRight: "0.5rem" }} />
+                        {errors[0].message}
+                    </div>
+                )}
+                {warnings.length > 0 && warnings[0].suggestion && (
+                    <div
+                        className="search-warning"
+                        style={{
+                            color: "#bf7326",
+                            fontSize: "0.85rem",
+                            padding: "0.25rem 0.5rem",
+                            marginBottom: "0.5rem",
+                        }}
+                    >
+                        Did you mean <code>{warnings[0].suggestion}</code>?
+                    </div>
+                )}
+                {hasSearchQuery && matchedIds.size === 0 && (
+                    <div
+                        className="search-no-results"
+                        style={{
+                            color: "#5c7080",
+                            fontSize: "0.9rem",
+                            padding: "0.5rem",
+                            textAlign: "center",
+                            fontStyle: "italic",
+                        }}
+                    >
+                        No Pokémon match your search
+                    </div>
+                )}
+                <BoxesComponent
+                    searchTerm={searchTerm}
+                    matchedIds={matchedIds}
+                    hasSearchQuery={hasSearchQuery}
+                    boxes={boxes}
+                    team={team}
+                />
+            </>
+        );
+    }
 
     public componentDidMount() {
         // @NOTE: refactor so that there's an easier way to auto-generate Pokemon data
@@ -173,11 +241,7 @@ export class PokemonEditorBase extends React.Component<
                             />
                         </div>
                     </div>
-                    <BoxesComponent
-                        searchTerm={this.state.searchTerm}
-                        boxes={boxes}
-                        team={team}
-                    />
+                    {this.renderBoxesWithSearch(boxes, team)}
                     <BoxForm boxes={boxes} />
                     <CurrentPokemonEdit />
                     <BaseEditor name="Location Checklist" defaultOpen={false}>

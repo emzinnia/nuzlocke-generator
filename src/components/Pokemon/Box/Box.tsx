@@ -91,13 +91,15 @@ export type BoxProps = {
     connectDragSource?: ConnectDragSource;
     connectDropTargetBox?: ConnectDropTarget;
     canDrop?: boolean;
-    clearBox: clearBox;
-    editBox: editBox;
-    deletePokemon: deletePokemon;
+    clearBox?: clearBox;
+    editBox?: editBox;
+    deletePokemon?: deletePokemon;
     background?: string;
-    deleteBox: deleteBox;
-    updateBoxes: updateBoxes;
+    deleteBox?: deleteBox;
+    updateBoxes?: updateBoxes;
     searchTerm: string;
+    matchedIds: Set<string>;
+    hasSearchQuery: boolean;
 } & BoxType;
 
 export const wallpapers = [
@@ -157,6 +159,8 @@ export const Box: React.FC<BoxProps> = (props) => {
         background,
         collapsed: isCollapsed,
         searchTerm,
+        matchedIds,
+        hasSearchQuery,
     } = props;
 
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
@@ -370,6 +374,8 @@ export const Box: React.FC<BoxProps> = (props) => {
             </Popover>
             <PokemonByFilter
                 searchTerm={searchTerm}
+                matchedIds={matchedIds}
+                hasSearchQuery={hasSearchQuery}
                 team={pokemon}
                 status={name}
             />

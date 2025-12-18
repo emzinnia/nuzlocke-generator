@@ -5,33 +5,27 @@ import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { sortPokes } from "utils";
 import { connect } from "react-redux";
 import { editPokemon } from "actions";
-import {} from "ramda";
 
 export interface PokemonByFilterProps {
     team: Pokemon[];
     status: string;
     editPokemon: editPokemon;
     searchTerm: string;
+    /** Set of Pokémon IDs that match the current search query */
+    matchedIds: Set<string>;
+    /** Whether there is an active search query */
+    hasSearchQuery: boolean;
 }
-
-const matchesStatus = (searchTerm) => (poke: Pokemon) =>
-    poke.nickname?.toLowerCase().startsWith(searchTerm?.toLowerCase()) ||
-    poke.species?.toLowerCase().startsWith(searchTerm?.toLowerCase()) ||
-    poke.forme?.toLowerCase() === searchTerm?.toLowerCase() ||
-    poke.nickname?.toLowerCase().startsWith(searchTerm?.toLowerCase()) ||
-    poke.gender?.toLowerCase() === searchTerm?.toLowerCase() ||
-    poke.moves?.includes(searchTerm) ||
-    poke.gameOfOrigin?.toLowerCase() === searchTerm?.toLowerCase() ||
-    poke.item?.toLowerCase() === searchTerm?.toLowerCase() ||
-    poke.types?.includes(searchTerm);
 
 export class PokemonByFilterBase extends React.PureComponent<PokemonByFilterProps> {
     public render() {
-        const { team, status, searchTerm } = this.props;
+        const { team, status, matchedIds, hasSearchQuery } = this.props;
 
         return team
             .sort(sortPokes)
             .filter((poke) => poke.status === status)
+            // Filter by search results when there's an active query
+            .filter((poke) => !hasSearchQuery || matchedIds.has(poke.id))
             .map((poke) => (
                 <Tooltip
                     key={poke.id}
@@ -40,9 +34,9 @@ export class PokemonByFilterBase extends React.PureComponent<PokemonByFilterProp
                 >
                     <PokemonIcon
                         style={{
+                            // Highlight matched Pokémon when searching
                             backgroundColor:
-                                searchTerm !== "" &&
-                                matchesStatus(searchTerm)(poke)
+                                hasSearchQuery && matchedIds.has(poke.id)
                                     ? "#90EE90"
                                     : undefined,
                             borderRadius: "50%",
