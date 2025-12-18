@@ -179,8 +179,9 @@ export function tokenize(input: string): TokenizeResult {
                 addToken("OR", value, start);
             } else if (upperValue === "AND") {
                 addToken("AND", value, start);
-            } else if (isFieldName(value.toLowerCase()) && isFollowedByOperator(peek(), peek(1))) {
-                // This is a field name followed by colon or comparator
+            } else if (isFollowedByOperator(peek(), peek(1))) {
+                // This is a field name (known or unknown) followed by colon or comparator
+                // The parser will validate if it's a known field
                 addToken("FIELD", value.toLowerCase(), start);
             } else {
                 // Regular bare string (search term)
