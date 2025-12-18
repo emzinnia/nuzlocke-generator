@@ -152,7 +152,7 @@ export class PokemonEditorBase extends React.Component<
                                 </Button>
                             </ButtonGroup>
                         </div>
-                        <div style={{ marginLeft: "auto", width: "100%", paddingLeft: "2rem", paddingRight: "1rem" }}>
+                        <div style={{ marginLeft: "auto", width: "100%", paddingLeft: "2rem", paddingRight: "1rem", position: "relative" }}>
                             <input
                                 type="search"
                                 placeholder="Search..."
@@ -164,7 +164,12 @@ export class PokemonEditorBase extends React.Component<
                                         searchTerm: e.target.value,
                                     })
                                 }
-                                style={{ margin: "0.25rem", width: "100%" }}
+                                style={{ margin: "0.25rem", width: "100%", paddingRight: "2rem" }}
+                            />
+                            <HotkeyIndicator
+                                hotkey="/"
+                                showModifier={false}
+                                style={{ position: "absolute", right: "1.5rem", top: "50%", transform: "translateY(-50%)" }}
                             />
                         </div>
                     </div>
