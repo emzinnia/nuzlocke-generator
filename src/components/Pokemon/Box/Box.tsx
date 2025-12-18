@@ -238,13 +238,12 @@ export const Box: React.FC<BoxProps> = (props) => {
 
     return (
         <div
-            ref={(node) => dragRef(dropRef(node))}
+            ref={dropRef}
             style={{
                 backgroundImage: getBoxBackground(),
                 opacity: isDragging ? 0.5 : 1,
                 outline: isOverBox ? "2px dashed #48aff0" : "none",
                 outlineOffset: "-2px",
-                cursor: isDragging ? "grabbing" : "grab",
                 ...collapsedStyle,
             }}
             className={`box ${name.replace(/\s/g, "-")}-box`}
@@ -342,18 +341,30 @@ export const Box: React.FC<BoxProps> = (props) => {
                         color: "#eee",
                         display: "inline-flex",
                         minHeight: "2rem",
-                        justifyContent: "space-around",
+                        gap: "0.25rem",
                         margin: ".25rem",
-                        padding: ".25rem",
+                        padding: ".25rem .5rem",
                         textAlign: "center",
                         minWidth: "5rem",
-                        cursor: "grab",
                         userSelect: "none",
                     }}
                 >
-                    <Icon style={{ marginRight: "0.25rem", opacity: 0.6 }} icon="drag-handle-vertical" />
-                    <Icon style={{ transform: "rotate(90deg)" }} icon="more" />
+                    <span
+                        ref={dragRef}
+                        style={{
+                            cursor: isDragging ? "grabbing" : "grab",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            padding: "0.25rem",
+                            marginLeft: "-0.25rem",
+                            borderRadius: "0.125rem",
+                        }}
+                        title="Drag to reorder"
+                    >
+                        <Icon style={{ opacity: 0.5 }} icon="drag-handle-vertical" />
+                    </span>
                     {name}
+                    <Icon style={{ opacity: 0.7 }} icon="caret-down" />
                 </span>
             </Popover>
             <PokemonByFilter
