@@ -168,36 +168,62 @@ export const Box: React.FC<BoxProps> = (props) => {
 
     const [{ isDragging }, dragRef] = useDrag(() => ({
         type: "BOX",
-        item: { id },
+        item: { id, position: props.position },
         collect: (monitor) => ({
             isDragging: monitor.isDragging(),
         }),
-    }));
+    }), [id, props.position]);
 
-    const [{ isOver }, dropRef] = useDrop(() => ({
-        accept: "POKEMON_ICON",
-        drop: (item: PokemonIconProps, monitor) => {
-            if (props.id == null || item.id == null) {
-                showToast({
-                    message: "Failed to move Pokémon",
-                    intent: Intent.DANGER,
-                });
-                return;
+    const [{ isOver, isOverBox }, dropRef] = useDrop(() => ({
+        accept: ["POKEMON_ICON", "BOX"],
+        drop: (item: PokemonIconProps | { id: number; position: number }, monitor) => {
+            const itemType = monitor.getItemType();
+            
+            // Handle Pokemon drops
+            if (itemType === "POKEMON_ICON") {
+                const pokemonItem = item as PokemonIconProps;
+                if (props.id == null || pokemonItem.id == null) {
+                    showToast({
+                        message: "Failed to move Pokémon",
+                        intent: Intent.DANGER,
+                    });
+                    return;
+                }
+                dispatch(
+                    editPokemon(
+                        {
+                            status: props.name,
+                        },
+                        pokemonItem.id,
+                    ),
+                );
             }
-            dispatch(
-                editPokemon(
-                    {
-                        // position: oldPosition,
-                        status: props.name,
-                    },
-                    item.id,
-                ),
-            );
+            
+            // Handle Box drops (reordering)
+            if (itemType === "BOX") {
+                const boxItem = item as { id: number; position: number };
+                if (props.id == null || boxItem.id == null || boxItem.id === props.id) {
+                    return; // Don't swap with self
+                }
+                
+                // Swap positions between the two boxes
+                dispatch(
+                    editBox(props.id, {
+                        position: boxItem.position,
+                    }),
+                );
+                dispatch(
+                    editBox(boxItem.id, {
+                        position: props.position,
+                    }),
+                );
+            }
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
+            isOverBox: monitor.isOver() && monitor.getItemType() === "BOX",
         }),
-    }));
+    }), [props.id, props.name, props.position, dispatch]);
 
     const toggleDialog = () =>
         setDeleteConfirmationOpen(!deleteConfirmationOpen);

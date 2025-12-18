@@ -47,19 +47,29 @@ const generateArray = (n: number): BoxMappings => {
 const generateBoxMappingsDefault = (saveFormat: GameSaveFormat) =>
     generateArray(getGameNumberOfBoxes(saveFormat));
 
+export interface AdvancedImportSettings {
+    selectedGame: GameSaveFormat;
+    boxMappings: BoxMappings;
+    mergeDataMode: boolean;
+}
+
 export interface AdvancedImportOptionsProps {
     boxes: State["box"];
     isDarkMode: boolean;
-    fileInputRef: React.RefObject<HTMLInputElement>;
-    onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onFileSelect: (file: File, settings: AdvancedImportSettings) => void;
 }
 
-export function AdvancedImportOptions({
-    boxes,
-    isDarkMode,
-    fileInputRef,
-    onFileChange,
-}: AdvancedImportOptionsProps) {
+export interface AdvancedImportOptionsHandle {
+    openFileDialog: () => void;
+}
+
+export const AdvancedImportOptions = React.forwardRef<
+    AdvancedImportOptionsHandle,
+    AdvancedImportOptionsProps
+>(function AdvancedImportOptions(
+    { boxes, isDarkMode, onFileSelect },
+    ref
+) {
     const [isOpen, setIsOpen] = React.useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
     const [selectedGame, setSelectedGame] = React.useState<GameSaveFormat>("Auto");
@@ -69,10 +79,19 @@ export function AdvancedImportOptions({
     );
     const [fileName, setFileName] = React.useState<string>("");
 
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
     const gen3Enabled = import.meta.env.VITE_GEN3_SAVES === "true";
     const allowedGames: GameSaveFormat[] = gen3Enabled
         ? ["RBY", "GS", "Crystal", "RS", "FRLG", "Emerald"]
         : ["RBY", "GS", "Crystal"];
+
+    // Expose openFileDialog to parent via ref
+    React.useImperativeHandle(ref, () => ({
+        openFileDialog: () => {
+            fileInputRef.current?.click();
+        },
+    }));
 
     const handleGameChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const game = e.target.value as GameSaveFormat;
@@ -92,8 +111,12 @@ export function AdvancedImportOptions({
         const file = e.target.files?.[0];
         if (file) {
             setFileName(file.name);
+            onFileSelect(file, {
+                selectedGame,
+                boxMappings,
+                mergeDataMode,
+            });
         }
-        onFileChange(e);
     };
 
     return (
@@ -150,7 +173,6 @@ export function AdvancedImportOptions({
                         buttonText="Browse"
                         inputProps={{
                             accept: ".sav",
-                            ref: fileInputRef,
                             onChange: handleFileChange,
                         }}
                         fill={false}
@@ -158,18 +180,16 @@ export function AdvancedImportOptions({
                 </div>
             )}
 
-            {/* Hidden file input ref when panel is collapsed */}
-            {!isOpen && (
-                <input
-                    style={{ display: "none" }}
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    type="file"
-                    id="file-hidden"
-                    name="file-hidden"
-                    accept=".sav"
-                />
-            )}
+            {/* Hidden file input for programmatic access when panel is collapsed */}
+            <input
+                style={{ display: "none" }}
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                type="file"
+                id="file-hidden"
+                name="file-hidden"
+                accept=".sav"
+            />
 
             <Dialog
                 isOpen={isSettingsOpen}
@@ -189,5 +209,4 @@ export function AdvancedImportOptions({
             </Dialog>
         </div>
     );
-}
-
+});
