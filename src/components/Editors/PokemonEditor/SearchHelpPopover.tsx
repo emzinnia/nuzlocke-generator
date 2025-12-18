@@ -24,6 +24,16 @@ const styles = {
             background: rgba(92, 112, 128, 0.3);
             color: #394b59;
         }
+
+        .bp5-dark & {
+            background: rgba(255, 255, 255, 0.1);
+            color: #a7b6c2;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.2);
+                color: #f5f8fa;
+            }
+        }
     `,
     popoverContent: css`
         padding: 1rem;
@@ -53,6 +63,10 @@ const styles = {
         text-transform: uppercase;
         letter-spacing: 0.5px;
         margin-bottom: 0.35rem;
+
+        .bp5-dark & {
+            color: #a7b6c2;
+        }
     `,
     exampleGrid: css`
         display: grid;
@@ -66,10 +80,19 @@ const styles = {
         padding: 0.1rem 0.35rem;
         border-radius: 3px;
         color: #137cbd;
+
+        .bp5-dark & {
+            background: rgba(255, 255, 255, 0.1);
+            color: #48aff0;
+        }
     `,
     description: css`
         color: #5c7080;
         font-size: 0.8rem;
+
+        .bp5-dark & {
+            color: #a7b6c2;
+        }
     `,
     fieldList: css`
         display: flex;
@@ -84,6 +107,11 @@ const styles = {
         padding: 0.15rem 0.4rem;
         border-radius: 3px;
         color: #394b59;
+
+        .bp5-dark & {
+            background: rgba(255, 255, 255, 0.1);
+            color: #bfccd6;
+        }
     `,
 };
 
@@ -206,4 +234,3 @@ export const SearchHelpPopover: React.FC<SearchHelpPopoverProps> = ({
         </Popover>
     );
 };
-
