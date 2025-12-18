@@ -1,6 +1,17 @@
 # Search (Advanced + Performant) — Implementation Plan
 
-This document describes a comprehensive plan for implementing **fast, advanced search** across Pokémon in the app (starting with the Pokémon Editor “Search…” bar).
+> **Implementation Status: ✅ Complete (Phase 1-3)**
+>
+> The search engine is now implemented in `src/utils/search/` with:
+> - Tokenizer, Parser, Compiler, and Normalization utilities
+> - Full integration with PokemonEditor → Box → PokemonByFilter
+> - Comprehensive test suite (39 tests)
+>
+> Remaining work: Phase 4 (UX polish) and Phase 5 (perf hardening) are optional future enhancements.
+
+---
+
+This document describes a comprehensive plan for implementing **fast, advanced search** across Pokémon in the app (starting with the Pokémon Editor "Search…" bar).
 
 Today, the Pokémon Editor search term is passed into each box and used primarily for **highlighting** matching Pokémon, not filtering. The goal of this plan is to implement a real search system that:
 
@@ -436,8 +447,10 @@ Create tests covering:
 
 - **Should bare terms search only species/nickname, or include items/moves/notes too?**
   - Recommended: species/nickname only (predictable).
+  - Decision: species/nickname only
 - **Should `species:Feebas` be exact or prefix by default?**
   - Recommended: exact unless wildcard is used (predictable), but allow a dedicated operator if we want prefix: `species^:Fee` or `species:Fee*`.
+  - Decision: prefix by default but there can be an exact key `species
 - **How should multiple bare terms behave?**
   - Option A: treat each bare token as prefix against species/nickname (AND across tokens)
   - Option B: treat the whole string as a single prefix phrase
