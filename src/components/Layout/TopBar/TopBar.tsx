@@ -143,7 +143,7 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                                 : "Minimize"}{" "}
                             Editor{" "}
                             <HotkeyIndicator
-                                hotkey="m"
+                                hotkey="shift+m"
                                 showModifier={false}
                                 style={{ marginLeft: "0.35rem" }}
                             />

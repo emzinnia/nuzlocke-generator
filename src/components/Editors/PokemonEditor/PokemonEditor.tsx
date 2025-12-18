@@ -213,7 +213,7 @@ export class PokemonEditorBase extends React.Component<
                                 >
                                     Mass Editor{" "}
                                     <HotkeyIndicator
-                                        hotkey="shift+m"
+                                        hotkey="m"
                                         showModifier={false}
                                         style={{ marginLeft: "0.35rem" }}
                                     />
