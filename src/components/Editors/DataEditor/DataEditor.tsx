@@ -842,15 +842,12 @@ export class DataEditorBase extends React.Component<
                                 style={{ marginLeft: "0.35rem" }}
                             />
                         </Button>
-                    </ButtonGroup>
-
-                    <ButtonGroup>
-                        <Button
+                         <Button
                             icon="folder-open"
                             data-testid="import-save-file-button"
                             onClick={() => this.fileInput?.click()}
                         >
-                            Import Save File{" "}
+                            Import Save{" "}
                             <HotkeyIndicator
                                 hotkey="o"
                                 showModifier={false}
