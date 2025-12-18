@@ -434,13 +434,6 @@ Create tests covering:
   - clearing query restores all
   - invalid query shows error but remains usable
 
-### Cypress e2e
-
-- Ensure search works end-to-end in the real UI:
-  - `Br` filters as expected
-  - `type:dark` filters
-  - `!species:Bulbasaur` excludes
-
 ---
 
 ## Open questions (decisions to make)
