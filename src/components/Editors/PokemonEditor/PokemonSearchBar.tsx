@@ -99,7 +99,7 @@ export interface PokemonSearchBarProps {
 export const PokemonSearchBar: React.FC<PokemonSearchBarProps> = ({
     value,
     onChange,
-    placeholder = "Search... (type:dark, gender:f, etc.)",
+    placeholder = "Search...",
     className,
     style,
 }) => {
