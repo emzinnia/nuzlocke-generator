@@ -279,13 +279,6 @@ Note: previous versions of this tech debt referenced an `UpdaterBase` class; thi
   - Verify present state after sequences of edits/undo/redo/jump.
   - Verify number of history entries under rapid sequences.
 
-### Cypress (UI)
-- End-to-end flows:
-  - typing creates batched history entry (not one per keystroke)
-  - undo/redo changes visible UI state as expected
-  - jump to a history point restores UI
-  - making a new edit after undo clears redo
-
 ### Perf/regression harness
 - Add a small benchmark-like test (even if coarse) that:
   - creates N edits,
