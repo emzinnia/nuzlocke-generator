@@ -59,6 +59,7 @@ export function Autocomplete({
     const [selectedValue, setSelectedValue] = React.useState("");
     const [isOpen, setIsOpen] = React.useState(false);
     const [visibleItems, setVisibleItems] = React.useState<string[]>([]);
+    const listRef = React.useRef<HTMLUListElement>(null);
 
     const delayedValue = useDebounceCallback((e) => onChange(e), 300);
 
@@ -80,12 +81,29 @@ export function Autocomplete({
         };
 
     const handleMovement = (e) => {
-        const currentIndex = visibleItems?.indexOf(selectedValue);
-        if (e.which === 38) {
-            setSelectedValue(visibleItems[currentIndex - 1]);
-        } else {
-            setSelectedValue(visibleItems[currentIndex + 1]);
+        e.preventDefault();
+        if (!visibleItems?.length) {
+            return;
         }
+
+        const direction = e.which === 38 ? -1 : 1;
+
+        setSelectedValue((prev) => {
+            const currentIndex = visibleItems.indexOf(prev);
+            const hasSelection = currentIndex !== -1;
+            const proposedIndex = hasSelection
+                ? currentIndex + direction
+                : direction > 0
+                  ? 0
+                  : visibleItems.length - 1;
+            const nextIndex = Math.min(
+                Math.max(proposedIndex, 0),
+                visibleItems.length - 1,
+            );
+
+            return visibleItems[nextIndex] ?? prev;
+        });
+        setIsOpen(true);
     };
     const openList = (_e) => {
         setIsOpen(true);
@@ -125,7 +143,6 @@ export function Autocomplete({
             case 38:
             case 40:
                 handleMovement(e);
-                setIsOpen(true);
                 break;
             default:
                 setSelectedValue("");
@@ -135,6 +152,23 @@ export function Autocomplete({
     const selectItem = (e) => (value) => {
         changeEvent(false)({ ...e, target: { value } });
     };
+
+    React.useEffect(() => {
+        if (!selectedValue || !listRef.current) {
+            return;
+        }
+
+        const selectedIndex = visibleItems.indexOf(selectedValue);
+        if (selectedIndex < 0) {
+            return;
+        }
+
+        const selectedNode = listRef.current.children[
+            selectedIndex
+        ] as HTMLElement | undefined;
+
+        selectedNode?.scrollIntoView({ block: "nearest" });
+    }, [selectedValue, visibleItems]);
 
     return (
         <div className={cx("current-pokemon-input-wrapper", "autocomplete")}>
@@ -154,7 +188,10 @@ export function Autocomplete({
                 data-testid="autocomplete"
             />
             {isOpen ? (
-                <ul className="autocomplete-items has-nice-scrollbars">
+                <ul
+                    className="autocomplete-items has-nice-scrollbars"
+                    ref={listRef}
+                >
                     {renderItems(
                         visibleItems,
                         selectItem,
