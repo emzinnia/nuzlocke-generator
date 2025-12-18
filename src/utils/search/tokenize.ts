@@ -179,8 +179,8 @@ export function tokenize(input: string): TokenizeResult {
                 addToken("OR", value, start);
             } else if (upperValue === "AND") {
                 addToken("AND", value, start);
-            } else if (isFieldName(value.toLowerCase()) && peek() === ":") {
-                // This is a field name followed by colon
+            } else if (isFieldName(value.toLowerCase()) && isFollowedByOperator(peek(), peek(1))) {
+                // This is a field name followed by colon or comparator
                 addToken("FIELD", value.toLowerCase(), start);
             } else {
                 // Regular bare string (search term)
@@ -207,6 +207,16 @@ function isFieldName(name: string): boolean {
     return name.toLowerCase() in FIELD_ALIASES;
 }
 
+/** Check if the next character(s) indicate a field operator (: or comparator) */
+function isFollowedByOperator(char: string, nextChar: string): boolean {
+    if (char === ":") return true;
+    if (char === "=" || char === "!") return true;
+    if (char === ">" || char === "<") return true;
+    // Check for >= or <=
+    if ((char === ">" || char === "<") && nextChar === "=") return true;
+    return false;
+}
+
 /** Check if position starts a field name (for negation disambiguation) */
 function isFieldStart(input: string, startPos: number): boolean {
     let pos = startPos;
@@ -217,6 +227,8 @@ function isFieldStart(input: string, startPos: number): boolean {
         pos++;
     }
 
-    return isFieldName(word.toLowerCase()) && input[pos] === ":";
+    const nextChar = input[pos] ?? "";
+    const followingChar = input[pos + 1] ?? "";
+    return isFieldName(word.toLowerCase()) && isFollowedByOperator(nextChar, followingChar);
 }
 
