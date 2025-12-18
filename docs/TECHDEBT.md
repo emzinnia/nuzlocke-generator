@@ -297,4 +297,18 @@ Note: previous versions of this tech debt referenced an `UpdaterBase` class; thi
 - What is the desired max history length once entries are smaller?
   - Today: 50; with diffs + checkpoints we might increase safely.
 
+---
+
+## Additional considerations (adjacent debt to track)
+
+- **Search system**: the new advanced search (parser/compiler, normalized cache, persisted terms) needs perf profiling under large teams and should guard against unbounded regex/wildcards; add timeout/guardrails and a fall-back when parsing fails. Maintain a stable public API for search helpers to avoid tight coupling to UI components.
+- **Hotkey expansion**: recent hotkeys that click DOM buttons via `data-testid` are brittle; consider a central command bus or Redux actions instead of DOM querying so hotkeys work in non-DOM contexts and remain testable.
+- **Image download path**: new download flows should funnel through the documented proxy/strategy (see `docs/DOWNLOADS.md`); add integration tests that mock the proxy and assert error-handling and retries.
+- **Debug tools**: the debug panel now creates random boxes; ensure this stays dev-only (feature flag or `isLocal` guard) and cannot be triggered in production builds.
+- **History exclusions drift**: as more UI actions (search, hotkeys, download) are added, revisit the middleware exclusion list so history doesn’t grow from UI-only actions.
+- **E2E migration**: Cypress was removed in favor of Playwright scripts; ensure equivalent coverage exists for core flows (editor, imports/exports, downloads) and that CI is wired to run headed/traceful runs to diagnose flake.
+- **Docs relocation**: key Markdown references (CSS, NAV, PERFORMANCE, SEARCH, TECHDEBT, HOTKEYS, DOWNLOADS) moved to `docs/`; update any in-app links or README pointers to avoid broken references.
+- **Search storage**: localStorage persistence of search term may collide across tabs/sessions; consider namespacing by save ID or feature flagging persistence to avoid surprising cross-tab bleed-through.
+- **Search cache invalidation**: normalization cache uses WeakMap keyed on Pokémon objects; if reducers replace array elements with new objects, cache churn is fine, but if objects are mutated in place, normalized fields can drift—add tests or explicit cache busting on edits.
+- **Proxy/operator limits**: the image proxy should enforce payload/time limits and deny-list hosts to prevent SSRF; document ops runbooks (e.g., how to rotate allowlists, where logs are shipped).
 
