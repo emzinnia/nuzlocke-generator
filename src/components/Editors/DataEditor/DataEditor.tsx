@@ -109,22 +109,6 @@ export interface SaveGameSettingsDialogProps {
     setBoxMappings: ({ key, status }) => void;
 }
 
-// Quick and dirty method of getting Array w n.length
-const generateArray = (n: number) => {
-    const arr: BoxMappings = [];
-    for (let i = 1; i < n + 1; i++) {
-        if (i === 2) {
-            arr.push({ key: i, status: "Dead" });
-        } else {
-            arr.push({ key: i, status: "Boxed" });
-        }
-    }
-    return arr;
-};
-
-const generateBoxMappingsDefault = (saveFormat) =>
-    generateArray(getGameNumberOfBoxes(saveFormat));
-
 export function BoxSelect({
     boxes,
     value,
