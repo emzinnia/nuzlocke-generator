@@ -24,7 +24,6 @@ import {
     TagInput,
     TextArea,
     Tooltip,
-    Toaster,
 } from "@blueprintjs/core";
 import { OverlayToaster, PopoverInteractionKind } from "@blueprintjs/core";
 import { renderWithPortal, flushPromises } from "../../../tests/blueprintHarness";
@@ -120,7 +119,7 @@ describe("Blueprint controls characterization", () => {
             </Tag>,
         );
 
-        expect(screen.getByText("Warning")).toBeInTheDocument();
+        expect(screen.getByText("Warning")).toBeTruthy();
     });
 
     it("Tag supports round, large, icon, and onRemove", () => {
@@ -134,7 +133,9 @@ describe("Blueprint controls characterization", () => {
         const tag = container.querySelector("span");
         expect(tag?.querySelector('[data-icon="star"], .bp5-icon-star')).not.toBeNull();
 
-        const removeBtn = tag?.querySelector(".bp5-tag-remove") as HTMLElement | null;
+        const removeBtn =
+            (tag?.querySelector('button[aria-label], button[type="button"]') as HTMLElement | null) ??
+            (tag?.querySelector(".bp5-tag-remove") as HTMLElement | null);
         expect(removeBtn).not.toBeNull();
         if (removeBtn) {
             fireEvent.click(removeBtn);
@@ -209,7 +210,9 @@ describe("Blueprint form controls characterization", () => {
         const handleRemove = vi.fn();
         const { container } = render(<TagInput values={["alpha"]} onRemove={handleRemove} />);
 
-        const removeButton = container.querySelector(".bp5-tag-remove") as HTMLElement | null;
+        const removeButton =
+            (container.querySelector('button[aria-label], button[type="button"]') as HTMLElement | null) ??
+            (container.querySelector(".bp5-tag-remove") as HTMLElement | null);
         expect(removeButton).not.toBeNull();
         if (removeButton) {
             fireEvent.click(removeButton);
@@ -430,7 +433,7 @@ describe("Blueprint overlays characterization", () => {
         );
 
         const callout = screen.getByText("Body text");
-        expect(callout).toBeInTheDocument();
+        expect(callout).toBeTruthy();
     });
 
     it("Callout supports icon and minimal props", () => {
@@ -480,7 +483,7 @@ describe("Blueprint toaster characterization", () => {
         toaster.show({ message: "Toast message", intent: Intent.SUCCESS });
 
         await flushPromises();
-        const toast = document.body.querySelector(".bp5-toast");
+        const toast = document.body.querySelector('[role="status"], .bp5-toast');
         expect(toast?.textContent).toContain("Toast message");
 
         toaster.clear();
