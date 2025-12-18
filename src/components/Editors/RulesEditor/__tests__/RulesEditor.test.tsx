@@ -324,6 +324,17 @@ describe("RulesEditor", () => {
         const ruleItems = container.querySelectorAll(".rules-list-item");
         expect(ruleItems.length).toBe(hardcore.rules.length);
     });
+
+    it("updates textarea contents when rules props change (controlled inputs)", () => {
+        const { rerender } = render(<RulesEditor {...defaultProps} rules={["old rule"]} />);
+
+        expect(screen.getByDisplayValue("old rule")).toBeDefined();
+
+        rerender(<RulesEditor {...defaultProps} rules={["new rule"]} />);
+
+        expect(screen.getByDisplayValue("new rule")).toBeDefined();
+        expect(screen.queryByDisplayValue("old rule")).toBeNull();
+    });
 });
 
 describe("RulesEditorDialogBase", () => {
