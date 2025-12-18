@@ -143,7 +143,7 @@ Provide fast switching between editor sections.
 - [ ] **Force save**: `Mod+S` (intercept and prevent browser Save)
 - [x] **Export data**: `E` (global single-key; via `Hotkeys.tsx`)
 - [x] **Import data**: `I` (global single-key; via `Hotkeys.tsx`)
-- [x] **Import from save file**: `O` (global single-key; via `Hotkeys.tsx`)
+- [x] **Advanced Import**: `O` (global single-key; via `Hotkeys.tsx`)
 - [ ] **Clear all data (dangerous)**: require chord + confirmation (e.g., `Mod+Shift+Backspace` then confirm)
 
 ### Location checklist
