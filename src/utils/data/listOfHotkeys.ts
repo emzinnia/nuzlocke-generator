@@ -64,7 +64,8 @@ export const listOfHotkeys: HotkeyList[] = [
         onKeyUp: "movePokemonStatusDown",
     },
     {
-        key: "m",
+        key: "M",
+        label: "shift+m",
         comment: "Toggle editor",
         onKeyUp: "toggleEditor",
     },
@@ -79,8 +80,7 @@ export const listOfHotkeys: HotkeyList[] = [
         onKeyUp: "toggleTypeMatchups",
     },
     {
-        key: "M",
-        label: "shift+m",
+        key: "m",
         comment: "Toggle Mass Editor",
         onKeyUp: "toggleMassEditor",
     },
