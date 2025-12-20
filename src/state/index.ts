@@ -4,6 +4,7 @@ import { Checkpoints } from "reducers/checkpoints";
 import { Nuzlockes } from "reducers/nuzlocke";
 import { History } from "reducers/editorHistory";
 import { HotkeyBindings } from "reducers/hotkeys";
+import { SaveUploadSettingsState } from "reducers/saveUploadSettings";
 
 export interface State {
     box: Boxes;
@@ -17,6 +18,7 @@ export interface State {
     pokemon: Pokemon[];
     rules: string[];
     sawRelease: { [v: string]: boolean };
+    saveUploadSettings: SaveUploadSettingsState;
     selectedId: string;
     style: Styles;
     theme: any;

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
     Button,
     ButtonGroup,
@@ -11,39 +12,7 @@ import { GameSaveFormat } from "utils";
 import { State } from "state";
 import { BoxMappings } from "parsers/utils/boxMappings";
 import { SaveGameSettingsDialog } from "./DataEditor";
-
-const getGameNumberOfBoxes = (game: GameSaveFormat) => {
-    switch (game) {
-        case "Auto":
-            return 14;
-        case "RBY":
-            return 12;
-        case "GS":
-        case "Crystal":
-            return 14;
-        case "Emerald":
-        case "RS":
-        case "FRLG":
-            return 14;
-        default:
-            return 12;
-    }
-};
-
-const generateArray = (n: number): BoxMappings => {
-    const arr: BoxMappings = [];
-    for (let i = 1; i < n + 1; i++) {
-        if (i === 2) {
-            arr.push({ key: i, status: "Dead", name: `Box ${i}` });
-        } else {
-            arr.push({ key: i, status: "Boxed", name: `Box ${i}` });
-        }
-    }
-    return arr;
-};
-
-const generateBoxMappingsDefault = (saveFormat: GameSaveFormat) =>
-    generateArray(getGameNumberOfBoxes(saveFormat));
+import { updateSaveUploadSettings } from "actions";
 
 export interface AdvancedImportSettings {
     selectedGame: GameSaveFormat;
@@ -68,13 +37,13 @@ export const AdvancedImportOptions = React.forwardRef<
     { boxes, isDarkMode, onFileSelect },
     ref
 ) {
+    const dispatch = useDispatch();
+    const { selectedGame, boxMappings, mergeDataMode } = useSelector(
+        (state: State) => state.saveUploadSettings
+    );
+
     const [isOpen, setIsOpen] = React.useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
-    const [selectedGame, setSelectedGame] = React.useState<GameSaveFormat>("Auto");
-    const [mergeDataMode, setMergeDataMode] = React.useState(true);
-    const [boxMappings, setBoxMappings] = React.useState<BoxMappings>(() =>
-        generateBoxMappingsDefault("Auto")
-    );
     const [fileName, setFileName] = React.useState<string>("");
 
     const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -93,16 +62,18 @@ export const AdvancedImportOptions = React.forwardRef<
 
     const handleGameChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const game = e.target.value as GameSaveFormat;
-        setSelectedGame(game);
-        setBoxMappings(generateBoxMappingsDefault(game));
+        dispatch(updateSaveUploadSettings({ selectedGame: game }));
     };
 
     const handleBoxMappingChange = ({ key, status }: { key: number; status: string }) => {
-        setBoxMappings((prev) =>
-            prev.map((mapping) =>
-                mapping.key === key ? { key, status } : mapping
-            )
+        const updatedMappings = boxMappings.map((mapping) =>
+            mapping.key === key ? { ...mapping, status } : mapping
         );
+        dispatch(updateSaveUploadSettings({ boxMappings: updatedMappings }));
+    };
+
+    const handleMergeDataChange = () => {
+        dispatch(updateSaveUploadSettings({ mergeDataMode: !mergeDataMode }));
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -195,7 +166,7 @@ export const AdvancedImportOptions = React.forwardRef<
             >
                 <SaveGameSettingsDialog
                     mergeDataMode={mergeDataMode}
-                    onMergeDataChange={() => setMergeDataMode(!mergeDataMode)}
+                    onMergeDataChange={handleMergeDataChange}
                     boxes={boxes}
                     selectedGame={selectedGame}
                     boxMappings={boxMappings}
