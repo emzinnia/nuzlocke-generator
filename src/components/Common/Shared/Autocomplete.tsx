@@ -11,7 +11,7 @@ export interface AutocompleteProps {
     label?: string;
     disabled?: boolean;
     value: string;
-    onChange: any;
+    onChange: (e: { target: { value: string } }) => void;
     className?: string;
     /* @NOTE: this value should always be in conjunction with disabled
        it is used to obscure unimportant data, like Species when a Pokemon is an egg */
@@ -20,8 +20,8 @@ export interface AutocompleteProps {
 
 const renderItems = (
     visibleItems: string[],
-    selectItem: any,
-    innerValue: string,
+    selectItem: (e: React.SyntheticEvent) => (value: string) => void,
+    _innerValue: string,
     selectedValue: string,
 ) =>
     visibleItems.map((v, i) => {
@@ -58,8 +58,10 @@ export function Autocomplete({
     const [innerValue, setValue] = React.useState("");
     const [selectedValue, setSelectedValue] = React.useState("");
     const [isOpen, setIsOpen] = React.useState(false);
-    const [visibleItems, setVisibleItems] = React.useState<string[]>([]);
+    // Initialize from props so keyboard navigation works immediately (before the first effect runs).
+    const [visibleItems, setVisibleItems] = React.useState<string[]>(() => filter(items, value) ?? []);
     const listRef = React.useRef<HTMLUListElement>(null);
+    const closeTimeoutRef = React.useRef<number | undefined>(undefined);
 
     const delayedValue = useDebounceCallback((e) => onChange(e), 300);
 
@@ -81,12 +83,15 @@ export function Autocomplete({
         };
 
     const handleMovement = (e) => {
-        e.preventDefault();
+        e?.preventDefault?.();
         if (!visibleItems?.length) {
             return;
         }
 
-        const direction = e.which === 38 ? -1 : 1;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const keyCode = (e as any)?.which ?? (e as any)?.keyCode ?? (e as any)?.nativeEvent?.keyCode;
+        const isArrowUp = e?.key === "ArrowUp" || keyCode === 38;
+        const direction = isArrowUp ? -1 : 1;
 
         setSelectedValue((prev) => {
             const currentIndex = visibleItems.indexOf(prev);
@@ -106,12 +111,24 @@ export function Autocomplete({
         setIsOpen(true);
     };
     const openList = (_e) => {
+        if (closeTimeoutRef.current) {
+            window.clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = undefined;
+        }
         setIsOpen(true);
+        // Keep list in sync when reopening without changing the input value.
+        setVisibleItems(filter(items, innerValue) ?? []);
     };
     const closeList = (e) => {
-        setTimeout(() => {
+        if (closeTimeoutRef.current) {
+            window.clearTimeout(closeTimeoutRef.current);
+        }
+        closeTimeoutRef.current = window.setTimeout(() => {
             setIsOpen(false);
-            setVisibleItems(items);
+            // Keep visible items aligned to the last typed value; reopening will re-filter anyway.
+            setVisibleItems(filter(items, e.target.value) ?? []);
+            setSelectedValue("");
+            closeTimeoutRef.current = undefined;
         }, 250);
         setValue(e.target.value);
     };
@@ -119,8 +136,19 @@ export function Autocomplete({
         e.persist();
         setVisibleItems(filter(items, e.currentTarget.value));
 
-        switch (e.which) {
-            case 13:
+        // Prefer modern `key` but keep keyCode/which compatibility (tests + older browsers).
+        const keyCode =
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (e as any).which ?? (e as any).keyCode ?? (e as any).nativeEvent?.keyCode;
+        const isEnter = e.key === "Enter" || keyCode === 13;
+        const isBackspace = e.key === "Backspace" || keyCode === 8;
+        const isEscape = e.key === "Escape" || keyCode === 27;
+        const isTab = e.key === "Tab" || keyCode === 9;
+        const isArrowUp = e.key === "ArrowUp" || keyCode === 38;
+        const isArrowDown = e.key === "ArrowDown" || keyCode === 40;
+
+        switch (true) {
+            case isEnter:
                 e.preventDefault();
                 if (selectedValue) {
                     setValue(selectedValue);
@@ -134,14 +162,14 @@ export function Autocomplete({
                     },
                 });
                 break;
-            case 8:
+            case isBackspace:
                 break;
-            case 27:
-            case 9:
+            case isEscape:
+            case isTab:
                 closeList(e);
                 break;
-            case 38:
-            case 40:
+            case isArrowUp:
+            case isArrowDown:
                 handleMovement(e);
                 break;
             default:
@@ -150,6 +178,12 @@ export function Autocomplete({
         }
     };
     const selectItem = (e) => (value) => {
+        if (closeTimeoutRef.current) {
+            window.clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = undefined;
+        }
+        setIsOpen(false);
+        setSelectedValue("");
         changeEvent(false)({ ...e, target: { value } });
     };
 
@@ -178,6 +212,7 @@ export function Autocomplete({
                 className={cx(className, makeInvisibleText && invisibleText)}
                 onKeyDown={handleKeyDown}
                 onFocus={openList}
+                onClick={openList}
                 onBlur={closeList}
                 placeholder={placeholder}
                 name={name}

@@ -1,6 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 test('captures screenshot of default page view', async ({ page }) => {
+    // Set viewport to 4k size
+    await page.setViewportSize({ width: 3840, height: 2160 });
+
     await page.goto('/');
 
     // Wait for the page to be fully loaded (may redirect)

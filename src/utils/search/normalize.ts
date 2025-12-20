@@ -99,3 +99,4 @@ export function clearNormalizationCache(): void {
     // This function exists for API consistency but the WeakMap handles cleanup automatically
 }
 
+

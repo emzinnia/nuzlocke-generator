@@ -151,3 +151,4 @@ export function clearSearchCache(): void {
     cachedResult = null;
 }
 
+
