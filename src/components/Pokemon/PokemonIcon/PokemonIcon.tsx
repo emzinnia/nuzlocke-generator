@@ -18,6 +18,7 @@ import { State } from "state";
 import { Omit } from "ramda";
 import { normalizeSpeciesName } from "utils/getters/normalizeSpeciesName";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
+import { ResizedImage } from "components/Common/Shared/ResizedImage";
 import { Pokemon } from "models";
 
 export interface PokemonIconProps {
@@ -177,7 +178,18 @@ export function PokemonIconPlain({
             className={`${id === selectedId ? "pokemon-icon selected" : "pokemon-icon"} ${className || ""} ${isDragging ? "opacity-medium" : ""} ${canDrop ? "droppable" : ""}`}
         >
             {customIcon ? (
-                <PokemonImage url={customIcon} />
+                <PokemonImage url={customIcon}>
+                    {(image) => (
+                        <ResizedImage
+                            // Keep layout consistent with default icons, but cap custom icon data at 64x64.
+                            src={image}
+                            width={64}
+                            height={64}
+                            style={imageStyle}
+                            alt={species}
+                        />
+                    )}
+                </PokemonImage>
             ) : (
                 <img
                     style={imageStyle}

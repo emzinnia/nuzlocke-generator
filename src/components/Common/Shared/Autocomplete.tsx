@@ -13,6 +13,7 @@ export interface AutocompleteProps {
     value: string;
     onChange: (e: { target: { value: string } }) => void;
     className?: string;
+    rightElement?: React.ReactNode;
     /* @NOTE: this value should always be in conjunction with disabled
        it is used to obscure unimportant data, like Species when a Pokemon is an egg */
     makeInvisibleText?: boolean;
@@ -54,6 +55,7 @@ export function Autocomplete({
     items,
     // onInput,
     value,
+    rightElement,
 }: AutocompleteProps) {
     const [innerValue, setValue] = React.useState("");
     const [selectedValue, setSelectedValue] = React.useState("");
@@ -207,21 +209,29 @@ export function Autocomplete({
     return (
         <div className={cx("current-pokemon-input-wrapper", "autocomplete")}>
             <label>{label}</label>
-            <input
-                autoComplete="off"
-                className={cx(className, makeInvisibleText && invisibleText)}
-                onKeyDown={handleKeyDown}
-                onFocus={openList}
-                onClick={openList}
-                onBlur={closeList}
-                placeholder={placeholder}
-                name={name}
-                type="text"
-                onChange={changeEvent()}
-                value={innerValue}
-                disabled={disabled}
-                data-testid="autocomplete"
-            />
+            <div style={{ display: "flex", gap: "0.25rem", alignItems: "center" }}>
+                <input
+                    autoComplete="off"
+                    className={cx(className, makeInvisibleText && invisibleText)}
+                    onKeyDown={handleKeyDown}
+                    onFocus={openList}
+                    onClick={openList}
+                    onBlur={closeList}
+                    placeholder={placeholder}
+                    name={name}
+                    type="text"
+                    onChange={changeEvent()}
+                    value={innerValue}
+                    disabled={disabled}
+                    data-testid="autocomplete"
+                    style={{ flex: 1, minWidth: 0 }}
+                />
+                {rightElement ? (
+                    <span style={{ display: "inline-flex", alignItems: "center" }}>
+                        {rightElement}
+                    </span>
+                ) : null}
+            </div>
             {isOpen ? (
                 <ul
                     className="autocomplete-items has-nice-scrollbars"

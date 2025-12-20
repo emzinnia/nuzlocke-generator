@@ -7,11 +7,11 @@
     border-bottom-right-radius: 0.25rem;
     max-height: 200px;
     position: absolute;
-    top: 2.5rem;
-    margin-top: 0;
+    top: 100%;
+    margin-top: 0.25rem;
     padding: 0;
     overflow: auto;
-    width: 11.5rem;
+    width: 100%;
     z-index: 11;
     background: #ffffff;
     color: #111;
@@ -29,7 +29,7 @@
 
 @media screen and (max-width: 720px) {
     .autocomplete-items {
-        top: 2.25rem;
+        top: 100%;
     }
 }
 

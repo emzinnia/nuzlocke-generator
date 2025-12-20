@@ -44,6 +44,7 @@ interface CurrentPokemonInputProps {
     usesKeyValue?: boolean;
     className?: string;
     items?: string[];
+    rightElement?: React.ReactNode;
     key: string;
 }
 interface ChangeArgs {
@@ -442,14 +443,32 @@ export function CurrentPokemonInput(props: CurrentPokemonInputProps) {
             className={`current-pokemon-input-wrapper current-pokemon-${props.type} ${props.type === "autocomplete" && "autocomplete"} current-pokemon-${props.inputName} ${className}`}
         >
             <label>{props.labelName}</label>
-            {getInput({
-                ...props,
-                selectedId,
-                onChange,
-                setEdit,
-                edit,
-                customMoveMap,
-            })}
+            {props.rightElement ? (
+                <div style={{ display: "flex", gap: "0.25rem", alignItems: "center" }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        {getInput({
+                            ...props,
+                            selectedId,
+                            onChange,
+                            setEdit,
+                            edit,
+                            customMoveMap,
+                        })}
+                    </div>
+                    <span style={{ display: "inline-flex", alignItems: "center" }}>
+                        {props.rightElement}
+                    </span>
+                </div>
+            ) : (
+                getInput({
+                    ...props,
+                    selectedId,
+                    onChange,
+                    setEdit,
+                    edit,
+                    customMoveMap,
+                })
+            )}
         </span>
     );
 }
