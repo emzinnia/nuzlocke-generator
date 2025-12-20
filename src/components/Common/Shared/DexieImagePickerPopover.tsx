@@ -174,6 +174,7 @@ export function DexieImagePickerPopover({
         <div className={styles.popover}>
             <div className={styles.headerRow}>
                 <InputGroup
+                    fill
                     placeholder="Search uploaded images…"
                     value={query}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>

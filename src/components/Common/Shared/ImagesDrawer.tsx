@@ -44,6 +44,16 @@ const styles = {
         min-height: 50vh;
         padding-bottom: 2rem;
     `,
+    imagesGrid: css`
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: stretch;
+    `,
+    imagesList: css`
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: stretch;
+    `,
     imageCard: css`
         width: calc(33.333% - 0.75rem);
         padding: 0 !important;
@@ -53,6 +63,12 @@ const styles = {
             width: calc(50% - 0.5rem);
         }
     `,
+    imageCardList: css`
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+    `,
     imageWrapper: css`
         position: relative;
         height: 10rem;
@@ -61,6 +77,11 @@ const styles = {
         &:hover .image-overlay {
             opacity: 1;
         }
+    `,
+    imageWrapperList: css`
+        height: 4rem;
+        width: 6rem;
+        flex: 0 0 6rem;
     `,
     imageInner: css`
         object-fit: cover;
@@ -86,6 +107,11 @@ const styles = {
         justify-content: space-between;
         gap: 0.5rem;
         border-top: 1px solid rgba(128, 128, 128, 0.2);
+    `,
+    imageFooterList: css`
+        flex: 1;
+        border-top: none;
+        border-left: 1px solid rgba(128, 128, 128, 0.2);
     `,
     imageName: css`
         font-size: 0.8rem;
@@ -357,7 +383,14 @@ export function ImagesDrawerInner() {
                 </div>
             </header>
 
-            <div className={styles.images}>
+            <div
+                className={cx(
+                    styles.images,
+                    layoutView === ImagesDrawerLayout.List
+                        ? styles.imagesList
+                        : styles.imagesGrid,
+                )}
+            >
                 {images.length === 0 && !isLoading && (
                     <NonIdealState
                         icon="media"
@@ -366,40 +399,86 @@ export function ImagesDrawerInner() {
                     />
                 )}
                 {images?.map((image) => (
-                    <Card key={image.id} className={styles.imageCard} elevation={1}>
-                        <div className={styles.imageWrapper}>
+                    <Card
+                        key={image.id}
+                        className={cx(
+                            styles.imageCard,
+                            layoutView === ImagesDrawerLayout.List &&
+                                styles.imageCardList,
+                        )}
+                        elevation={1}
+                    >
+                        <div
+                            className={cx(
+                                styles.imageWrapper,
+                                layoutView === ImagesDrawerLayout.List &&
+                                    styles.imageWrapperList,
+                            )}
+                        >
                             <img
                                 className={styles.imageInner}
                                 src={image.image}
                                 alt={image.name}
                                 title={image.name}
                             />
-                            <div className={cx("image-overlay", styles.imageOverlay)}>
-                                <Button
-                                    icon="clipboard"
-                                    small
-                                    onClick={copyToClipboard(image.name)}
-                                    title="Copy name"
+                            {layoutView === ImagesDrawerLayout.Grid ? (
+                                <div
+                                    className={cx(
+                                        "image-overlay",
+                                        styles.imageOverlay,
+                                    )}
                                 >
-                                    Copy
-                                </Button>
-                                {image?.id && (
                                     <Button
-                                        icon="trash"
+                                        icon="clipboard"
                                         small
-                                        intent={Intent.DANGER}
-                                        onClick={deleteImage(image.id)}
-                                        title="Delete image"
+                                        onClick={copyToClipboard(image.name)}
+                                        title="Copy name"
                                     >
-                                        Delete
+                                        Copy
                                     </Button>
-                                )}
-                            </div>
+                                    {image?.id && (
+                                        <Button
+                                            icon="trash"
+                                            small
+                                            intent={Intent.DANGER}
+                                            onClick={deleteImage(image.id)}
+                                            title="Delete image"
+                                        >
+                                            Delete
+                                        </Button>
+                                    )}
+                                </div>
+                            ) : null}
                         </div>
-                        <div className={styles.imageFooter}>
+                        <div
+                            className={cx(
+                                styles.imageFooter,
+                                layoutView === ImagesDrawerLayout.List &&
+                                    styles.imageFooterList,
+                            )}
+                        >
                             <span className={styles.imageName} title={image.name}>
                                 {image.name}
                             </span>
+                            {layoutView === ImagesDrawerLayout.List ? (
+                                <div style={{ display: "flex", gap: "0.25rem" }}>
+                                    <Button
+                                        icon="clipboard"
+                                        small
+                                        onClick={copyToClipboard(image.name)}
+                                        title="Copy name"
+                                    />
+                                    {image?.id && (
+                                        <Button
+                                            icon="trash"
+                                            small
+                                            intent={Intent.DANGER}
+                                            onClick={deleteImage(image.id)}
+                                            title="Delete image"
+                                        />
+                                    )}
+                                </div>
+                            ) : null}
                         </div>
                     </Card>
                 ))}
