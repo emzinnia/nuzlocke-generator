@@ -1,1 +1,40 @@
-./node_modules/@types
+# Heroku slug ignore file
+# These files/directories are excluded from the deployed slug to reduce size
+
+# Development and test files
+__mocks__
+_old
+coverage
+e2e
+test-results
+tests
+playwright-report
+setupTests.ts
+jest-config.json
+
+# Documentation
+docs
+*.md
+
+# Configuration files not needed at runtime
+*.config.js
+*.config.ts
+tsconfig*.json
+eslint.config.js
+babel.config.js
+stylus.config.ts
+
+# Scripts not needed at runtime
+scripts
+massRename.ts
+scraper.js
+
+# Source files (already bundled into dist)
+# These are copied to dist during build, so not needed in slug
+src
+
+# Playwright
+playwright.config.ts
+
+# App JSON (Expo config, not needed for web)
+app.json

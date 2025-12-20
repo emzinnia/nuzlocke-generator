@@ -22,8 +22,15 @@ export default defineConfig({
         viteStaticCopy({
             targets: [
                 { src: "src/img/*", dest: "img" },
-                { src: "src/assets/*", dest: "assets" },
                 { src: "src/assets/icons/*", dest: "icons" },
+                // Copy assets/img subdirectory (box backgrounds, etc.)
+                { src: "src/assets/img/*", dest: "assets/img" },
+                // Copy only non-icon root assets to avoid duplication
+                { src: "src/assets/*.png", dest: "assets" },
+                { src: "src/assets/*.jpg", dest: "assets" },
+                { src: "src/assets/*.woff", dest: "assets" },
+                { src: "src/assets/*.ttf", dest: "assets" },
+                { src: "src/assets/*.css", dest: "assets" },
             ],
         }),
         // Plugin to mock CSS and static files in tests only
@@ -90,7 +97,7 @@ export default defineConfig({
     build: {
         outDir: "dist",
         minify: isProduction,
-        sourcemap: true,
+        sourcemap: !isProduction, // Disable sourcemaps in production to reduce bundle size
         // Code splitting
         rollupOptions: {
             output: {
