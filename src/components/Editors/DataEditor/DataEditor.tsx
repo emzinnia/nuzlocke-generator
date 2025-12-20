@@ -9,7 +9,6 @@ import {
     Intent,
     Switch,
     Classes,
-    HTMLSelect,
 } from "@blueprintjs/core";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { ErrorBoundary, HotkeyIndicator } from "components/Common/Shared";
@@ -36,6 +35,7 @@ import { showToast } from "components/Common/Shared/appToaster";
 import { BoxMappings } from "parsers/utils/boxMappings";
 import SaveFileWorker from "parsers/worker?worker";
 import { cx } from "emotion";
+import { StatusDropZone } from "./StatusDropZone";
 
 export interface DataEditorProps {
     state: State;
@@ -106,34 +106,8 @@ export interface SaveGameSettingsDialogProps {
     boxes: State["box"];
     selectedGame: GameSaveFormat;
     boxMappings: BoxMappings;
-    setBoxMappings: ({ key, status }) => void;
-}
-
-export function BoxSelect({
-    boxes,
-    value,
-    boxKey,
-    setBoxMappings,
-}: {
-    boxes: State["box"];
-    value: string;
-    boxKey: number;
-    setBoxMappings: SaveGameSettingsDialogProps["setBoxMappings"];
-}) {
-    return (
-        <HTMLSelect
-            value={value}
-            onChange={(e) =>
-                setBoxMappings({ key: boxKey, status: e.target.value })
-            }
-        >
-            {boxes.map((box) => (
-                <option key={box.id} value={box.name}>
-                    {box.name}
-                </option>
-            ))}
-        </HTMLSelect>
-    );
+    setBoxMappings: ({ key, status }: { key: number; status: string }) => void;
+    isDarkMode: boolean;
 }
 
 export function SaveGameSettingsDialog({
@@ -142,14 +116,39 @@ export function SaveGameSettingsDialog({
     boxes,
     boxMappings,
     setBoxMappings,
+    isDarkMode,
 }: SaveGameSettingsDialogProps) {
-    // const select = (
-    //     <Select
-    //         items={boxes}
-    //         onItemSelect={() => {}}
-    //     >
-    //     </Select>
-    // );
+    // Group boxMappings by status
+    const boxesByStatus = React.useMemo(() => {
+        const grouped: Record<string, typeof boxMappings> = {};
+        
+        // Initialize with all available statuses from app boxes
+        for (const box of boxes) {
+            grouped[box.name] = [];
+        }
+        
+        // Assign each save file box to its status
+        for (const mapping of boxMappings) {
+            if (!grouped[mapping.status]) {
+                grouped[mapping.status] = [];
+            }
+            grouped[mapping.status].push(mapping);
+        }
+        
+        return grouped;
+    }, [boxes, boxMappings]);
+
+    // Get ordered list of statuses (from app boxes)
+    const statusOrder = React.useMemo(() => {
+        return boxes.map((box) => box.name);
+    }, [boxes]);
+
+    const handleDrop = React.useCallback(
+        (boxKey: number, newStatus: string) => {
+            setBoxMappings({ key: boxKey, status: newStatus });
+        },
+        [setBoxMappings]
+    );
 
     return (
         <div className={cx(Classes.DIALOG_BODY, "has-nice-scrollbars")}>
@@ -170,36 +169,29 @@ export function SaveGameSettingsDialog({
                 onChange={onMergeDataChange}
             />
 
+            <p className={Classes.TEXT_MUTED} style={{ marginBottom: "1rem" }}>
+                Drag and drop the save file boxes to assign them to different statuses.
+            </p>
+
             <div
                 style={{
-                    height: "60vh",
+                    maxHeight: "50vh",
                     overflow: "auto",
                     display: "flex",
                     flexDirection: "column",
-                    flexWrap: "wrap",
                 }}
                 className="has-nice-scrollbars"
             >
-                {boxMappings.map((value) => {
-                    return (
-                        <div key={value.key} style={{ padding: "0.25rem" }}>
-                            <BoxSelect
-                                boxKey={value.key}
-                                setBoxMappings={setBoxMappings}
-                                value={value.status}
-                                boxes={boxes}
-                            />
-                            <div
-                                className={Classes.BUTTON}
-                                style={{
-                                    marginLeft: "0.25rem",
-                                    cursor: "default",
-                                    width: "8rem",
-                                }}
-                            >{`Box ${value.key}`}</div>
-                        </div>
-                    );
-                })}
+                {statusOrder.map((status) => (
+                    <StatusDropZone
+                        key={status}
+                        statusName={status}
+                        boxes={boxesByStatus[status] || []}
+                        isDarkMode={isDarkMode}
+                        showPartyBox={status === "Team"}
+                        onDrop={handleDrop}
+                    />
+                ))}
             </div>
         </div>
     );

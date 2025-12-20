@@ -255,29 +255,64 @@ export function ImagesDrawerInner() {
     };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e?.target?.files?.[0];
-        if (!file) return;
-        const size = file.size / 1024 / 1024;
-        if (size > 0.5) {
+        const files: File[] = Array.from(e?.target?.files ?? []);
+        if (!files.length) return;
+
+        const toBase64 = (file: File) =>
+            new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result as string);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+
+        let uploaded = 0;
+        let tooLarge = 0;
+        let failed = 0;
+        let lastId: number | undefined;
+
+        for (const file of files) {
+            const size = (file.size ?? 0) / 1024 / 1024;
+            if (size > 0.5) {
+                tooLarge += 1;
+                continue;
+            }
+            try {
+                const image = await toBase64(file);
+                lastId = await db.images.put({
+                    image,
+                    name: file.name,
+                });
+                uploaded += 1;
+            } catch {
+                failed += 1;
+            }
+        }
+
+        // Allow selecting the same files again.
+        try {
+            e.target.value = "";
+        } catch {
+            // ignore
+        }
+
+        if (lastId != null) {
+            setRefresh(lastId);
+        }
+
+        const skippedText = tooLarge > 0 ? ` Skipped ${tooLarge} too-large.` : "";
+        const failedText = failed > 0 ? ` Failed ${failed}.` : "";
+        if (uploaded > 0) {
             toaster?.show({
-                message: `File size of 500KB exceeded. File was ${size.toFixed(2)}MB`,
+                message: `Uploaded ${uploaded} images.${skippedText}${failedText}`,
+                intent: failed > 0 ? Intent.WARNING : Intent.SUCCESS,
+            });
+        } else {
+            toaster?.show({
+                message: `No images uploaded.${skippedText}${failedText}`,
                 intent: Intent.DANGER,
             });
-            return;
         }
-        const reader = new FileReader();
-        reader.onload = async () => {
-            const id = await db.images.put({
-                image: reader.result as string,
-                name: file.name,
-            });
-            setRefresh(id);
-            toaster?.show({
-                message: "Upload successful!",
-                intent: Intent.SUCCESS,
-            });
-        };
-        reader.readAsDataURL(file);
     };
 
     return (
@@ -313,6 +348,7 @@ export function ImagesDrawerInner() {
                         </Button>
                         <input
                             accept="image/*"
+                            multiple
                             className={styles.hiddenInput}
                             onChange={handleFileUpload}
                             type="file"

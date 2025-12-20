@@ -34,9 +34,9 @@ const generateArray = (n: number): BoxMappings => {
     const arr: BoxMappings = [];
     for (let i = 1; i < n + 1; i++) {
         if (i === 2) {
-            arr.push({ key: i, status: "Dead" });
+            arr.push({ key: i, status: "Dead", name: `Box ${i}` });
         } else {
-            arr.push({ key: i, status: "Boxed" });
+            arr.push({ key: i, status: "Boxed", name: `Box ${i}` });
         }
     }
     return arr;
@@ -191,6 +191,7 @@ export const AdvancedImportOptions = React.forwardRef<
                 title="Save Upload Settings"
                 className={isDarkMode ? Classes.DARK : ""}
                 icon="floppy-disk"
+                style={{ width: "700px" }}
             >
                 <SaveGameSettingsDialog
                     mergeDataMode={mergeDataMode}
@@ -199,6 +200,7 @@ export const AdvancedImportOptions = React.forwardRef<
                     selectedGame={selectedGame}
                     boxMappings={boxMappings}
                     setBoxMappings={handleBoxMappingChange}
+                    isDarkMode={isDarkMode}
                 />
             </Dialog>
         </div>
