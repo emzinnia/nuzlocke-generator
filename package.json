@@ -13,6 +13,7 @@
         "preview": "vite preview --host",
         "clean": "rimraf dist",
         "clean:all": "rimraf dist coverage node_modules/.cache node_modules/.vite",
+        "scrape:pokedex:full": "node scripts/download-pokedex-full.mjs --from 891 --to 1025",
         "deploy": "npm run build && git push heroku master",
         "lint": "npx eslint",
         "lint:fix": "npx eslint --fix",
@@ -39,7 +40,8 @@
         "typecheck:watch": "tsc --noEmit --watch",
         "validate": "npm run typecheck && npm run lint && npm run test:run",
         "todos": "npx leasot 'src/**/*.tsx' 'src/**/*.ts'",
-        "lh": "npx lighthouse http://localhost:8080 --output-path=./lighthouse/audit.html --save-assets --preset=desktop --quiet --chrome-flags=headless"
+        "lh": "npx lighthouse http://localhost:8080 --output-path=./lighthouse/audit.html --save-assets --preset=desktop --quiet --chrome-flags=headless",
+        "images:check": "npx tsx scripts/imageCheck.ts"
     },
     "engines": {
         "node": "^24",

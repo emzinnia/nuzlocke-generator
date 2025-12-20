@@ -1,5 +1,4 @@
 ## A
-
 - [x] Abomasnow
 - [x] Abra
 - [x] Absol
@@ -25,6 +24,7 @@
 - [x] Arboliva
 - [x] Arcanine
 - [x] Arceus
+- [x] Archaludon
 - [x] Archen
 - [x] Archeops
 - [ ] Arctibax
@@ -44,9 +44,7 @@
 - [x] Azelf
 - [x] Azumarill
 - [x] Azurill
-
 ## B
-
 - [x] Bagon
 - [x] Baltoy
 - [x] Banette
@@ -102,9 +100,7 @@
 - [x] Burmy
 - [x] Butterfree
 - [x] Buzzwole
-
 ## C
-
 - [x] Cacnea
 - [x] Cacturne
 - [x] Calyrex
@@ -191,9 +187,7 @@
 - [x] Cutiefly
 - [x] Cyclizar
 - [x] Cyndaquil
-
 ## D
-
 - [x] Dachsbun
 - [x] Darkrai
 - [x] Darmanitan
@@ -215,6 +209,7 @@
 - [x] Diancie
 - [x] Diggersby
 - [x] Diglett
+- [x] Dipplin
 - [x] Ditto
 - [x] Dodrio
 - [x] Doduo
@@ -254,9 +249,7 @@
 - [x] Duskull
 - [x] Dustox
 - [x] Dwebble
-
 ## E
-
 - [x] Eelektrik
 - [x] Eelektross
 - [x] Eevee
@@ -283,9 +276,7 @@
 - [x] Exeggcute
 - [x] Exeggutor
 - [x] Exploud
-
 ## F
-
 - [x] Falinks
 - [x] Farfetch'd
 - [x] Farigiraf
@@ -295,6 +286,7 @@
 - [x] Feraligatr
 - [x] Ferroseed
 - [x] Ferrothorn
+- [ ] Fezandipiti
 - [x] Fidough
 - [x] Finizen
 - [x] Finneon
@@ -325,9 +317,7 @@
 - [x] Fuecoco
 - [x] Furfrou
 - [x] Furret
-
 ## G
-
 - [x] Gabite
 - [x] Gallade
 - [x] Galvantula
@@ -370,6 +360,7 @@
 - [x] Gothita
 - [x] Gothitelle
 - [x] Gothorita
+- [x] Gouging Fire
 - [x] Gourgeist
 - [ ] Grafaiai
 - [x] Granbull
@@ -393,9 +384,7 @@
 - [x] Gurdurr
 - [x] Guzzlord
 - [x] Gyarados
-
 ## H
-
 - [x] Hakamo-o
 - [x] Happiny
 - [x] Hariyama
@@ -427,11 +416,10 @@
 - [x] Houndour
 - [x] Houndstone
 - [x] Huntail
+- [x] Hydrapple
 - [x] Hydreigon
 - [x] Hypno
-
 ## I
-
 - [x] Igglybuff
 - [x] Illumise
 - [x] Impidimp
@@ -440,17 +428,18 @@
 - [x] Infernape
 - [x] Inkay
 - [x] Inteleon
+- [ ] Iron Boulder
 - [x] Iron Bundle
+- [ ] Iron Crown
 - [x] Iron Hands
 - [ ] Iron Jugulis
+- [x] Iron Leaves
 - [x] Iron Moth
 - [ ] Iron Thorns
 - [ ] Iron Treads
 - [ ] Iron Valiant
 - [x] Ivysaur
-
 ## J
-
 - [x] Jangmo-o
 - [x] Jellicent
 - [x] Jigglypuff
@@ -459,9 +448,7 @@
 - [x] Joltik
 - [x] Jumpluff
 - [x] Jynx
-
 ## K
-
 - [x] Kabuto
 - [x] Kabutops
 - [x] Kadabra
@@ -494,9 +481,7 @@
 - [x] Kubfu
 - [x] Kyogre
 - [x] Kyurem
-
 ## L
-
 - [x] Lairon
 - [x] Lampent
 - [x] Landorus
@@ -537,9 +522,7 @@
 - [x] Luxio
 - [x] Luxray
 - [x] Lycanroc
-
 ## M
-
 - [ ] Mabosstiff
 - [x] Machamp
 - [x] Machoke
@@ -615,12 +598,11 @@
 - [x] Mudsdale
 - [x] Muk
 - [x] Munchlax
+- [ ] Munkidori
 - [x] Munna
 - [x] Murkrow
 - [x] Musharna
-
 ## N
-
 - [x] Nacli
 - [ ] Naclstack
 - [x] Naganadel
@@ -644,13 +626,13 @@
 - [x] Numel
 - [x] Nuzleaf
 - [ ] Nymble
-
 ## O
-
 - [x] Obstagoon
 - [x] Octillery
 - [x] Oddish
+- [x] Ogerpon
 - [x] Oinkologne
+- [ ] Okidogi
 - [x] Omanyte
 - [x] Omastar
 - [x] Onix
@@ -660,9 +642,7 @@
 - [x] Orthworm
 - [x] Oshawott
 - [x] Overqwil
-
 ## P
-
 - [x] Pachirisu
 - [x] Palafin
 - [x] Palkia
@@ -681,6 +661,7 @@
 - [x] Pawmo
 - [x] Pawmot
 - [x] Pawniard
+- [x] Pecharunt
 - [x] Pelipper
 - [x] Perrserker
 - [x] Persian
@@ -708,6 +689,7 @@
 - [x] Poliwag
 - [x] Poliwhirl
 - [x] Poliwrath
+- [ ] Poltchageist
 - [x] Polteageist
 - [x] Ponyta
 - [x] Poochyena
@@ -726,9 +708,7 @@
 - [x] Purugly
 - [x] Pyroar
 - [x] Pyukumuku
-
 ## Q
-
 - [x] Quagsire
 - [x] Quaquaval
 - [x] Quaxly
@@ -736,11 +716,10 @@
 - [x] Quilava
 - [x] Quilladin
 - [x] Qwilfish
-
 ## R
-
 - [x] Raboot
 - [ ] Rabsca
+- [x] Raging Bolt
 - [x] Raichu
 - [x] Raikou
 - [x] Ralts
@@ -778,9 +757,7 @@
 - [x] Rowlet
 - [x] Rufflet
 - [x] Runerigus
-
 ## S
-
 - [x] Sableye
 - [x] Salamence
 - [x] Salandit
@@ -837,6 +814,7 @@
 - [x] Simipour
 - [x] Simisage
 - [x] Simisear
+- [ ] Sinistcha
 - [x] Sinistea
 - [x] Sirfetch'd
 - [x] Sizzlipede
@@ -915,19 +893,17 @@
 - [x] Swirlix
 - [x] Swoobat
 - [x] Sylveon
-
 ## T
-
 - [ ] Tadbulb
 - [x] Taillow
 - [x] Talonflame
 - [x] Tandemaus
 - [x] Tangela
 - [x] Tangrowth
-- [ ] Tapu Bulu
-- [ ] Tapu Fini
+- [x] Tapu Bulu
+- [x] Tapu Fini
 - [x] Tapu Koko
-- [ ] Tapu Lele
+- [x] Tapu Lele
 - [x] Tarountula
 - [x] Tatsugiri
 - [x] Tauros
@@ -935,6 +911,7 @@
 - [x] Tentacool
 - [x] Tentacruel
 - [x] Tepig
+- [x] Terapagos
 - [x] Terrakion
 - [x] Thievul
 - [x] Throh
@@ -981,9 +958,7 @@
 - [x] Tyrantrum
 - [x] Tyrogue
 - [x] Tyrunt
-
 ## U
-
 - [x] Umbreon
 - [x] Unfezant
 - [x] Unown
@@ -991,9 +966,7 @@
 - [x] Ursaring
 - [x] Urshifu
 - [x] Uxie
-
 ## V
-
 - [x] Vanillish
 - [x] Vanillite
 - [x] Vanilluxe
@@ -1019,11 +992,10 @@
 - [x] Voltorb
 - [x] Vullaby
 - [x] Vulpix
-
 ## W
-
 - [x] Wailmer
 - [x] Wailord
+- [x] Walking Wake
 - [x] Walrein
 - [x] Wartortle
 - [x] Watchog
@@ -1051,24 +1023,18 @@
 - [x] Wurmple
 - [x] Wynaut
 - [x] Wyrdeer
-
 ## X
-
 - [x] Xatu
 - [x] Xerneas
 - [x] Xurkitree
-
 ## Y
-
 - [x] Yamask
 - [x] Yamper
 - [x] Yanma
 - [x] Yanmega
 - [x] Yungoos
 - [x] Yveltal
-
 ## Z
-
 - [x] Zacian
 - [x] Zamazenta
 - [x] Zangoose
