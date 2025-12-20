@@ -19,11 +19,14 @@ jobs:
         with:
           node-version: 24
 
-      - name: Install production dependencies
-        run: npm ci --omit=dev
+      - name: Install all dependencies
+        run: npm ci
 
       - name: Build project
-        run: npm run build:production
+        run: npm run build
+
+      - name: Prune to production dependencies
+        run: npm prune --omit=dev
 
       - name: Calculate slug size
         id: slug-size
