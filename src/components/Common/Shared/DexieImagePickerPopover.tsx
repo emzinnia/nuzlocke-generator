@@ -8,6 +8,8 @@ import {
 } from "@blueprintjs/core";
 import { css, cx } from "emotion";
 import * as React from "react";
+import { useDispatch } from "react-redux";
+import { toggleDialog } from "actions";
 import {
     getImagesPage,
     searchImagesByNamePrefix,
@@ -93,12 +95,18 @@ export function DexieImagePickerPopover({
     icon = "media",
     tooltip = "Pick from uploaded images",
 }: DexieImagePickerPopoverProps) {
+    const dispatch = useDispatch();
     const [isOpen, setIsOpen] = React.useState(false);
     const [query, setQuery] = React.useState("");
     const [images, setImages] = React.useState<DexieImage[]>([]);
     const [offset, setOffset] = React.useState(0);
     const [hasMore, setHasMore] = React.useState(true);
     const [isLoading, setIsLoading] = React.useState(false);
+
+    const openGallery = React.useCallback(() => {
+        setIsOpen(false);
+        dispatch(toggleDialog("imageUploader"));
+    }, [dispatch]);
 
     const PAGE_SIZE = 40;
 
@@ -188,7 +196,15 @@ export function DexieImagePickerPopover({
                 </div>
             ) : images.length === 0 ? (
                 <div className={cx(styles.empty, Classes.TEXT_MUTED)}>
-                    No uploaded images yet. Open the Images drawer (Shift+I) to upload.
+                    <p style={{ margin: 0 }}>No uploaded images yet.</p>
+                    <Button
+                        small
+                        icon="folder-open"
+                        onClick={openGallery}
+                        style={{ marginTop: "0.5rem" }}
+                    >
+                        Open Gallery to Upload
+                    </Button>
                 </div>
             ) : (
                 <>
@@ -219,9 +235,13 @@ export function DexieImagePickerPopover({
                             ))}
                     </div>
                     <div className={styles.footerRow}>
-                        <div style={{ fontSize: "0.8rem", opacity: 0.75 }}>
-                            {selectedName ? `Selected: ${selectedName}` : ""}
-                        </div>
+                        <Button
+                            small
+                            icon="folder-open"
+                            onClick={openGallery}
+                        >
+                            Open Gallery
+                        </Button>
                         {hasMore ? (
                             <Button
                                 small
