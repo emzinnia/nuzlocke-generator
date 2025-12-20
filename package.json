@@ -41,7 +41,8 @@
         "validate": "npm run typecheck && npm run lint && npm run test:run",
         "todos": "npx leasot 'src/**/*.tsx' 'src/**/*.ts'",
         "lh": "npx lighthouse http://localhost:8080 --output-path=./lighthouse/audit.html --save-assets --preset=desktop --quiet --chrome-flags=headless",
-        "images:check": "npx tsx scripts/imageCheck.ts"
+        "images:check": "npx tsx scripts/imageCheck.ts",
+        "heroku-postbuild": "rm -rf src node_modules/typescript node_modules/@babel node_modules/sass node_modules/tailwindcss node_modules/vitest node_modules/@playwright node_modules/eslint node_modules/@testing-library node_modules/jsdom node_modules/@vitest"
     },
     "engines": {
         "node": "^24",
@@ -141,6 +142,7 @@
         "@types/redux": "^3.6.0",
         "@types/redux-logger": "^3.0.5",
         "@types/redux-mock-store": "^1.5.0",
+        "@types/sharp": "^0.31.1",
         "@types/uuid": "^3.4.4",
         "@vitest/coverage-v8": "^4.0.12",
         "@vitest/ui": "^4.0.12",
@@ -187,6 +189,7 @@
         "rollbar": "^2.26.5",
         "rxjs": "^5.5.6",
         "sass-loader": "^10.0.4",
+        "sharp": "^0.34.5",
         "sinon": "^6.1.3",
         "style-loader": "^2.0.0",
         "ts-loader": "^8.0.7",
