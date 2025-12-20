@@ -22,6 +22,7 @@ export default defineConfig({
         viteStaticCopy({
             targets: [
                 { src: "src/img/*", dest: "img" },
+                { src: "src/assets/*", dest: "assets" },
                 { src: "src/assets/icons/*", dest: "icons" },
                 // Copy assets/img subdirectory (box backgrounds, etc.)
                 { src: "src/assets/img/*", dest: "assets/img" },

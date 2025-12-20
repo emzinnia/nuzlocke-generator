@@ -1,10 +1,16 @@
 /**
  * Finds and optionally optimizes large JPG images in src/img/ (non-recursive).
  *
+ * Prerequisites (sharp is not in package.json to avoid build issues):
+ *   npm install sharp
+ *
  * Run:
  *   npx tsx scripts/findLargestImages.ts           # Dry run (default)
  *   npx tsx scripts/findLargestImages.ts --dry-run # Explicit dry run
  *   npx tsx scripts/findLargestImages.ts --run     # Actually resize images
+ *
+ * Cleanup (optional, to remove sharp after use):
+ *   npm uninstall sharp
  */
 
 import * as fs from "node:fs";
