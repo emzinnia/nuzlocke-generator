@@ -20,6 +20,7 @@ export function AddPokemonButton({ pokemon }: { pokemon: Pokemon }) {
             className="add-new-pokemon"
             data-testid="add-pokemon-button"
             onClick={onClick}
+            style={{ whiteSpace: "nowrap" }}
         >
             Add New Pokémon{" "}
             <HotkeyIndicator

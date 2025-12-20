@@ -5,64 +5,93 @@ import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { sortPokes } from "utils";
 import { connect } from "react-redux";
 import { editPokemon } from "actions";
-import {} from "ramda";
+import { State } from "state";
 
 export interface PokemonByFilterProps {
     team: Pokemon[];
     status: string;
     editPokemon: editPokemon;
     searchTerm: string;
+    /** Set of Pokémon IDs that match the current search query */
+    matchedIds: Set<string>;
+    /** Whether there is an active search query */
+    hasSearchQuery: boolean;
+    /** Whether dark mode is enabled (from Redux) */
+    isDarkMode: boolean;
+    /** Currently selected Pokémon ID (from Redux) */
+    selectedId: string;
 }
 
-const matchesStatus = (searchTerm) => (poke: Pokemon) =>
-    poke.nickname?.toLowerCase().startsWith(searchTerm?.toLowerCase()) ||
-    poke.species?.toLowerCase().startsWith(searchTerm?.toLowerCase()) ||
-    poke.forme?.toLowerCase() === searchTerm?.toLowerCase() ||
-    poke.nickname?.toLowerCase().startsWith(searchTerm?.toLowerCase()) ||
-    poke.gender?.toLowerCase() === searchTerm?.toLowerCase() ||
-    poke.moves?.includes(searchTerm) ||
-    poke.gameOfOrigin?.toLowerCase() === searchTerm?.toLowerCase() ||
-    poke.item?.toLowerCase() === searchTerm?.toLowerCase() ||
-    poke.types?.includes(searchTerm);
+// Highlight colors for matched Pokémon
+const HIGHLIGHT_COLOR_LIGHT = "#90EE90"; // Light green
+const HIGHLIGHT_COLOR_DARK = "#2e7d32"; // Darker green for dark mode
+
+// Selection highlight (transparent dark circle)
+const SELECTION_COLOR_LIGHT = "rgba(0, 0, 0, 0.33)";
+const SELECTION_COLOR_DARK = "rgba(255, 255, 255, 0.25)";
 
 export class PokemonByFilterBase extends React.PureComponent<PokemonByFilterProps> {
     public render() {
-        const { team, status, searchTerm } = this.props;
+        const { team, status, matchedIds, hasSearchQuery, isDarkMode, selectedId } = this.props;
+
+        const searchHighlightColor = isDarkMode ? HIGHLIGHT_COLOR_DARK : HIGHLIGHT_COLOR_LIGHT;
+        const selectionColor = isDarkMode ? SELECTION_COLOR_DARK : SELECTION_COLOR_LIGHT;
 
         return team
             .sort(sortPokes)
             .filter((poke) => poke.status === status)
-            .map((poke) => (
-                <Tooltip
-                    key={poke.id}
-                    content={poke.nickname || poke.species}
-                    position={Position.TOP}
-                >
-                    <PokemonIcon
-                        style={{
-                            backgroundColor:
-                                searchTerm !== "" &&
-                                matchesStatus(searchTerm)(poke)
-                                    ? "#90EE90"
-                                    : undefined,
-                            borderRadius: "50%",
-                        }}
-                        id={poke.id}
-                        status={poke.status}
-                        species={poke.species}
-                        forme={poke.forme}
-                        shiny={poke.shiny}
-                        gender={poke.gender}
-                        customIcon={poke.customIcon}
-                        hidden={poke.hidden}
-                        position={poke.position}
-                        egg={poke.egg}
-                    />
-                </Tooltip>
-            ));
+            // Filter by search results when there's an active query
+            .filter((poke) => !hasSearchQuery || matchedIds.has(poke.id))
+            .map((poke) => {
+                const isSelected = poke.id === selectedId;
+                const isSearchMatch = hasSearchQuery && matchedIds.has(poke.id);
+
+                // Determine background color: selection takes priority over search highlight
+                let backgroundColor: string | undefined;
+                if (isSelected) {
+                    backgroundColor = selectionColor;
+                } else if (isSearchMatch) {
+                    backgroundColor = searchHighlightColor;
+                }
+
+                return (
+                    <Tooltip
+                        key={poke.id}
+                        content={poke.nickname || poke.species}
+                        position={Position.TOP}
+                    >
+                        <PokemonIcon
+                            style={
+                                backgroundColor
+                                    ? {
+                                          backgroundColor,
+                                          borderRadius: "50%",
+                                      }
+                                    : undefined
+                            }
+                            id={poke.id}
+                            status={poke.status}
+                            species={poke.species}
+                            forme={poke.forme}
+                            shiny={poke.shiny}
+                            gender={poke.gender}
+                            customIcon={poke.customIcon}
+                            hidden={poke.hidden}
+                            position={poke.position}
+                            egg={poke.egg}
+                        />
+                    </Tooltip>
+                );
+            });
     }
 }
 
-export const PokemonByFilter = connect(null, {
-    editPokemon,
-})(PokemonByFilterBase);
+export const PokemonByFilter = connect(
+    (state: State) => ({
+        isDarkMode: state.style.editorDarkMode ?? false,
+        selectedId: state.selectedId,
+    }),
+    {
+        editPokemon,
+    },
+)(PokemonByFilterBase);

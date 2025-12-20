@@ -106,7 +106,7 @@ export class RulesEditor extends React.Component<RulesEditorProps, RulesEditorSt
             <li className="rules-list-item" key={index}>
                 <div className="rule-no">{index + 1}</div>
                 <TextArea
-                    defaultValue={rule}
+                    value={rule}
                     className={Classes.FILL}
                     onChange={(e: any) =>
                         this.props.editRule(index, e.target.value)

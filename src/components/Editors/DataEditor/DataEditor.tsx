@@ -9,7 +9,6 @@ import {
     Intent,
     Switch,
     Classes,
-    HTMLSelect,
 } from "@blueprintjs/core";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { ErrorBoundary, HotkeyIndicator } from "components/Common/Shared";
@@ -28,6 +27,7 @@ import {
     Game as GameName,
 } from "utils";
 import { DeleteAlert } from "./DeleteAlert";
+import { AdvancedImportOptions } from "./AdvancedImportOptions";
 import { isEmpty } from "utils/isEmpty";
 import { showToast } from "components/Common/Shared/appToaster";
 // @TODO: fix codegen imports
@@ -35,6 +35,7 @@ import { showToast } from "components/Common/Shared/appToaster";
 import { BoxMappings } from "parsers/utils/boxMappings";
 import SaveFileWorker from "parsers/worker?worker";
 import { cx } from "emotion";
+import { StatusDropZone } from "./StatusDropZone";
 
 export interface DataEditorProps {
     state: State;
@@ -48,32 +49,8 @@ export interface DataEditorState {
     mode: "import" | "export";
     data: string;
     href: string;
-    selectedGame: GameSaveFormat;
-    mergeDataMode: boolean;
-    showSaveFileUI: boolean;
     overrideImport: boolean;
-    isSettingsOpen: boolean;
-    boxMappings: BoxMappings;
 }
-
-const getGameNumberOfBoxes = (game: GameSaveFormat) => {
-    switch (game) {
-        case "Auto":
-            // Default to 14 so box mappings are available for Gen 2/3; Gen 1 will only read the first 12.
-            return 14;
-        case "RBY":
-            return 12;
-        case "GS":
-        case "Crystal":
-            return 14;
-        case "Emerald":
-        case "RS":
-        case "FRLG":
-            return 14;
-        default:
-            return 12;
-    }
-};
 
 const isValidJSON = (data: string): boolean => {
     try {
@@ -129,50 +106,8 @@ export interface SaveGameSettingsDialogProps {
     boxes: State["box"];
     selectedGame: GameSaveFormat;
     boxMappings: BoxMappings;
-    setBoxMappings: ({ key, status }) => void;
-}
-
-// Quick and dirty method of getting Array w n.length
-const generateArray = (n: number) => {
-    const arr: BoxMappings = [];
-    for (let i = 1; i < n + 1; i++) {
-        if (i === 2) {
-            arr.push({ key: i, status: "Dead" });
-        } else {
-            arr.push({ key: i, status: "Boxed" });
-        }
-    }
-    return arr;
-};
-
-const generateBoxMappingsDefault = (saveFormat) =>
-    generateArray(getGameNumberOfBoxes(saveFormat));
-
-export function BoxSelect({
-    boxes,
-    value,
-    boxKey,
-    setBoxMappings,
-}: {
-    boxes: State["box"];
-    value: string;
-    boxKey: number;
-    setBoxMappings: SaveGameSettingsDialogProps["setBoxMappings"];
-}) {
-    return (
-        <HTMLSelect
-            value={value}
-            onChange={(e) =>
-                setBoxMappings({ key: boxKey, status: e.target.value })
-            }
-        >
-            {boxes.map((box) => (
-                <option key={box.id} value={box.name}>
-                    {box.name}
-                </option>
-            ))}
-        </HTMLSelect>
-    );
+    setBoxMappings: ({ key, status }: { key: number; status: string }) => void;
+    isDarkMode: boolean;
 }
 
 export function SaveGameSettingsDialog({
@@ -181,14 +116,39 @@ export function SaveGameSettingsDialog({
     boxes,
     boxMappings,
     setBoxMappings,
+    isDarkMode,
 }: SaveGameSettingsDialogProps) {
-    // const select = (
-    //     <Select
-    //         items={boxes}
-    //         onItemSelect={() => {}}
-    //     >
-    //     </Select>
-    // );
+    // Group boxMappings by status
+    const boxesByStatus = React.useMemo(() => {
+        const grouped: Record<string, typeof boxMappings> = {};
+        
+        // Initialize with all available statuses from app boxes
+        for (const box of boxes) {
+            grouped[box.name] = [];
+        }
+        
+        // Assign each save file box to its status
+        for (const mapping of boxMappings) {
+            if (!grouped[mapping.status]) {
+                grouped[mapping.status] = [];
+            }
+            grouped[mapping.status].push(mapping);
+        }
+        
+        return grouped;
+    }, [boxes, boxMappings]);
+
+    // Get ordered list of statuses (from app boxes)
+    const statusOrder = React.useMemo(() => {
+        return boxes.map((box) => box.name);
+    }, [boxes]);
+
+    const handleDrop = React.useCallback(
+        (boxKey: number, newStatus: string) => {
+            setBoxMappings({ key: boxKey, status: newStatus });
+        },
+        [setBoxMappings]
+    );
 
     return (
         <div className={cx(Classes.DIALOG_BODY, "has-nice-scrollbars")}>
@@ -209,36 +169,29 @@ export function SaveGameSettingsDialog({
                 onChange={onMergeDataChange}
             />
 
+            <p className={Classes.TEXT_MUTED} style={{ marginBottom: "1rem" }}>
+                Drag and drop the save file boxes to assign them to different statuses.
+            </p>
+
             <div
                 style={{
-                    height: "60vh",
+                    maxHeight: "50vh",
                     overflow: "auto",
                     display: "flex",
                     flexDirection: "column",
-                    flexWrap: "wrap",
                 }}
                 className="has-nice-scrollbars"
             >
-                {boxMappings.map((value) => {
-                    return (
-                        <div key={value.key} style={{ padding: "0.25rem" }}>
-                            <BoxSelect
-                                boxKey={value.key}
-                                setBoxMappings={setBoxMappings}
-                                value={value.status}
-                                boxes={boxes}
-                            />
-                            <div
-                                className={Classes.BUTTON}
-                                style={{
-                                    marginLeft: "0.25rem",
-                                    cursor: "default",
-                                    width: "8rem",
-                                }}
-                            >{`Box ${value.key}`}</div>
-                        </div>
-                    );
-                })}
+                {statusOrder.map((status) => (
+                    <StatusDropZone
+                        key={status}
+                        statusName={status}
+                        boxes={boxesByStatus[status] || []}
+                        isDarkMode={isDarkMode}
+                        showPartyBox={status === "Team"}
+                        onDrop={handleDrop}
+                    />
+                ))}
             </div>
         </div>
     );
@@ -249,8 +202,8 @@ export class DataEditorBase extends React.Component<
     DataEditorState
 > {
     public textarea: HTMLTextAreaElement | null;
-    public fileInput: HTMLInputElement | null;
     public nuzlockeJsonFileInput: HTMLInputElement | null;
+    public advancedImportRef = React.createRef<import("./AdvancedImportOptions").AdvancedImportOptionsHandle>();
 
     public constructor(props) {
         super(props);
@@ -260,19 +213,8 @@ export class DataEditorBase extends React.Component<
             mode: "export",
             data: "",
             href: "",
-            selectedGame: "Auto",
-            mergeDataMode: true,
-            showSaveFileUI: false,
             overrideImport: true,
-            isSettingsOpen: false,
-            boxMappings: [],
         };
-    }
-
-    public componentDidMount() {
-        this.setState((state) => ({
-            boxMappings: generateBoxMappingsDefault(state.selectedGame),
-        }));
     }
 
     private uploadJSON = (e) => {
@@ -417,19 +359,17 @@ export class DataEditorBase extends React.Component<
         });
     };
 
-    private uploadFile = (replaceState, state) => () => {
+    private handleFileSelect = (
+        file: File,
+        settings: import("./AdvancedImportOptions").AdvancedImportSettings
+    ) => {
         const t0 = performance.now();
-        // @NOTE: this is a gross work-around a bug with tests and import.meta.url
-        // const worker = new Worker(new URL('parsers/worker.ts', codegen`module.exports = import.meta.env.MODE === "test" ? "" : "import.meta.url"`));
-
         const worker = new SaveFileWorker();
-
-        if (!this.fileInput?.files?.[0]) return;
-        const file = this.fileInput.files[0];
         const reader = new FileReader();
-        const componentState = this.state;
+        const { replaceState, state } = this.props;
+        const { selectedGame, boxMappings, mergeDataMode } = settings;
 
-        console.log(file, reader, componentState, worker);
+        console.log(file, reader, settings, worker);
 
         reader.readAsArrayBuffer(file);
 
@@ -437,9 +377,9 @@ export class DataEditorBase extends React.Component<
             const save = new Uint8Array(this.result as ArrayBuffer);
 
             worker.postMessage({
-                selectedGame: componentState.selectedGame,
+                selectedGame,
                 save,
-                boxMappings: componentState.boxMappings,
+                boxMappings,
                 fileName: file.name,
             });
 
@@ -453,7 +393,7 @@ export class DataEditorBase extends React.Component<
                 }>,
             ) => {
                 const result = e.data;
-                const mergedPokemon = componentState.mergeDataMode
+                const mergedPokemon = mergeDataMode
                     ? DataEditorBase.pokeMerge(
                           state.pokemon,
                           result.pokemon as Pokemon[],
@@ -463,7 +403,7 @@ export class DataEditorBase extends React.Component<
                     result.detectedGame ??
                     DataEditorBase.determineGame({
                         isYellow: result.isYellow,
-                        selectedGame: componentState.selectedGame,
+                        selectedGame,
                     });
                 const bgColor = gameOfOriginToColor(game.name as GameName);
                 const data = {
@@ -506,7 +446,7 @@ export class DataEditorBase extends React.Component<
 
             const t1 = performance.now();
             console.info(
-                `Call: ${t1 - t0} ms on ${componentState.selectedGame} save file type`,
+                `Call: ${t1 - t0} ms on ${selectedGame} save file type`,
             );
         });
     };
@@ -536,145 +476,6 @@ export class DataEditorBase extends React.Component<
     private toggleClearingData = () =>
         this.setState({ isClearAllDataOpen: !this.state.isClearAllDataOpen });
 
-    private renderSaveFileUI() {
-        const gen3Enabled = import.meta.env.VITE_GEN3_SAVES === "true";
-        const allowedGames: GameSaveFormat[] = gen3Enabled
-            ? ["RBY", "GS", "Crystal", "RS", "FRLG", "Emerald"]
-            : ["RBY", "GS", "Crystal"];
-
-        return (
-            <>
-                <Button
-                    onClick={() => {
-                        this.setState({
-                            showSaveFileUI: !this.state.showSaveFileUI,
-                        });
-                    }}
-                    style={{
-                        // @TODO: find a more sensible hack
-                        transform: "translateY(-5px)",
-                    }}
-                >
-                    Import From Save File
-                </Button>
-                <div
-                    className="data-editor-save-file-form"
-                    style={{
-                        alignItems: "center",
-                        flexWrap: "wrap",
-                        margin: "0.25rem",
-                        display: this.state.showSaveFileUI ? "flex" : "none",
-                        borderRadius: "0.25rem",
-                        padding: "0.25rem",
-                    }}
-                >
-                    <div
-                        className={cx(Classes.LABEL, Classes.INLINE)}
-                        style={{ padding: ".25rem 0", paddingBottom: ".5rem" }}
-                    >
-                        <HTMLSelect
-                            value={this.state.selectedGame}
-                            onChange={(e) => {
-                                this.setState({
-                                    selectedGame: e.target
-                                        .value as GameSaveFormat,
-                                    boxMappings: generateBoxMappingsDefault(
-                                        e.target.value as GameSaveFormat,
-                                    ),
-                                });
-                            }}
-                        >
-                            <option key={"Auto"} value={"Auto"}>
-                                Auto
-                            </option>
-                            {allowedGames.map((game) => (
-                                <option key={game} value={game}>
-                                    {game}
-                                </option>
-                            ))}
-                        </HTMLSelect>
-                    </div>
-
-                    <div
-                        className={cx(Classes.LABEL, Classes.INLINE)}
-                        style={{
-                            padding: ".25rem 0",
-                            paddingBottom: ".5rem",
-                            marginLeft: ".25rem",
-                        }}
-                    >
-                        <input
-                            style={{ padding: ".25rem" }}
-                            className={Classes.FILE_INPUT}
-                            ref={(ref) => (this.fileInput = ref)}
-                            onChange={this.uploadFile(
-                                this.props.replaceState,
-                                this.props.state,
-                            )}
-                            type="file"
-                            id="file"
-                            name="file"
-                            accept=".sav"
-                        />
-                    </div>
-
-                    <Button
-                        onClick={() => this.setState({ isSettingsOpen: true })}
-                        minimal
-                        intent={Intent.PRIMARY}
-                    >
-                        Options
-                    </Button>
-
-                    <Dialog
-                        isOpen={this.state.isSettingsOpen}
-                        onClose={() => this.setState({ isSettingsOpen: false })}
-                        title={"Save Upload Settings"}
-                        className={
-                            this.props.state.style.editorDarkMode
-                                ? Classes.DARK
-                                : ""
-                        }
-                        icon="floppy-disk"
-                    >
-                        <SaveGameSettingsDialog
-                            mergeDataMode={this.state.mergeDataMode}
-                            onMergeDataChange={() =>
-                                this.setState({
-                                    mergeDataMode: !this.state.mergeDataMode,
-                                })
-                            }
-                            boxes={this.props.state.box}
-                            selectedGame={this.state.selectedGame}
-                            boxMappings={this.state.boxMappings}
-                            setBoxMappings={({ key, status }) => {
-                                console.log("setBoxMappings:", key, status);
-                                this.setState(({ boxMappings }) => {
-                                    const newBoxMappings = boxMappings.map(
-                                        ({
-                                            key: boxKey,
-                                            status: boxStatus,
-                                        }) => {
-                                            if (key === boxKey) {
-                                                return { key, status };
-                                            }
-                                            return {
-                                                key: boxKey,
-                                                status: boxStatus,
-                                            };
-                                        },
-                                    );
-                                    return {
-                                        boxMappings: newBoxMappings,
-                                    };
-                                });
-                            }}
-                        />
-                    </Dialog>
-                </div>
-            </>
-        );
-    }
 
     public render() {
         return (
@@ -811,48 +612,76 @@ export class DataEditorBase extends React.Component<
                     )}
                 </Dialog>
 
-                <ButtonGroup style={{ margin: ".25rem" }}>
-                    <Button
-                        onClick={() => this.importState()}
-                        icon="import"
-                        intent={Intent.PRIMARY}
-                    >
-                        Import Data
-                    </Button>
-                    <Button
-                        onClick={() => this.exportState(this.props.state)}
-                        icon="export"
-                    >
-                        Export Data
-                    </Button>
-                    {/* <Button icon='add' intent={Intent.SUCCESS}>
-                        New Nuzlocke
-                    </Button> */}
-                </ButtonGroup>
-                {this.renderSaveFileUI()}
-                <ButtonGroup style={{ margin: ".25rem" }}>
-                    <Button
-                        minimal
-                        intent={Intent.SUCCESS}
-                        onClick={this.writeAllData}
-                        icon="floppy-disk"
-                    >
-                        Force Save{" "}
-                        <HotkeyIndicator
-                            hotkey="s"
-                            showModifier={false}
-                            style={{ marginLeft: "0.35rem" }}
-                        />
-                    </Button>
-                    <Button
-                        icon="trash"
-                        onClick={this.toggleClearingData}
-                        intent={Intent.DANGER}
-                        minimal
-                    >
-                        Clear All Data
-                    </Button>
-                </ButtonGroup>
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.25rem", margin: "0.25rem" }}>
+                    <ButtonGroup>
+                        <Button
+                            data-testid="import-data-button"
+                            onClick={() => this.importState()}
+                            icon="import"
+                            intent={Intent.PRIMARY}
+                        >
+                            Import Data{" "}
+                            <HotkeyIndicator
+                                hotkey="i"
+                                showModifier={false}
+                                style={{ marginLeft: "0.35rem" }}
+                            />
+                        </Button>
+                        <Button
+                            data-testid="export-data-button"
+                            onClick={() => this.exportState(this.props.state)}
+                            icon="export"
+                        >
+                            Export Data{" "}
+                            <HotkeyIndicator
+                                hotkey="e"
+                                showModifier={false}
+                                style={{ marginLeft: "0.35rem" }}
+                            />
+                        </Button>
+                        <Button
+                            icon="folder-open"
+                            data-testid="import-save-file-button"
+                            onClick={() => this.advancedImportRef.current?.openFileDialog()}
+                        >
+                            Import Save{" "}
+                            <HotkeyIndicator
+                                hotkey="o"
+                                showModifier={false}
+                                style={{ marginLeft: "0.35rem" }}
+                            />
+                        </Button>
+                    </ButtonGroup>
+
+                    <ButtonGroup>
+                        <Button
+                            intent={Intent.SUCCESS}
+                            onClick={this.writeAllData}
+                            icon="floppy-disk"
+                        >
+                            Force Save{" "}
+                            <HotkeyIndicator
+                                hotkey="s"
+                                showModifier={false}
+                                style={{ marginLeft: "0.35rem" }}
+                            />
+                        </Button>
+                        <Button
+                            icon="trash"
+                            onClick={this.toggleClearingData}
+                            intent={Intent.DANGER}
+                        >
+                            Clear All Data
+                        </Button>
+                    </ButtonGroup>
+                </div>
+
+                <AdvancedImportOptions
+                    ref={this.advancedImportRef}
+                    boxes={this.props.state.box}
+                    isDarkMode={this.props.state.style.editorDarkMode ?? false}
+                    onFileSelect={this.handleFileSelect}
+                />
             </BaseEditor>
         );
     }

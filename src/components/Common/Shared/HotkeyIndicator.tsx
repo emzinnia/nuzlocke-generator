@@ -2,6 +2,15 @@ import * as React from "react";
 
 const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 
+function formatHotkeyText(hotkey: string): string {
+    // Normalize to uppercase for legibility, then replace known modifier words with glyphs.
+    // Example: "shift+m" -> "⇧M", "Shift + Z" -> "⇧Z"
+    return hotkey
+        .toUpperCase()
+        .replace(/\bSHIFT\s*\+\s*/g, "⇧")
+        .replace(/\bSHIFT\b/g, "⇧");
+}
+
 export interface HotkeyIndicatorProps {
     /** The key to display (e.g., "Z", "Y", "S") */
     hotkey: string;
@@ -34,10 +43,9 @@ export function HotkeyIndicator({
     style,
     className,
 }: HotkeyIndicatorProps) {
-    // uppercase the hotkey for legibility
-    const upppercaseHotkey = hotkey.toUpperCase();
+    const formattedHotkey = formatHotkeyText(hotkey);
     const modKey = modifier ?? (isMac ? "⌘" : "Ctrl+");
-    const displayText = showModifier ? `${modKey}${upppercaseHotkey}` : upppercaseHotkey;
+    const displayText = showModifier ? `${modKey}${formattedHotkey}` : formattedHotkey;
 
     return (
         <kbd

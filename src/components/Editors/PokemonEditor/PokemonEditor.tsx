@@ -4,13 +4,15 @@ import { connect } from "react-redux";
 import { Pokemon, Box as BoxModel, Boxes, Game } from "models";
 import { State } from "state";
 import { generateEmptyPokemon } from "utils";
+import { searchPokemon } from "utils/search";
+import { getPersistedSearchTerm, setPersistedSearchTerm } from "utils/searchTermStorage";
 import { CurrentPokemonEdit } from ".";
 import { AddPokemonButton } from "components";
 import { BaseEditor } from "components";
 import { Box, BoxForm } from "components";
 import { ErrorBoundary } from "components";
 import { HotkeyIndicator } from "components/Common/Shared";
-import { cx } from "emotion";
+import { PokemonSearchBar, SearchFeedback } from "./PokemonSearchBar";
 import { addPokemon, toggleDialog } from "actions";
 
 export interface PokemonEditorProps {
@@ -36,10 +38,14 @@ export interface BoxesComponentProps {
     boxes: Boxes;
     team: Pokemon[];
     searchTerm: string;
+    matchedIds: Set<string>;
+    hasSearchQuery: boolean;
 }
 
 export class BoxesComponent extends React.Component<BoxesComponentProps> {
-    private renderBoxes(boxes, team) {
+    private renderBoxes(boxes: Boxes, team: Pokemon[]) {
+        const { matchedIds, hasSearchQuery, searchTerm } = this.props;
+
         return boxes
             .sort((a: BoxModel, b: BoxModel) => {
                 const positionA = a.position || 0;
@@ -49,7 +55,9 @@ export class BoxesComponent extends React.Component<BoxesComponentProps> {
             .map((box) => {
                 return (
                     <Box
-                        searchTerm={this.props.searchTerm || ""}
+                        searchTerm={searchTerm || ""}
+                        matchedIds={matchedIds}
+                        hasSearchQuery={hasSearchQuery}
                         {...box}
                         key={box.id}
                         pokemon={team}
@@ -79,13 +87,42 @@ export class PokemonEditorBase extends React.Component<
     public constructor(props: PokemonEditorProps) {
         super(props);
         this.state = {
-            searchTerm: "",
+            searchTerm: getPersistedSearchTerm(),
         };
     }
 
     private openMassEditor = (_e) => {
         this.props.toggleDialog("massEditor");
     };
+
+    private handleSearchChange = (value: string) => {
+        this.setState({ searchTerm: value });
+        setPersistedSearchTerm(value);
+    };
+
+    private renderBoxesWithSearch(boxes: Boxes, team: Pokemon[]) {
+        const { searchTerm } = this.state;
+        const hasSearchQuery = searchTerm.trim().length > 0;
+
+        // Compute matched IDs using the search engine
+        const searchResult = searchPokemon(team, searchTerm);
+
+        return (
+            <>
+                <SearchFeedback
+                    searchResult={searchResult}
+                    hasSearchQuery={hasSearchQuery}
+                />
+                <BoxesComponent
+                    searchTerm={searchTerm}
+                    matchedIds={searchResult.matchedIds}
+                    hasSearchQuery={hasSearchQuery}
+                    boxes={boxes}
+                    team={team}
+                />
+            </>
+        );
+    }
 
     public componentDidMount() {
         // @NOTE: refactor so that there's an easier way to auto-generate Pokemon data
@@ -145,34 +182,19 @@ export class PokemonEditorBase extends React.Component<
                                 >
                                     Mass Editor{" "}
                                     <HotkeyIndicator
-                                        hotkey="shift+m"
+                                        hotkey="m"
                                         showModifier={false}
                                         style={{ marginLeft: "0.35rem" }}
                                     />
                                 </Button>
                             </ButtonGroup>
                         </div>
-                        <div style={{ marginLeft: "auto", width: "100%", paddingLeft: "2rem", paddingRight: "1rem" }}>
-                            <input
-                                type="search"
-                                placeholder="Search..."
-                                className={Classes.INPUT}
-                                data-testid="pokemon-search"
-                                value={this.state.searchTerm}
-                                onChange={(e) =>
-                                    this.setState({
-                                        searchTerm: e.target.value,
-                                    })
-                                }
-                                style={{ margin: "0.25rem", width: "100%" }}
-                            />
-                        </div>
+                        <PokemonSearchBar
+                            value={this.state.searchTerm}
+                            onChange={this.handleSearchChange}
+                        />
                     </div>
-                    <BoxesComponent
-                        searchTerm={this.state.searchTerm}
-                        boxes={boxes}
-                        team={team}
-                    />
+                    {this.renderBoxesWithSearch(boxes, team)}
                     <BoxForm boxes={boxes} />
                     <CurrentPokemonEdit />
                     <BaseEditor name="Location Checklist" defaultOpen={false}>

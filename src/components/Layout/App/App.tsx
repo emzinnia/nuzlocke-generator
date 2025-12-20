@@ -2,7 +2,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 
 import { State } from "state";
-import { addPokemon } from "actions";
+import { addPokemon, addBox } from "actions";
 import { feature, isLocal, choose, generateEmptyPokemon } from "utils";
 import { ErrorBoundary } from "components";
 import { Button } from "@blueprintjs/core";
@@ -19,6 +19,7 @@ export interface AppProps {
     view: State["view"];
     pokemon: State["pokemon"];
     addPokemon: typeof addPokemon;
+    addBox: typeof addBox;
 }
 
 const Editor = React.lazy(() =>
@@ -72,6 +73,26 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
             types,
         });
         this.props.addPokemon(pokemon);
+    };
+
+    private createRandomBox = (count: number) => {
+        const boxName = `Random Box ${Date.now()}`;
+        this.props.addBox({
+            name: boxName,
+            background: "",
+            inheritFrom: "Boxed",
+        });
+
+        for (let i = 0; i < count; i++) {
+            const species = choose([...listOfPokemon]) as Species;
+            const types = matchSpeciesToTypes(species);
+            const pokemon = generateEmptyPokemon(this.props.pokemon, {
+                species,
+                status: boxName,
+                types,
+            });
+            this.props.addPokemon(pokemon);
+        }
     };
 
     private updateDarkModeClass = () => {
@@ -177,6 +198,7 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
                     {showDebugPanel && (
                         <DebugDialog
                             onAddRandomPokemon={this.addRandomPokemon}
+                            onCreateRandomBox={this.createRandomBox}
                         />
                     )}
 
@@ -191,4 +213,4 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
     }
 }
 
-export const App = connect(appSelector, { addPokemon })(AppBase);
+export const App = connect(appSelector, { addPokemon, addBox })(AppBase);

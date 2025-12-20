@@ -189,7 +189,7 @@ export const GEN_3_HELD_ITEM_MAP: Record<number, string | undefined> = {
     179: "BrightPowder",
     180: "White Herb",
     181: "Macho Brace",
-    182: "Exp. Share",
+    182: "Exp Share",
     183: "Quick Claw",
     184: "Soothe Bell",
     185: "Mental Herb",

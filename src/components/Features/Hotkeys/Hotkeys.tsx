@@ -8,6 +8,7 @@ import {
     changeEditorSize,
     toggleDialog,
     editPokemon,
+    editStyle,
 } from "actions";
 import { Pokemon, Boxes } from "models";
 import { sortPokes, sortPokesReverse, noop, generateEmptyPokemon } from "utils";
@@ -33,7 +34,9 @@ export interface HotkeysProps {
     boxes: Boxes;
     selectedId: string;
     editor: Editor;
+    style: State["style"];
     customHotkeys: HotkeyBindings;
+    editStyle: editStyle;
 }
 
 export class HotkeysBase extends React.PureComponent<HotkeysProps> {
@@ -192,6 +195,15 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         return this.lastPokemonId ?? this.props.pokemon?.[this.props.pokemon.length - 1]?.id;
     }
 
+    private clickButtonByTestId(testId: string) {
+        if (typeof document === "undefined") return;
+        const button = document.querySelector<HTMLButtonElement>(
+            `[data-testid="${testId}"]`,
+        );
+        if (!button || button.disabled) return;
+        button.click();
+    }
+
     private manualSave() {
         Promise.resolve(persistor.flush())
             .then(() => {
@@ -263,6 +275,33 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
 
     private toggleMassEditor() {
         this.props.toggleDialog("massEditor");
+    }
+
+    private importData() {
+        this.clickButtonByTestId("import-data-button");
+    }
+
+    private exportData() {
+        this.clickButtonByTestId("export-data-button");
+    }
+
+    private importSaveFile() {
+        this.clickButtonByTestId("import-save-file-button");
+    }
+
+    private downloadImage() {
+        this.clickButtonByTestId("download-image-button");
+    }
+
+    private toggleDarkMode() {
+        const isDark = this.props.style?.editorDarkMode;
+        if (typeof isDark === "boolean") {
+            this.props.editStyle({ editorDarkMode: !isDark });
+        }
+    }
+
+    private toggleReleaseDialog() {
+        this.clickButtonByTestId("release-dialog-button");
     }
 
     private focusPokemonSearch() {
@@ -404,6 +443,7 @@ export const Hotkeys = connect(
         boxes: state.box,
         selectedId: state.selectedId,
         editor: state.editor,
+        style: state.style,
         customHotkeys: state.hotkeys,
     }),
     {
@@ -414,5 +454,6 @@ export const Hotkeys = connect(
         changeEditorSize,
         toggleDialog,
         editPokemon,
+        editStyle,
     },
 )(HotkeysBase);

@@ -45,6 +45,7 @@ import { MoveEditor } from "components/Editors/MoveEditor/MoveEditor";
 import { PokemonIconPlain } from "components/Pokemon/PokemonIcon/PokemonIcon";
 import { CheckpointsInputList } from "components/Editors/TrainerEditor/BadgeInput";
 import { getImages, Image } from "components/Common/Shared/ImagesDrawer";
+import { DexieImagePickerPopover } from "components/Common/Shared/DexieImagePickerPopover";
 import { normalizePokeballName } from "utils";
 
 const pokeball = "./assets/pokeball.png";
@@ -359,6 +360,17 @@ export class CurrentPokemonEditBase extends React.Component<
                             };
                             editPokemon(edit, this.state.selectedId);
                         }}
+                        rightElement={
+                            <DexieImagePickerPopover
+                                selectedName={currentPokemon.customImage || ""}
+                                onSelect={(name) =>
+                                    editPokemon(
+                                        { customImage: name },
+                                        this.state.selectedId,
+                                    )
+                                }
+                            />
+                        }
                         key={this.state.selectedId + "customimage"}
                     />
                 ) : (
@@ -368,6 +380,17 @@ export class CurrentPokemonEditBase extends React.Component<
                         placeholder="http://..."
                         value={currentPokemon.customImage}
                         type="text"
+                        rightElement={
+                            <DexieImagePickerPopover
+                                selectedName={currentPokemon.customImage || ""}
+                                onSelect={(name) =>
+                                    editPokemon(
+                                        { customImage: name },
+                                        this.state.selectedId,
+                                    )
+                                }
+                            />
+                        }
                         key={this.state.selectedId + "customImage"}
                     />
                 )}
@@ -377,6 +400,17 @@ export class CurrentPokemonEditBase extends React.Component<
                     placeholder="http://..."
                     value={currentPokemon.customIcon}
                     type="text"
+                    rightElement={
+                        <DexieImagePickerPopover
+                            selectedName={currentPokemon.customIcon || ""}
+                            onSelect={(name) =>
+                                editPokemon(
+                                    { customIcon: name },
+                                    this.state.selectedId,
+                                )
+                            }
+                        />
+                    }
                     key={this.state.selectedId + "customIcon"}
                 />
                 <CurrentPokemonInput
@@ -407,6 +441,17 @@ export class CurrentPokemonEditBase extends React.Component<
                     placeholder="http://.."
                     value={currentPokemon.customItemImage}
                     type="text"
+                    rightElement={
+                        <DexieImagePickerPopover
+                            selectedName={currentPokemon.customItemImage || ""}
+                            onSelect={(name) =>
+                                editPokemon(
+                                    { customItemImage: name },
+                                    this.state.selectedId,
+                                )
+                            }
+                        />
+                    }
                     key={this.state.selectedId + "customItemImage"}
                 />
                 <CurrentPokemonInput
@@ -593,7 +638,7 @@ export class CurrentPokemonEditBase extends React.Component<
                                 this.props.editPokemon(
                                     {
                                         types: matchSpeciesToTypes(
-                                            e.target.value,
+                                            e.target.value as Species,
                                             // @TODO: tighten type
                                             currentPokemon.forme as any,
                                             getGameGeneration(

@@ -77,4 +77,54 @@ describe("ImageUpload", () => {
         const button = container.querySelector("button");
         expect(button).not.toBeNull();
     });
+
+    it("supports uploading multiple images when multiple=true", async () => {
+        const { container } = render(
+            <ImageUpload onSuccess={mockOnSuccess} multiple />
+        );
+        const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+        expect(fileInput.multiple).toBe(true);
+
+        const file1 = new File(["a"], "a.png", { type: "image/png" });
+        const file2 = new File(["b"], "b.png", { type: "image/png" });
+
+        // Stub FileReader to resolve immediately with a predictable result.
+        // Some environments expose FileReader on both `window` and `globalThis`.
+        const originalWindowFileReader = (window as any).FileReader;
+        const originalGlobalFileReader = (globalThis as any).FileReader;
+        class MockFileReader {
+            public result: string | null = null;
+            public onload: null | (() => void) = null;
+            public onerror: null | ((e: any) => void) = null;
+            readAsDataURL(file: File) {
+                this.result = `data:${file.name}`;
+                // Real FileReader fires load asynchronously; defer so ImageUpload's code
+                // has a chance to attach `onload` after calling readAsDataURL().
+                queueMicrotask(() => this.onload?.());
+            }
+        }
+        (window as any).FileReader = MockFileReader;
+        (globalThis as any).FileReader = MockFileReader;
+
+        const fileListLike = {
+            0: file1,
+            1: file2,
+            length: 2,
+            item: (i: number) => [file1, file2][i] ?? null,
+        };
+        // For file inputs, React reads from the element's `.files`. Define a getter so jsdom returns our list.
+        Object.defineProperty(fileInput, "files", {
+            configurable: true,
+            get: () => fileListLike,
+        });
+        fireEvent.change(fileInput);
+
+        await waitFor(() => {
+            expect(mockOnSuccess).toHaveBeenCalledTimes(2);
+        });
+
+        // Restore
+        (window as any).FileReader = originalWindowFileReader;
+        (globalThis as any).FileReader = originalGlobalFileReader;
+    });
 });

@@ -10,11 +10,6 @@ export interface HotkeyList {
 
 export const betaHotkeys: HotkeyList[] = [
     {
-        key: "m",
-        comment: "Toggle editor",
-        onKeyUp: "toggleEditor",
-    },
-    {
         key: "I",
         label: "shift+i",
         comment: "Toggle image uploader",
@@ -69,6 +64,12 @@ export const listOfHotkeys: HotkeyList[] = [
         onKeyUp: "movePokemonStatusDown",
     },
     {
+        key: "M",
+        label: "shift+m",
+        comment: "Toggle editor",
+        onKeyUp: "toggleEditor",
+    },
+    {
         key: "n",
         comment: "Add new Pok\xE9mon",
         onKeyUp: "addPokemon",
@@ -79,10 +80,36 @@ export const listOfHotkeys: HotkeyList[] = [
         onKeyUp: "toggleTypeMatchups",
     },
     {
-        key: "M",
-        label: "shift+m",
+        key: "m",
         comment: "Toggle Mass Editor",
         onKeyUp: "toggleMassEditor",
+    },
+    {
+        key: "i",
+        comment: "Import data",
+        onKeyUp: "importData",
+    },
+    {
+        key: "e",
+        comment: "Export data",
+        onKeyUp: "exportData",
+    },
+    {
+        key: "o",
+        comment: "Import save file",
+        onKeyUp: "importSaveFile",
+    },
+    {
+        key: "D",
+        label: "shift+d",
+        comment: "Download image",
+        onKeyUp: "downloadImage",
+    },
+    {
+        key: "L",
+        label: "shift+l",
+        comment: "Toggle dark mode",
+        onKeyUp: "toggleDarkMode",
     },
     {
         key: "s",
@@ -104,6 +131,12 @@ export const listOfHotkeys: HotkeyList[] = [
         label: "shift+n",
         comment: "Create New Nuzlocke",
         onKeyUp: "newNuzlocke",
+    },
+    {
+        key: "V",
+        label: "shift+v",
+        comment: "Toggle release notes",
+        onKeyUp: "toggleReleaseDialog",
     },
     {
         label: "shift+scroll",

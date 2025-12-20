@@ -1,11 +1,11 @@
 import * as React from "react";
-import { Button } from "@blueprintjs/core";
+import { Button, NumericInput } from "@blueprintjs/core";
 import { noop } from "utils";
 import { css } from "emotion";
 
 interface DebugDialogProps {
     onAddRandomPokemon: () => void;
-    onCreateBox?: () => void;
+    onCreateRandomBox?: (count: number) => void;
 }
 
 const debugPanelClassName = css`
@@ -29,10 +29,11 @@ const debugPanelHeader = css`
 
 export const DebugDialog: React.FC<DebugDialogProps> = ({
     onAddRandomPokemon,
-    onCreateBox = noop,
+    onCreateRandomBox = noop,
 }) => {
-
     const [isOpen, setIsOpen] = React.useState(true);
+    const [boxPokemonCount, setBoxPokemonCount] = React.useState(30);
+
     if (!isOpen) return null;
     return (
         <div className={debugPanelClassName} aria-label="Debug Panel">
@@ -44,9 +45,23 @@ export const DebugDialog: React.FC<DebugDialogProps> = ({
                 <Button fill onClick={onAddRandomPokemon}>
                     Add Random Pokemon
                 </Button>
-                <Button fill onClick={onCreateBox}>
-                    Create a new box of 30 Pokemon
-                </Button>
+                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                    <Button 
+                        fill 
+                        onClick={() => onCreateRandomBox(boxPokemonCount)}
+                        style={{ flex: 1 }}
+                    >
+                        Create Random Box
+                    </Button>
+                    <NumericInput
+                        value={boxPokemonCount}
+                        onValueChange={(value) => setBoxPokemonCount(value)}
+                        min={1}
+                        max={100}
+                        style={{ width: "4rem" }}
+                        buttonPosition="none"
+                    />
+                </div>
             </div>
         </div>
     );
