@@ -61,7 +61,6 @@ export function ResizedImage({ src, width, height, ...imgProps }: ResizedImagePr
         };
     }, [src, width, height]);
 
-    // eslint-disable-next-line jsx-a11y/alt-text
     return <img {...imgProps} src={resizedSrc} />;
 }
 

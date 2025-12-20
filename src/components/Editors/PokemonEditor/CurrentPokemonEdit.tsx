@@ -638,7 +638,7 @@ export class CurrentPokemonEditBase extends React.Component<
                                 this.props.editPokemon(
                                     {
                                         types: matchSpeciesToTypes(
-                                            e.target.value,
+                                            e.target.value as Species,
                                             // @TODO: tighten type
                                             currentPokemon.forme as any,
                                             getGameGeneration(

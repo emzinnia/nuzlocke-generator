@@ -12,6 +12,7 @@ describe.skip("<App />", () => {
                 style={styleDefaults}
                 pokemon={[generateEmptyPokemon()]}
                 addPokemon={(pokemon: Pokemon) => ({ type: "ADD_POKEMON" as const, pokemon })}
+                addBox={() => ({ type: "ADD_BOX" as const, box: { id: "1", Pokemon: [], name: "Box" } })}
             />,
         );
         expect(screen.getByTestId("app")).toBeDefined();

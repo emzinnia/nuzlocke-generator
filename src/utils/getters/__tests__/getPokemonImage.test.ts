@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 // Hoisted mocks so they are available inside vi.mock factories (Vitest hoists vi.mock).
 const mocks = vi.hoisted(() => {
     return {
-        getImages: vi.fn<[], Promise<Array<{ name: string; image: string }>>>(),
+        getImages: vi.fn(() => Promise.resolve([] as Array<{ name: string; image: string }>)),
         wrapImageInCORS: vi.fn(async (url: string) => `cors(${url})`),
         speciesToNumber: vi.fn((species: string) => {
             const map: Record<string, number> = {
