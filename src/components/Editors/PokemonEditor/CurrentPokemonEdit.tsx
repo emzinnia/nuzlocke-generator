@@ -255,7 +255,7 @@ export class CurrentPokemonEditBase extends React.Component<
 
     private getTypes(includeShadow = true) {
         const { customTypes, editor } = this.props;
-        return getListOfTypes(customTypes, editor.temtemMode).filter((type) =>
+        return getListOfTypes(customTypes).filter((type) =>
             includeShadow ? true : type !== "Shadow",
         );
     }
