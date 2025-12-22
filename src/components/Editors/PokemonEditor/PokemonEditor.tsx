@@ -197,7 +197,7 @@ export class PokemonEditorBase extends React.Component<
                     {this.renderBoxesWithSearch(boxes, team)}
                     <BoxForm boxes={boxes} />
                     <CurrentPokemonEdit />
-                    <BaseEditor name="Location Checklist" defaultOpen={false}>
+                    <BaseEditor name="Location Checklist" defaultOpen={true}>
                         <React.Suspense fallback={<Spinner />}>
                             <PokemonLocationChecklist
                                 customAreas={customAreas}
