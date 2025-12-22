@@ -54,9 +54,9 @@ const DataEditor = React.lazy(() =>
         default: res.DataEditor,
     })),
 );
-const EditorControls = React.lazy(() =>
-    import("components/Editors/Editor/EditorControls").then((res) => ({
-        default: res.EditorControls,
+const EditorToolbar = React.lazy(() =>
+    import("components/Editors/Editor/EditorToolbar").then((res) => ({
+        default: res.EditorToolbar,
     })),
 );
 const Credits = React.lazy(() =>
@@ -139,7 +139,7 @@ export function Editor() {
         >
             <ErrorBoundary key={1}>
                 <React.Suspense fallback={Skeleton}>
-                    <EditorControls
+                    <EditorToolbar
                         editorDarkMode={editorDarkMode}
                         minimized={minimized}
                     />
