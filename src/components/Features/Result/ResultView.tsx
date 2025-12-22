@@ -36,11 +36,17 @@ export function ResultView() {
     const editor = useSelector<State, State["editor"]>((state) => state.editor);
     const style = useSelector<State, State["style"]>((state) => state.style);
     const resultRef = React.useRef<ResultBase>(null);
-    const prevDownloadRequested = React.useRef<number>(0);
+    const prevDownloadRequested = React.useRef<number | null>(null);
 
     // Listen for download triggers from Redux
     React.useEffect(() => {
         const downloadRequested = editor.downloadRequested ?? 0;
+        // On first run, store the initial value without triggering download
+        // This prevents downloads from firing on page reload due to persisted state
+        if (prevDownloadRequested.current === null) {
+            prevDownloadRequested.current = downloadRequested;
+            return;
+        }
         if (downloadRequested > 0 && downloadRequested !== prevDownloadRequested.current) {
             prevDownloadRequested.current = downloadRequested;
             resultRef.current?.toImage();
