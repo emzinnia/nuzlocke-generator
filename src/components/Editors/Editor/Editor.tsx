@@ -6,6 +6,7 @@ import { ErrorBoundary, Skeleton } from "components";
 import { editorStyles } from "./styles";
 import "./editor.css";
 import { editorModeSelector, minimizedSelector } from "selectors";
+import { Tabs, Tab, Icon } from "components/ui";
 
 const PokemonEditor = React.lazy(() =>
     import("components/Editors/PokemonEditor").then((res) => ({
