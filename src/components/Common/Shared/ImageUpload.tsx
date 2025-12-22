@@ -2,23 +2,23 @@ import * as React from "react";
 import { Button, Intent } from "components/ui";
 import { showToast } from "./appToaster";
 
-const toBase64 = (file) =>
+const toBase64 = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
+        reader.onload = () => resolve((reader.result as string) ?? "");
         reader.onerror = (error) => reject(error);
     });
 
 export interface ImageUploadProps {
     onSuccess: (data: string, fileName?: string) => void;
-    onError?: (error: any) => void;
+    onError?: (error: unknown) => void;
     multiple?: boolean;
 }
 
 const onUpload =
     ({ onSuccess, onError }: ImageUploadProps) =>
-    async (e: any) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files: File[] = Array.from(
             // Prefer `target` (matches how RTL passes `fireEvent.change(..., { target: { files }})`)
             e?.target?.files ?? e?.currentTarget?.files ?? [],
