@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-function-type */
 import * as React from "react";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 

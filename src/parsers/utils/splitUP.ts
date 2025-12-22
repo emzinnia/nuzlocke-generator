@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-function-type */
 export function splitUp(arr, n) {
     const rest = arr.length % n; // how much to divide
     let restUsed = rest; // to keep track of the division over the elements

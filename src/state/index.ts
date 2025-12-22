@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-function-type */
 import { Styles } from "utils";
 import { Pokemon, Trainer, Game, Editor, Boxes, View } from "models";
 import { Checkpoints } from "reducers/checkpoints";

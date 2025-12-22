@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-function-type */
 import { Pokemon } from "models";
 import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";

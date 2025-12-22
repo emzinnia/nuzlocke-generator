@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-function-type */
 import { applyMiddleware, createStore, Middleware } from "redux";
 import { createLogger } from "redux-logger";
 // @TODO: figure out this deprecation

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Hoisted mocks so they are available inside vi.mock factories (Vitest hoists vi.mock).
