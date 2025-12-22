@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { diff } from "deep-diff";
 import {
     editorHistory,

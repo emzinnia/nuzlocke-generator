@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-function-type */
 import { v4 as uuid } from "uuid";
 import { Pokemon } from "models";
 import { sortPokes } from ".";

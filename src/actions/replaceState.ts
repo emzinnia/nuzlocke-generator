@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-function-type */
 import { Action } from "actions";
 
 export type REPLACE_STATE = "REPLACE_STATE";

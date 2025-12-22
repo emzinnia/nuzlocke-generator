@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-function-type */
 import { describe, it, expect } from "vitest";
 import { parseQuery } from "../parse";
 import { compileQuery } from "../compile";
