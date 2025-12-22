@@ -277,3 +277,46 @@ input[name="metLevel"] {
 .current-pokemon-notes {
     width: 100%;
 }
+
+/* Editor Tabs */
+.editor-tabs {
+    margin-top: 0.25rem;
+}
+
+.editor-tabs [role="tablist"] {
+    padding: 0 0.25rem;
+    gap: 0.25rem;
+    border-bottom-color: #e5e7eb;
+}
+
+.dark .editor-tabs [role="tablist"] {
+    border-bottom-color: #374151;
+}
+
+.editor-tabs [role="tab"] {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+    border-radius: 0.25rem 0.25rem 0 0;
+    background: transparent;
+    transition: background-color 150ms ease;
+}
+
+.editor-tabs [role="tab"]:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.dark .editor-tabs [role="tab"]:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.editor-tabs [role="tab"][aria-selected="true"] {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.dark .editor-tabs [role="tab"][aria-selected="true"] {
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.editor-tab-panel {
+    padding-top: 0.25rem;
+}
