@@ -270,7 +270,7 @@ export function DexieImagePickerPopover({
         >
             <Button
                 minimal
-                icon={icon as any}
+                icon={icon}
                 disabled={disabled}
                 title={tooltip}
                 aria-label={tooltip}
