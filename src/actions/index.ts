@@ -38,3 +38,4 @@ export * from "./updateCustomAreas";
 export * from "./syncStateFromHistory";
 export * from "./editHotkey";
 export * from "./saveUploadSettings";
+export * from "./setZoomLevel";

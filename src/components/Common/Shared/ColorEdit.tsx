@@ -4,21 +4,27 @@ import { cx } from "emotion";
 import { connect } from "react-redux";
 import { classWithDarkTheme } from "utils";
 import { State } from "state";
-import { ChromePicker } from "react-color";
+import { ChromePicker, type ColorResult } from "react-color";
 import { Popover } from "components/ui";
 
-export const rgbaOrHex = (o) =>
-    (o.rgb && o.rgb.a && o.rgb.a !== 1
-        ? `rgba(${o.rgb.r}, ${o.rgb.g}, ${o.rgb.b}, ${o.rgb.a})`
-        : o.hex) || o;
+type ColorLike = ColorResult | string;
+
+export const rgbaOrHex = (color: ColorLike): string => {
+    if (typeof color === "string") return color;
+    const { rgb, hex } = color;
+    if (rgb && rgb.a && rgb.a !== 1) {
+        return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`;
+    }
+    return hex;
+};
 
 export interface ColorEditProps {
-    value?: any;
+    value?: ColorLike;
     onChange: (e?: React.ChangeEvent<HTMLInputElement>) => void;
     name: string;
     style?: State["style"];
     width?: string;
-    onColorChange: (color) => void;
+    onColorChange: (color: ColorResult) => void;
 }
 
 export class ColorEditBase extends React.Component<

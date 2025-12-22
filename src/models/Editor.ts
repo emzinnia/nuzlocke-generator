@@ -3,4 +3,6 @@ export interface Editor {
     temtemMode?: boolean;
     monsterType?: string;
     showResultInMobile?: boolean;
+    downloadRequested?: number; // Timestamp to trigger downloads
+    zoomLevel?: number;
 }
