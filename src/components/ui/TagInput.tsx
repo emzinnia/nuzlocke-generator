@@ -24,6 +24,8 @@ export interface TagProps {
     className?: string;
     /** Click handler */
     onClick?: () => void;
+    /** Inline styles */
+    style?: React.CSSProperties;
 }
 
 /**
@@ -40,6 +42,7 @@ export const Tag: React.FC<TagProps> = ({
     minimal = false,
     className = "",
     onClick,
+    style,
 }) => {
     const sizeClass = large ? "h-7 px-3 text-sm" : "h-5 px-2 text-xs";
     const roundClass = round ? "rounded-full" : "rounded";
@@ -54,6 +57,7 @@ export const Tag: React.FC<TagProps> = ({
         <span
             className={`inline-flex items-center gap-1 font-medium transition-colors ${sizeClass} ${roundClass} ${bgClasses} ${interactive ? "cursor-pointer hover:opacity-80" : ""} ${className}`}
             onClick={onClick}
+            style={style}
         >
             {icon && <Icon icon={icon} size={large ? 14 : 12} />}
             <span>{children}</span>

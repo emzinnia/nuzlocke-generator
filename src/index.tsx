@@ -12,12 +12,6 @@ import { AppToasterHost } from "components/Common/Shared/appToaster";
 
 (window as any).global = window;
 
-// @TODO: add back Buffer/Path
-// // @ts-ignore
-// window.Buffer = window.Buffer || require('buffer').Buffer;
-// // @ts-ignore
-// window.path = window.path || require('path').path;
-
 async function getRollbar() {
     const { default: Rollbar } = await import("rollbar");
 
@@ -67,23 +61,6 @@ void injectGlobal`
         min-width: 100%;
         overflow-y: hidden;
     }
-
-    .opacity-medium {
-        opacity: 0.5;
-    }
-
-    .flex { display: flex; }
-    .p-6 { padding: 6rem; }
-    .center-text { text-align: center; }
-    .font-bold { font-weight: bold; }
-    .items-center { align-items: center; }
-    .content-center { align-content: center; }
-    .justify-between { justify-content: space-between; }
-    .m-1 { margin: 0.25rem; }
-    .mb-2 { margin-bottom: 0.5rem; }
-    .cursor-pointer { cursor: pointer; }
-    .inline-flex { display: inline-flex !important; }
-    .full-width { width: 100%; }
 `;
 
 const mountNode = document.getElementById("app");

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useSelector } from "react-redux";
 import { cx } from "emotion";
-import {} from "state";
+import { isMobile } from "is-mobile";
 import { ErrorBoundary, Skeleton } from "components";
 import { editorStyles } from "./styles";
 import "./editor.css";
@@ -63,6 +63,11 @@ const EditorToolbar = React.lazy(() =>
 const Credits = React.lazy(() =>
     import("components/Features/Credits").then((res) => ({
         default: res.Credits,
+    })),
+);
+const Result = React.lazy(() =>
+    import("components/Features/Result/Result").then((res) => ({
+        default: res.Result,
     })),
 );
 
@@ -151,7 +156,6 @@ export function Editor() {
                 id="editor-tabs"
                 defaultSelectedTabId="nuzlocke"
                 fill
-                className="editor-tabs"
             >
                 <Tab
                     id="nuzlocke"
@@ -206,6 +210,22 @@ export function Editor() {
                         </div>
                     }
                 />
+                {isMobile() && (
+                    <Tab
+                        id="result"
+                        title="Result"
+                        icon={<Icon icon="media" />}
+                        panel={
+                            <div className="editor-tab-panel result-tab-panel">
+                                <ErrorBoundary key={12}>
+                                    <React.Suspense fallback={Skeleton}>
+                                        <Result />
+                                    </React.Suspense>
+                                </ErrorBoundary>
+                            </div>
+                        }
+                    />
+                )}
                 <Tab
                     id="settings"
                     title="Settings"
@@ -252,6 +272,11 @@ export function Editor() {
                         }
                     }}
                 />
+            )}
+            
+            {/* Overlay to capture mouse events during resize and prevent them from hitting other components */}
+            {isResizing && (
+                <div className="editor-resize-overlay" />
             )}
         </div>
     );

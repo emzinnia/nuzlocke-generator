@@ -24,83 +24,38 @@ export function NuzlockeGameTags({
     isCopy,
     size,
 }: NuzlockeGameTagsProps) {
+    const textColor = darkMode ? color : game === "None" ? "#000" : color;
+    const secondaryTagClasses = `mx-0.5 bg-black/10 ${darkMode ? "text-white" : "text-black"}`;
+
     return (
-        <>
-            <div
-                style={{
-                    display: "flex",
-                    width: "20rem",
-                    alignItems: "center",
-                    pointerEvents: "none",
-                    flexDirection: "column",
-                    margin: "auto",
-                }}
-            >
-                <div
+        <div className="flex flex-col items-center w-80 pointer-events-none mx-auto">
+            <div className="flex justify-center min-w-1/2">
+                <Tag
+                    round
+                    className="mx-0.5"
                     style={{
-                        display: "flex",
+                        background: gameOfOriginToColor(game),
+                        color: textColor,
                     }}
                 >
-                    {data?.pokemon
-                        ?.filter((p) => p.status === "Team")
-                        .map((poke) => <PokemonIcon key={poke.id} {...poke} />)}
-                </div>
-                <div
-                    className="flex justify-center"
-                    style={{ minWidth: "50%" }}
-                >
-                    <Tag
-                        round
-                        style={{
-                            margin: "0 2px",
-                            background: gameOfOriginToColor(game),
-                            color: darkMode
-                                ? color
-                                : game === "None"
-                                  ? "#000"
-                                  : color,
-                        }}
-                    >
-                        {game}
+                    {game}
+                </Tag>
+                {isCurrent && (
+                    <Tag round className={secondaryTagClasses}>
+                        Current
                     </Tag>
-                    {isCurrent && (
-                        <Tag
-                            round
-                            style={{
-                                margin: "0 2px",
-                                background: "rgba(0,0,0,0.1)",
-                                color: darkMode ? "#fff" : "#000",
-                            }}
-                        >
-                            Current
-                        </Tag>
-                    )}
-                    {isCopy && (
-                        <Tag
-                            round
-                            style={{
-                                margin: "0 2px",
-                                background: "rgba(0,0,0,0.1)",
-                                color: darkMode ? "#fff" : "#000",
-                            }}
-                        >
-                            Copy
-                        </Tag>
-                    )}
-                    {size && (
-                        <Tag
-                            round
-                            style={{
-                                margin: "0 2px",
-                                background: "rgba(0,0,0,0.1)",
-                                color: darkMode ? "#fff" : "#000",
-                            }}
-                        >
-                            {size}KB
-                        </Tag>
-                    )}
-                </div>
+                )}
+                {isCopy && (
+                    <Tag round className={secondaryTagClasses}>
+                        Copy
+                    </Tag>
+                )}
+                {size && (
+                    <Tag round className={secondaryTagClasses}>
+                        {size}KB
+                    </Tag>
+                )}
             </div>
-        </>
+        </div>
     );
 }

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
     Popover,
     Button,
@@ -7,8 +8,8 @@ import {
     MenuItem,
     Intent,
 } from "components/ui/shims";
-import { Icon } from "components/ui";
-import { connect } from "react-redux";
+import { ButtonGroup, Icon } from "components/ui";
+import { useSelector, useDispatch } from "react-redux";
 import { State } from "state";
 import {
     updateNuzlocke,
@@ -18,12 +19,7 @@ import {
     replaceState,
     updateSwitchNuzlocke,
 } from "actions";
-import {
-    feature,
-    gameOfOriginToColor,
-    getContrastColor,
-    Styles,
-} from "utils";
+import { feature, gameOfOriginToColor, getContrastColor, Styles } from "utils";
 import { omit } from "ramda";
 import { createStore } from "redux";
 import { appReducers } from "reducers";
@@ -32,31 +28,16 @@ import { DeleteAlert } from "components/Editors/DataEditor/DeleteAlert";
 import { HallOfFameDialog } from "./HallOfFameDialog";
 import { showToast } from "components/Common/Shared/appToaster";
 import { HotkeyIndicator } from "components/Common/Shared";
+import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 
-export interface NuzlockeSaveControlsProps {
-    nuzlockes: State["nuzlockes"];
-    darkMode?: boolean;
-    state: string;
-    updateNuzlocke: updateNuzlocke;
-    deleteNuzlocke: deleteNuzlocke;
-    newNuzlocke: newNuzlocke;
-    switchNuzlocke: switchNuzlocke;
-    replaceState: replaceState;
-    updateSwitchNuzlocke: updateSwitchNuzlocke;
+interface NuzlockeSaveData {
+    id: string;
+    data: string;
+    isCopy?: boolean;
 }
 
-export interface NuzlockeSaveControlsState {
-    isDeletingNuzlocke: boolean;
-    isHofOpen: boolean;
-    deletionFunction?: () => void;
-}
-
-interface ContainsId {
-    id: number;
-    [prop: string]: any;
-}
-
-const sort = (a: ContainsId, b: ContainsId) => a.id - b.id;
+const sortById = (a: NuzlockeSaveData, b: NuzlockeSaveData) =>
+    a.id.localeCompare(b.id);
 
 const stripEditorDarkModeFromState = (state: State) => {
     const baseState = omit(["nuzlockes", "editorHistory"], state) as {
@@ -72,275 +53,255 @@ const stripEditorDarkModeFromState = (state: State) => {
     };
 };
 
-export class NuzlockeSaveBase extends React.Component<
-    NuzlockeSaveControlsProps,
-    NuzlockeSaveControlsState
-> {
-    public state = {
-        isDeletingNuzlocke: false,
-        deletionFunction: undefined,
-        isHofOpen: false,
-    };
-
-    public UNSAFE_componentWillMount() {
-        const { nuzlockes, newNuzlocke, state } = this.props;
-        if (!nuzlockes.currentId || nuzlockes.currentId === "") {
-            newNuzlocke(state, { isCopy: false });
-        }
-    }
-
-    private toggleIsDeletingNuzlocke = () => {
-        this.setState((state) => ({
-            isDeletingNuzlocke: !state.isDeletingNuzlocke,
-        }));
-    };
-
-    private toggleIsHofOpen = () => {
-        this.setState((state) => ({ isHofOpen: !state.isHofOpen }));
-    };
-
-    public renderMenu() {
-        const {
-            state,
-            replaceState,
-            updateSwitchNuzlocke,
-            newNuzlocke,
-            updateNuzlocke,
-            deleteNuzlocke,
-            switchNuzlocke,
-            darkMode,
-        } = this.props;
-        const { nuzlockes } = this.props;
-        const { currentId } = this.props.nuzlockes;
-        const { isHofOpen, isDeletingNuzlocke, deletionFunction } = this.state;
-        const saves = nuzlockes.saves.sort(sort);
-
-        return (
-            <div
-                style={{
-                    padding: "0.5rem",
-                }}
-            >
-                <Button
-                    intent={Intent.SUCCESS}
-                    icon="add"
-                    style={{ marginBottom: "0.25rem" }}
-                    onClick={() => {
-                        updateNuzlocke(currentId, state);
-                        const data = createStore(appReducers)?.getState();
-                        const preparedData = stripEditorDarkModeFromState(
-                            data as unknown as State,
-                        );
-                        newNuzlocke(JSON.stringify(preparedData), {
-                            isCopy: false,
-                        });
-                        replaceState(data);
-                    }}
-                >
-                    New Nuzlocke{" "}
-                    <HotkeyIndicator
-                        hotkey="shift+n"
-                        showModifier={false}
-                        style={{ marginLeft: "0.35rem" }}
-                    />
-                </Button>
-                {saves.map((nuzlocke) => {
-                    const id = nuzlocke.id;
-                    console.log(nuzlocke.id);
-                    const { isCopy } = nuzlocke;
-                    const isCurrent = currentId === id;
-                    const data = nuzlocke.data;
-
-                    if (!data || data === "{}" || data === "{ }") {
-                        return null;
-                    }
-
-                    let parsedData: State | null = null;
-
-                    try {
-                        parsedData = isCurrent
-                            ? JSON.parse(state)
-                            : JSON.parse(data);
-                        //parsedData = JSON.parse(data);
-                    } catch (_e) {
-                        // Ignore parse errors
-                    }
-
-                    if (!parsedData) {
-                        return null;
-                    }
-
-                    const game = parsedData?.game?.name;
-                    const color = getContrastColor(gameOfOriginToColor(game));
-
-                    return (
-                        <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                border: darkMode
-                                    ? "1px solid #444"
-                                    : "1px solid #ccc",
-                                padding: "0.5rem",
-                                borderRadius: "0.25rem",
-                                boxShadow: "0 0 4px rgba(0,0,0,0.1)",
-                                marginBottom: "2px",
-                                justifyContent: "space-between",
-                                // width: isMobile() ? '80%' : '100%',
-                            }}
-                            key={id}
-                        >
-                            <NuzlockeGameTags
-                                darkMode={darkMode}
-                                game={game}
-                                color={color}
-                                data={parsedData}
-                                isCurrent={isCurrent}
-                                isCopy={isCopy}
-                                size={((data.length * 2) / 1024).toFixed(2)}
-                            />
-                            <DeleteAlert
-                                onConfirm={deletionFunction}
-                                isOpen={isDeletingNuzlocke}
-                                onCancel={this.toggleIsDeletingNuzlocke}
-                                warningText="This will delete your Nuzlocke save without any to retrieve it. Are you sure you want to do this?"
-                            />
-                            {feature.hallOfFame && (
-                                <HallOfFameDialog
-                                    icon={"crown"}
-                                    isOpen={isHofOpen}
-                                    onClose={this.toggleIsHofOpen}
-                                    title="Hall of Fame"
-                                />
-                            )}
-                            <Popover
-                                position={Position.BOTTOM_RIGHT}
-                                content={
-                                    <Menu>
-                                        <MenuItem
-                                            shouldDismissPopover={false}
-                                            disabled={isCurrent}
-                                            icon="swap-horizontal"
-                                            onClick={() => {
-                                                try {
-                                                    updateSwitchNuzlocke(
-                                                        currentId,
-                                                        id,
-                                                        state,
-                                                    );
-                                                    replaceState(parsedData);
-                                                } catch (e) {
-                                                    showToast({
-                                                        message: `Failed to switch nuzlockes. ${e}`,
-                                                        intent: Intent.DANGER,
-                                                    });
-                                                }
-                                            }}
-                                            text="Switch to this Nuzlocke"
-                                        />
-                                        <MenuItem
-                                            shouldDismissPopover={false}
-                                            icon="clipboard"
-                                            onClick={() => {
-                                                try {
-                                                    if (
-                                                        typeof data !== "string"
-                                                    ) {
-                                                        throw new Error(
-                                                            "Data is not in correct format.",
-                                                        );
-                                                    }
-                                                    newNuzlocke(data, {
-                                                        isCopy: true,
-                                                    });
-                                                } catch (e) {
-                                                    showToast({
-                                                        message: `Failed to copy nuzlocke. ${e}`,
-                                                        intent: Intent.DANGER,
-                                                    });
-                                                }
-                                            }}
-                                            text="Copy this Nuzlocke"
-                                        ></MenuItem>
-                                        {feature.hallOfFame && (
-                                            <MenuItem
-                                                shouldDismissPopover={false}
-                                                onClick={this.toggleIsHofOpen}
-                                                icon={"crown"}
-                                                text="Submit to Hall of Fame"
-                                            />
-                                        )}
-                                        <MenuItem
-                                            disabled={saves.length === 1}
-                                            shouldDismissPopover={false}
-                                            icon="trash"
-                                            intent={Intent.DANGER}
-                                            onClick={() => {
-                                                const deletionFunction = () => {
-                                                    try {
-                                                        deleteNuzlocke(id);
-                                                        if (isCurrent) {
-                                                            switchNuzlocke(
-                                                                saves[0].id,
-                                                            );
-                                                            replaceState(
-                                                                JSON.parse(
-                                                                    saves[0]
-                                                                        .data,
-                                                                ),
-                                                            );
-                                                        }
-                                                        this.toggleIsDeletingNuzlocke();
-                                                    } catch (e) {
-                                                        showToast({
-                                                            message: `Failed to delete nuzlocke. ${e}`,
-                                                            intent: Intent.DANGER,
-                                                        });
-                                                    }
-                                                };
-                                                this.setState({
-                                                    deletionFunction,
-                                                    isDeletingNuzlocke: true,
-                                                });
-                                            }}
-                                            text="Delete Nuzlocke"
-                                        />
-                                    </Menu>
-                                }
-                            >
-                                <Icon
-                                    style={{
-                                        transform: "rotate(90deg)",
-                                        marginLeft: "auto",
-                                        cursor: "pointer",
-                                    }}
-                                    icon="more"
-                                />
-                            </Popover>
-                        </div>
-                    );
-                })}
-            </div>
-        );
-    }
-
-    public render() {
-        return this.renderMenu();
-    }
+interface NuzlockeSaveItemProps {
+    nuzlocke: NuzlockeSaveData;
+    currentId: string;
+    stateString: string;
+    darkMode?: boolean;
+    saves: NuzlockeSaveData[];
+    onDelete: (deletionFn: () => void) => void;
+    onToggleHof: () => void;
 }
 
-export const NuzlockeSave = connect(
-    (state: State) => ({
-        nuzlockes: state.nuzlockes,
-        state: JSON.stringify(stripEditorDarkModeFromState(state)),
-        darkMode: state.style.editorDarkMode,
-    }),
-    {
-        updateNuzlocke,
-        newNuzlocke,
-        deleteNuzlocke,
-        switchNuzlocke,
-        replaceState,
-        updateSwitchNuzlocke,
-    },
-)(NuzlockeSaveBase as any);
+function NuzlockeSaveItem({
+    nuzlocke,
+    currentId,
+    stateString,
+    darkMode,
+    saves,
+    onDelete,
+    onToggleHof,
+}: NuzlockeSaveItemProps) {
+    const dispatch = useDispatch();
+
+    const id = nuzlocke.id;
+    const { isCopy } = nuzlocke;
+    const isCurrent = currentId === id;
+    const data = nuzlocke.data;
+
+    if (!data || data === "{}" || data === "{ }") {
+        return null;
+    }
+
+    let parsedData: State | null = null;
+
+    try {
+        parsedData = isCurrent ? JSON.parse(stateString) : JSON.parse(data);
+    } catch (_e) {
+        // Ignore parse errors
+    }
+
+    if (!parsedData) {
+        return null;
+    }
+
+    const game = parsedData?.game?.name;
+    const color = getContrastColor(gameOfOriginToColor(game));
+
+    const handleSwitch = () => {
+        try {
+            dispatch(updateSwitchNuzlocke(currentId, id, stateString));
+            dispatch(replaceState(parsedData));
+        } catch (e) {
+            showToast({
+                message: `Failed to switch nuzlockes. ${e}`,
+                intent: Intent.DANGER,
+            });
+        }
+    };
+
+    const handleCopy = () => {
+        try {
+            if (typeof data !== "string") {
+                throw new Error("Data is not in correct format.");
+            }
+            dispatch(newNuzlocke(data, { isCopy: true }));
+        } catch (e) {
+            showToast({
+                message: `Failed to copy nuzlocke. ${e}`,
+                intent: Intent.DANGER,
+            });
+        }
+    };
+
+    const handleDeleteClick = () => {
+        const deletionFn = () => {
+            try {
+                dispatch(deleteNuzlocke(id));
+                if (isCurrent) {
+                    dispatch(switchNuzlocke(saves[0].id));
+                    dispatch(replaceState(JSON.parse(saves[0].data)));
+                }
+            } catch (e) {
+                showToast({
+                    message: `Failed to delete nuzlocke. ${e}`,
+                    intent: Intent.DANGER,
+                });
+            }
+        };
+        onDelete(deletionFn);
+    };
+
+    return (
+        <div
+            className={`
+                flex flex-col items-center justify-between
+                rounded-md
+                p-2
+                ${darkMode ? "border border-[#444]" : "border border-[#ccc]"}
+                shadow-[0_0_4px_rgba(0,0,0,0.1)]
+            `}
+        >
+            <div className="flex flex-row ">
+                {parsedData?.pokemon
+                    ?.filter((p) => p.status === "Team")
+                    .map((poke) => (
+                        <PokemonIcon key={poke.id} {...poke} />
+                    ))}
+            </div>
+            <NuzlockeGameTags
+                darkMode={darkMode}
+                game={game}
+                color={color}
+                data={parsedData}
+                isCurrent={isCurrent}
+                isCopy={isCopy ?? false}
+                size={((data.length * 2) / 1024).toFixed(2)}
+            />
+
+            <ButtonGroup>
+                <Button
+                    disabled={isCurrent}
+                    icon="arrow-left-right"
+                    onClick={handleSwitch}
+                    minimal
+                >
+                    Switch
+                </Button>
+                <Button icon="clipboard" onClick={handleCopy}>
+                    Copy
+                </Button>
+                <Button onClick={onToggleHof} icon="crown">
+                    Hall of Fame
+                </Button>
+                <Button
+                    disabled={saves.length === 1}
+                    icon="trash"
+                    intent={Intent.DANGER}
+                    onClick={handleDeleteClick}
+                    minimal
+                >
+                    Delete
+                </Button>
+            </ButtonGroup>
+
+            <Icon
+                style={{
+                    transform: "rotate(90deg)",
+                    marginLeft: "auto",
+                    cursor: "pointer",
+                }}
+                icon="more"
+            />
+        </div>
+    );
+}
+
+export function NuzlockeSave() {
+    const dispatch = useDispatch();
+
+    const nuzlockes = useSelector((state: State) => state.nuzlockes);
+    const stateString = useSelector((state: State) =>
+        JSON.stringify(stripEditorDarkModeFromState(state))
+    );
+    const darkMode = useSelector((state: State) => state.style.editorDarkMode);
+
+    const [isDeletingNuzlocke, setIsDeletingNuzlocke] = useState(false);
+    const [isHofOpen, setIsHofOpen] = useState(false);
+    const [deletionFunction, setDeletionFunction] = useState<
+        (() => void) | undefined
+    >(undefined);
+
+    const { currentId } = nuzlockes;
+    const saves = [...nuzlockes.saves].sort(sortById);
+
+    // Initialize nuzlocke if none exists
+    useEffect(() => {
+        if (!currentId || currentId === "") {
+            dispatch(newNuzlocke(stateString, { isCopy: false }));
+        }
+    }, []);
+
+    const toggleIsDeletingNuzlocke = useCallback(() => {
+        setIsDeletingNuzlocke((prev) => !prev);
+    }, []);
+
+    const toggleIsHofOpen = useCallback(() => {
+        setIsHofOpen((prev) => !prev);
+    }, []);
+
+    const handleNewNuzlocke = () => {
+        dispatch(updateNuzlocke(currentId, stateString));
+        const data = createStore(appReducers)?.getState();
+        const preparedData = stripEditorDarkModeFromState(
+            data as unknown as State
+        );
+        dispatch(newNuzlocke(JSON.stringify(preparedData), { isCopy: false }));
+        dispatch(replaceState(data));
+    };
+
+    const handleDelete = (deletionFn: () => void) => {
+        setDeletionFunction(() => () => {
+            deletionFn();
+            toggleIsDeletingNuzlocke();
+        });
+        setIsDeletingNuzlocke(true);
+    };
+
+    return (
+        <div style={{ padding: "0.5rem" }}>
+            <Button
+                intent={Intent.SUCCESS}
+                icon="add"
+                style={{ marginBottom: "0.25rem" }}
+                onClick={handleNewNuzlocke}
+            >
+                New Nuzlocke{" "}
+                <HotkeyIndicator
+                    hotkey="shift+n"
+                    showModifier={false}
+                    style={{ marginLeft: "0.35rem" }}
+                />
+            </Button>
+
+            {saves.map((nuzlocke) => (
+                <NuzlockeSaveItem
+                    key={nuzlocke.id}
+                    nuzlocke={nuzlocke}
+                    currentId={currentId}
+                    stateString={stateString}
+                    darkMode={darkMode}
+                    saves={saves}
+                    onDelete={handleDelete}
+                    onToggleHof={toggleIsHofOpen}
+                />
+            ))}
+
+            <DeleteAlert
+                onConfirm={deletionFunction}
+                isOpen={isDeletingNuzlocke}
+                onClose={toggleIsDeletingNuzlocke}
+                warningText="This will delete your Nuzlocke save without any to retrieve it. Are you sure you want to do this?"
+            />
+
+            {feature.hallOfFame && (
+                <HallOfFameDialog
+                    icon="crown"
+                    isOpen={isHofOpen}
+                    onClose={toggleIsHofOpen}
+                    title="Hall of Fame"
+                />
+            )}
+        </div>
+    );
+}

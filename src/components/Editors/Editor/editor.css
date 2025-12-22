@@ -10,12 +10,14 @@ html.dark {
 
 .editor {
     border: 1px solid #eee;
+    border-right: none; /* Remove right border to blend with resize handle */
     /* height: 100vh; */
     overflow-y: scroll;
     overflow-x: visible;
     padding: 0.25rem;
+    padding-right: 0.5rem; /* Extra padding for scrollbar */
     width: 90%;
-    clip-path: inset(0 -10px 0 0); /* Allow resize handle to show outside */
+    clip-path: inset(0 -20px 0 0); /* Allow resize handle to show outside */
 }
 
 .editor::-webkit-scrollbar {
@@ -322,39 +324,57 @@ input[name="metLevel"] {
     padding-top: 0.25rem;
 }
 
-/* Editor Resize Handle */
+/* Mobile Result tab */
+@media screen and (max-width: 720px) {
+    .result-tab-panel {
+        padding: 0;
+        overflow-x: auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .result-tab-panel .result {
+        margin: 0 auto !important;
+        transform-origin: top center !important;
+    }
+}
+
+/* Editor Resize Handle - positioned after the scrollbar */
 .editor-resize-handle {
     position: absolute;
     top: 0;
-    right: -4px;
-    width: 8px;
+    right: -12px; /* After the 8px scrollbar + 4px gap */
+    width: 12px;
     height: 100%;
     cursor: ew-resize;
-    z-index: 20;
+    z-index: 100;
     display: flex;
     align-items: center;
     justify-content: center;
     touch-action: none;
+    background: transparent;
 }
 
 .editor-resize-handle::before {
     content: '';
-    width: 3px;
+    width: 4px;
     height: 100%;
     background: #d1d5db;
     border-radius: 2px;
-    transition: background-color 150ms ease, width 150ms ease;
+    transition: background-color 150ms ease, width 150ms ease, box-shadow 150ms ease;
 }
 
 .editor-resize-handle:hover::before {
     background: #3b82f6;
-    width: 4px;
+    width: 5px;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
 }
 
 .editor-resize-handle:active::before,
 .editor-resize-handle.resizing::before {
     background: #2563eb;
-    width: 4px;
+    width: 5px;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
 }
 
 .dark .editor-resize-handle::before {
@@ -363,9 +383,22 @@ input[name="metLevel"] {
 
 .dark .editor-resize-handle:hover::before {
     background: #60a5fa;
+    box-shadow: 0 0 8px rgba(96, 165, 250, 0.4);
 }
 
 .dark .editor-resize-handle:active::before,
 .dark .editor-resize-handle.resizing::before {
     background: #3b82f6;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+}
+
+/* Overlay to capture all mouse events during resize */
+.editor-resize-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    cursor: ew-resize;
 }
