@@ -3,11 +3,12 @@ import * as React from "react";
 import { State } from "state";
 import { getPokemonImage, wrapImageInCORSPlain } from "utils";
 import { getImageByName } from "components/Common/Shared/ImagesDrawer";
+import { Forme } from "utils";
 
 export interface PokemonImageProps {
     children?: (image: string) => JSX.Element;
     customImage?: Pokemon["customImage"];
-    forme?: Pokemon["forme"];
+    forme?: keyof typeof Forme;
     shiny?: Pokemon["shiny"];
     species?: Pokemon["species"];
     gender?: Pokemon["gender"];
@@ -61,7 +62,7 @@ export function PokemonImage({
                     setImage(
                         await getPokemonImage({
                             customImage: customImage,
-                            forme: forme as any,
+                            forme: forme,
                             species: species,
                             shiny: shiny,
                             style: style,
