@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Classes, HTMLSelect } from "@blueprintjs/core";
+import { Classes, HTMLSelect } from "components/ui/shims";
 import * as css from "./styles";
 import { cx } from "emotion";
 import { head, last } from "ramda";

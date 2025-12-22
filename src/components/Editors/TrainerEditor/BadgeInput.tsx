@@ -12,7 +12,7 @@ import {
     Checkbox,
     Dialog,
     Classes,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
 import { CheckpointsEditor } from "./CheckpointsEditor";
 import { cx } from "emotion";
 import { State } from "state";

@@ -6,10 +6,10 @@ import {
     Dialog,
     Intent,
     Button,
-    Icon,
     Classes,
     HTMLSelect,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { Move } from "components/Pokemon/TeamPokemon/Moves";
 import {
     editCustomMoveMap,

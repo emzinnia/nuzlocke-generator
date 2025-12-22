@@ -4,12 +4,12 @@ import {
     Dialog,
     Intent,
     TextArea,
-    Icon,
     Classes,
     HTMLSelect,
     Divider,
     Spinner,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { connect } from "react-redux";
 import { editRule, addRule, deleteRule, resetRules, setRules } from "actions";
 import { showToast } from "components/Common/Shared/appToaster";

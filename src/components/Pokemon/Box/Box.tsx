@@ -20,7 +20,6 @@ import {
     useDrop,
 } from "react-dnd";
 import {
-    Icon,
     Popover,
     PopoverInteractionKind,
     Menu,
@@ -31,7 +30,8 @@ import {
     Alert,
     Classes,
     Toast,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { connect, useDispatch } from "react-redux";
 import {
     PokemonIcon,

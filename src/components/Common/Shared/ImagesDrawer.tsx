@@ -8,7 +8,7 @@ import {
     H4,
     Intent,
     NonIdealState,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
 import { css, cx } from "emotion";
 import * as React from "react";
 import Dexie from "dexie";

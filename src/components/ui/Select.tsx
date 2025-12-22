@@ -1,0 +1,74 @@
+/**
+ * Select Component
+ *
+ * A select component built with native HTML and React.
+ * Provides Blueprint-compatible API.
+ */
+
+import * as React from "react";
+import { ChevronDown } from "lucide-react";
+
+export interface SelectOption {
+    value: string;
+    label: string;
+    disabled?: boolean;
+}
+
+export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "children"> {
+    /** Options to display */
+    options?: SelectOption[] | string[];
+    /** Whether to fill the container width */
+    fill?: boolean;
+    /** Whether the select is large */
+    large?: boolean;
+    /** Whether to use minimal styling */
+    minimal?: boolean;
+    /** Icon name (not used, for Blueprint compatibility) */
+    iconName?: string;
+    /** Additional class name */
+    className?: string;
+    /** Children (alternative to options) */
+    children?: React.ReactNode;
+}
+
+export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
+    ({ options = [], fill = false, large = false, minimal = false, iconName, className = "", children, ...props }, ref) => {
+        const sizeClass = large ? "h-11 text-base" : "h-9 text-sm";
+
+        return (
+            <div className={`relative inline-block ${fill ? "w-full" : ""}`}>
+                <select
+                    ref={ref}
+                    className={`appearance-none rounded border bg-white pr-8 pl-3 outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 ${sizeClass} ${
+                        fill ? "w-full" : ""
+                    } ${
+                        minimal
+                            ? "border-transparent hover:border-gray-300 dark:hover:border-gray-600"
+                            : "border-gray-300 dark:border-gray-600"
+                    } ${props.disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"} ${className}`}
+                    {...props}
+                >
+                    {options.map((option) => {
+                        const value = typeof option === "string" ? option : option.value;
+                        const label = typeof option === "string" ? option : option.label;
+                        const disabled = typeof option === "string" ? false : option.disabled;
+                        return (
+                            <option key={value} value={value} disabled={disabled}>
+                                {label}
+                            </option>
+                        );
+                    })}
+                    {children}
+                </select>
+                <ChevronDown
+                    size={16}
+                    className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+            </div>
+        );
+    }
+);
+
+Select.displayName = "Select";
+
+export default Select;

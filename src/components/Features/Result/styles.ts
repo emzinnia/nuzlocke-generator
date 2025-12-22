@@ -297,6 +297,7 @@ export const result_download = css`
 /// v2 styles
 
 export const result_wrapper = css`
-    overflowy: scroll;
-    width: 100%;
+    overflow-y: scroll;
+    flex: 1;
+    min-width: 0;
 `;

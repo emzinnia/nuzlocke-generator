@@ -1,4 +1,4 @@
-import { Icon, IconName } from "@blueprintjs/core";
+import { Icon, type IconName } from "components/ui";
 import * as React from "react";
 
 export interface BaseEditorState {
@@ -7,7 +7,7 @@ export interface BaseEditorState {
 
 export interface BaseEditorProps {
     name: string;
-    icon?: IconName;
+    icon?: IconName | string;
     defaultOpen?: boolean;
     children?: React.ReactNode;
 }

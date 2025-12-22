@@ -9,7 +9,7 @@ import {
 } from "actions";
 import { gameOfOriginToColor, listOfGames, feature, Game } from "utils";
 
-import { Button, Intent, Switch, Classes, HTMLSelect } from "@blueprintjs/core";
+import { Button, Intent, Switch, Classes, HTMLSelect } from "components/ui/shims";
 import { RulesEditorDialog } from "components/Editors/RulesEditor/RulesEditor";
 import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";

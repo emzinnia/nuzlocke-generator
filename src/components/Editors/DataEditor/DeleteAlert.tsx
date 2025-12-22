@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useSelector } from "react-redux";
-import { Alert, Intent, AlertProps, Classes } from "@blueprintjs/core";
+import { Alert, Intent, AlertProps, Classes } from "components/ui/shims";
 import { State } from "state";
 
 // @TODO add back trubbish

@@ -382,14 +382,14 @@ describe("RulesEditorDialogBase", () => {
         );
         const dialog = baseElement.querySelector(".rules-editor-dialog");
         expect(dialog).not.toBeNull();
-        expect(dialog!.className.includes("bp5-dark")).toBe(true);
+        expect(dialog!.className.includes("dark")).toBe(true);
     });
 
     it("does not apply dark mode class when editorDarkMode is false", () => {
         const { baseElement } = render(<RulesEditorDialogBase {...dialogProps} />);
         const dialog = baseElement.querySelector(".rules-editor-dialog");
         expect(dialog).not.toBeNull();
-        expect(dialog!.className.includes("bp5-dark")).toBe(false);
+        expect(dialog!.className.includes("dark")).toBe(false);
     });
 });
 

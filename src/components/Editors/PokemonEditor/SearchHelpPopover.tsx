@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Popover, Position, Classes, Icon } from "@blueprintjs/core";
+import { Popover, Position, Classes } from "components/ui/shims";
+import { Icon } from "components/ui";
 import { css } from "emotion";
 
 const styles = {
@@ -25,7 +26,7 @@ const styles = {
             color: #394b59;
         }
 
-        .bp5-dark & {
+        .dark & {
             background: rgba(255, 255, 255, 0.1);
             color: #a7b6c2;
 
@@ -64,7 +65,7 @@ const styles = {
         letter-spacing: 0.5px;
         margin-bottom: 0.35rem;
 
-        .bp5-dark & {
+        .dark & {
             color: #a7b6c2;
         }
     `,
@@ -81,7 +82,7 @@ const styles = {
         border-radius: 3px;
         color: #137cbd;
 
-        .bp5-dark & {
+        .dark & {
             background: rgba(255, 255, 255, 0.1);
             color: #48aff0;
         }
@@ -90,7 +91,7 @@ const styles = {
         color: #5c7080;
         font-size: 0.8rem;
 
-        .bp5-dark & {
+        .dark & {
             color: #a7b6c2;
         }
     `,
@@ -108,7 +109,7 @@ const styles = {
         border-radius: 3px;
         color: #394b59;
 
-        .bp5-dark & {
+        .dark & {
             background: rgba(255, 255, 255, 0.1);
             color: #bfccd6;
         }

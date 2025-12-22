@@ -7,11 +7,11 @@ import {
     Callout,
     Classes,
     HTMLSelect,
-    Icon,
     Intent,
     TextArea,
     Tooltip,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { cx } from "emotion";
 import { useDispatch } from "react-redux";
 import { updateExcludedAreas, updateCustomAreas } from "actions";

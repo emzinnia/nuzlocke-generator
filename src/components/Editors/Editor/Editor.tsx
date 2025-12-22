@@ -2,7 +2,6 @@ import * as React from "react";
 import { useSelector } from "react-redux";
 import { cx } from "emotion";
 import {} from "state";
-import { Classes } from "@blueprintjs/core";
 import { ErrorBoundary, Skeleton } from "components";
 import { editorStyles } from "./styles";
 import "./editor.css";
@@ -66,24 +65,76 @@ const Credits = React.lazy(() =>
     })),
 );
 
+const MIN_WIDTH = 320; // px
+const MAX_WIDTH = 800; // px
+const DEFAULT_WIDTH = 480; // px
+
 /**
  * The main editor interface.
  */
 export function Editor() {
     const minimized = useSelector(minimizedSelector);
     const editorDarkMode = useSelector(editorModeSelector);
+    
+    const [width, setWidth] = React.useState(() => {
+        // Restore saved width from localStorage
+        const saved = localStorage.getItem("editor-sidebar-width");
+        return saved ? Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, parseInt(saved, 10))) : DEFAULT_WIDTH;
+    });
+    const [isResizing, setIsResizing] = React.useState(false);
+    const sidebarRef = React.useRef<HTMLDivElement>(null);
+
+    const handleMouseDown = React.useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+        setIsResizing(true);
+    }, []);
+
+    React.useEffect(() => {
+        if (!isResizing) return;
+
+        const handleMouseMove = (e: MouseEvent) => {
+            const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, e.clientX));
+            setWidth(newWidth);
+        };
+
+        const handleMouseUp = () => {
+            setIsResizing(false);
+            // Save to localStorage
+            localStorage.setItem("editor-sidebar-width", String(width));
+        };
+
+        document.addEventListener("mousemove", handleMouseMove);
+        document.addEventListener("mouseup", handleMouseUp);
+        
+        // Add cursor style to body during resize
+        document.body.style.cursor = "ew-resize";
+        document.body.style.userSelect = "none";
+
+        return () => {
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
+            document.body.style.cursor = "";
+            document.body.style.userSelect = "";
+        };
+    }, [isResizing, width]);
 
     return (
         <div
+            ref={sidebarRef}
             className={cx(
                 "editor",
                 editorStyles.base,
-                editorDarkMode ? Classes.DARK : "",
+                editorDarkMode ? "dark" : "",
             )}
             style={{
-                width: minimized ? "0%" : "33%",
-                marginLeft: minimized ? "-30rem" : "0",
+                width: minimized ? 0 : width,
+                minWidth: minimized ? 0 : MIN_WIDTH,
+                maxWidth: minimized ? 0 : MAX_WIDTH,
                 background: editorDarkMode ? "#222" : "#fff",
+                flexShrink: 0,
+                position: "relative",
+                overflow: minimized ? "hidden" : undefined,
+                visibility: minimized ? "hidden" : "visible",
             }}
         >
             <ErrorBoundary key={1}>
@@ -144,6 +195,44 @@ export function Editor() {
                     <Credits />
                 </React.Suspense>
             </ErrorBoundary>
+            
+            {/* Resize handle */}
+            {!minimized && (
+                <div
+                    onMouseDown={handleMouseDown}
+                    className={cx(
+                        "absolute top-0 right-0 h-full cursor-ew-resize z-20",
+                        "group flex items-center justify-center",
+                        "transition-all duration-150"
+                    )}
+                    style={{
+                        width: "8px",
+                        marginRight: "-4px",
+                        touchAction: "none",
+                    }}
+                    role="separator"
+                    aria-orientation="vertical"
+                    aria-label="Resize sidebar"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === "ArrowLeft") {
+                            setWidth((w) => Math.max(MIN_WIDTH, w - 20));
+                        } else if (e.key === "ArrowRight") {
+                            setWidth((w) => Math.min(MAX_WIDTH, w + 20));
+                        }
+                    }}
+                >
+                    {/* Visible resize bar */}
+                    <div
+                        className={cx(
+                            "w-1 h-full transition-colors duration-150",
+                            "bg-gray-200 dark:bg-gray-700",
+                            "group-hover:bg-blue-400 group-active:bg-blue-500",
+                            isResizing && "bg-blue-500"
+                        )}
+                    />
+                </div>
+            )}
         </div>
     );
 }

@@ -3,11 +3,11 @@ import {
     Button,
     Intent,
     Popover,
-    Icon,
     PopoverInteractionKind,
     Classes,
     HTMLSelect,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { State } from "state";
 import { connect } from "react-redux";
 import { addBox, AddBoxArgs } from "actions";

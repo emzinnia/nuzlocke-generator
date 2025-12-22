@@ -2,7 +2,6 @@ import * as React from "react";
 
 import { connect } from "react-redux";
 import { v4 as uuid } from "uuid";
-import { cx } from "emotion";
 
 import { selectPokemon, toggleMobileResultView, toggleDialog } from "actions";
 import {
@@ -13,10 +12,8 @@ import { DeadPokemon } from "components/Pokemon/DeadPokemon/DeadPokemon";
 import { BoxedPokemon } from "components/Pokemon/BoxedPokemon/BoxedPokemon";
 import { ChampsPokemon } from "components/Pokemon/ChampsPokemon/ChampsPokemon";
 import { TrainerResult } from "components/Features/Result/TrainerResult"; // Self-referential? Or maybe Result2?
-import { TopBar } from "components/Layout/TopBar/TopBar";
 import { ErrorBoundary } from "components/Common/Shared";
 import { Stats } from "./Stats";
-import { TypeMatchupDialog } from "components/Editors/PokemonEditor";
 import { Pokemon, Trainer, Editor, Box } from "models";
 import { reducers } from "reducers";
 import {
@@ -37,12 +34,11 @@ import "./Result.css";
 import "./themes.css";
 import { State } from "state";
 import isMobile from "is-mobile";
-import { Button, Classes, MenuItem } from "@blueprintjs/core";
+import { Button } from "components/ui/shims";
 import { clamp } from "ramda";
 import { resultSelector } from "selectors";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { normalizeSpeciesName } from "utils/getters/normalizeSpeciesName";
-import { Select } from "@blueprintjs/select";
 
 async function load() {
     const resource = await import("@emmaramirez/dom-to-image");
@@ -61,56 +57,14 @@ interface ResultProps {
     style: State["style"];
     rules: string[];
     customTypes: State["customTypes"];
+    onDownloadStateChange?: (isDownloading: boolean) => void;
+    onZoomLevelChange?: (zoomLevel: number) => void;
 }
 
-interface ResultState {
-    isDownloading: boolean;
-    downloadError: string | null;
-    panningCoordinates: [number?, number?];
-    zoomLevel: number;
+export interface ResultHandle {
+    toImage: () => Promise<void>;
+    setZoomLevel: (zoomLevel: number) => void;
 }
-
-const ZoomValues = [
-    { key: 0.25, value: "25%" },
-    { key: 0.5, value: "50%" },
-    { key: 0.75, value: "75%" },
-    { key: 1, value: "100%" },
-    { key: 1.25, value: "125%" },
-    { key: 1.5, value: "150%" },
-    { key: 2, value: "200%" },
-    { key: 3, value: "300%" },
-];
-type ZoomValue = (typeof ZoomValues)[number];
-
-const convertToPercentage = (n: number) => `${n * 100}%`;
-
-const TopBarItems = ({ editorDarkMode, setZoomLevel, currentZoomLevel }) => {
-    // @TODO: make this look decent
-    return (
-        <Select<ZoomValue>
-            className={cx({ "bp5-dark": editorDarkMode })}
-            filterable={false}
-            items={ZoomValues}
-            itemRenderer={(item, { handleClick }) => (
-                <MenuItem
-                    key={item.key}
-                    onClick={handleClick}
-                    text={item.value}
-                />
-            )}
-            noResults={<MenuItem disabled={true} text="No results." />}
-            onItemSelect={(item) => {
-                console.log("item", item);
-                setZoomLevel(item.key);
-            }}
-        >
-            <Button
-                text={convertToPercentage(currentZoomLevel) ?? "100%"}
-                endIcon="double-caret-vertical"
-            />
-        </Select>
-    );
-};
 
 export function BackspriteMontage({ pokemon }: { pokemon: Pokemon[] }) {
     return (
@@ -155,235 +109,8 @@ export function BackspriteMontage({ pokemon }: { pokemon: Pokemon[] }) {
     );
 }
 
-export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
-    public resultRef: React.RefObject<HTMLDivElement>;
-    public constructor(props: ResultProps) {
-        super(props);
-        this.resultRef = React.createRef();
-        this.state = {
-            isDownloading: false,
-            downloadError: null,
-            panningCoordinates: [undefined, undefined],
-            zoomLevel: 1,
-        };
-    }
-
-    private renderTeamPokemon(teamPokemon: Pokemon[]) {
-        return teamPokemon.sort(sortPokes).map((poke) => {
-            return <TeamPokemon key={poke.id} pokemon={poke} />;
-        });
-    }
-
-    private getCorrectStatusWrapper(
-        pokes: Pokemon[],
-        box,
-        paddingForVerticalTrainerSection,
-    ) {
-        return this.renderContainer(
-            pokes,
-            paddingForVerticalTrainerSection,
-            box,
-        );
-    }
-
-    private renderOtherPokemonStatuses(
-        paddingForVerticalTrainerSection,
-        pokemonByStatus: Map<string, Pokemon[]>,
-        orderedBoxes: Box[],
-    ) {
-        return orderedBoxes.map((box) => {
-            const pokes = pokemonByStatus.get(box.name) ?? [];
-            return this.getCorrectStatusWrapper(
-                pokes,
-                box,
-                paddingForVerticalTrainerSection,
-            );
-        });
-    }
-
-    private async toImage() {
-        const resultNode = this.resultRef.current;
-        this.setState({ isDownloading: true });
-        try {
-            const domToImage = await load();
-            const dataUrl = await domToImage.toPng(resultNode, {
-                corsImage: true,
-            });
-            console.log(dataUrl, resultNode);
-            const link = document.createElement("a");
-            link.download = `nuzlocke-${uuid()}.png`;
-            link.href = dataUrl;
-            link.click();
-            this.setState({ downloadError: null, isDownloading: false });
-        } catch (e) {
-            console.log(e);
-            this.setState({
-                downloadError:
-                    "Failed to download. This is likely due to your image containing an image resource that does not allow Cross-Origin",
-                isDownloading: false,
-            });
-        }
-    }
-
-    private getBoxClass = (s) => {
-        if (s === "Dead") return "dead";
-        if (s === "Boxed") return "boxed";
-        if (s === "Champs") return "champs";
-        if (s === "Team") return "team";
-        return "boxed";
-    };
-
-    private getBoxStyle = (s) => {
-        if (s === "Champs")
-            return {
-                margin: this.props.style.template === "Compact" ? 0 : ".5rem",
-                display: "flex",
-                flexWrap: "wrap" as React.CSSProperties["flexWrap"],
-            };
-        if (s === "Dead")
-            return {
-                display: "flex",
-                flexWrap: "wrap" as React.CSSProperties["flexWrap"],
-                justifyContent: "center",
-                margin: this.props.style.template === "Compact" ? 0 : ".5rem",
-            };
-
-        return {};
-    };
-
-    private getH3 = (box: Box, n: number) => {
-        if (box.name === "Dead" || box.name === "Champs") {
-            if (n) {
-                return ` (${n})`;
-            }
-        }
-        return null;
-    };
-
-    private renderContainer = (
-        pokemon: Pokemon[],
-        paddingForVerticalTrainerSection: React.CSSProperties,
-        box?: Box,
-    ) =>
-        box && pokemon && pokemon.length > 0 ? (
-            <div
-                key={box.id}
-                style={paddingForVerticalTrainerSection}
-                className={`${this.getBoxClass(box?.inheritFrom || box.name)}-container`}
-            >
-                {box?.name !== "Team" && (
-                    <h3
-                        style={{
-                            color: getContrastColor(
-                                this.props.style.bgColor || "#383840",
-                            ),
-                        }}
-                    >
-                        {box?.name}
-                        {this.getH3(box, pokemon.length)}
-                    </h3>
-                )}
-                <div
-                    className="boxed-container-inner"
-                    style={this.getBoxStyle(box?.name || box?.inheritFrom)}
-                >
-                    {pokemon.map((poke) => {
-                        if (
-                            box?.name === "Boxed" ||
-                            box?.inheritFrom === "Boxed"
-                        )
-                            return <BoxedPokemon key={poke.id} {...poke} />;
-                        if (box?.name === "Dead" || box?.inheritFrom === "Dead")
-                            return (
-                                <DeadPokemon
-                                    minimal={false}
-                                    key={poke.id}
-                                    {...poke}
-                                />
-                            );
-                        if (
-                            box?.name === "Champs" ||
-                            box?.inheritFrom === "Champs"
-                        )
-                            return (
-                                <ChampsPokemon
-                                    useSprites={
-                                        this.props.style
-                                            .useSpritesForChampsPokemon
-                                    }
-                                    showGender={
-                                        !this.props.style.minimalChampsLayout
-                                    }
-                                    showLevel={
-                                        !this.props.style.minimalChampsLayout
-                                    }
-                                    showNickname={
-                                        !this.props.style.minimalChampsLayout
-                                    }
-                                    key={poke.id}
-                                    {...poke}
-                                />
-                            );
-                        if (box?.name === "Team" || box?.inheritFrom === "Team")
-                            return <TeamPokemon key={poke.id} pokemon={poke} />;
-                        return null;
-                    })}
-                </div>
-            </div>
-        ) : null;
-
-    private getScale(
-        style: State["style"],
-        editor: State["editor"],
-        coords: ResultState["panningCoordinates"],
-    ) {
-        const rw = parseInt(style.resultWidth.toString());
-        const ww = window.innerWidth;
-        const scale = ww / rw / 1.1;
-        const height =
-            (this.resultRef?.current?.offsetHeight ?? 0) / this.state.zoomLevel;
-        const width =
-            (this.resultRef?.current?.offsetWidth ?? 300) /
-            this.state.zoomLevel;
-        const translate = `translateX(${clamp(-width, width, (coords?.[0] ?? 0) / 1)}px) translateY(${clamp(-height, Infinity, (coords?.[1] ?? 0) / 1)}px)`;
-        if (this.state.isDownloading) {
-            return { transform: undefined };
-        }
-        if (!editor.showResultInMobile) {
-            return { transform: `scale(${this.state.zoomLevel}) ${translate}` };
-        }
-        if (!Number.isNaN(rw)) {
-            return { transform: `scale(${scale.toFixed(2)})` };
-        } else {
-            return { transform: "scale(0.3)" };
-        }
-    }
-
-    private onPan = (e?: React.MouseEvent<HTMLElement>) => {
-        e?.preventDefault();
-        e?.persist();
-        if (e?.buttons === 1) {
-            this.setState((state) => ({
-                panningCoordinates: [
-                    (state.panningCoordinates?.[0] ?? 0) + e?.movementX,
-                    (state.panningCoordinates?.[1] ?? 0) + e?.movementY,
-                ],
-            }));
-        }
-    };
-
-    private onZoom = (e?: React.WheelEvent<HTMLElement>) => {
-        if (e?.shiftKey) {
-            const deltaY = e?.deltaY ?? -3;
-            this.setState({ zoomLevel: clamp(0.1, 5, -deltaY / 3) });
-        }
-    };
-
-    private resetPan = (e?: React.MouseEvent<HTMLElement>) => {
-        this.setState({ panningCoordinates: [0, 0], zoomLevel: 1 });
-    };
-
-    public render() {
+export const ResultBase = React.forwardRef<ResultHandle, ResultProps>(
+    (props, ref) => {
         const {
             style,
             box,
@@ -391,9 +118,288 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
             pokemon,
             editor,
             game,
-            customTypes,
-            toggleDialog,
-        } = this.props;
+            rules,
+            onDownloadStateChange,
+            onZoomLevelChange,
+            toggleMobileResultView,
+        } = props;
+
+        const resultRef = React.useRef<HTMLDivElement>(null);
+        const [isDownloading, setIsDownloading] = React.useState(false);
+        const [downloadError, setDownloadError] = React.useState<string | null>(
+            null,
+        );
+        const [panningCoordinates, setPanningCoordinates] = React.useState<
+            [number?, number?]
+        >([undefined, undefined]);
+        const [zoomLevel, setZoomLevel] = React.useState(1);
+
+        React.useEffect(() => {
+            onZoomLevelChange?.(zoomLevel);
+        }, [onZoomLevelChange, zoomLevel]);
+
+        const renderTeamPokemon = React.useCallback((teamPokemon: Pokemon[]) => {
+            return teamPokemon.sort(sortPokes).map((poke) => {
+                return <TeamPokemon key={poke.id} pokemon={poke} />;
+            });
+        }, []);
+
+        const getBoxClass = React.useCallback((s) => {
+            if (s === "Dead") return "dead";
+            if (s === "Boxed") return "boxed";
+            if (s === "Champs") return "champs";
+            if (s === "Team") return "team";
+            return "boxed";
+        }, []);
+
+        const getBoxStyle = React.useCallback(
+            (s) => {
+                if (s === "Champs")
+                    return {
+                        margin: style.template === "Compact" ? 0 : ".5rem",
+                        display: "flex",
+                        flexWrap: "wrap" as React.CSSProperties["flexWrap"],
+                    };
+                if (s === "Dead")
+                    return {
+                        display: "flex",
+                        flexWrap: "wrap" as React.CSSProperties["flexWrap"],
+                        justifyContent: "center",
+                        margin: style.template === "Compact" ? 0 : ".5rem",
+                    };
+
+                return {};
+            },
+            [style.template],
+        );
+
+        const getH3 = React.useCallback((box: Box, n: number) => {
+            if (box.name === "Dead" || box.name === "Champs") {
+                if (n) {
+                    return ` (${n})`;
+                }
+            }
+            return null;
+        }, []);
+
+        const renderContainer = React.useCallback(
+            (
+                pokemonList: Pokemon[],
+                paddingForVerticalTrainerSection: React.CSSProperties,
+                boxItem?: Box,
+            ) =>
+                boxItem && pokemonList && pokemonList.length > 0 ? (
+                    <div
+                        key={boxItem.id}
+                        style={paddingForVerticalTrainerSection}
+                        className={`${getBoxClass(boxItem?.inheritFrom || boxItem.name)}-container`}
+                    >
+                        {boxItem?.name !== "Team" && (
+                            <h3
+                                style={{
+                                    color: getContrastColor(
+                                        style.bgColor || "#383840",
+                                    ),
+                                }}
+                            >
+                                {boxItem?.name}
+                                {getH3(boxItem, pokemonList.length)}
+                            </h3>
+                        )}
+                        <div
+                            className="boxed-container-inner"
+                            style={getBoxStyle(
+                                boxItem?.name || boxItem?.inheritFrom,
+                            )}
+                        >
+                            {pokemonList.map((poke) => {
+                                if (
+                                    boxItem?.name === "Boxed" ||
+                                    boxItem?.inheritFrom === "Boxed"
+                                )
+                                    return (
+                                        <BoxedPokemon key={poke.id} {...poke} />
+                                    );
+                                if (
+                                    boxItem?.name === "Dead" ||
+                                    boxItem?.inheritFrom === "Dead"
+                                )
+                                    return (
+                                        <DeadPokemon
+                                            minimal={false}
+                                            key={poke.id}
+                                            {...poke}
+                                        />
+                                    );
+                                if (
+                                    boxItem?.name === "Champs" ||
+                                    boxItem?.inheritFrom === "Champs"
+                                )
+                                    return (
+                                        <ChampsPokemon
+                                            useSprites={style.useSpritesForChampsPokemon}
+                                            showGender={
+                                                !style.minimalChampsLayout
+                                            }
+                                            showLevel={!style.minimalChampsLayout}
+                                            showNickname={
+                                                !style.minimalChampsLayout
+                                            }
+                                            key={poke.id}
+                                            {...poke}
+                                        />
+                                    );
+                                if (
+                                    boxItem?.name === "Team" ||
+                                    boxItem?.inheritFrom === "Team"
+                                )
+                                    return (
+                                        <TeamPokemon
+                                            key={poke.id}
+                                            pokemon={poke}
+                                        />
+                                    );
+                                return null;
+                            })}
+                        </div>
+                    </div>
+                ) : null,
+            [getBoxClass, getBoxStyle, getH3, style],
+        );
+
+        const getCorrectStatusWrapper = React.useCallback(
+            (
+                pokes: Pokemon[],
+                boxItem,
+                paddingForVerticalTrainerSection: React.CSSProperties,
+            ) => {
+                return renderContainer(
+                    pokes,
+                    paddingForVerticalTrainerSection,
+                    boxItem,
+                );
+            },
+            [renderContainer],
+        );
+
+        const renderOtherPokemonStatuses = React.useCallback(
+            (
+                paddingForVerticalTrainerSection: React.CSSProperties,
+                pokemonByStatus: Map<string, Pokemon[]>,
+                orderedBoxes: Box[],
+            ) => {
+                return orderedBoxes.map((boxItem) => {
+                    const pokes = pokemonByStatus.get(boxItem.name) ?? [];
+                    return getCorrectStatusWrapper(
+                        pokes,
+                        boxItem,
+                        paddingForVerticalTrainerSection,
+                    );
+                });
+            },
+            [getCorrectStatusWrapper],
+        );
+
+        const getScale = React.useCallback(
+            (
+                styleState: State["style"],
+                editorState: State["editor"],
+                coords: [number?, number?],
+            ) => {
+                const rw = parseInt(styleState.resultWidth.toString());
+                const ww = window.innerWidth;
+                const scale = ww / rw / 1.1;
+                const height =
+                    (resultRef?.current?.offsetHeight ?? 0) / zoomLevel;
+                const width =
+                    (resultRef?.current?.offsetWidth ?? 300) / zoomLevel;
+                const translate = `translateX(${clamp(-width, width, (coords?.[0] ?? 0) / 1)}px) translateY(${clamp(-height, Infinity, (coords?.[1] ?? 0) / 1)}px)`;
+                if (isDownloading) {
+                    return { transform: undefined };
+                }
+                if (!editorState.showResultInMobile) {
+                    return { transform: `scale(${zoomLevel}) ${translate}` };
+                }
+                if (!Number.isNaN(rw)) {
+                    return { transform: `scale(${scale.toFixed(2)})` };
+                } else {
+                    return { transform: "scale(0.3)" };
+                }
+            },
+            [isDownloading, resultRef, zoomLevel],
+        );
+
+        const onPan = React.useCallback((e?: React.MouseEvent<HTMLElement>) => {
+            e?.preventDefault();
+            e?.persist();
+            if (e?.buttons === 1) {
+                setPanningCoordinates((coords) => [
+                    (coords?.[0] ?? 0) + (e?.movementX ?? 0),
+                    (coords?.[1] ?? 0) + (e?.movementY ?? 0),
+                ]);
+            }
+        }, []);
+
+        const updateZoomLevel = React.useCallback((zoom: number) => {
+            setZoomLevel(zoom);
+        }, []);
+
+        const onZoom = React.useCallback(
+            (e?: React.WheelEvent<HTMLElement>) => {
+                if (e?.shiftKey) {
+                    const deltaY = e?.deltaY ?? -3;
+                    updateZoomLevel(clamp(0.1, 5, -deltaY / 3));
+                }
+            },
+            [updateZoomLevel],
+        );
+
+        const resetPan = React.useCallback(() => {
+            setPanningCoordinates([0, 0]);
+            setZoomLevel(1);
+        }, []);
+
+        const notifyDownloadState = React.useCallback(
+            (state: boolean) => onDownloadStateChange?.(state),
+            [onDownloadStateChange],
+        );
+
+        const toImage = React.useCallback(async () => {
+            const resultNode = resultRef.current;
+            setIsDownloading(true);
+            notifyDownloadState(true);
+            try {
+                const domToImage = await load();
+                const dataUrl = await domToImage.toPng(resultNode, {
+                    corsImage: true,
+                });
+                console.log(dataUrl, resultNode);
+                const link = document.createElement("a");
+                link.download = `nuzlocke-${uuid()}.png`;
+                link.href = dataUrl;
+                link.click();
+                setDownloadError(null);
+                setIsDownloading(false);
+                notifyDownloadState(false);
+            } catch (e) {
+                console.log(e);
+                setDownloadError(
+                    "Failed to download. This is likely due to your image containing an image resource that does not allow Cross-Origin",
+                );
+                setIsDownloading(false);
+                notifyDownloadState(false);
+            }
+        }, [notifyDownloadState]);
+
+        React.useImperativeHandle(
+            ref,
+            () => ({
+                toImage,
+                setZoomLevel: updateZoomLevel,
+            }),
+            [toImage, updateZoomLevel],
+        );
+
         const pokemonWithId = (pokemon ?? [])
             .filter((v): v is Pokemon => typeof (v as Pokemon).id === "string")
             .filter((p) => !p.hidden);
@@ -409,8 +415,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
         const bgColor = style ? style.bgColor : "#383840";
         const topHeaderColor = style ? style.topHeaderColor : "#333333";
         const accentColor = style ? style.accentColor : "#111111";
-        const trainerSectionOrientation =
-            this.props.style.trainerSectionOrientation;
+        const trainerSectionOrientation = style.trainerSectionOrientation;
         const paddingForVerticalTrainerSection =
             trainerSectionOrientation === "vertical"
                 ? {
@@ -430,7 +435,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                 style={paddingForVerticalTrainerSection}
                 className="team-container"
             >
-                {this.renderTeamPokemon(teamPokemon)}
+                {renderTeamPokemon(teamPokemon)}
             </div>
         );
 
@@ -438,7 +443,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
             <div className="rules-container">
                 <h3 style={{ color: getContrastColor(bgColor) }}>Rules</h3>
                 <ol style={{ color: getContrastColor(bgColor) }}>
-                    {this.props.rules.map((rule, index) => {
+                    {rules.map((rule, index) => {
                         return <li key={index}>{rule}</li>;
                     })}
                 </ol>
@@ -451,29 +456,16 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
 
         return (
             <div
-                onWheel={this.onZoom}
-                onMouseMove={this.onPan}
-                onDoubleClick={this.resetPan}
+                onWheel={onZoom}
+                onMouseMove={onPan}
+                onDoubleClick={resetPan}
                 className="hide-scrollbars"
-                style={{ width: "100%", overflowY: "scroll" }}
+                style={{ flex: 1, minWidth: 0, overflowY: "scroll" }}
             >
-                <TypeMatchupDialog />
                 {isMobile() && editor.showResultInMobile && (
-                    <div className={Classes.OVERLAY_BACKDROP}></div>
+                    <div className="ui-overlay-backdrop"></div>
                 )}
                 <ErrorBoundary>
-                    <TopBar
-                        isDownloading={this.state.isDownloading}
-                        onClickDownload={() => this.toImage()}
-                    >
-                        <TopBarItems
-                            editorDarkMode={this.props.style.editorDarkMode}
-                            setZoomLevel={(zoomLevel) =>
-                                this.setState({ zoomLevel })
-                            }
-                            currentZoomLevel={this.state.zoomLevel}
-                        />
-                    </TopBar>
                     <style>
                         {`
                             .result {
@@ -489,15 +481,15 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                             className={Styles.result_download}
                             icon="download"
                             onClick={() => {
-                                this.props.toggleMobileResultView();
-                                this.toImage();
+                                toggleMobileResultView();
+                                toImage();
                             }}
                         >
                             Download
                         </Button>
                     )}
                     <div
-                        ref={this.resultRef}
+                        ref={resultRef}
                         className={`result ng-container ${
                             (style.template &&
                                 style.template
@@ -505,7 +497,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                                     .replace(/\s/g, "-")) ||
                             ""
                         } region-${getGameRegion(
-                            this.props.game.name,
+                            game.name,
                         )} team-size-${numberOfTeam} ${trainerSectionOrientation}-trainer
                        ${editor.showResultInMobile ? Styles.result_mobile : ""}
                         `}
@@ -514,9 +506,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                                 ? "pokemon_font"
                                 : "inherit",
                             fontSize: style.usePokemonGBAFont ? "125%" : "100%",
-                            margin: this.state.isDownloading
-                                ? "0"
-                                : "3rem auto",
+                            margin: isDownloading ? "0" : "3rem auto",
                             backgroundColor: bgColor,
                             backgroundImage: `url(${style.backgroundImage})`,
                             backgroundRepeat: style.tileBackground
@@ -533,10 +523,10 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                             transformOrigin: "0 0",
                             width: `${style.resultWidth}px`,
                             zIndex: 1,
-                            ...this.getScale(
+                            ...getScale(
                                 style,
                                 editor,
-                                this.state.panningCoordinates,
+                                panningCoordinates,
                             ),
                         }}
                     >
@@ -588,22 +578,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                         {style.template === "Generations" &&
                         trainerSectionOrientation === "vertical" ? (
                             <div className="statuses-wrapper">
-                                {/* {this.renderContainer(
-                                        this.getPokemonByStatus('Boxed'),
-                                        paddingForVerticalTrainerSection,
-                                    box?.[1],
-                                    )}
-                                    {this.renderContainer(
-                                        this.getPokemonByStatus('Dead'),
-                                        paddingForVerticalTrainerSection,
-                                    box?.[2],
-                                    )}
-                                    {this.renderContainer(
-                                        this.getPokemonByStatus('Champs'),
-                                        paddingForVerticalTrainerSection,
-                                    box?.[3],
-                                    )} */}
-                                {this.renderOtherPokemonStatuses(
+                                {renderOtherPokemonStatuses(
                                     paddingForVerticalTrainerSection,
                                     pokemonByStatus,
                                     orderedBoxes,
@@ -611,22 +586,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                             </div>
                         ) : (
                             <>
-                                {/* {this.renderContainer(
-                                        this.getPokemonByStatus('Boxed'),
-                                        paddingForVerticalTrainerSection,
-                                    box?.[1],
-                                    )}
-                                    {this.renderContainer(
-                                        this.getPokemonByStatus('Dead'),
-                                        paddingForVerticalTrainerSection,
-                                    box?.[2],
-                                    )}
-                                    {this.renderContainer(
-                                        this.getPokemonByStatus('Champs'),
-                                        paddingForVerticalTrainerSection,
-                                    box?.[3],
-                                    )} */}
-                                {this.renderOtherPokemonStatuses(
+                                {renderOtherPokemonStatuses(
                                     paddingForVerticalTrainerSection,
                                     pokemonByStatus,
                                     orderedBoxes,
@@ -652,19 +612,24 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                         )}
 
                         {enableBackSpriteMontage && (
-                            <BackspriteMontage
-                                pokemon={teamPokemon}
-                            />
+                            <BackspriteMontage pokemon={teamPokemon} />
                         )}
                     </div>
                 </ErrorBoundary>
             </div>
         );
-    }
-}
+    },
+);
 
-export const Result = connect(resultSelector, {
-    selectPokemon,
-    toggleMobileResultView,
-    toggleDialog,
-})(ResultBase);
+ResultBase.displayName = "ResultBase";
+
+export const Result = connect(
+    resultSelector,
+    {
+        selectPokemon,
+        toggleMobileResultView,
+        toggleDialog,
+    },
+    null,
+    { forwardRef: true },
+)(ResultBase);

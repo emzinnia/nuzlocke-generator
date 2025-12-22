@@ -19,11 +19,11 @@ import {
     Classes,
     Menu,
     MenuItem,
-    Icon,
     Switch,
     TextArea,
     Intent,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { ColorEdit, ThemeSelect } from "components/Common/Shared";
 import { ChampsPokemon, PokemonIcon, ErrorBoundary } from "components";
 import {} from "themes";

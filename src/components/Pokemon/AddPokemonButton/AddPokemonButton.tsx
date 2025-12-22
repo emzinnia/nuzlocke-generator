@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useDispatch } from "react-redux";
 import { addPokemon, selectPokemon } from "actions";
-import { Button, Intent } from "@blueprintjs/core";
+import { Button, Intent } from "components/ui";
 import { Pokemon } from "models";
 import { HotkeyIndicator } from "components/Common/Shared";
 

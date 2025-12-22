@@ -7,13 +7,13 @@ import {
     CellRenderer,
     EditableCell,
     JSONFormat,
-} from "@blueprintjs/table";
+} from "components/ui";
 import { State } from "state";
 import { generateEmptyPokemon } from "utils";
 import { PokemonKeys, Pokemon } from "models";
 import { editPokemon as editPokemonType } from "actions";
 import { AddPokemonButton } from "components/Pokemon/AddPokemonButton/AddPokemonButton";
-import { Button } from "@blueprintjs/core";
+import { Button } from "components/ui/shims";
 import { sortedPokemonSelector } from "selectors";
 
 export interface MassEditorTableProps {

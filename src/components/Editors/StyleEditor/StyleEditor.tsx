@@ -21,9 +21,9 @@ import {
     Classes,
     Drawer,
     DrawerSize,
-    Icon,
     HTMLSelect,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { ColorEdit, rgbaOrHex } from "components/Common/Shared";

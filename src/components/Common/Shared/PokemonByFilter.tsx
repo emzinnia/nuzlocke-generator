@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Tooltip, Position } from "@blueprintjs/core";
+import { Tooltip, Position } from "components/ui/shims";
 import { Pokemon } from "models";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { sortPokes } from "utils";

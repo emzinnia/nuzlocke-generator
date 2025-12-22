@@ -1,14 +1,6 @@
 import * as React from "react";
-import {
-    Alert,
-    Intent,
-    Icon,
-    Popover,
-    Position,
-    PopoverInteractionKind,
-    Classes,
-} from "@blueprintjs/core";
-import { cx, css } from "emotion";
+import { Dialog, Tooltip, Icon, Button, Checkbox, Intent } from "components/ui";
+import { css } from "emotion";
 
 import { deletePokemon, modifyDeletionConfirmation } from "actions";
 import { connect } from "react-redux";
@@ -49,49 +41,46 @@ export class DeletePokemonButtonBase extends React.Component<
         console.log(this.props.id);
         return (
             <div className={DeletePokemonButtonContainer}>
-                <Alert
-                    icon="trash"
+                <Dialog
                     isOpen={this.state.dialogOn && this.props.confirmation}
-                    onCancel={this.toggleDialog}
-                    onConfirm={(_e) => {
-                        if (this.props.id) {
-                            this.props.deletePokemon(this.props.id);
-                        }
-                        this.toggleDialog();
-                    }}
-                    confirmButtonText="Delete Pokemon"
-                    cancelButtonText="Cancel"
-                    intent={Intent.DANGER}
+                    onClose={this.toggleDialog}
+                    title="Delete Pokemon"
+                    icon={<Icon icon="trash" />}
+                    footer={
+                        <>
+                            <Button onClick={this.toggleDialog}>Cancel</Button>
+                            <Button
+                                intent={Intent.DANGER}
+                                onClick={(_e) => {
+                                    if (this.props.id) {
+                                        this.props.deletePokemon(this.props.id);
+                                    }
+                                    this.toggleDialog();
+                                }}
+                            >
+                                Delete Pokemon
+                            </Button>
+                        </>
+                    }
                 >
                     <p>
                         This will delete the currently selected Pokemon. Are you
                         sure you want to do that?
                     </p>
 
-                    <label className={cx(Classes.CONTROL, Classes.CHECKBOX)}>
-                        <input
-                            onChange={(event) =>
-                                this.props.modifyDeletionConfirmation &&
-                                this.props.modifyDeletionConfirmation(
-                                    !event.target.checked,
-                                )
-                            }
-                            type="checkbox"
-                        />
-                        <span className={Classes.CONTROL_INDICATOR} />
-                        Don&apos;t Ask Me For Confirmation Again
-                    </label>
-                </Alert>
-                <Popover
-                    interactionKind={PopoverInteractionKind.HOVER}
-                    position={Position.TOP}
-                    content={
-                        <div
-                            style={{ padding: "1rem" }}
-                        >{`Delete Pok${accentedE}mon`}</div>
-                    }
+                    <Checkbox
+                        onChange={(checked) =>
+                            this.props.modifyDeletionConfirmation &&
+                            this.props.modifyDeletionConfirmation(!checked)
+                        }
+                        label="Don't Ask Me For Confirmation Again"
+                    />
+                </Dialog>
+                <Tooltip
+                    content={`Delete Pok${accentedE}mon`}
+                    position="top"
                 >
-                    <Icon
+                    <span
                         onClick={(_e) => {
                             if (this.props.confirmation) {
                                 this.toggleDialog();
@@ -101,10 +90,14 @@ export class DeletePokemonButtonBase extends React.Component<
                                 }
                             }
                         }}
-                        icon="trash"
-                        title="Delete Pokemon"
-                    />
-                </Popover>
+                        style={{ cursor: "pointer" }}
+                    >
+                        <Icon
+                            icon="trash"
+                            aria-label="Delete Pokemon"
+                        />
+                    </span>
+                </Tooltip>
             </div>
         );
     }

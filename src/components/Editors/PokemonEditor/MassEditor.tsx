@@ -1,6 +1,6 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { Dialog, Classes } from "@blueprintjs/core";
+import { Dialog, Classes } from "components/ui/shims";
 import { State } from "state";
 import { ErrorBoundary } from "components";
 import { MassEditorTable } from "./MassEditorTable";

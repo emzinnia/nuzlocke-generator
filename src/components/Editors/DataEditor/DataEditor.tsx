@@ -8,8 +8,8 @@ import {
     TextArea,
     Intent,
     Switch,
-    Classes,
-} from "@blueprintjs/core";
+} from "components/ui";
+import { Classes } from "components/ui/shims";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { ErrorBoundary, HotkeyIndicator } from "components/Common/Shared";
 import { v4 as uuid } from "uuid";

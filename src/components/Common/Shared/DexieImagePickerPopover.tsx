@@ -5,7 +5,7 @@ import {
     Popover,
     Position,
     Spinner,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
 import { css, cx } from "emotion";
 import * as React from "react";
 import { useDispatch } from "react-redux";

@@ -3,17 +3,19 @@ import { render } from "@testing-library/react";
 import { Skeleton } from "../Skeletons";
 
 describe("Skeleton", () => {
-    it("renders a skeleton element", () => {
-        const { container } = render(Skeleton);
-        const skeletonElement = container.querySelector(".bp5-skeleton");
-        expect(skeletonElement).toBeDefined();
-        expect(skeletonElement).not.toBeNull();
-    });
-
-    it("has the skeleton class from blueprintjs", () => {
+    it("renders a skeleton element with animation", () => {
         const { container } = render(Skeleton);
         const skeletonElement = container.firstChild as HTMLElement;
-        expect(skeletonElement.className).toContain("bp5-skeleton");
+        expect(skeletonElement).toBeDefined();
+        expect(skeletonElement).not.toBeNull();
+        expect(skeletonElement.className).toContain("animate-pulse");
+    });
+
+    it("has Tailwind skeleton styling classes", () => {
+        const { container } = render(Skeleton);
+        const skeletonElement = container.firstChild as HTMLElement;
+        expect(skeletonElement.className).toContain("bg-slate-200");
+        expect(skeletonElement.className).toContain("rounded");
     });
 
     it("has correct dimensions", () => {

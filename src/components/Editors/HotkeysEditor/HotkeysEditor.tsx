@@ -2,7 +2,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { listOfHotkeys, HotkeyList } from "utils";
-import { Classes, Button, Intent } from "@blueprintjs/core";
+import { Classes, Button, Intent } from "components/ui/shims";
 import { State } from "state";
 import { editHotkey, resetHotkey, resetAllHotkeys } from "actions";
 import { HotkeyBindings } from "reducers/hotkeys";

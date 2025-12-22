@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Classes, Icon } from "@blueprintjs/core";
+import { Classes } from "components/ui/shims";
+import { Icon } from "components/ui";
 import { css } from "emotion";
 import { HotkeyIndicator } from "components/Common/Shared";
 import { SearchHelpPopover } from "./SearchHelpPopover";
@@ -39,7 +40,7 @@ const styles = {
         padding: 0.25rem 0.5rem;
         margin-bottom: 0.5rem;
 
-        .bp5-dark & {
+        .dark & {
             color: #ff6b6b;
         }
     `,
@@ -49,7 +50,7 @@ const styles = {
         padding: 0.25rem 0.5rem;
         margin-bottom: 0.5rem;
 
-        .bp5-dark & {
+        .dark & {
             color: #ffc107;
         }
 
@@ -61,7 +62,7 @@ const styles = {
             font-size: 0.8rem;
         }
 
-        .bp5-dark & code {
+        .dark & code {
             background: rgba(255, 255, 255, 0.1);
             color: #ffc107;
         }
@@ -73,7 +74,7 @@ const styles = {
         text-align: center;
         font-style: italic;
 
-        .bp5-dark & {
+        .dark & {
             color: #a7b6c2;
         }
     `,

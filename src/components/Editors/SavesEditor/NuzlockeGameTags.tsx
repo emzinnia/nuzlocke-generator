@@ -1,4 +1,4 @@
-import { Tag } from "@blueprintjs/core";
+import { Tag } from "components/ui/shims";
 import { PokemonIcon } from "components";
 import * as React from "react";
 import { State } from "state";

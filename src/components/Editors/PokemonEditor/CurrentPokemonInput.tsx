@@ -15,7 +15,7 @@ import { editPokemon } from "actions";
 
 import { ErrorBoundary } from "components/Common/Shared";
 
-import { TagInput, Classes, TextArea, HTMLSelect } from "@blueprintjs/core";
+import { TagInput, Classes, TextArea, HTMLSelect } from "components/ui/shims";
 import { State } from "state";
 import { Pokemon } from "models";
 import { cx } from "emotion";

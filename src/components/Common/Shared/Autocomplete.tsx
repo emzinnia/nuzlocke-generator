@@ -1,6 +1,5 @@
 import * as React from "react";
 import { cx } from "emotion";
-import "./Autocomplete.css";
 import { useDebounceCallback } from "@react-hook/debounce";
 import { css } from "emotion";
 

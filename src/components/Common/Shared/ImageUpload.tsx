@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, Intent } from "@blueprintjs/core";
+import { Button, Intent } from "components/ui";
 import { showToast } from "./appToaster";
 
 const toBase64 = (file) =>

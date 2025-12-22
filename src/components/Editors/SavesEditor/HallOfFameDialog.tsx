@@ -5,7 +5,7 @@ import {
     Dialog,
     DialogProps,
     Intent,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
 import { css, cx } from "emotion";
 import * as React from "react";
 

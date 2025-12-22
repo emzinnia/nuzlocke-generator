@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Classes, Intent, Spinner } from "@blueprintjs/core";
+import { Button, ButtonGroup, Classes, Intent, Spinner } from "components/ui/shims";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Pokemon, Box as BoxModel, Boxes, Game } from "models";

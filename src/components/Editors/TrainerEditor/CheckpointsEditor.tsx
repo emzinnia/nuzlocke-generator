@@ -3,11 +3,11 @@ import { cx } from "emotion";
 import {
     Classes,
     Button,
-    Icon,
     Intent,
     Popover,
     PopoverInteractionKind,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { classWithDarkTheme, feature, Styles } from "utils";
 import * as styles from "./style";
 import { connect } from "react-redux";

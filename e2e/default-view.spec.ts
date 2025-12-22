@@ -15,7 +15,7 @@ test('captures screenshot of default page view', async ({ page }) => {
         fullPage: true,
     });
 
-    // Verify the page loaded successfully (app redirects to beta-login)
-    await expect(page).toHaveURL(/localhost:8080/);
+    // Verify the page loaded successfully
+    await expect(page).toHaveURL(/localhost:\d+/);
 });
 

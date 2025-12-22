@@ -7,7 +7,7 @@ import {
     Dialog,
     HTMLSelect,
     Intent,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
 import { GameSaveFormat } from "utils";
 import { State } from "state";
 import { BoxMappings } from "parsers/utils/boxMappings";

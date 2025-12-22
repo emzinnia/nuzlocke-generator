@@ -1,6 +1,6 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { HTMLSelect } from "@blueprintjs/core";
+import { HTMLSelect } from "components/ui/shims";
 
 import { listOfThemes } from "utils";
 import { editStyle } from "actions";

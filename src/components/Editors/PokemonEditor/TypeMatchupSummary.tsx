@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Card, Elevation, Tabs, Tab, Checkbox, HTMLSelect } from "@blueprintjs/core";
+import { Card, Elevation, Tabs, Tab, Checkbox, HTMLSelect } from "components/ui/shims";
 import { Pokemon, Game } from "models";
 import { State } from "state";
 import { getGameGeneration, typeToColor, getContrastColor } from "utils";

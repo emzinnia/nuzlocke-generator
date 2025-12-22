@@ -6,8 +6,8 @@ import {
     PopoverInteractionKind,
     Position,
     Menu,
-    Icon,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { listOfTrainers } from "utils";
 import { TrainerInfoEditField } from "./TrainerInfoEditField";
 import { useDispatch, useSelector } from "react-redux";

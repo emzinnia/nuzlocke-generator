@@ -2,14 +2,9 @@ import * as React from "react";
 import { injectGlobal } from "emotion";
 import { createRoot } from "react-dom/client";
 
-import "@blueprintjs/icons/lib/css/blueprint-icons.css";
-import "@blueprintjs/core/lib/css/blueprint.css";
-import "@blueprintjs/table/lib/css/table.css";
-import "@blueprintjs/select/lib/css/blueprint-select.css";
-// import 'tailwindcss/dist/base.min.css';
-// import 'tailwindcss/dist/components.min.css';
-// import 'tailwindcss/dist/utilities.min.css';
+// Base styles and design tokens
 import "normalize.css/normalize.css";
+import "./styles/tokens.css";
 
 import { isLocal } from "utils";
 import { ErrorBoundary } from "components";
@@ -61,8 +56,9 @@ void injectGlobal`
     }
 
     body {
-        background: #fff;
-        font-family: 'Arial';
+        background: var(--color-bg-primary);
+        font-family: var(--font-sans);
+        color: var(--color-text-primary);
     }
 
     .app {

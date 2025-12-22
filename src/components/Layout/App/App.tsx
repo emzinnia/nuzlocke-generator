@@ -15,7 +15,7 @@ import {
     movesByType,
 } from "utils";
 import { ErrorBoundary } from "components";
-import { Button } from "@blueprintjs/core";
+import { Button } from "components/ui";
 import { appSelector } from "selectors";
 import { Skeleton } from "components";
 import {
@@ -47,15 +47,9 @@ const Editor = React.lazy(() =>
     })),
 );
 
-const Result = React.lazy(() =>
-    import("components/Features/Result/Result").then((res) => ({
-        default: res.Result,
-    })),
-);
-
-const Result2 = React.lazy(() =>
-    import("components/Features/Result/Result2").then((res) => ({
-        default: res.Result,
+const ResultView = React.lazy(() =>
+    import("components/Features/Result/ResultView").then((res) => ({
+        default: res.ResultView,
     })),
 );
 
@@ -259,10 +253,9 @@ const buildRandomPokemonAttributes = (
     };
 };
 
-export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
+export class AppBase extends React.Component<AppProps> {
     public constructor(props: AppProps) {
         super(props);
-        this.state = { result2: false };
     }
 
     private addRandomPokemon = () => {
@@ -304,15 +297,6 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
 
     public componentDidMount() {
         this.updateDarkModeClass();
-
-        if (feature.resultv2) {
-            // TOP SECRET
-            if (this.props.style.customCSS.includes("resultv2")) {
-                this.setState({ result2: true });
-            } else {
-                this.setState({ result2: false });
-            }
-        }
     }
 
     public componentDidUpdate(prevProps: AppProps) {
@@ -323,7 +307,6 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
 
     public render() {
         const { style, view } = this.props;
-        const { result2 } = this.state;
         const isDarkMode = style.editorDarkMode;
         const showDebugPanel = isLocal();
         console.log("features", feature);
@@ -363,35 +346,11 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
                             <Editor />
                         </React.Suspense>
                     </ErrorBoundary>
-                    {result2 ? (
-                        <ErrorBoundary key={3}>
-                            <React.Suspense fallback={Skeleton}>
-                                <Result2 />
-                            </React.Suspense>
-                        </ErrorBoundary>
-                    ) : (
-                        <ErrorBoundary key={3}>
-                            <React.Suspense fallback={Skeleton}>
-                                <Result />
-                            </React.Suspense>
-                        </ErrorBoundary>
-                    )}
-
-                    {showDebugPanel && feature.resultv2 && (
-                        <Button
-                            style={{
-                                position: "absolute",
-                                top: "0.5rem",
-                                right: "0.5rem",
-                                zIndex: 1000,
-                            }}
-                            onClick={(e) =>
-                                this.setState({ result2: !result2 })
-                            }
-                        >
-                            Use Result v2
-                        </Button>
-                    )}
+                    <ErrorBoundary key={3}>
+                        <React.Suspense fallback={Skeleton}>
+                                <ResultView />
+                        </React.Suspense>
+                    </ErrorBoundary>
 
                     {showDebugPanel && (
                         <DebugDialog

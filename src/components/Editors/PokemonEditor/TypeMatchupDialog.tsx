@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Dialog, Classes, Card, Button, Intent, Alert, Callout } from "@blueprintjs/core";
+import { Dialog, Classes, Card, Button, Intent, Alert, Callout } from "components/ui/shims";
 import { useDispatch, useSelector } from "react-redux";
 import { PokemonIconPlain } from "components";
 import { toggleDialog, editPokemon } from "actions";

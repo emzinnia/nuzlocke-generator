@@ -6,8 +6,8 @@ import {
     Position,
     MenuItem,
     Intent,
-    Icon,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { connect } from "react-redux";
 import { State } from "state";
 import {

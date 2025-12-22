@@ -29,7 +29,6 @@ import * as Styles from "./styles";
 import { v4 as uuid } from "uuid";
 import {
     Classes,
-    Icon,
     Popover,
     Position,
     PopoverInteractionKind,
@@ -37,7 +36,8 @@ import {
     Intent,
     ButtonGroup,
     Tooltip,
-} from "@blueprintjs/core";
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { addPokemon } from "actions";
 import { State } from "state";
 import { CurrentPokemonLayoutItem } from "./CurrentPokemonLayoutItem";

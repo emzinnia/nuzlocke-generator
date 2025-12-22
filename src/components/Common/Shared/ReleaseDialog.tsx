@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import * as React from "react";
-import { Dialog, Classes, Button, DialogProps } from "@blueprintjs/core";
+import { Dialog, Button, Icon } from "components/ui";
 import { css, cx } from "emotion";
 import * as styles from "components/Features/Result/styles";
 import { Styles, classWithDarkTheme, getPatchlessVersion } from "utils";
@@ -93,6 +93,7 @@ const mascot = css`
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export interface ReleaseDialogProps {
+    isOpen: boolean;
     onClose: (e?: React.SyntheticEvent) => void;
     style: Styles;
 }
@@ -103,7 +104,7 @@ export interface ReleaseNote {
     note: string;
 }
 
-export function ReleaseDialog(props: DialogProps & ReleaseDialogProps) {
+export function ReleaseDialog(props: ReleaseDialogProps) {
     const [seePrevious, setSeePrevious] = React.useState(false);
     const { data, error } = useSwr("/release/latest", fetcher);
     const { data: allNotesData, error: allNotesError } = useSwr(
@@ -126,59 +127,57 @@ export function ReleaseDialog(props: DialogProps & ReleaseDialogProps) {
         <Dialog
             isOpen={props.isOpen}
             onClose={props.onClose}
-            icon="document"
+            icon={<Icon icon="document" />}
             title={`Release Notes ${version}`}
-            className={`release-dialog ${props.style.editorDarkMode ? Classes.DARK : ""}`}
+            className={`release-dialog ${props.style.editorDarkMode ? "dark" : ""}`}
         >
-            <div className={Classes.DIALOG_BODY}>
-                <div className="release-notes-wrapper">
-                    <h3
-                        className={cx(
-                            classWithDarkTheme(
-                                styles,
-                                "heading",
-                                props.style.editorDarkMode,
-                            ),
-                        )}
-                    >
-                        {version}{" "}
-                        <img
-                            className={mascot}
-                            alt="mascot"
-                            src={getMascot(getPatchlessVersion(version))}
-                        />
-                    </h3>
-                    {data && (
-                        <ReactMarkdown className="release-notes">
-                            {note.note}
-                        </ReactMarkdown>
+            <div className="release-notes-wrapper">
+                <h3
+                    className={cx(
+                        classWithDarkTheme(
+                            styles,
+                            "heading",
+                            props.style.editorDarkMode,
+                        ),
                     )}
-                    {error && (
-                        <div>There was an error retrieving release notes.</div>
-                    )}
-                    <Button
-                        onClick={() => setSeePrevious(!seePrevious)}
-                        icon={
-                            seePrevious
-                                ? "symbol-triangle-up"
-                                : "symbol-triangle-down"
-                        }
-                    >
-                        Previous Release Notes
-                    </Button>
-                    {seePrevious &&
-                        allNotes.map((note) => {
-                            const source = `#### ![${mascot}](${getMascot(getPatchlessVersion(note.version))}) ${note.version}\n${note.note}\n\n_Uploaded on ${new Date(note.timestamp).toLocaleString()}_`;
-                            return (
-                                <ReactMarkdown
-                                    key={note.id}
-                                    className="release-notes"
-                                >
-                                    {source}
-                                </ReactMarkdown>
-                            );
-                        })}
-                </div>
+                >
+                    {version}{" "}
+                    <img
+                        className={mascot}
+                        alt="mascot"
+                        src={getMascot(getPatchlessVersion(version))}
+                    />
+                </h3>
+                {data && (
+                    <ReactMarkdown className="release-notes">
+                        {note.note}
+                    </ReactMarkdown>
+                )}
+                {error && (
+                    <div>There was an error retrieving release notes.</div>
+                )}
+                <Button
+                    onClick={() => setSeePrevious(!seePrevious)}
+                    icon={
+                        seePrevious
+                            ? "symbol-triangle-up"
+                            : "symbol-triangle-down"
+                    }
+                >
+                    Previous Release Notes
+                </Button>
+                {seePrevious &&
+                    allNotes.map((note) => {
+                        const source = `#### ![${mascot}](${getMascot(getPatchlessVersion(note.version))}) ${note.version}\n${note.note}\n\n_Uploaded on ${new Date(note.timestamp).toLocaleString()}_`;
+                        return (
+                            <ReactMarkdown
+                                key={note.id}
+                                className="release-notes"
+                            >
+                                {source}
+                            </ReactMarkdown>
+                        );
+                    })}
             </div>
         </Dialog>
     );

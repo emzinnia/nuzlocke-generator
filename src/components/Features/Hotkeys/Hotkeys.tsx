@@ -19,7 +19,7 @@ import { createStore } from "redux";
 import { appReducers } from "reducers";
 import { Editor } from "models";
 import { HotkeyBindings } from "reducers/hotkeys";
-import { Intent } from "@blueprintjs/core";
+import { Intent } from "components/ui/shims";
 import { showToast } from "components/Common/Shared/appToaster";
 
 export interface HotkeysProps {

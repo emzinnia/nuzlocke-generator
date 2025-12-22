@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, Classes, Spinner, Intent } from "@blueprintjs/core";
+import { Button, Spinner, Intent } from "components/ui";
 import { connect } from "react-redux";
 import * as styles from "components/Features/Result/styles";
 import { classWithDarkTheme, getPatchlessVersion, Styles } from "utils";
@@ -94,8 +94,8 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                                     isMenuOpen: !state.isMenuOpen,
                                 }))
                             }
-                            className={Classes.MINIMAL}
-                            icon={"menu"}
+                            minimal
+                            icon="menu"
                         >
                             Nuzlocke Generator
                         </Button>
@@ -108,10 +108,8 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                                 position: "relative",
                             }}
                             onClick={() => this.props.toggleMobileResultView()}
-                            className={cx(
-                                Classes.MINIMAL,
-                                styles.close_result_button,
-                            )}
+                            minimal
+                            className={styles.close_result_button}
                             icon={showResultInMobile ? "cross" : "eye-open"}
                         >
                             {showResultInMobile ? "Close" : "View Result"}
@@ -131,7 +129,7 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                                     !this.props.editor.minimized,
                                 )
                             }
-                            className={Classes.MINIMAL}
+                            minimal
                             icon={
                                 this.props.editor.minimized
                                     ? "minimize"
@@ -150,7 +148,7 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                         </Button>
                         {isDownloading ? (
                             <Button
-                                className={Classes.MINIMAL}
+                                minimal
                                 style={{
                                     ...darkModeStyle(
                                         this.props.style.editorDarkMode,
@@ -158,7 +156,7 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                                     height: "30px",
                                 }}
                             >
-                                <Spinner className={"inline-flex"} size={20} />{" "}
+                                <Spinner className="inline-flex" size={20} />{" "}
                                 Downloading
                             </Button>
                         ) : (
@@ -168,7 +166,7 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                                     this.props.style.editorDarkMode,
                                 )}
                                 onClick={this.props.onClickDownload}
-                                className={Classes.MINIMAL}
+                                minimal
                                 icon="download"
                             >
                                 Download Image{" "}
@@ -190,7 +188,7 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                                         !this.props.style.editorDarkMode,
                                 });
                             }}
-                            className={Classes.MINIMAL}
+                            minimal
                             icon={
                                 this.props.style.editorDarkMode
                                     ? "flash"
@@ -212,7 +210,7 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                                 this.props.style.editorDarkMode,
                             )}
                             onClick={this.toggleDialog}
-                            className={Classes.MINIMAL}
+                            minimal
                             icon="star"
                         >
                             {version}{" "}

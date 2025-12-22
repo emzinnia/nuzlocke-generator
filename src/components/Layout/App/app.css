@@ -1,4 +1,5 @@
-.bp5-light .release-notes {
+/* Light theme for release notes - use :not(.dark) selector */
+:root:not(.dark) .release-notes {
     background: #fafafa;
 }
 .release-notes-wrapper .release-notes {
@@ -59,10 +60,10 @@
     margin-left: 2.5rem;
 }
 
-.bp5-dark .release-dialog h1,
-.bp5-dark .release-dialog h2,
-.bp5-dark .release-dialog h3,
-.bp5-dark .release-dialog h4 {
+.dark .release-dialog h1,
+.dark .release-dialog h2,
+.dark .release-dialog h3,
+.dark .release-dialog h4 {
     color: #fff !important;
 }
 .release-dialog {
@@ -81,14 +82,16 @@
 .no-list-item-types {
     list-style-type: none;
 }
-.bp5-tag-input {
+/* Tag input styling */
+.ui-tag-input {
     align-items: center !important;
 }
-.bp5-tag-input-icon {
+.ui-tag-input-icon {
     margin: 0 !important;
     margin-right: 0.25rem !important;
 }
-.bp5-switch {
+/* Switch styling */
+.ui-switch {
     margin-bottom: 0 !important;
 }
 
@@ -102,21 +105,23 @@ html.dark {
     --app-bp-input-border-focus: #58a6ff;
 }
 
-.bp5-input:not(.bp5-input-ghost),
-.bp5-tag-input,
-.bp5-html-select select {
+/* Input styling */
+.ui-input:not(.ui-input-ghost),
+.ui-tag-input,
+.ui-select select {
     border: 1px solid var(--app-bp-input-border) !important;
     box-shadow: none !important;
 }
 
-.bp5-input:not(.bp5-input-ghost):focus,
-.bp5-input:not(.bp5-input-ghost).bp5-active,
-.bp5-tag-input:focus-within,
-.bp5-html-select select:focus {
+.ui-input:not(.ui-input-ghost):focus,
+.ui-input:not(.ui-input-ghost).ui-active,
+.ui-tag-input:focus-within,
+.ui-select select:focus {
     border-color: var(--app-bp-input-border-focus) !important;
     box-shadow: none !important;
 }
 
-.bp5-tab-panel {
+/* Tab panel styling */
+.ui-tab-panel {
     margin-top: 0;
 }

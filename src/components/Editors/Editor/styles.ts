@@ -2,11 +2,11 @@ import { css } from "emotion";
 
 export const editorStyles = {
     base: css`
-        min-width: 30rem;
-        max-width: 40rem;
         min-height: 100vh;
         padding: 0.25rem;
         position: relative;
+        overflow-y: auto;
+        overflow-x: hidden;
     `,
     historyControls: css`
         left: 0;

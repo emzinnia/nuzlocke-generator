@@ -2,12 +2,11 @@ import * as React from "react";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import {
     Button,
-    Intent,
     TextArea,
     Checkbox,
-    Classes,
     Spinner,
-} from "@blueprintjs/core";
+    Intent,
+} from "components/ui";
 import { connect } from "react-redux";
 import { css } from "emotion";
 import { showToast } from "components/Common/Shared/appToaster";
@@ -64,7 +63,7 @@ export class BugReporterBase extends React.Component<
                             width: "100%",
                             marginBottom: "0.25rem",
                         }}
-                        className={Classes.INPUT}
+                        className="rounded border border-border bg-input px-3 py-2 outline-none"
                         required
                         type="text"
                         placeholder="Issue Title"
@@ -76,6 +75,7 @@ export class BugReporterBase extends React.Component<
                         style={{ width: "100%" }}
                         value={userReport}
                         onChange={this.updateReport("userReport")}
+                        fill
                     />
                     <div
                         style={{
@@ -86,13 +86,11 @@ export class BugReporterBase extends React.Component<
                         }}
                     >
                         <Checkbox
-                            onChange={(e) =>
-                                this.setState((state) => ({
-                                    includeNuzlocke: !state.includeNuzlocke,
-                                }))
+                            onChange={(checked) =>
+                                this.setState({ includeNuzlocke: checked })
                             }
                             checked={includeNuzlocke}
-                            label={"include nuzlocke.json file"}
+                            label="include nuzlocke.json file"
                         />
                         <Button
                             disabled={!userReportTitle || isSending}

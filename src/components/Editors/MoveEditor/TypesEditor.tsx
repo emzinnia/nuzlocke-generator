@@ -3,7 +3,8 @@ import { State } from "state";
 import { getListOfTypes, typeToColor, Types, getContrastColor } from "utils";
 import { createCustomType, deleteCustomType, editCustomType } from "actions";
 import { ColorEdit, rgbaOrHex } from "components/Common/Shared";
-import { Classes, Button, Icon } from "@blueprintjs/core";
+import { Classes, Button } from "components/ui/shims";
+import { Icon } from "components/ui";
 
 export interface TypesEditorProps {
     customTypes: State["customTypes"];

@@ -1,0 +1,163 @@
+/**
+ * Dialog Component
+ *
+ * A modal dialog component built with native HTML and React.
+ * Provides Blueprint-compatible API.
+ */
+
+import * as React from "react";
+import { createPortal } from "react-dom";
+import { Icon } from "./Icon";
+
+export interface DialogProps {
+    /** Whether the dialog is open */
+    isOpen: boolean;
+    /** Callback when the dialog should close */
+    onClose: () => void;
+    /** Dialog title */
+    title?: React.ReactNode;
+    /** Icon to show in the header */
+    icon?: string;
+    /** Whether pressing Escape closes the dialog */
+    canEscapeKeyClose?: boolean;
+    /** Whether clicking outside closes the dialog */
+    canOutsideClickClose?: boolean;
+    /** Whether to show the close button */
+    isCloseButtonShown?: boolean;
+    /** Additional class name */
+    className?: string;
+    /** Dialog content */
+    children?: React.ReactNode;
+    /** Custom styles */
+    style?: React.CSSProperties;
+}
+
+export const Dialog: React.FC<DialogProps> = ({
+    isOpen,
+    onClose,
+    title,
+    icon,
+    canEscapeKeyClose = true,
+    canOutsideClickClose = true,
+    isCloseButtonShown = true,
+    className = "",
+    children,
+    style,
+}) => {
+    const dialogRef = React.useRef<HTMLDivElement>(null);
+
+    // Handle escape key
+    React.useEffect(() => {
+        if (!isOpen || !canEscapeKeyClose) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                onClose();
+            }
+        };
+
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [isOpen, canEscapeKeyClose, onClose]);
+
+    // Prevent body scroll when dialog is open
+    React.useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [isOpen]);
+
+    // Focus trap (basic implementation)
+    React.useEffect(() => {
+        if (isOpen && dialogRef.current) {
+            dialogRef.current.focus();
+        }
+    }, [isOpen]);
+
+    if (!isOpen) return null;
+
+    const handleBackdropClick = (e: React.MouseEvent) => {
+        if (canOutsideClickClose && e.target === e.currentTarget) {
+            onClose();
+        }
+    };
+
+    const content = (
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            onClick={handleBackdropClick}
+        >
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
+
+            {/* Dialog panel */}
+            <div
+                ref={dialogRef}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={title ? "dialog-title" : undefined}
+                tabIndex={-1}
+                className={`relative z-10 max-h-[85vh] w-full max-w-lg overflow-auto rounded-lg bg-white shadow-xl dark:bg-gray-800 ${className}`}
+                style={style}
+            >
+                {/* Header */}
+                {(title || isCloseButtonShown) && (
+                    <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">
+                        <div className="flex items-center gap-2">
+                            {icon && <Icon icon={icon} size={18} className="text-gray-500" />}
+                            {title && (
+                                <h2 id="dialog-title" className="text-lg font-semibold text-gray-900 dark:text-white">
+                                    {title}
+                                </h2>
+                            )}
+                        </div>
+                        {isCloseButtonShown && (
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                aria-label="Close"
+                                className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                            >
+                                <Icon icon="cross" size={20} />
+                            </button>
+                        )}
+                    </div>
+                )}
+
+                {/* Body */}
+                <div className="p-4">{children}</div>
+            </div>
+        </div>
+    );
+
+    return createPortal(content, document.body);
+};
+
+/**
+ * Dialog body wrapper (for Blueprint compatibility)
+ */
+export const DialogBody: React.FC<{ children?: React.ReactNode; className?: string }> = ({
+    children,
+    className = "",
+}) => <div className={`p-4 ${className}`}>{children}</div>;
+
+/**
+ * Dialog footer wrapper (for Blueprint compatibility)
+ */
+export const DialogFooter: React.FC<{ children?: React.ReactNode; className?: string }> = ({
+    children,
+    className = "",
+}) => (
+    <div
+        className={`flex items-center justify-end gap-2 border-t border-gray-200 px-4 py-3 dark:border-gray-700 ${className}`}
+    >
+        {children}
+    </div>
+);
+
+export default Dialog;

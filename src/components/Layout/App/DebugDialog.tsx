@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, NumericInput } from "@blueprintjs/core";
+import { Button, NumericInput } from "components/ui";
 import { noop } from "utils";
 import { css } from "emotion";
 
@@ -55,15 +55,13 @@ export const DebugDialog: React.FC<DebugDialogProps> = ({
                     </Button>
                     <NumericInput
                         value={boxPokemonCount}
-                        onValueChange={(value) => setBoxPokemonCount(value)}
+                        onValueChange={(value) => setBoxPokemonCount(value ?? 30)}
                         min={1}
                         max={100}
                         style={{ width: "4rem" }}
-                        buttonPosition="none"
                     />
                 </div>
             </div>
         </div>
     );
 };
-
