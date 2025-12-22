@@ -1,3 +1,8 @@
+/**
+ * @deprecated TopBar functionality has been moved to EditorToolbar in the Editor panel.
+ * This component is kept for backwards compatibility but will be removed in a future version.
+ * Use EditorToolbar from "components/Editors/Editor/EditorToolbar" instead.
+ */
 import * as React from "react";
 import { Button, Spinner, Intent } from "components/ui";
 import { connect } from "react-redux";
