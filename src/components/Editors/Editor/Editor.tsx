@@ -146,56 +146,91 @@ export function Editor() {
                     />
                 </React.Suspense>
             </ErrorBoundary>
-            <ErrorBoundary key={2}>
-                <React.Suspense fallback={Skeleton}>
-                    <NuzlockeSaveControls />
-                </React.Suspense>
-            </ErrorBoundary>
-            <ErrorBoundary key={3}>
-                <React.Suspense fallback={Skeleton}>
-                    <GameEditor />
-                </React.Suspense>
-            </ErrorBoundary>
-            <ErrorBoundary key={4}>
-                <React.Suspense fallback={Skeleton}>
-                    <DataEditor />
-                </React.Suspense>
-            </ErrorBoundary>
-            <ErrorBoundary key={5}>
-                <React.Suspense fallback={Skeleton}>
-                    <TrainerEditor />
-                </React.Suspense>
-            </ErrorBoundary>
-            <ErrorBoundary key={6}>
-                <React.Suspense fallback={Skeleton}>
-                    <PokemonEditor />
-                </React.Suspense>
-            </ErrorBoundary>
-            <ErrorBoundary key={7}>
-                <React.Suspense fallback={Skeleton}>
-                    <StyleEditor />
-                </React.Suspense>
-            </ErrorBoundary>
-            <ErrorBoundary key={8}>
-                <React.Suspense fallback={Skeleton}>
-                    <StatsEditor />
-                </React.Suspense>
-            </ErrorBoundary>
-            <ErrorBoundary key={9}>
-                <React.Suspense fallback={Skeleton}>
-                    <HotkeysEditor />
-                </React.Suspense>
-            </ErrorBoundary>
-            <ErrorBoundary key={10}>
-                <React.Suspense fallback={Skeleton}>
-                    <BugReporter />
-                </React.Suspense>
-            </ErrorBoundary>
-            <ErrorBoundary key={11}>
-                <React.Suspense fallback={Skeleton}>
-                    <Credits />
-                </React.Suspense>
-            </ErrorBoundary>
+            
+            <Tabs
+                id="editor-tabs"
+                defaultSelectedTabId="nuzlocke"
+                fill
+                className="editor-tabs"
+            >
+                <Tab
+                    id="nuzlocke"
+                    title="Nuzlocke"
+                    icon={<Icon icon="cube" />}
+                    panel={
+                        <div className="editor-tab-panel">
+                            <ErrorBoundary key={2}>
+                                <React.Suspense fallback={Skeleton}>
+                                    <NuzlockeSaveControls />
+                                </React.Suspense>
+                            </ErrorBoundary>
+                            <ErrorBoundary key={3}>
+                                <React.Suspense fallback={Skeleton}>
+                                    <GameEditor />
+                                </React.Suspense>
+                            </ErrorBoundary>
+                            <ErrorBoundary key={4}>
+                                <React.Suspense fallback={Skeleton}>
+                                    <DataEditor />
+                                </React.Suspense>
+                            </ErrorBoundary>
+                            <ErrorBoundary key={5}>
+                                <React.Suspense fallback={Skeleton}>
+                                    <TrainerEditor />
+                                </React.Suspense>
+                            </ErrorBoundary>
+                            <ErrorBoundary key={6}>
+                                <React.Suspense fallback={Skeleton}>
+                                    <PokemonEditor />
+                                </React.Suspense>
+                            </ErrorBoundary>
+                        </div>
+                    }
+                />
+                <Tab
+                    id="style"
+                    title="Style"
+                    icon={<Icon icon="style" />}
+                    panel={
+                        <div className="editor-tab-panel">
+                            <ErrorBoundary key={7}>
+                                <React.Suspense fallback={Skeleton}>
+                                    <StyleEditor />
+                                </React.Suspense>
+                            </ErrorBoundary>
+                            <ErrorBoundary key={8}>
+                                <React.Suspense fallback={Skeleton}>
+                                    <StatsEditor />
+                                </React.Suspense>
+                            </ErrorBoundary>
+                        </div>
+                    }
+                />
+                <Tab
+                    id="settings"
+                    title="Settings"
+                    icon={<Icon icon="cog" />}
+                    panel={
+                        <div className="editor-tab-panel">
+                            <ErrorBoundary key={9}>
+                                <React.Suspense fallback={Skeleton}>
+                                    <HotkeysEditor />
+                                </React.Suspense>
+                            </ErrorBoundary>
+                            <ErrorBoundary key={10}>
+                                <React.Suspense fallback={Skeleton}>
+                                    <BugReporter />
+                                </React.Suspense>
+                            </ErrorBoundary>
+                            <ErrorBoundary key={11}>
+                                <React.Suspense fallback={Skeleton}>
+                                    <Credits />
+                                </React.Suspense>
+                            </ErrorBoundary>
+                        </div>
+                    }
+                />
+            </Tabs>
             
             {/* Resize handle */}
             {!minimized && (
