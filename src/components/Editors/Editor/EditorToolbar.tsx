@@ -82,6 +82,7 @@ export function EditorToolbar({ editorDarkMode, minimized }: EditorToolbarProps)
         !sawRelease?.[getPatchlessVersion(version) ?? 0],
     );
     const [isDownloading, setIsDownloading] = React.useState(false);
+    const prevDownloadRequested = React.useRef<number | null>(null);
 
     const zoomLevel = editor.zoomLevel ?? 1;
 
@@ -92,9 +93,17 @@ export function EditorToolbar({ editorDarkMode, minimized }: EditorToolbarProps)
         }
     }, [dispatch]);
 
-    // Listen for download completion (reset after 3s)
+    // Listen for download completion (reset after 5s)
     React.useEffect(() => {
-        if (editor.downloadRequested && editor.downloadRequested > 0) {
+        const downloadRequested = editor.downloadRequested ?? 0;
+        // On first run, store the initial value without triggering the spinner
+        // This prevents the spinner from showing on page reload due to persisted state
+        if (prevDownloadRequested.current === null) {
+            prevDownloadRequested.current = downloadRequested;
+            return;
+        }
+        if (downloadRequested > 0 && downloadRequested !== prevDownloadRequested.current) {
+            prevDownloadRequested.current = downloadRequested;
             setIsDownloading(true);
             const timeout = setTimeout(() => setIsDownloading(false), 5000);
             return () => clearTimeout(timeout);
