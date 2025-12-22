@@ -7,8 +7,8 @@ import { Action } from "./action";
 export type SYNC_STATE_FROM_HISTORY = "SYNC_STATE_FROM_HISTORY";
 export const SYNC_STATE_FROM_HISTORY: SYNC_STATE_FROM_HISTORY = "SYNC_STATE_FROM_HISTORY";
 
-export type syncStateFromHistory = (syncWith: any) => Action<SYNC_STATE_FROM_HISTORY>;
-export function syncStateFromHistory(syncWith: any): Action<SYNC_STATE_FROM_HISTORY> {
+export type syncStateFromHistory = (syncWith: unknown) => Action<SYNC_STATE_FROM_HISTORY, unknown>;
+export function syncStateFromHistory(syncWith: unknown): Action<SYNC_STATE_FROM_HISTORY, unknown> {
     return {
         type: SYNC_STATE_FROM_HISTORY,
         syncWith,

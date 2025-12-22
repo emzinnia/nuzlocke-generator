@@ -1,12 +1,11 @@
 /**
- * @interface Action
- * @param T type
- * @param P payload
+ * Generic Redux-style action.
+ * T is the action type string; P is the payload shape.
  */
-export interface Action<T, P = any> {
+export interface Action<T, P = unknown> {
     type: T;
     [payload: string]: P | T;
-    readonly meta?: any;
+    readonly meta?: unknown;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -16,7 +15,7 @@ export namespace Action {
     export type Payload<P> = { [K in Index]?: P };
     export interface Data<T extends Type> {
         readonly type: T & Type;
-        readonly meta?: any;
+        readonly meta?: unknown;
     }
 }
 
