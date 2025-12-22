@@ -12,9 +12,10 @@ html.dark {
     border: 1px solid #eee;
     /* height: 100vh; */
     overflow-y: scroll;
-    overflow-x: hidden;
+    overflow-x: visible;
     padding: 0.25rem;
     width: 90%;
+    clip-path: inset(0 -10px 0 0); /* Allow resize handle to show outside */
 }
 
 .editor::-webkit-scrollbar {
@@ -319,4 +320,52 @@ input[name="metLevel"] {
 
 .editor-tab-panel {
     padding-top: 0.25rem;
+}
+
+/* Editor Resize Handle */
+.editor-resize-handle {
+    position: absolute;
+    top: 0;
+    right: -4px;
+    width: 8px;
+    height: 100%;
+    cursor: ew-resize;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+}
+
+.editor-resize-handle::before {
+    content: '';
+    width: 3px;
+    height: 100%;
+    background: #d1d5db;
+    border-radius: 2px;
+    transition: background-color 150ms ease, width 150ms ease;
+}
+
+.editor-resize-handle:hover::before {
+    background: #3b82f6;
+    width: 4px;
+}
+
+.editor-resize-handle:active::before,
+.editor-resize-handle.resizing::before {
+    background: #2563eb;
+    width: 4px;
+}
+
+.dark .editor-resize-handle::before {
+    background: #4b5563;
+}
+
+.dark .editor-resize-handle:hover::before {
+    background: #60a5fa;
+}
+
+.dark .editor-resize-handle:active::before,
+.dark .editor-resize-handle.resizing::before {
+    background: #3b82f6;
 }

@@ -237,15 +237,9 @@ export function Editor() {
                 <div
                     onMouseDown={handleMouseDown}
                     className={cx(
-                        "absolute top-0 right-0 h-full cursor-ew-resize z-20",
-                        "group flex items-center justify-center",
-                        "transition-all duration-150"
+                        "editor-resize-handle",
+                        isResizing && "resizing"
                     )}
-                    style={{
-                        width: "8px",
-                        marginRight: "-4px",
-                        touchAction: "none",
-                    }}
                     role="separator"
                     aria-orientation="vertical"
                     aria-label="Resize sidebar"
@@ -257,17 +251,7 @@ export function Editor() {
                             setWidth((w) => Math.min(MAX_WIDTH, w + 20));
                         }
                     }}
-                >
-                    {/* Visible resize bar */}
-                    <div
-                        className={cx(
-                            "w-1 h-full transition-colors duration-150",
-                            "bg-gray-200 dark:bg-gray-700",
-                            "group-hover:bg-blue-400 group-active:bg-blue-500",
-                            isResizing && "bg-blue-500"
-                        )}
-                    />
-                </div>
+                />
             )}
         </div>
     );
