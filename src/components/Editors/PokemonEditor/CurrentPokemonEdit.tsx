@@ -550,18 +550,18 @@ export class CurrentPokemonEditBase extends React.Component<
 
         if (currentPokemon == null) {
             return (
-                <div className="current-pokemon no-pokemon-selected">
+                <div className="border border-gray-300 dark:border-gray-700 rounded m-1 p-1 flex items-center p-2">
                     <img alt="pokeball" src={pokeball} />{" "}
-                    <p>Select a Pok&eacute;mon to edit</p>
+                    <p className="m-1 pl-1">Select a Pok&eacute;mon to edit</p>
                 </div>
             );
         }
 
         return (
-            <div className="current-pokemon">
-                <span className="current-pokemon-header">
+            <div className="border border-gray-300 dark:border-gray-700 rounded m-1 p-1">
+                <span className="flex items-center justify-start">
                     <PokemonIconPlain
-                        className="current-pokemon-image"
+                        className="p-0.5 border border-gray-300 dark:border-none dark:bg-slate-600 rounded-sm ml-1 h-10"
                         id={currentPokemon.id}
                         species={currentPokemon.species}
                         forme={currentPokemon.forme}

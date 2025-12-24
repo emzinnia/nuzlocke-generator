@@ -5,7 +5,7 @@ import { ShapeInput, Shape } from "../ShapeInput";
 describe("ShapeInput", () => {
     it("renders with default selected shape", () => {
         const { container } = render(<ShapeInput shapes={[Shape.Circle, Shape.Square]} />);
-        expect(container.querySelector(".bp5-input")).not.toBeNull();
+        expect(container.querySelector("input")).not.toBeNull();
     });
 
     it("renders an input element", () => {

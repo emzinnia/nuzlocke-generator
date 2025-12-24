@@ -301,7 +301,7 @@ export function PokemonDoubleSelectInput({
     );
 
     return (
-        <span className="double-select-wrapper">
+        <span className="flex">
             <HTMLSelect
                 onChange={onSelect(0)}
                 value={edit?.[inputName]?.[0]}
@@ -440,7 +440,7 @@ export function CurrentPokemonInput(props: CurrentPokemonInputProps) {
 
     return (
         <span
-            className={`current-pokemon-input-wrapper current-pokemon-${props.type} ${props.type === "autocomplete" && "autocomplete"} current-pokemon-${props.inputName} ${className}`}
+            className={`inline-flex flex-col p-1 ${props.type === "autocomplete" ? "autocomplete" : ""} ${className || ""} [&_label]:text-[10px] [&_input]:border [&_input]:border-gray-200 [&_input]:p-1 dark:[&_input]:bg-[rgba(16,22,26,0.3)] dark:[&_input]:border-none dark:[&_input]:text-gray-100 dark:[&_input]:shadow-[inset_0_0_0_1px_rgba(16,22,26,0.3),inset_0_1px_1px_rgba(16,22,26,0.4)]`}
         >
             <label>{props.labelName}</label>
             {props.rightElement ? (

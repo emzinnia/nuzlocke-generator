@@ -32,7 +32,7 @@ export class BaseEditor extends React.Component<
         return (
             <div
                 data-testid="base-editor"
-                className={`${this.props.name.toLowerCase().replace(/\s/g, "-")}-editor base-editor`}
+                className={`${this.props.name.toLowerCase().replace(/\s/g, "-")}-editor p-1 border border-gray-100 dark:border-gray-700 border-t-0 my-1 rounded`}
             >
                 <h4
                     title={`${this.state.isOpen ? "Collapse" : "Open"} this editor.`}

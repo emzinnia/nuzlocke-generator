@@ -1,25 +1,19 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Editor CSS - Only styles that cannot be expressed in Tailwind
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Scrollbar CSS variables */
 html {
     --scrollbarBG: rgba(0, 0, 0, 0.1);
     --thumbBG: rgba(126, 136, 146, 0.33);
 }
 
 html.dark {
-    --scrollbarBG: #222;
-    --thumbBG: #111;
+    --scrollbarBG: var(--color-bg-tertiary);
+    --thumbBG: var(--color-bg-secondary);
 }
 
-.editor {
-    border: 1px solid #eee;
-    border-right: none; /* Remove right border to blend with resize handle */
-    /* height: 100vh; */
-    overflow-y: scroll;
-    overflow-x: visible;
-    padding: 0.25rem;
-    padding-right: 0.5rem; /* Extra padding for scrollbar */
-    width: 90%;
-    clip-path: inset(0 -20px 0 0); /* Allow resize handle to show outside */
-}
-
+/* Scrollbar pseudo-elements (cannot be done in Tailwind) */
 .editor::-webkit-scrollbar {
     width: 8px;
     padding: 2px;
@@ -36,6 +30,7 @@ html.dark {
     border-radius: 4px;
 }
 
+/* Mobile responsive overrides */
 @media screen and (max-width: 720px) {
     .editor {
         width: 100% !important;
@@ -43,192 +38,28 @@ html.dark {
         margin-top: 3rem;
         border-width: 0 !important;
     }
-    .base-editor {
-        width: 98vw;
-    }
-    .bug-reports-and-feature-requests-editor {
-        margin-bottom: 3rem !important;
-    }
 }
-.editor.dark {
-    border: 1px solid #000;
-}
-.editor:hover {
-    box-shadow: 0 0 4px #eee;
-}
-.dark .editor:hover {
-    box-shadow: 0 0 4px #222;
-}
+
 /* Select elements take full width */
 .ui-select select,
 select.w-full {
     width: 100%;
 }
-.game-editor,
-.trainer-editor,
-.pokemon-editor,
-.style-editor,
-.hotkeys-editor,
-.reporter-editor,
-.requests-editor,
-.checklist-editor,
-.saves-editor,
-.data-editor,
-.bug-reports-and-feature-requests-editor,
-.stats-editor {
-    padding: 0.3rem;
-}
-.base-editor {
-    border: 1px solid #fafafa;
-    border-top: 0 solid transparent !important;
-    margin: 4px 0;
-    border-radius: 0.25rem;
-}
-.data-editor-save-file-form {
-    border: 1px solid #ddd;
-}
-.dark .data-editor-save-file-form {
-    border: 1px solid #333;
-}
-.dark .base-editor {
-    border: 1px solid #333;
-}
-.trainer-info-field {
-    align-items: center;
-    border-bottom: 1px solid #ddd;
-    display: flex;
-    justify-content: space-between;
-}
-.trainer-info-field input {
-    background: inherit;
-    border: 0 solid transparent;
-    border-left: 1px solid #eee;
-    border-radius: 2px;
-    color: inherit;
-    padding: 0.25rem;
-}
-.dark .trainer-info-field {
-    border-bottom: 1px solid #394b59;
-}
-.dark .trainer-info-field input {
-    border-left: 1px solid #394b59;
-}
-.box-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-.box-wrapper .tab {
-    margin: 2px;
-}
-.pokemon-tab {
-    display: flex;
-    justify-content: center;
-}
-.current-pokemon {
-    border: 1px solid #ddd;
-    border-radius: 0.25rem;
-    margin: 0.25rem;
-    padding: 0.25rem;
-}
-.dark .current-pokemon {
-    border: 1px solid #333;
-}
-.current-pokemon-header {
-    align-items: center;
-    display: flex;
-    justify-content: flex-start;
-}
-.current-pokemon-image {
-    padding: 2px;
-    border: 1px solid #ccc;
-    border-radius: 2px;
-    margin-left: 4px;
-    height: 2.5rem;
-}
-.dark .current-pokemon-image {
-    border: none;
-    background: #394b59;
-}
-.current-pokemon-input-wrapper {
-    display: inline-flex;
-    flex-direction: column;
-    padding: 0.25rem;
-}
-.current-pokemon-input-wrapper label {
-    font-size: 10px;
-}
-.current-pokemon-input-wrapper input {
-    border: 1px solid #dfdfdf;
-    padding: 0.25rem;
-}
-.current-pokemon-number {
-    width: 6rem;
-}
-.current-pokemon-checkbox {
-    display: inline-flex;
-    flex-flow: row-reverse;
-    justify-content: flex-end;
-    width: 8rem;
-    transform: translateY(1rem);
-}
-.current-pokemon-checkbox label {
-    font-size: 14px;
-}
-.dark .current-pokemon-input-wrapper input {
-    box-shadow:
-        0 0 0 0 rgba(19, 124, 189, 0),
-        0 0 0 0 rgba(19, 124, 189, 0),
-        0 0 0 0 rgba(19, 124, 189, 0),
-        inset 0 0 0 1px rgba(16, 22, 26, 0.3),
-        inset 0 1px 1px rgba(16, 22, 26, 0.4);
-    background: rgba(16, 22, 26, 0.3);
-    border: none;
-    color: #f5f8fa;
-}
+
 /* Ghost input style for tag inputs */
 .ui-input-ghost {
     border: 0 !important;
     width: 0 !important;
     flex: auto;
 }
-.small-input {
-    width: 5rem;
-}
-.current-pokemon-gender {
-    width: 6rem;
-}
-.current-pokemon-moves {
-    width: 80%;
-}
-.current-pokemon-nature {
-    width: 6.5rem;
-}
-.double-select-wrapper {
-    display: flex;
-}
-.status-wrapper {
-    display: inline-flex;
-    flex-flow: column;
-    padding: 0.25rem;
-    width: 30%;
-    vertical-align: top;
-}
-.status-wrapper span {
-    font-size: 10px;
-    width: 100%;
-}
-input[name="metLevel"] {
-    color: #ccc;
-}
-/* Wide dialog modifier */
-.ui-dialog.wide-dialog {
-    width: 90% !important;
-}
+
+/* Hide scrollbars utility */
 .hide-scrollbars::-webkit-scrollbar {
     width: 0;
     height: 0;
 }
+
+/* Nice scrollbars for autocomplete lists */
 .has-nice-scrollbars::-webkit-scrollbar {
     width: 5px;
     height: 8px;
@@ -238,167 +69,13 @@ input[name="metLevel"] {
 .has-nice-scrollbars::-webkit-scrollbar-thumb {
     background: #aaa;
 }
-.no-pokemon-selected {
-    display: flex;
-    align-items: center;
-    padding: 0.5rem;
-}
-.no-pokemon-selected p {
-    margin: 0.25rem;
-    padding-left: 0.25rem;
-}
-.box {
-    border-radius: 0.25rem;
-    padding: 0.25rem;
-    margin: 0.25rem;
-    display: flex;
-    align-items: center;
-    background-position: center;
-    flex-wrap: wrap;
-    box-shadow: 0 0 2px rgba(0, 0, 0, 0.33);
-}
-.box .pokemon-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 40px;
-}
-.box .pokemon-icon img,
-.box .pokemon-icon {
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: 500ms all;
-}
-.box .pokemon-icon.selected {
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.33);
-    transition: 500ms all;
-}
-.dark .box {
-    box-shadow: 0 0 0.25rem #000;
-}
-.current-pokemon-notes {
-    width: 100%;
+
+/* Wide dialog modifier */
+.ui-dialog.wide-dialog {
+    width: 90% !important;
 }
 
-/* Editor Tabs */
-.editor-tabs {
-    margin-top: 0.25rem;
-}
-
-.editor-tabs [role="tablist"] {
-    padding: 0 0.25rem;
-    gap: 0.25rem;
-    border-bottom-color: #e5e7eb;
-}
-
-.dark .editor-tabs [role="tablist"] {
-    border-bottom-color: #374151;
-}
-
-.editor-tabs [role="tab"] {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8125rem;
-    border-radius: 0.25rem 0.25rem 0 0;
-    background: transparent;
-    transition: background-color 150ms ease;
-}
-
-.editor-tabs [role="tab"]:hover {
-    background: rgba(0, 0, 0, 0.05);
-}
-
-.dark .editor-tabs [role="tab"]:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.editor-tabs [role="tab"][aria-selected="true"] {
-    background: rgba(59, 130, 246, 0.1);
-}
-
-.dark .editor-tabs [role="tab"][aria-selected="true"] {
-    background: rgba(59, 130, 246, 0.15);
-}
-
-.editor-tab-panel {
-    padding-top: 0.25rem;
-}
-
-/* Mobile Result tab */
-@media screen and (max-width: 720px) {
-    .result-tab-panel {
-        padding: 0;
-        overflow-x: auto;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    .result-tab-panel .result {
-        margin: 0 auto !important;
-        transform-origin: top center !important;
-    }
-}
-
-/* Editor Resize Handle - positioned after the scrollbar */
-.editor-resize-handle {
-    position: absolute;
-    top: 0;
-    right: -12px; /* After the 8px scrollbar + 4px gap */
-    width: 12px;
-    height: 100%;
-    cursor: ew-resize;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    touch-action: none;
-    background: transparent;
-}
-
-.editor-resize-handle::before {
-    content: '';
-    width: 4px;
-    height: 100%;
-    background: #d1d5db;
-    border-radius: 2px;
-    transition: background-color 150ms ease, width 150ms ease, box-shadow 150ms ease;
-}
-
-.editor-resize-handle:hover::before {
-    background: #3b82f6;
-    width: 5px;
-    box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
-}
-
-.editor-resize-handle:active::before,
-.editor-resize-handle.resizing::before {
-    background: #2563eb;
-    width: 5px;
-    box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
-}
-
-.dark .editor-resize-handle::before {
-    background: #4b5563;
-}
-
-.dark .editor-resize-handle:hover::before {
-    background: #60a5fa;
-    box-shadow: 0 0 8px rgba(96, 165, 250, 0.4);
-}
-
-.dark .editor-resize-handle:active::before,
-.dark .editor-resize-handle.resizing::before {
-    background: #3b82f6;
-    box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
-}
-
-/* Overlay to capture all mouse events during resize */
-.editor-resize-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 9999;
-    cursor: ew-resize;
+/* Met level input color (attribute selector) */
+input[name="metLevel"] {
+    color: #ccc;
 }

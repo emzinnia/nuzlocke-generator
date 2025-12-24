@@ -42,6 +42,7 @@ const toolbarStyles = {
         z-index: 12;
         width: 100%;
         padding: 0.25rem;
+        background: var(--color-bg-primary);
     `,
     row: css`
         display: flex;
@@ -198,7 +199,6 @@ export function EditorToolbar({ editorDarkMode, minimized }: EditorToolbarProps)
         <div
             className={toolbarStyles.container}
             style={{
-                background: editorDarkMode ? "#222" : "#fff",
                 display: minimized ? "none" : "block",
             }}
         >

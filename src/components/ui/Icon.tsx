@@ -27,6 +27,7 @@ import {
     User,
     Award,
     Grid,
+    Grid3X3,
     Filter,
     Link,
     Menu,
@@ -51,6 +52,23 @@ import {
     ArrowDown,
     ArrowLeft,
     ArrowRight,
+    ArrowLeftRight,
+    Clipboard,
+    Crown,
+    Box,
+    Palette,
+    Image,
+    LayoutGrid,
+    Circle,
+    Swords,
+    List,
+    BarChart3,
+    Lightbulb,
+    Database,
+    Import,
+    FileOutput,
+    Command,
+    Square,
     type LucideIcon,
 } from "lucide-react";
 
@@ -140,6 +158,33 @@ const iconMap: Record<string, LucideIcon> = {
     // History/Time
     history: RotateCcw,
     record: Moon, // Using Moon as a placeholder for record dot
+
+    // Arrows
+    "arrow-left-right": ArrowLeftRight,
+
+    // Actions
+    clipboard: Clipboard,
+    more: MoreHorizontal,
+
+    // Objects & Symbols
+    crown: Crown,
+    cube: Box,
+    style: Palette,
+    media: Image,
+    "layout-group-by": LayoutGrid,
+    circle: Circle,
+    ninja: Swords, // Using Swords as a substitute for ninja
+    list: List,
+    chart: BarChart3,
+    lightbulb: Lightbulb,
+    database: Database,
+    import: Import,
+    export: FileOutput,
+    "grid-view": LayoutGrid,
+    "document-open": FolderOpen,
+    "key-command": Command,
+    square: Square,
+    "heat-grid": Grid3X3,
 };
 
 export type IconName = keyof typeof iconMap;

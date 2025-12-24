@@ -39,7 +39,7 @@ export function TrainerInfoEditField({
     };
 
     return (
-        <div className="trainer-info-field">
+        <div className="flex items-center justify-between border-b border-gray-300 dark:border-slate-600">
             <label>{label}</label>
             {element ? (
                 element({
@@ -56,6 +56,7 @@ export function TrainerInfoEditField({
                     onChange={onChange}
                     placeholder={placeholder}
                     name={name}
+                    className="bg-inherit border-0 border-l border-gray-200 dark:border-slate-600 rounded-sm text-inherit p-1"
                 />
             )}
         </div>

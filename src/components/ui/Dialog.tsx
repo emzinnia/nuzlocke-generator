@@ -9,7 +9,7 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import { Icon } from "./Icon";
 
-export interface DialogProps {
+export interface DialogProps extends React.HTMLAttributes<HTMLDivElement> {
     /** Whether the dialog is open */
     isOpen: boolean;
     /** Callback when the dialog should close */
@@ -43,6 +43,7 @@ export const Dialog: React.FC<DialogProps> = ({
     className = "",
     children,
     style,
+    ...rest
 }) => {
     const dialogRef = React.useRef<HTMLDivElement>(null);
 
@@ -104,6 +105,7 @@ export const Dialog: React.FC<DialogProps> = ({
                 tabIndex={-1}
                 className={`relative z-10 max-h-[85vh] w-full max-w-lg overflow-auto rounded-lg bg-white shadow-xl dark:bg-gray-800 ${className}`}
                 style={style}
+                {...rest}
             >
                 {/* Header */}
                 {(title || isCloseButtonShown) && (

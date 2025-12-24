@@ -1,168 +1,91 @@
 import * as React from "react";
-import { Provider } from "react-redux";
-import { createStore } from "redux";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import { ResultView } from "../ResultView";
+import { isMobile } from "is-mobile";
 
-import {
-    ResultInner,
-    TeamPokemonMemberView,
-    TopBarWithDownload,
-} from "../Result2";
-import { appReducers } from "reducers";
-import { State } from "state";
-import { styleDefaults, generateEmptyPokemon } from "utils";
-import { Box, Pokemon } from "models";
-
-const toPngMock = vi.fn().mockResolvedValue("data:image/png;base64");
-
-vi.mock("@emmaramirez/dom-to-image", () => ({
-    domToImage: {
-        toPng: (...args: any[]) => toPngMock(...args),
-    },
-}));
-
-vi.mock("components/Layout/TopBar/TopBar", () => ({
-    TopBar: ({ onClickDownload, children, isDownloading }: any) => (
-        <div data-testid="top-bar">
-            <button onClick={onClickDownload}>download</button>
-            <span data-testid="top-bar-status">
-                {isDownloading ? "downloading" : "idle"}
-            </span>
-            {children}
-        </div>
-    ),
-}));
-
-vi.mock("components/Pokemon/TeamPokemon/TeamPokemon2", () => ({
-    TeamPokemon: ({ pokemon }: any) => (
-        <div data-testid={`team-${pokemon.species}`}>{pokemon.species}</div>
-    ),
-}));
-
-vi.mock("components/Pokemon/BoxedPokemon/BoxedPokemon2", () => ({
-    BoxedPokemon: ({ pokemon }: any) => (
-        <div data-testid={`boxed-${pokemon.species}`}>{pokemon.species}</div>
-    ),
-}));
-
-vi.mock("components/Pokemon/DeadPokemon/DeadPokemon2", () => ({
-    DeadPokemon: ({ pokemon }: any) => (
-        <div data-testid={`dead-${pokemon.species}`}>{pokemon.species}</div>
-    ),
-}));
-
-vi.mock("components/Pokemon/ChampsPokemon/ChampsPokemonCollection", () => ({
-    ChampsPokemonView: ({ pokemon }: any) => (
-        <div data-testid="champs">{pokemon?.map((p: Pokemon) => p.species).join(",")}</div>
-    ),
-}));
-
-vi.mock("components/Layout/Layout/Layout", () => ({
-    Layout: ({ children, name }: any) => (
-        <div data-testid={name ?? "layout"}>{children}</div>
-    ),
-    LayoutDisplay: { Flex: "flex", Inline: "inline" },
-    LayoutDirection: { Row: "row", Column: "column" },
-    LayoutAlignment: { Center: "center" },
-    LayoutSpacing: { Center: "center" },
-    LayoutWrap: { Wrap: "wrap", NoWrap: "nowrap" },
-}));
-
-vi.mock("components/Common/Shared", () => ({
-    ErrorBoundary: ({ children }: any) => <>{children}</>,
-}));
-
-vi.mock("components/Features/Result/TrainerResult", () => ({
-    TrainerResult: () => <div data-testid="trainer-result" />,
-}));
-
-const boxes: Box[] = [
-    { id: 0, position: 0, name: "Team" },
-    { id: 1, position: 1, name: "Boxed" },
-    { id: 2, position: 2, name: "Dead" },
-    { id: 3, position: 3, name: "Champs" },
-];
-
-const createStoreWithState = (overrides: Partial<State> = {}) => {
-    const base = appReducers(undefined, { type: "@@INIT" } as any) as State;
-    return createStore(appReducers, {
-        ...base,
-        ...overrides,
-        style: { ...base.style, ...(overrides.style ?? {}) },
-        trainer: { ...base.trainer, ...(overrides.trainer ?? {}) },
-        pokemon: overrides.pokemon ?? base.pokemon,
-        box: overrides.box ?? base.box,
-    } as State);
+const toImageMock = vi.fn();
+const setZoomLevelMock = vi.fn();
+let editorState = {
+    downloadRequested: 0,
+    zoomLevel: 1,
+    showResultInMobile: false,
 };
 
-describe("<TeamPokemonMemberView />", () => {
-    it("toggles context menu on click", () => {
-        render(
-            <TeamPokemonMemberView
-                pokemon={{ id: "p1", species: "Alpha" } as Pokemon}
-            />,
-        );
+const useSelectorMock = vi.fn((selector: any) => selector({ editor: editorState }));
+const isMobileMock = isMobile as unknown as vi.Mock;
 
-        expect(screen.queryByText("Delete")).toBeNull();
-        fireEvent.click(screen.getByRole("group"));
-        expect(screen.getByText("Delete")).toBeTruthy();
+vi.mock("react-redux", () => ({
+    useSelector: (selector: any) => useSelectorMock(selector),
+}));
+
+vi.mock("is-mobile", () => ({
+    isMobile: vi.fn(() => false),
+}));
+
+vi.mock("../Result", () => {
+    const MockResult = React.forwardRef(function MockResult(_, ref) {
+        React.useImperativeHandle(ref, () => ({
+            toImage: toImageMock,
+            setZoomLevel: setZoomLevelMock,
+        }));
+        return <div data-testid="result-component" />;
     });
+    return { Result: MockResult, ResultBase: MockResult };
 });
 
-describe("<ResultInner />", () => {
-    it("renders pokemon groups and trainer info from the store", () => {
-        const pokemon: Pokemon[] = [
-            generateEmptyPokemon([], { id: "t1", species: "Alpha", status: "Team" }),
-            generateEmptyPokemon([], {
-                id: "b1",
-                species: "Boxmon",
-                status: "Boxed",
-                hidden: false,
-            }),
-            generateEmptyPokemon([], { id: "d1", species: "Fallen", status: "Dead" }),
-            generateEmptyPokemon([], { id: "c1", species: "Champion", status: "Champs" }),
-        ];
+vi.mock("components/Editors/PokemonEditor", () => ({
+    TypeMatchupDialog: () => <div data-testid="type-matchup-dialog" />,
+}));
 
-        const store = createStoreWithState({
-            pokemon,
-            box: boxes,
-            style: {
-                ...styleDefaults,
-                resultHeight: 400,
-                resultWidth: 500,
-                trainerAuto: true,
-            },
-            trainer: { notes: "Do not lose." } as any,
-        });
-
-        render(
-            <Provider store={store}>
-                <ResultInner ref={React.createRef<HTMLDivElement>()} />
-            </Provider>,
+describe("<ResultView />", () => {
+    beforeEach(() => {
+        editorState = {
+            downloadRequested: 0,
+            zoomLevel: 1,
+            showResultInMobile: false,
+        };
+        toImageMock.mockClear();
+        setZoomLevelMock.mockClear();
+        useSelectorMock.mockImplementation((selector: any) =>
+            selector({ editor: editorState }),
         );
-
-        expect(screen.getByTestId("result")).toBeTruthy();
-        expect(screen.getByTestId("team-Alpha")).toBeTruthy();
-        expect(screen.getByTestId("boxed-Boxmon")).toBeTruthy();
-        expect(screen.getByTestId("dead-Fallen")).toBeTruthy();
-        expect(screen.getByTestId("champs").textContent).toContain("Champion");
-        expect(screen.getByText("Do not lose.")).toBeTruthy();
+        isMobileMock.mockReturnValue(false);
     });
-});
 
-describe("<TopBarWithDownload />", () => {
-    it("invokes dom-to-image when download is clicked", async () => {
-        const ref = React.createRef<HTMLDivElement>();
-        ref.current = document.createElement("div");
+    it("renders Result and TypeMatchupDialog on desktop", () => {
+        render(<ResultView />);
 
-        render(<TopBarWithDownload ref={ref} />);
+        expect(screen.getByTestId("result-component")).toBeDefined();
+        expect(screen.getAllByTestId("type-matchup-dialog").length).toBeGreaterThan(0);
+    });
 
-        fireEvent.click(screen.getByText("download"));
+    it("triggers download when downloadRequested increments", async () => {
+        const { rerender } = render(<ResultView />);
+        expect(toImageMock).not.toHaveBeenCalled();
 
-        expect(screen.getByTestId("top-bar-status").textContent).toBe(
-            "downloading",
-        );
-        await waitFor(() => expect(toPngMock).toHaveBeenCalled());
+        editorState = { ...editorState, downloadRequested: 1 };
+        rerender(<ResultView />);
+
+        await waitFor(() => expect(toImageMock).toHaveBeenCalledTimes(1));
+    });
+
+    it("applies zoom changes to the Result ref", async () => {
+        const { rerender } = render(<ResultView />);
+        expect(setZoomLevelMock).toHaveBeenCalledWith(1);
+
+        editorState = { ...editorState, zoomLevel: 2 };
+        rerender(<ResultView />);
+
+        await waitFor(() => expect(setZoomLevelMock).toHaveBeenLastCalledWith(2));
+    });
+
+    it("renders mobile fallback when on a mobile device", () => {
+        isMobileMock.mockReturnValue(true);
+
+        render(<ResultView />);
+
+        expect(screen.getByTestId("type-matchup-dialog")).toBeDefined();
+        expect(screen.queryByTestId("result-component")).toBeNull();
     });
 });
 

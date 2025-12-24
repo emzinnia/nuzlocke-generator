@@ -131,16 +131,21 @@ export function Editor() {
                 "editor",
                 editorStyles.base,
                 editorDarkMode ? "dark" : "",
+                // Tailwind classes for editor styling
+                "min-h-screen p-1 relative overflow-y-auto overflow-x-hidden",
+                "border border-[var(--color-border-default)] border-r-0",
+                "bg-[var(--color-bg-primary)]",
+                "hover:shadow-[0_0_4px_var(--color-border-default)]",
             )}
             style={{
                 width: minimized ? 0 : width,
                 minWidth: minimized ? 0 : MIN_WIDTH,
                 maxWidth: minimized ? 0 : MAX_WIDTH,
-                background: editorDarkMode ? "#222" : "#fff",
                 flexShrink: 0,
                 position: "relative",
                 overflow: minimized ? "hidden" : undefined,
                 visibility: minimized ? "hidden" : "visible",
+                clipPath: "inset(0 -20px 0 0)", // Allow resize handle to show outside
             }}
         >
             <ErrorBoundary key={1}>
@@ -156,13 +161,14 @@ export function Editor() {
                 id="editor-tabs"
                 defaultSelectedTabId="nuzlocke"
                 fill
+                className="mt-1 [&_[role=tablist]]:px-1 [&_[role=tablist]]:gap-1 [&_[role=tablist]]:border-b-gray-200 dark:[&_[role=tablist]]:border-b-gray-700 [&_[role=tab]]:px-3 [&_[role=tab]]:py-2 [&_[role=tab]]:text-[0.8125rem] [&_[role=tab]]:rounded-t [&_[role=tab]]:bg-transparent [&_[role=tab]]:transition-colors [&_[role=tab]:hover]:bg-black/5 dark:[&_[role=tab]:hover]:bg-white/5 [&_[role=tab][aria-selected=true]]:bg-blue-500/10 dark:[&_[role=tab][aria-selected=true]]:bg-blue-500/15"
             >
                 <Tab
                     id="nuzlocke"
                     title="Nuzlocke"
                     icon={<Icon icon="cube" />}
                     panel={
-                        <div className="editor-tab-panel">
+                        <div className="pt-1">
                             <ErrorBoundary key={2}>
                                 <React.Suspense fallback={Skeleton}>
                                     <NuzlockeSaveControls />
@@ -196,7 +202,7 @@ export function Editor() {
                     title="Style"
                     icon={<Icon icon="style" />}
                     panel={
-                        <div className="editor-tab-panel">
+                        <div className="pt-1">
                             <ErrorBoundary key={7}>
                                 <React.Suspense fallback={Skeleton}>
                                     <StyleEditor />
@@ -216,7 +222,7 @@ export function Editor() {
                         title="Result"
                         icon={<Icon icon="media" />}
                         panel={
-                            <div className="editor-tab-panel result-tab-panel">
+                            <div className="pt-1 p-0 overflow-auto max-sm:[&_.result]:mx-auto max-sm:[&_.result]:origin-top-center">
                                 <ErrorBoundary key={12}>
                                     <React.Suspense fallback={Skeleton}>
                                         <Result />
@@ -231,7 +237,7 @@ export function Editor() {
                     title="Settings"
                     icon={<Icon icon="cog" />}
                     panel={
-                        <div className="editor-tab-panel">
+                        <div className="pt-1">
                             <ErrorBoundary key={9}>
                                 <React.Suspense fallback={Skeleton}>
                                     <HotkeysEditor />
@@ -257,8 +263,15 @@ export function Editor() {
                 <div
                     onMouseDown={handleMouseDown}
                     className={cx(
-                        "editor-resize-handle",
-                        isResizing && "resizing"
+                        // Resize handle positioning and interaction
+                        "absolute top-0 -right-3 w-3 h-full cursor-ew-resize z-[100]",
+                        "flex items-center justify-center touch-none bg-transparent",
+                        // Before pseudo-element for visual handle
+                        "before:content-[''] before:w-1 before:h-full before:rounded-sm before:transition-all before:duration-150",
+                        "before:bg-gray-300 dark:before:bg-gray-600",
+                        "hover:before:bg-blue-500 hover:before:w-[5px] hover:before:shadow-[0_0_8px_rgba(59,130,246,0.4)]",
+                        "dark:hover:before:bg-blue-400 dark:hover:before:shadow-[0_0_8px_rgba(96,165,250,0.4)]",
+                        isResizing && "before:bg-blue-600 before:w-[5px] before:shadow-[0_0_12px_rgba(59,130,246,0.6)] dark:before:bg-blue-500"
                     )}
                     role="separator"
                     aria-orientation="vertical"
@@ -276,7 +289,7 @@ export function Editor() {
             
             {/* Overlay to capture mouse events during resize and prevent them from hitting other components */}
             {isResizing && (
-                <div className="editor-resize-overlay" />
+                <div className="fixed inset-0 z-[9999] cursor-ew-resize" />
             )}
         </div>
     );

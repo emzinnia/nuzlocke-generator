@@ -330,6 +330,7 @@ export const RulesEditorDialogBase = (
             isOpen={props.isOpen}
             onClose={props.onClose}
             className={`rules-editor-dialog ${props.style.editorDarkMode ? Classes.DARK : ""}`}
+            data-theme={props.style.editorDarkMode ? "dark" : "light"}
             title="Rules Editor"
             icon="edit"
         >

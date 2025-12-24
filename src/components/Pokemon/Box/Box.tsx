@@ -246,7 +246,7 @@ export const Box: React.FC<BoxProps> = (props) => {
                 outlineOffset: "-2px",
                 ...collapsedStyle,
             }}
-            className={`box ${name.replace(/\s/g, "-")}-box`}
+            className={`box ${name.replace(/\s/g, "-")}-box rounded p-1 m-1 flex items-center bg-center flex-wrap shadow-[0_0_2px_rgba(0,0,0,0.33)] dark:shadow-[0_0_0.25rem_#000]`}
         >
             <Alert
                 icon="trash"

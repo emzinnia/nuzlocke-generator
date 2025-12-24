@@ -5,6 +5,7 @@ const Skeleton = (
     <div
         style={{ width: "100%", height: "100px" }}
         className="animate-pulse bg-slate-200 dark:bg-slate-700 rounded"
+        data-testid="suspense-skeleton"
     />
 );
 

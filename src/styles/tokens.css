@@ -4,6 +4,11 @@
  * Light theme is default, dark theme activates with `.dark` class on html/body.
  */
 
+/* Tailwind CSS - Base, Components, and Utilities */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   /* ─────────────────────────────────────────────────────────────────────────
      COLORS - Semantic tokens mapped to Tailwind palette
@@ -194,33 +199,33 @@
 
 .dark,
 html.dark {
-  /* Background layers */
-  --color-bg-primary: #1e293b;
-  --color-bg-secondary: #0f172a;
-  --color-bg-tertiary: #334155;
-  --color-bg-overlay: rgba(0, 0, 0, 0.7);
+  /* Background layers - warm burnt umber palette */
+  --color-bg-primary: #0E0601;
+  --color-bg-secondary: #1a120a;
+  --color-bg-tertiary: #271c12;
+  --color-bg-overlay: rgba(14, 6, 1, 0.85);
 
-  /* Foreground / text */
-  --color-text-primary: #f1f5f9;
-  --color-text-secondary: #cbd5e1;
-  --color-text-tertiary: #64748b;
-  --color-text-inverse: #1e293b;
-  --color-text-disabled: #475569;
+  /* Foreground / text - warm cream and tan tones */
+  --color-text-primary: #f5ede4;
+  --color-text-secondary: #c9b9a6;
+  --color-text-tertiary: #8a7560;
+  --color-text-inverse: #1a120a;
+  --color-text-disabled: #5c4d3d;
 
-  /* Borders */
-  --color-border-default: #334155;
-  --color-border-muted: #1e293b;
-  --color-border-focus: #60a5fa;
+  /* Borders - warm brown tones */
+  --color-border-default: #3d2e1f;
+  --color-border-muted: #251a10;
+  --color-border-focus: #d97706;
 
-  /* Shadows for dark mode (more subtle) */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  /* Shadows for dark mode - warm tinted */
+  --shadow-sm: 0 1px 2px 0 rgba(14, 6, 1, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(14, 6, 1, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(14, 6, 1, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px -5px rgba(14, 6, 1, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
 
-  /* Focus ring - slightly brighter in dark mode */
-  --focus-ring-color: var(--color-primary-400);
+  /* Focus ring - amber to match warm theme */
+  --focus-ring-color: #f59e0b;
 
   /* Component-specific dark overrides */
   --input-bg: var(--color-bg-secondary);

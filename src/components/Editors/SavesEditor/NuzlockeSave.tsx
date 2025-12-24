@@ -174,14 +174,13 @@ function NuzlockeSaveItem({
                     disabled={isCurrent}
                     icon="arrow-left-right"
                     onClick={handleSwitch}
-                    minimal
-                >
+                    small >
                     Switch
                 </Button>
-                <Button icon="clipboard" onClick={handleCopy}>
+                <Button icon="clipboard" onClick={handleCopy} small>
                     Copy
                 </Button>
-                <Button onClick={onToggleHof} icon="crown">
+                <Button onClick={onToggleHof} icon="crown" small>
                     Hall of Fame
                 </Button>
                 <Button
@@ -190,19 +189,12 @@ function NuzlockeSaveItem({
                     intent={Intent.DANGER}
                     onClick={handleDeleteClick}
                     minimal
+                    small
                 >
                     Delete
                 </Button>
             </ButtonGroup>
 
-            <Icon
-                style={{
-                    transform: "rotate(90deg)",
-                    marginLeft: "auto",
-                    cursor: "pointer",
-                }}
-                icon="more"
-            />
         </div>
     );
 }
