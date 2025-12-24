@@ -43,7 +43,7 @@ export function BaseEditor({
                 className="font-bold flex content-center justify-between m-1 mb-2 cursor-pointer text-base"
                 onClick={toggleEditor}
             >
-                <Icon icon={icon} />
+                {icon && <Icon icon={icon} />}
                 <span>
                     {name}
                 </span>
