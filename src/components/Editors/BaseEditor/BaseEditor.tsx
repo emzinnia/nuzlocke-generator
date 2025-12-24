@@ -43,10 +43,12 @@ export function BaseEditor({
                 className="font-bold flex content-center justify-between m-1 mb-2 cursor-pointer text-base"
                 onClick={toggleEditor}
             >
+                <div className="flex items-center gap-2">
                 {icon && <Icon icon={icon} />}
                 <span>
                     {name}
                 </span>
+                </div>
                 <Icon icon={isOpen ? "caret-up" : "caret-down"} />
             </h4>
             {isOpen ? children : null}
