@@ -3,5 +3,4 @@ alwaysApply: true
 ---
 
 - Run `npm run validate` after every large feature or refactor
-- Generally do not make comments
-- Do not make comments unless the code pattern is difficult to understand or requires explanation
+- Generally do not make comments unless the pattern needs to be explained

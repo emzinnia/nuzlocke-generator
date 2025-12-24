@@ -7,12 +7,9 @@ import { vi } from "vitest";
 const createProps = () => ({
     game: { name: listOfGames[0], customName: "" },
     style: styleDefaults,
-    editor: { temtemMode: false },
     editGame: vi.fn(),
     editStyle: vi.fn(),
-    changeEditorSize: vi.fn(),
     resetCheckpoints: vi.fn(),
-    toggleTemtemMode: vi.fn(),
 });
 
 describe("<GameEditor />", () => {

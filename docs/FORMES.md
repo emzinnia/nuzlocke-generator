@@ -32,6 +32,7 @@ type FormeSlug = {
   spriteSlug?: string;          // Serebii suffix, e.g., "-m", "-a", "-g"
   generations?: Generation[];   // availability gates
   types?: [Types, Types];       // override for matchSpeciesToTypes
+  typesByGeneration?: Partial<Record<Generation, [Types, Types]>>; // per-gen typing (e.g., Rotom appliances)
   evolvesFromForme?: FormeSlug["id"]; // optional dependency for gating
 };
 
@@ -57,6 +58,12 @@ Implementation approach:
   - `Mega` (if we keep it) → gated via `evolvesFromForme: "Complete"` so UI can disable Mega until Complete is selected; slugs follow `-mega` across surfaces.
 - UI uses `getAvailableFormes("Zygarde")` to show `["Normal (50%)", "10%", "Complete", "Mega"]` with an optional note that 50% is the default.
 - Asset helpers ensure all three surfaces agree on slugs; adding a new sprite provider only requires updating the config mapper.
+
+## Rotom example (generation-specific typing)
+- Formes: Heat, Wash, Frost, Fan, Mow (all share the same availability).
+- Gen 4 (DP/Pt/HGSS): all appliances stay Electric/Ghost.
+- Gen 5 onward: Electric plus appliance type (Fire/Water/Ice/Flying/Grass respectively).
+- Model this with `typesByGeneration` (or two config entries gated by `generations`) so `matchSpeciesToTypes` can return the correct typing when a generation is supplied.
 
 ## Quick wins before full refactor
 - Fix known slug typos (`palden-aqua` → `paldean-aqua`, ensure consistent 10%/Complete slugs).

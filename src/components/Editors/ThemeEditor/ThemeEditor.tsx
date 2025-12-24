@@ -265,12 +265,8 @@ export class ThemeEditorBase extends React.Component<
     ThemeEditorProps,
     ThemEditorState
 > {
-    public state = { componentTree: [] };
-
-    public UNSAFE_componentWillMount() {
-        // TODO: Refactor out as props
-        this.setState({ componentTree: componentTree });
-    }
+    // Initialize state directly with componentTree (replaces UNSAFE_componentWillMount)
+    public state: ThemEditorState = { componentTree: componentTree };
 
     private getCurrentNode() {
         let currentNode;

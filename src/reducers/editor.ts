@@ -1,9 +1,9 @@
 import {
     CHANGE_EDITOR_SIZE,
     Action,
-    TOGGLE_TEMTEM_MODE,
     TOGGLE_MOBILE_RESULT_VIEW,
     TRIGGER_DOWNLOAD,
+    SET_BASE_EDITOR_STATE,
 } from "actions";
 import { Editor } from "models";
 
@@ -13,17 +13,16 @@ export const SET_ZOOM_LEVEL: SET_ZOOM_LEVEL = "SET_ZOOM_LEVEL";
 export function editor(
     state: Editor = {
         minimized: false,
-        temtemMode: false,
         showResultInMobile: false,
-        monsterType: "Pokémon",
         downloadRequested: 0,
         zoomLevel: 1,
+        baseEditors: {},
     },
     action: Action<
         | CHANGE_EDITOR_SIZE
-        | TOGGLE_TEMTEM_MODE
         | TOGGLE_MOBILE_RESULT_VIEW
         | TRIGGER_DOWNLOAD
+        | SET_BASE_EDITOR_STATE
         | SET_ZOOM_LEVEL
     >,
 ) {
@@ -32,12 +31,6 @@ export function editor(
             return {
                 ...state,
                 minimized: action.mode,
-            };
-        case TOGGLE_TEMTEM_MODE:
-            return {
-                ...state,
-                temtemMode: !state.temtemMode,
-                monsterType: !state.temtemMode ? "TemTem" : "Pokémon",
             };
         case TOGGLE_MOBILE_RESULT_VIEW:
             return {
@@ -53,6 +46,14 @@ export function editor(
             return {
                 ...state,
                 zoomLevel: action.payload,
+            };
+        case SET_BASE_EDITOR_STATE:
+            return {
+                ...state,
+                baseEditors: {
+                    ...(state.baseEditors ?? {}),
+                    [action.editorId]: action.isOpen,
+                },
             };
         default:
             return state;

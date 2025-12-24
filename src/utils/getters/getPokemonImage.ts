@@ -145,7 +145,6 @@ export async function getPokemonImage({
     name,
     style,
     shiny,
-    editor,
     gender,
     egg,
 }: GetPokemonImage): Promise<string> {
@@ -168,10 +167,6 @@ export async function getPokemonImage({
             return await wrapImageInCORS(customImage);
         }
         return `url(${customImage})`;
-    }
-
-    if (editor?.temtemMode) {
-        return `url(img/temtem/${species?.trim()}.png)`;
     }
 
     if (egg) {

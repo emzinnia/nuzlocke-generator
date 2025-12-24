@@ -159,29 +159,21 @@ export class CurrentPokemonEditBase extends React.Component<
 > {
     public constructor(props: CurrentPokemonEditProps) {
         super(props);
+        // Initialize state directly from props (replaces UNSAFE_componentWillMount)
         this.state = {
-            selectedId: "5",
-            box: [],
+            selectedId: props.selectedId ?? "5",
+            box: props.box ?? [],
             isMoveEditorOpen: false,
             expandedView: false,
             images: [],
         };
     }
 
-    public UNSAFE_componentWillMount() {
-        this.setState({
-            selectedId: this.props.selectedId,
-            box: this.props.box,
-        });
-    }
-
-    public UNSAFE_componentWillReceiveProps(
-        nextProps: CurrentPokemonEditProps,
-        prevProps: CurrentPokemonEditProps,
-    ) {
-        if (nextProps.selectedId !== prevProps.selectedId) {
+    public componentDidUpdate(prevProps: CurrentPokemonEditProps) {
+        // Sync selectedId from props when it changes (replaces UNSAFE_componentWillReceiveProps)
+        if (this.props.selectedId !== prevProps.selectedId) {
             this.setState({
-                selectedId: nextProps.selectedId,
+                selectedId: this.props.selectedId,
             });
         }
     }

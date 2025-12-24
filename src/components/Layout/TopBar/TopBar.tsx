@@ -12,7 +12,6 @@ import {
     changeEditorSize,
     editStyle,
     seeRelease,
-    toggleTemtemMode,
     toggleMobileResultView,
 } from "actions";
 import { version } from "package";
@@ -32,7 +31,6 @@ export interface TopBarProps {
     changeEditorSize: changeEditorSize;
     editStyle: editStyle;
     seeRelease: seeRelease;
-    toggleTemtemMode: toggleTemtemMode;
     toggleMobileResultView: toggleMobileResultView;
 
     pokemon: Pokemon[];
@@ -54,7 +52,8 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
         isMenuOpen: false,
     };
 
-    public UNSAFE_componentWillMount() {
+    public componentDidMount() {
+        // Mark patch releases as seen (replaces UNSAFE_componentWillMount)
         if (version.split(".")[2] !== "0") {
             this.props.seeRelease(getPatchlessVersion(version));
         }
@@ -141,15 +140,17 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                                     : "maximize"
                             }
                         >
-                            {this.props.editor.minimized
-                                ? "Maximize"
-                                : "Minimize"}{" "}
-                            Editor{" "}
-                            <HotkeyIndicator
-                                hotkey="shift+m"
-                                showModifier={false}
-                                style={{ marginLeft: "0.35rem" }}
-                            />
+                            <span style={{ whiteSpace: "nowrap" }}>
+                                {this.props.editor.minimized
+                                    ? "Maximize"
+                                    : "Minimize"}{" "}
+                                Editor{" "}
+                                <HotkeyIndicator
+                                    hotkey="shift+m"
+                                    showModifier={false}
+                                    style={{ marginLeft: "0.35rem" }}
+                                />
+                            </span>
                         </Button>
                         {isDownloading ? (
                             <Button
@@ -174,12 +175,14 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                                 minimal
                                 icon="download"
                             >
-                                Download Image{" "}
-                                <HotkeyIndicator
-                                    hotkey="shift+d"
-                                    showModifier={false}
-                                    style={{ marginLeft: "0.35rem" }}
-                                />
+                                <span style={{ whiteSpace: "nowrap" }}>
+                                    Download Image{" "}
+                                    <HotkeyIndicator
+                                        hotkey="shift+d"
+                                        showModifier={false}
+                                        style={{ marginLeft: "0.35rem" }}
+                                    />
+                                </span>
                             </Button>
                         )}
                         <Button
@@ -200,13 +203,15 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                                     : "moon"
                             }
                         >
-                            {this.props.style.editorDarkMode ? "Light" : "Dark"}{" "}
-                            Mode{" "}
-                            <HotkeyIndicator
-                                hotkey="shift+l"
-                                showModifier={false}
-                                style={{ marginLeft: "0.35rem" }}
-                            />
+                            <span style={{ whiteSpace: "nowrap" }}>
+                                {this.props.style.editorDarkMode ? "Light" : "Dark"}{" "}
+                                Mode{" "}
+                                <HotkeyIndicator
+                                    hotkey="shift+l"
+                                    showModifier={false}
+                                    style={{ marginLeft: "0.35rem" }}
+                                />
+                            </span>
                         </Button>
                         {this.props.children}
                         <Button
@@ -218,12 +223,14 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
                             minimal
                             icon="star"
                         >
-                            {version}{" "}
-                            <HotkeyIndicator
-                                hotkey="shift+v"
-                                showModifier={false}
-                                style={{ marginLeft: "0.35rem" }}
-                            />
+                            <span style={{ whiteSpace: "nowrap" }}>
+                                {version}{" "}
+                                <HotkeyIndicator
+                                    hotkey="shift+v"
+                                    showModifier={false}
+                                    style={{ marginLeft: "0.35rem" }}
+                                />
+                            </span>
                         </Button>
                     </>
                 )}
@@ -250,7 +257,6 @@ export const TopBar = connect(
         changeEditorSize,
         editStyle,
         seeRelease,
-        toggleTemtemMode,
         toggleMobileResultView,
     },
 )(TopBarBase);

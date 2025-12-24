@@ -62,9 +62,8 @@ vi.mock("is-mobile", () => ({ default: () => false }));
 
 const baseEditor: Editor = {
     minimized: false,
-    temtemMode: false,
     showResultInMobile: false,
-    monsterType: "Pokémon",
+    zoomLevel: 1,
 };
 
 const boxes: Box[] = [

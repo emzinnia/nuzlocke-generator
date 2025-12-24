@@ -620,36 +620,42 @@ export class DataEditorBase extends React.Component<
                             icon="import"
                             intent={Intent.PRIMARY}
                         >
-                            Import Data{" "}
-                            <HotkeyIndicator
-                                hotkey="i"
-                                showModifier={false}
-                                style={{ marginLeft: "0.35rem" }}
-                            />
+                            <span style={{ whiteSpace: "nowrap" }}>
+                                Import Data{" "}
+                                <HotkeyIndicator
+                                    hotkey="i"
+                                    showModifier={false}
+                                    style={{ marginLeft: "0.35rem" }}
+                                />
+                            </span>
                         </Button>
                         <Button
                             data-testid="export-data-button"
                             onClick={() => this.exportState(this.props.state)}
                             icon="export"
                         >
-                            Export Data{" "}
-                            <HotkeyIndicator
-                                hotkey="e"
-                                showModifier={false}
-                                style={{ marginLeft: "0.35rem" }}
-                            />
+                            <span style={{ whiteSpace: "nowrap" }}>
+                                Export Data{" "}
+                                <HotkeyIndicator
+                                    hotkey="e"
+                                    showModifier={false}
+                                    style={{ marginLeft: "0.35rem" }}
+                                />
+                            </span>
                         </Button>
                         <Button
                             icon="folder-open"
                             data-testid="import-save-file-button"
                             onClick={() => this.advancedImportRef.current?.openFileDialog()}
                         >
-                            Import Save{" "}
-                            <HotkeyIndicator
-                                hotkey="o"
-                                showModifier={false}
-                                style={{ marginLeft: "0.35rem" }}
-                            />
+                            <span style={{ whiteSpace: "nowrap" }}>
+                                Import Save{" "}
+                                <HotkeyIndicator
+                                    hotkey="o"
+                                    showModifier={false}
+                                    style={{ marginLeft: "0.35rem" }}
+                                />
+                            </span>
                         </Button>
                     </ButtonGroup>
 
@@ -659,12 +665,14 @@ export class DataEditorBase extends React.Component<
                             onClick={this.writeAllData}
                             icon="floppy-disk"
                         >
-                            Force Save{" "}
-                            <HotkeyIndicator
-                                hotkey="s"
-                                showModifier={false}
-                                style={{ marginLeft: "0.35rem" }}
-                            />
+                            <span style={{ whiteSpace: "nowrap" }}>
+                                Force Save{" "}
+                                <HotkeyIndicator
+                                    hotkey="s"
+                                    showModifier={false}
+                                    style={{ marginLeft: "0.35rem" }}
+                                />
+                            </span>
                         </Button>
                         <Button
                             icon="trash"

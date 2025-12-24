@@ -2,14 +2,12 @@ import * as React from "react";
 import { connect } from "react-redux";
 import {
     editGame,
-    changeEditorSize,
     editStyle,
     resetCheckpoints,
-    toggleTemtemMode,
 } from "actions";
-import { gameOfOriginToColor, listOfGames, feature, Game } from "utils";
+import { gameOfOriginToColor, listOfGames, Game } from "utils";
 
-import { Button, Intent, Switch, Classes, HTMLSelect } from "components/ui/shims";
+import { Button, Intent, Classes, HTMLSelect } from "components/ui/shims";
 import { RulesEditorDialog } from "components/Editors/RulesEditor/RulesEditor";
 import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
@@ -17,12 +15,9 @@ import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 export interface GameEditorProps {
     game: any;
     editGame: any;
-    editor: any;
     style: State["style"];
     editStyle: editStyle;
-    changeEditorSize: changeEditorSize;
     resetCheckpoints: resetCheckpoints;
-    toggleTemtemMode: toggleTemtemMode;
 }
 
 const gameSubEditorStyle: any = {
@@ -111,25 +106,6 @@ export class GameEditorBase extends React.Component<
                                 placeholder={game.name}
                             />
                         </div>
-                        {feature.temTemMode && (
-                            <Button
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
-                                className={Classes.MINIMAL}
-                            >
-                                <Switch
-                                    // style={{...darkModeStyle(this.props.style.editorDarkMode), marginBottom: 0}}
-                                    label="TemTem Mode"
-                                    checked={this.props.editor.temtemMode}
-                                    onChange={(_e) =>
-                                        this.props.toggleTemtemMode()
-                                    }
-                                />
-                            </Button>
-                        )}
                     </div>
                 </BaseEditor>
             </>
@@ -140,14 +116,11 @@ export class GameEditorBase extends React.Component<
 export const GameEditor = connect(
     (state: Pick<State, keyof State>) => ({
         game: state.game,
-        editor: state.editor,
         style: state.style,
     }),
     {
         editGame,
         editStyle,
-        changeEditorSize,
         resetCheckpoints,
-        toggleTemtemMode,
     },
 )(GameEditorBase as any);

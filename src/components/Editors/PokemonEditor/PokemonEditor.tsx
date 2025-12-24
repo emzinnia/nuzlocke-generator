@@ -1,5 +1,6 @@
 import { Button, ButtonGroup, Classes, Intent, Spinner } from "components/ui/shims";
 import * as React from "react";
+import { useState, useCallback, useMemo } from "react";
 import { connect } from "react-redux";
 import { Pokemon, Box as BoxModel, Boxes, Game } from "models";
 import { State } from "state";
@@ -30,10 +31,6 @@ export interface PokemonEditorProps {
     // addPokemon: addPokemon;
 }
 
-export interface PokemonEditorState {
-    searchTerm: string;
-}
-
 export interface BoxesComponentProps {
     boxes: Boxes;
     team: Pokemon[];
@@ -42,36 +39,38 @@ export interface BoxesComponentProps {
     hasSearchQuery: boolean;
 }
 
-export class BoxesComponent extends React.Component<BoxesComponentProps> {
-    private renderBoxes(boxes: Boxes, team: Pokemon[]) {
-        const { matchedIds, hasSearchQuery, searchTerm } = this.props;
-
-        return boxes
-            .sort((a: BoxModel, b: BoxModel) => {
+export const BoxesComponent: React.FC<BoxesComponentProps> = ({
+    boxes,
+    team,
+    searchTerm,
+    matchedIds,
+    hasSearchQuery,
+}) => {
+    const sortedBoxes = useMemo(
+        () =>
+            [...boxes].sort((a: BoxModel, b: BoxModel) => {
                 const positionA = a.position || 0;
                 const positionB = b.position || 1;
                 return positionA - positionB;
-            })
-            .map((box) => {
-                return (
-                    <Box
-                        searchTerm={searchTerm || ""}
-                        matchedIds={matchedIds}
-                        hasSearchQuery={hasSearchQuery}
-                        {...box}
-                        key={box.id}
-                        pokemon={team}
-                    />
-                );
-            });
-    }
+            }),
+        [boxes],
+    );
 
-    public render() {
-        const { boxes, team } = this.props;
-
-        return this.renderBoxes(boxes, team);
-    }
-}
+    return (
+        <>
+            {sortedBoxes.map((box) => (
+                <Box
+                    searchTerm={searchTerm || ""}
+                    matchedIds={matchedIds}
+                    hasSearchQuery={hasSearchQuery}
+                    {...box}
+                    key={box.id}
+                    pokemon={team}
+                />
+            ))}
+        </>
+    );
+};
 
 const MassEditor = React.lazy(
     () => import("components/Editors/PokemonEditor/MassEditor"),
@@ -80,35 +79,90 @@ const PokemonLocationChecklist = React.lazy(
     () => import("components/Editors/PokemonEditor/PokemonLocationChecklist"),
 );
 
-export class PokemonEditorBase extends React.Component<
-    PokemonEditorProps,
-    PokemonEditorState
-> {
-    public constructor(props: PokemonEditorProps) {
-        super(props);
-        this.state = {
-            searchTerm: getPersistedSearchTerm(),
-        };
-    }
+export const PokemonEditorBase: React.FC<PokemonEditorProps> = ({
+    team,
+    boxes,
+    game,
+    style,
+    excludedAreas,
+    customAreas,
+    isMassEditorOpen,
+    toggleDialog,
+}) => {
+    const [searchTerm, setSearchTerm] = useState(() => getPersistedSearchTerm());
 
-    private openMassEditor = (_e) => {
-        this.props.toggleDialog("massEditor");
-    };
+    const openMassEditor = useCallback(() => {
+        toggleDialog("massEditor");
+    }, [toggleDialog]);
 
-    private handleSearchChange = (value: string) => {
-        this.setState({ searchTerm: value });
+    const handleSearchChange = useCallback((value: string) => {
+        setSearchTerm(value);
         setPersistedSearchTerm(value);
-    };
+    }, []);
 
-    private renderBoxesWithSearch(boxes: Boxes, team: Pokemon[]) {
-        const { searchTerm } = this.state;
-        const hasSearchQuery = searchTerm.trim().length > 0;
+    const hasSearchQuery = searchTerm.trim().length > 0;
+    const searchResult = useMemo(
+        () => searchPokemon(team, searchTerm),
+        [team, searchTerm],
+    );
 
-        // Compute matched IDs using the search engine
-        const searchResult = searchPokemon(team, searchTerm);
-
-        return (
-            <>
+    return (
+        <>
+            <BaseEditor icon="circle" name="Pokemon">
+                <div
+                    data-testid="pokemon-editor"
+                    className="button-row"
+                    style={{ display: "flex", alignItems: "flex-start" }}
+                >
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "0.5rem",
+                        }}
+                    >
+                        <AddPokemonButton
+                            pokemon={{
+                                ...generateEmptyPokemon(team),
+                                gameOfOrigin: game.name || "None",
+                            }}
+                        />
+                        <ButtonGroup className={Classes.MINIMAL}>
+                            <Button
+                                icon="layout-group-by"
+                                intent={Intent.PRIMARY}
+                                onClick={() => toggleDialog("typeMatchups")}
+                            >
+                                <span style={{ whiteSpace: "nowrap" }}>
+                                    Type Matchups{" "}
+                                    <HotkeyIndicator
+                                        hotkey="t"
+                                        showModifier={false}
+                                        style={{ marginLeft: "0.35rem" }}
+                                    />
+                                </span>
+                            </Button>
+                            <Button
+                                icon={"heat-grid"}
+                                intent={Intent.PRIMARY}
+                                onClick={openMassEditor}
+                            >
+                                <span style={{ whiteSpace: "nowrap" }}>
+                                    Mass Editor{" "}
+                                    <HotkeyIndicator
+                                        hotkey="m"
+                                        showModifier={false}
+                                        style={{ marginLeft: "0.35rem" }}
+                                    />
+                                </span>
+                            </Button>
+                        </ButtonGroup>
+                    </div>
+                    <PokemonSearchBar
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                    />
+                </div>
                 <SearchFeedback
                     searchResult={searchResult}
                     hasSearchQuery={hasSearchQuery}
@@ -120,112 +174,34 @@ export class PokemonEditorBase extends React.Component<
                     boxes={boxes}
                     team={team}
                 />
-            </>
-        );
-    }
-
-    public componentDidMount() {
-        // @NOTE: refactor so that there's an easier way to auto-generate Pokemon data
-        // const {team} = this.props;
-        // listOfPokemon.slice(1008).forEach((value) => {
-        //     this.props.addPokemon(
-        //         generateEmptyPokemon(team, {
-        //             species: value,
-        //             // @ts-ignore cuzi said so
-        //             types: matchSpeciesToTypes(value)
-        //         }));
-        // });
-    }
-
-    public render() {
-        const { team, boxes, game, style, excludedAreas, customAreas } =
-            this.props;
-
-        return (
-            <>
-                <BaseEditor icon="circle" name="Pokemon">
-                    <div
-                        data-testid="pokemon-editor"
-                        className="button-row"
-                        style={{ display: "flex", alignItems: "flex-start" }}
-                    >
-                        <div
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "0.5rem",
-                            }}
-                        >
-                            <AddPokemonButton
-                                pokemon={{
-                                    ...generateEmptyPokemon(team),
-                                    gameOfOrigin: this.props.game.name || "None",
-                                }}
-                            />
-                            <ButtonGroup className={Classes.MINIMAL}>
-                                <Button
-                                    icon="layout-group-by"
-                                    intent={Intent.PRIMARY}
-                                    onClick={() => this.props.toggleDialog("typeMatchups")}
-                                >
-                                    Type Matchups{" "}
-                                    <HotkeyIndicator
-                                        hotkey="t"
-                                        showModifier={false}
-                                        style={{ marginLeft: "0.35rem" }}
-                                    />
-                                </Button>
-                                <Button
-                                    icon={"heat-grid"}
-                                    intent={Intent.PRIMARY}
-                                    onClick={this.openMassEditor}
-                                >
-                                    Mass Editor{" "}
-                                    <HotkeyIndicator
-                                        hotkey="m"
-                                        showModifier={false}
-                                        style={{ marginLeft: "0.35rem" }}
-                                    />
-                                </Button>
-                            </ButtonGroup>
-                        </div>
-                        <PokemonSearchBar
-                            value={this.state.searchTerm}
-                            onChange={this.handleSearchChange}
+                <BoxForm boxes={boxes} />
+                <CurrentPokemonEdit />
+                <BaseEditor name="Location Checklist" defaultOpen={true}>
+                    <React.Suspense fallback={<Spinner />}>
+                        <PokemonLocationChecklist
+                            customAreas={customAreas}
+                            excludedAreas={excludedAreas}
+                            boxes={boxes}
+                            style={style}
+                            pokemon={team}
+                            game={game}
                         />
-                    </div>
-                    {this.renderBoxesWithSearch(boxes, team)}
-                    <BoxForm boxes={boxes} />
-                    <CurrentPokemonEdit />
-                    <BaseEditor name="Location Checklist" defaultOpen={true}>
-                        <React.Suspense fallback={<Spinner />}>
-                            <PokemonLocationChecklist
-                                customAreas={customAreas}
-                                excludedAreas={excludedAreas}
-                                boxes={boxes}
-                                style={style}
-                                pokemon={team}
-                                game={game}
-                            />
-                        </React.Suspense>
-                    </BaseEditor>
+                    </React.Suspense>
                 </BaseEditor>
-                <React.Suspense fallback={<Spinner />}>
-                    {this.props.isMassEditorOpen && (
-                        <ErrorBoundary>
-                            <MassEditor
-                                isOpen={this.props.isMassEditorOpen}
-                                toggleDialog={() =>
-                                    this.props.toggleDialog("massEditor")
-                                }
-                            />
-                        </ErrorBoundary>
-                    )}
-                </React.Suspense>
-            </>
-        );
-    }
-}
+            </BaseEditor>
+            <React.Suspense fallback={<Spinner />}>
+                {isMassEditorOpen && (
+                    <ErrorBoundary>
+                        <MassEditor
+                            isOpen={isMassEditorOpen}
+                            toggleDialog={() => toggleDialog("massEditor")}
+                        />
+                    </ErrorBoundary>
+                )}
+            </React.Suspense>
+        </>
+    );
+};
 
 export const PokemonEditor = connect(
     (state: Pick<State, keyof State>) => ({

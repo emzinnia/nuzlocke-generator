@@ -12,7 +12,6 @@ import {
     SYNC_STATE_FROM_HISTORY,
     CHANGE_EDITOR_SIZE,
     REPLACE_STATE,
-    TOGGLE_TEMTEM_MODE,
     TOGGLE_MOBILE_RESULT_VIEW,
     SELECT_POKEMON,
     MODIFY_DELETION_CONFIRMATION,
@@ -20,6 +19,7 @@ import {
     TRIGGER_DOWNLOAD,
     TOGGLE_DIALOG,
     JUMP_TO_HISTORY_STATE,
+    SET_BASE_EDITOR_STATE,
 } from "actions";
 import { State } from "state";
 import { DiffEntry } from "reducers/editorHistory";
@@ -46,7 +46,7 @@ const EXCLUDED_ACTIONS = new Set<string>([
 
     // UI-only actions (don't affect nuzlocke data)
     CHANGE_EDITOR_SIZE,
-    TOGGLE_TEMTEM_MODE,
+    SET_BASE_EDITOR_STATE,
     TOGGLE_MOBILE_RESULT_VIEW,
     SELECT_POKEMON,
     MODIFY_DELETION_CONFIRMATION,

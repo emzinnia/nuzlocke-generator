@@ -145,20 +145,13 @@ function NuzlockeSaveItem({
     return (
         <div
             className={`
-                flex flex-col items-center justify-between
+                flex items-center justify-between
                 rounded-md
                 p-2
                 ${darkMode ? "border border-[#444]" : "border border-[#ccc]"}
                 shadow-[0_0_4px_rgba(0,0,0,0.1)]
             `}
         >
-            <div className="flex flex-row ">
-                {parsedData?.pokemon
-                    ?.filter((p) => p.status === "Team")
-                    .map((poke) => (
-                        <PokemonIcon key={poke.id} {...poke} />
-                    ))}
-            </div>
             <NuzlockeGameTags
                 darkMode={darkMode}
                 game={game}
@@ -168,33 +161,42 @@ function NuzlockeSaveItem({
                 isCopy={isCopy ?? false}
                 size={((data.length * 2) / 1024).toFixed(2)}
             />
+            <div className="flex flex-col gap-2">
+                <div className="flex flex-row ">
+                    {parsedData?.pokemon
+                        ?.filter((p) => p.status === "Team")
+                        .map((poke) => (
+                            <PokemonIcon key={poke.id} {...poke} />
+                        ))}
+                </div>
 
-            <ButtonGroup>
-                <Button
-                    disabled={isCurrent}
-                    icon="arrow-left-right"
-                    onClick={handleSwitch}
-                    small >
-                    Switch
-                </Button>
-                <Button icon="clipboard" onClick={handleCopy} small>
-                    Copy
-                </Button>
-                <Button onClick={onToggleHof} icon="crown" small>
-                    Hall of Fame
-                </Button>
-                <Button
-                    disabled={saves.length === 1}
-                    icon="trash"
-                    intent={Intent.DANGER}
-                    onClick={handleDeleteClick}
-                    minimal
-                    small
-                >
-                    Delete
-                </Button>
-            </ButtonGroup>
-
+                <ButtonGroup>
+                    <Button
+                        disabled={isCurrent}
+                        icon="arrow-left-right"
+                        onClick={handleSwitch}
+                        small
+                    >
+                        Switch
+                    </Button>
+                    <Button icon="clipboard" onClick={handleCopy} small>
+                        Copy
+                    </Button>
+                    <Button onClick={onToggleHof} icon="crown" small>
+                        HoF
+                    </Button>
+                    <Button
+                        disabled={saves.length === 1}
+                        icon="trash"
+                        intent={Intent.DANGER}
+                        onClick={handleDeleteClick}
+                        minimal
+                        small
+                    >
+                        Delete
+                    </Button>
+                </ButtonGroup>
+            </div>
         </div>
     );
 }
@@ -258,26 +260,29 @@ export function NuzlockeSave() {
                 style={{ marginBottom: "0.25rem" }}
                 onClick={handleNewNuzlocke}
             >
-                New Nuzlocke{" "}
-                <HotkeyIndicator
-                    hotkey="shift+n"
-                    showModifier={false}
-                    style={{ marginLeft: "0.35rem" }}
-                />
+                <span style={{ whiteSpace: "nowrap" }}>
+                    New Nuzlocke{" "}
+                    <HotkeyIndicator
+                        hotkey="shift+n"
+                        showModifier={false}
+                        style={{ marginLeft: "0.35rem" }}
+                    />
+                </span>
             </Button>
-
-            {saves.map((nuzlocke) => (
-                <NuzlockeSaveItem
-                    key={nuzlocke.id}
-                    nuzlocke={nuzlocke}
-                    currentId={currentId}
-                    stateString={stateString}
-                    darkMode={darkMode}
-                    saves={saves}
-                    onDelete={handleDelete}
-                    onToggleHof={toggleIsHofOpen}
-                />
-            ))}
+            <div className="flex flex-col gap-2">
+                {saves.map((nuzlocke) => (
+                    <NuzlockeSaveItem
+                        key={nuzlocke.id}
+                        nuzlocke={nuzlocke}
+                        currentId={currentId}
+                        stateString={stateString}
+                        darkMode={darkMode}
+                        saves={saves}
+                        onDelete={handleDelete}
+                        onToggleHof={toggleIsHofOpen}
+                    />
+                ))}
+            </div>
 
             <DeleteAlert
                 onConfirm={deletionFunction}
@@ -286,14 +291,12 @@ export function NuzlockeSave() {
                 warningText="This will delete your Nuzlocke save without any to retrieve it. Are you sure you want to do this?"
             />
 
-            {feature.hallOfFame && (
-                <HallOfFameDialog
-                    icon="crown"
-                    isOpen={isHofOpen}
-                    onClose={toggleIsHofOpen}
-                    title="Hall of Fame"
-                />
-            )}
+            <HallOfFameDialog
+                icon="crown"
+                isOpen={isHofOpen}
+                onClose={toggleIsHofOpen}
+                title="Hall of Fame"
+            />
         </div>
     );
 }

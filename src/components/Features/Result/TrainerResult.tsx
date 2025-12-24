@@ -5,12 +5,11 @@ import {
     Game,
     Styles,
     getContrastColor,
-    getBadges,
     isEmpty,
     feature,
 } from "utils";
 import { connect, useSelector } from "react-redux";
-import { Trainer, Badge } from "models";
+import { Trainer } from "models";
 import { State } from "state";
 import { Checkpoints } from "reducers/checkpoints";
 import { Stats } from "./Stats";

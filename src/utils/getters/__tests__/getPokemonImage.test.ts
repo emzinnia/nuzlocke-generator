@@ -131,15 +131,6 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 
-    it("returns temtem sprites when temtemMode is enabled", async () => {
-        const result = await getPokemonImage({
-            editor: { temtemMode: true } as any,
-            species: "  Platypet  ",
-        });
-
-        expect(result).toBe("url(img/temtem/Platypet.png)");
-    });
-
     it("returns egg image when egg is true", async () => {
         const result = await getPokemonImage({
             egg: true as any,

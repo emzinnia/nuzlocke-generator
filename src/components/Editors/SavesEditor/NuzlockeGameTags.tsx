@@ -11,25 +11,23 @@ export interface NuzlockeGameTagsProps {
     data: State;
     color: string;
     isCopy: boolean;
-    /* size in kilobytes */
     size: string;
 }
 
 export function NuzlockeGameTags({
     isCurrent,
-    darkMode,
     game,
+    darkMode,
     data,
     color,
     isCopy,
     size,
 }: NuzlockeGameTagsProps) {
-    const textColor = darkMode ? color : game === "None" ? "#000" : color;
-    const secondaryTagClasses = `mx-0.5 bg-black/10 ${darkMode ? "text-white" : "text-black"}`;
+    const textColor = game === "None" ? "#fff" : color;
+    const secondaryTagClasses = `mx-0.5 bg-black/20 dark:text-white text-black`;
 
     return (
-        <div className="flex flex-col items-center w-80 pointer-events-none mx-auto">
-            <div className="flex justify-center min-w-1/2">
+            <div className="flex gap-0.5 flex-col justify-center min-w-1/2">
                 <Tag
                     round
                     className="mx-0.5"
@@ -46,16 +44,21 @@ export function NuzlockeGameTags({
                     </Tag>
                 )}
                 {isCopy && (
-                    <Tag round className={secondaryTagClasses}>
+                    <Tag
+                        round
+                        className={`mx-0.5 ${darkMode ? "text-[#eee]" : "text-[#444]"} bg-[rgba(128,128,128,0.15)]`}
+                    >
                         Copy
                     </Tag>
                 )}
                 {size && (
-                    <Tag round className={secondaryTagClasses}>
+                    <Tag
+                        round
+                        className={`mx-0.5 ${darkMode ? "text-[#eee]" : "text-[#444]"} bg-[rgba(128,128,128,0.15)]`}
+                    >
                         {size}KB
                     </Tag>
                 )}
             </div>
-        </div>
     );
 }
