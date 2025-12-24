@@ -179,7 +179,7 @@ export const CurrentPokemonEditBase: React.FC<CurrentPokemonEditProps> = ({
                 setSelectedId(firstId);
             }
         }
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);
 
     const currentPokemon = useMemo(
         () => pokemon.find((v: Pokemon) => v.id === selectedId),
