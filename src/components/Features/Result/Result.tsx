@@ -460,7 +460,14 @@ export const ResultBase = React.forwardRef<ResultHandle, ResultProps>(
                 onMouseMove={onPan}
                 onDoubleClick={resetPan}
                 className="hide-scrollbars"
-                style={{ flex: 1, minWidth: 0, overflowY: "scroll" }}
+                style={{ 
+                    flex: 1, 
+                    minWidth: 0, 
+                    overflowY: "scroll",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "flex-start"
+                }}
             >
                 {isMobile() && editor.showResultInMobile && (
                     <div className="ui-overlay-backdrop"></div>
@@ -506,7 +513,7 @@ export const ResultBase = React.forwardRef<ResultHandle, ResultProps>(
                                 ? "pokemon_font"
                                 : "inherit",
                             fontSize: style.usePokemonGBAFont ? "125%" : "100%",
-                            margin: isDownloading ? "0" : "3rem auto",
+                            margin: isDownloading ? "0" : "3rem 0",
                             backgroundColor: bgColor,
                             backgroundImage: `url(${style.backgroundImage})`,
                             backgroundRepeat: style.tileBackground
@@ -520,7 +527,7 @@ export const ResultBase = React.forwardRef<ResultHandle, ResultProps>(
                                 ? "600px"
                                 : undefined,
                             transition: "transform 300ms ease-in-out",
-                            transformOrigin: "0 0",
+                            transformOrigin: "center top",
                             width: `${style.resultWidth}px`,
                             zIndex: 1,
                             ...getScale(
