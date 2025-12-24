@@ -44,10 +44,10 @@ export function BaseEditor({
                 onClick={toggleEditor}
             >
                 <div className="flex items-center gap-2">
-                {icon && <Icon icon={icon} />}
-                <span>
-                    {name}
-                </span>
+                    {icon && <Icon icon={icon} />}
+                    <span>
+                        {name}
+                    </span>
                 </div>
                 <Icon icon={isOpen ? "caret-up" : "caret-down"} />
             </h4>
