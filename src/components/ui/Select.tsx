@@ -55,7 +55,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
                         const label = typeof option === "string" ? option : option.label;
                         const disabled = typeof option === "string" ? false : option.disabled;
                         return (
-                            <option key={value} value={value} disabled={disabled}>
+                            <option className="p-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700" key={value} value={value} disabled={disabled}>
                                 {label}
                             </option>
                         );
