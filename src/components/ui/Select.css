@@ -76,6 +76,7 @@ option {
     transition-property: color, background;
     transition-duration: var(--duration-normal);
     transition-timing-function: var(--ease-out);
+    padding: var(--space-2);
 
     &:where(:hover, :focus, :active) {
         background: var(--color-primary-600);
