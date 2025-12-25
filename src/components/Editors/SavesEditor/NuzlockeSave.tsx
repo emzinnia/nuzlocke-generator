@@ -269,7 +269,7 @@ export function NuzlockeSave() {
                     <HotkeyIndicator
                         hotkey="shift+n"
                         showModifier={false}
-                        style={{ marginLeft: "0.35rem" }}
+                        className="ml-1"
                     />
                 </span>
             </Button>
