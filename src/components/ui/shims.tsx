@@ -217,23 +217,7 @@ export const NonIdealState: React.FC<NonIdealStateProps> = ({
     </div>
 );
 
-// Alert component (Blueprint's Alert)
-export interface AlertProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onConfirm?: () => void;
-    cancelButtonText?: string;
-    confirmButtonText?: string;
-    intent?: "none" | "primary" | "success" | "warning" | "danger";
-    icon?: React.ReactNode;
-    children?: React.ReactNode;
-    canEscapeKeyCancel?: boolean;
-    canOutsideClickCancel?: boolean;
-    className?: string;
-}
-
-// Note: Alert should be imported from Dialog and composed
-// This is a placeholder that can be used with our Dialog component
+// Alert type shim is provided by the internal UI `Alert` component (re-exported via `./index`).
 
 // Additional Blueprint component shims for missing types
 

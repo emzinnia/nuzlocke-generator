@@ -32,6 +32,7 @@ export { Card, type CardProps, type Elevation } from "./Card";
 export { Spinner, type SpinnerProps } from "./Spinner";
 export { Callout, type CalloutProps } from "./Callout";
 export { Toast, Toaster, useToast, type ToastProps, type ToasterProps } from "./Toast";
+export { Alert, type AlertProps } from "./Alert";
 
 // Icons
 export { Icon, type IconProps, type IconName } from "./Icon";
