@@ -79,10 +79,6 @@ option {
     transition-duration: var(--duration-normal);
     transition-timing-function: var(--ease-out);
 
-    img {
-        width: 1.875rem;
-    }
-
     &:where(:hover, :focus, :active) {
         background: var(--color-primary-600);
         color: var(--color-text-inverse);
