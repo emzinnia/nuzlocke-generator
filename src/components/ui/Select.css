@@ -69,11 +69,11 @@
   min-width: 100%;
   justify-content: space-between;
   align-items: center;
-  color: white;
-  background-color: hotpink;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid plum;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-default);
   cursor: pointer;
 }
 
