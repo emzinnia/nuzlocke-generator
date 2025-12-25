@@ -221,8 +221,6 @@ export function NuzlockeSave() {
     const { currentId } = nuzlockes;
     const saves = [...nuzlockes.saves].sort(sortById);
 
-
-
     // Initialize nuzlocke if none exists
     useEffect(() => {
         if (!currentId || currentId === "") {
@@ -257,32 +255,34 @@ export function NuzlockeSave() {
     };
 
     return (
-        <div className="p-2 flex justify-between">
-            <Button
-                intent={Intent.SUCCESS}
-                icon="add"
-                className="mb-1"
-                onClick={handleNewNuzlocke}
-            >
-                <span className="whitespace-nowrap">
-                    New Nuzlocke{" "}
-                    <HotkeyIndicator
-                        hotkey="shift+n"
-                        showModifier={false}
-                        className="ml-1"
-                    />
-                </span>
-            </Button>
-            <div>
-                <span>Sort by:</span>
-                <Select
-                    value={sortOption}
-                    onChange={(e) => setSortOption(e.target.value)}
-                    className="ml-2 h-8 text-sm"
+        <div className="p-2">
+            <div className="flex justify-between">
+                <Button
+                    intent={Intent.SUCCESS}
+                    icon="add"
+                    className="mb-1"
+                    onClick={handleNewNuzlocke}
                 >
-                    <option value="name">Name</option>
-                    <option value="date">Date</option>
-                </Select>
+                    <span className="whitespace-nowrap">
+                        New Nuzlocke{" "}
+                        <HotkeyIndicator
+                            hotkey="shift+n"
+                            showModifier={false}
+                            className="ml-1"
+                        />
+                    </span>
+                </Button>
+                <div>
+                    <span>Sort by:</span>
+                    <Select
+                        value={sortOption}
+                        onChange={(e) => setSortOption(e.target.value)}
+                        className="ml-2 h-8 text-sm"
+                    >
+                        <option value="name">Name</option>
+                        <option value="date">Date</option>
+                    </Select>
+                </div>
             </div>
             <div className="flex flex-col gap-2">
                 {saves.map((nuzlocke) => (
