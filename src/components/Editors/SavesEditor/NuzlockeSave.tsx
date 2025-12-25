@@ -269,6 +269,17 @@ export function NuzlockeSave() {
                     />
                 </span>
             </Button>
+            <div>
+                <span>Sort by:</span>
+                <ButtonGroup>
+                    <Button icon="sort-asc" onClick={() => {}} small>
+                        Name
+                    </Button>
+                    <Button icon="sort-desc" onClick={() => {}} small>
+                        Date
+                    </Button>
+                </ButtonGroup>
+            </div>
             <div className="flex flex-col gap-2">
                 {saves.map((nuzlocke) => (
                     <NuzlockeSaveItem
