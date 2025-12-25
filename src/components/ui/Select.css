@@ -6,7 +6,7 @@
     background: var(--input-bg);
     padding-block: var(--space-2);
     padding-inline: var(--space-5) var(--space-8);
-    border-radius: var(--radius-full);
+    border-radius: var(--radius-sm);
     cursor: pointer;
     font-family: var(--font-sans);
     font-size: var(--text-sm);
@@ -28,7 +28,7 @@
         margin-top: var(--space-1);
         border: 0.125rem solid var(--color-border-default);
         background: var(--color-bg-secondary);
-        border-radius: var(--radius-xl);
+        border-radius: var(--radius-sm);
         font-weight: var(--weight-normal);
         box-shadow: var(--shadow-lg);
 
