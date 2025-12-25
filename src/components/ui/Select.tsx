@@ -41,7 +41,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             <div className={`relative inline-block ${fill ? "w-full" : ""}`}>
                 <select
                     ref={ref}
-                    className={`ui-select rounded border bg-white pr-8 pl-3 outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 ${sizeClass} ${
+                    className={`ui-select rounded border bg-white outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 ${sizeClass} ${
                         fill ? "w-full" : ""
                     } ${
                         minimal
