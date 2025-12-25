@@ -1,7 +1,6 @@
 .ui-select {
     display: flex;
     justify-content: space-between;
-    min-width: 18.75rem;
     align-items: center;
     color: var(--color-text-primary);
     background: var(--input-bg);
