@@ -48,14 +48,6 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
                     } ${props.disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"} ${className}`}
                     {...props}
                 >
-                    <button>
-                        <div>
-                            <selectedcontent></selectedcontent>
-                            <svg width="24" height="24" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="m7 10l5 5l5-5z"/>
-                            </svg>
-                        </div>
-                    </button>
                     {options.map((option) => {
                         const value = typeof option === "string" ? option : option.value;
                         const label = typeof option === "string" ? option : option.label;
