@@ -34,6 +34,7 @@ interface NuzlockeSaveData {
     id: string;
     data: string;
     isCopy?: boolean;
+    lastEdited?: number;
 }
 
 const sortById = (a: NuzlockeSaveData, b: NuzlockeSaveData) =>
