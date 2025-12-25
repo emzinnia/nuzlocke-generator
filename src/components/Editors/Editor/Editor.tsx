@@ -173,7 +173,7 @@ export function Editor() {
                     title="Data"
                     icon={<Icon icon="database" />}
                     panel={
-                        <div className="pt-1 pb-8">
+                        <div className="pt-1">
                             <ErrorBoundary key={2}>
                                 <React.Suspense fallback={Skeleton}>
                                     <NuzlockeSaveControls />
