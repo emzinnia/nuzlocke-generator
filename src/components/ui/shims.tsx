@@ -410,6 +410,5 @@ export const Elevation = {
     FOUR: 4 as const,
 };
 
-// Alert component (uses Dialog internally)
-export { Dialog as Alert } from "./Dialog";
+// Alert component is exported from `./index`
 
