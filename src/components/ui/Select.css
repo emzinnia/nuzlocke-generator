@@ -24,6 +24,7 @@
     }
 
     &::picker(select) {
+        margin-left: auto;
         padding: 0;
         margin-top: var(--space-1);
         border: 0.125rem solid var(--color-border-default);
