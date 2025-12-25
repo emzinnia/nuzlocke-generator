@@ -608,7 +608,7 @@ export class DataEditorBase extends React.Component<
                     )}
                 </Dialog>
 
-                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.25rem", margin: "0.25rem" }}>
+                <div className="flex flex-wrap items-center gap-1 m-1">
                     <ButtonGroup>
                         <Button
                             data-testid="import-data-button"
@@ -616,7 +616,7 @@ export class DataEditorBase extends React.Component<
                             icon="import"
                             intent={Intent.PRIMARY}
                         >
-                            <span style={{ whiteSpace: "nowrap" }}>
+                            <span className="whitespace-nowrap">
                                 Import Data{" "}
                                 <HotkeyIndicator
                                     hotkey="i"
