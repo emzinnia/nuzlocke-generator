@@ -86,7 +86,7 @@ export const AdvancedImportOptions = React.forwardRef<
     };
 
     return (
-        <div style={{ margin: "0.25rem" }}>
+        <div className="m-1">
             <Button
                 onClick={() => setIsOpen(!isOpen)}
                 icon={isOpen ? "chevron-down" : "chevron-right"}
@@ -97,7 +97,7 @@ export const AdvancedImportOptions = React.forwardRef<
 
             {/* Single hidden file input - always available for both panel button and parent's Import Save button */}
             <input
-                style={{ display: "none" }}
+                className="hidden"
                 ref={fileInputRef}
                 onChange={handleFileChange}
                 type="file"
@@ -108,19 +108,9 @@ export const AdvancedImportOptions = React.forwardRef<
 
             {isOpen && (
                 <div
-                    className="data-editor-save-file-form"
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        flexWrap: "wrap",
-                        gap: "0.5rem",
-                        marginTop: "0.5rem",
-                        padding: "0.75rem",
-                        borderRadius: "0.25rem",
-                        background: isDarkMode
-                            ? "rgba(255, 255, 255, 0.05)"
-                            : "rgba(0, 0, 0, 0.05)",
-                    }}
+                    className={`data-editor-save-file-form flex items-center flex-wrap gap-2 mt-2 p-3 rounded ${
+                        isDarkMode ? "bg-white/5" : "bg-black/5"
+                    }`}
                 >
                     <ButtonGroup>
                         <HTMLSelect
