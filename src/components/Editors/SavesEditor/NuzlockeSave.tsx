@@ -261,10 +261,10 @@ export function NuzlockeSave() {
             <Button
                 intent={Intent.SUCCESS}
                 icon="add"
-                style={{ marginBottom: "0.25rem" }}
+                className="mb-1"
                 onClick={handleNewNuzlocke}
             >
-                <span style={{ whiteSpace: "nowrap" }}>
+                <span className="whitespace-nowrap">
                     New Nuzlocke{" "}
                     <HotkeyIndicator
                         hotkey="shift+n"
