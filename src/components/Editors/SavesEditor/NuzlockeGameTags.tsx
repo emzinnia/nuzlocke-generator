@@ -1,5 +1,4 @@
 import { Tag } from "components/ui/shims";
-import { PokemonIcon } from "components";
 import * as React from "react";
 import { State } from "state";
 import { Game, gameOfOriginToColor, getContrastColor } from "utils";
