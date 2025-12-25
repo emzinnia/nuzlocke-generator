@@ -272,8 +272,9 @@ export function NuzlockeSave() {
                     </span>
                 </Button>
                 <div className="flex flex-col">
-                    <Label>sort by</Label>
+                    <Label htmlFor="saves-sort-by">sort by</Label>
                     <Select
+                        id="saves-sort-by"
                         value={sortOption}
                         onChange={(e) => setSortOption(e.target.value)}
                         className="h-8 text-sm w-60"
