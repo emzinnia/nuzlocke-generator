@@ -5,7 +5,7 @@
     color: var(--color-text-primary);
     background: var(--input-bg);
     padding-block: var(--space-2);
-    padding-inline: var(--space-2) var(--space-8);
+    padding-inline: var(--space-2) var(--space-2);
     border-radius: var(--radius-md);
     cursor: pointer;
     font-family: var(--font-sans);
