@@ -277,7 +277,7 @@ export function NuzlockeSave() {
                     <Select
                         value={sortOption}
                         onChange={(e) => setSortOption(e.target.value)}
-                        className="ml-2 h-8 text-sm"
+                        className="h-8 text-sm"
                     >
                         <option value="last-edited">Last Edited</option>
                         <option value="name">Name</option>
