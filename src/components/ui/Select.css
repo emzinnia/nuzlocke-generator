@@ -64,7 +64,7 @@
     }
 }
 
-.ui-select-button {
+.ui-select > button {
     display: flex;
   min-width: 100%;
   justify-content: space-between;
