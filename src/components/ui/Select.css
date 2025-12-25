@@ -7,7 +7,6 @@
     padding-block: var(--space-2);
     padding-inline: var(--space-5) var(--space-8);
     border-radius: var(--radius-full);
-    border: 0.1875rem solid var(--color-border-focus);
     cursor: pointer;
     font-family: var(--font-sans);
     font-size: var(--text-sm);
