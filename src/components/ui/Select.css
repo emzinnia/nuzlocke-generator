@@ -69,8 +69,6 @@
 option {
     display: flex;
     align-items: center;
-    padding: var(--space-3);
-    gap: var(--space-3);
     border-top: 0.0625rem solid var(--color-border-muted);
     cursor: pointer;
     color: var(--color-text-primary);
