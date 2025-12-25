@@ -290,10 +290,7 @@ export function NuzlockeSave() {
     };
 
     const handleDelete = (deletionFn: () => void) => {
-        setDeletionFunction(() => () => {
-            deletionFn();
-            toggleIsDeletingNuzlocke();
-        });
+        setDeletionFunction(() => deletionFn);
         setIsDeletingNuzlocke(true);
     };
 
