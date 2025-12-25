@@ -249,7 +249,6 @@ export function NuzlockeSave() {
             deletionFn();
             toggleIsDeletingNuzlocke();
         });
-        setIsDeletingNuzlocke(true);
     };
 
     return (
