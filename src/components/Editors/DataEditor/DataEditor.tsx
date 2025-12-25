@@ -153,7 +153,7 @@ export function SaveGameSettingsDialog({
     return (
         <div className={cx(Classes.DIALOG_BODY, "has-nice-scrollbars")}>
             <Switch
-                labelElement={
+                label={
                     <>
                         <strong>Merge Data?</strong>
                         <p className={Classes.TEXT_MUTED}>
@@ -601,11 +601,12 @@ export class DataEditorBase extends React.Component<
                                                 ? true
                                                 : false
                                         }
-                                        text="Confirm"
                                         style={{
                                             marginLeft: "auto",
                                         }}
-                                    />
+                                    >
+                                        Confirm
+                                    </Button>
                                 </div>
                             </div>
                         </>
