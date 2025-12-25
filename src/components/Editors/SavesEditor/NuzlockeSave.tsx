@@ -272,8 +272,8 @@ export function NuzlockeSave() {
                         />
                     </span>
                 </Button>
-                <div>
-                    <Label>Sort by:</Label>
+                <div className="flex flex-col">
+                    <Label>sort by</Label>
                     <Select
                         value={sortOption}
                         onChange={(e) => setSortOption(e.target.value)}
