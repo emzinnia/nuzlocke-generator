@@ -180,7 +180,7 @@ function NuzlockeSaveItem({
                         Switch
                     </Button>
                     <Button icon="clipboard" onClick={handleCopy} small>
-                        Copy
+                        Duplicate
                     </Button>
                     <Button onClick={onToggleHof} icon="crown" small>
                         HoF
