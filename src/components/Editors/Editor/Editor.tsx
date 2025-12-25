@@ -11,64 +11,64 @@ import { Tabs, Tab, Icon } from "components/ui";
 const PokemonEditor = React.lazy(() =>
     import("components/Editors/PokemonEditor").then((res) => ({
         default: res.PokemonEditor,
-    })),
+    }))
 );
 const NuzlockeSaveControls = React.lazy(() =>
     import("components/Editors/SavesEditor/NuzlockeSaveControls").then(
         (res) => ({
             default: res.NuzlockeSaveControls,
-        }),
-    ),
+        })
+    )
 );
 const GameEditor = React.lazy(() =>
     import("components/Editors/GameEditor").then((res) => ({
         default: res.GameEditor,
-    })),
+    }))
 );
 const TrainerEditor = React.lazy(() =>
     import("components/Editors/TrainerEditor").then((res) => ({
         default: res.TrainerEditor,
-    })),
+    }))
 );
 const HotkeysEditor = React.lazy(() =>
     import("components/Editors/HotkeysEditor").then((res) => ({
         default: res.HotkeysEditor,
-    })),
+    }))
 );
 const BugReporter = React.lazy(() =>
     import("components/Features/BugReporter").then((res) => ({
         default: res.BugReporter,
-    })),
+    }))
 );
 const StatsEditor = React.lazy(() =>
     import("components/Editors/StatsEditor").then((res) => ({
         default: res.StatsEditor,
-    })),
+    }))
 );
 const StyleEditor = React.lazy(() =>
     import("components/Editors/StyleEditor").then((res) => ({
         default: res.StyleEditor,
-    })),
+    }))
 );
 const DataEditor = React.lazy(() =>
     import("components/Editors/DataEditor").then((res) => ({
         default: res.DataEditor,
-    })),
+    }))
 );
 const EditorToolbar = React.lazy(() =>
     import("components/Editors/Editor/EditorToolbar").then((res) => ({
         default: res.EditorToolbar,
-    })),
+    }))
 );
 const Credits = React.lazy(() =>
     import("components/Features/Credits").then((res) => ({
         default: res.Credits,
-    })),
+    }))
 );
 const Result = React.lazy(() =>
     import("components/Features/Result/Result").then((res) => ({
         default: res.Result,
-    })),
+    }))
 );
 
 const MIN_WIDTH = 320; // px
@@ -81,11 +81,13 @@ const DEFAULT_WIDTH = 480; // px
 export function Editor() {
     const minimized = useSelector(minimizedSelector);
     const editorDarkMode = useSelector(editorModeSelector);
-    
+
     const [width, setWidth] = React.useState(() => {
         // Restore saved width from localStorage
         const saved = localStorage.getItem("editor-sidebar-width");
-        return saved ? Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, parseInt(saved, 10))) : DEFAULT_WIDTH;
+        return saved
+            ? Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, parseInt(saved, 10)))
+            : DEFAULT_WIDTH;
     });
     const [isResizing, setIsResizing] = React.useState(false);
     const sidebarRef = React.useRef<HTMLDivElement>(null);
@@ -99,7 +101,10 @@ export function Editor() {
         if (!isResizing) return;
 
         const handleMouseMove = (e: MouseEvent) => {
-            const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, e.clientX));
+            const newWidth = Math.max(
+                MIN_WIDTH,
+                Math.min(MAX_WIDTH, e.clientX)
+            );
             setWidth(newWidth);
         };
 
@@ -111,7 +116,7 @@ export function Editor() {
 
         document.addEventListener("mousemove", handleMouseMove);
         document.addEventListener("mouseup", handleMouseUp);
-        
+
         // Add cursor style to body during resize
         document.body.style.cursor = "ew-resize";
         document.body.style.userSelect = "none";
@@ -135,7 +140,7 @@ export function Editor() {
                 "min-h-screen p-1 relative overflow-y-auto overflow-x-hidden",
                 "border border-[var(--color-border-default)] border-r-0",
                 "bg-[var(--color-bg-primary)]",
-                "hover:shadow-[0_0_4px_var(--color-border-default)]",
+                "hover:shadow-[0_0_4px_var(--color-border-default)]"
             )}
             style={{
                 width: minimized ? 0 : width,
@@ -156,7 +161,7 @@ export function Editor() {
                     />
                 </React.Suspense>
             </ErrorBoundary>
-            
+
             <Tabs
                 id="editor-tabs"
                 defaultSelectedTabId="nuzlocke"
@@ -164,9 +169,9 @@ export function Editor() {
                 className="mt-1 [&_[role=tablist]]:px-1 [&_[role=tablist]]:gap-1 [&_[role=tablist]]:border-b-gray-200 dark:[&_[role=tablist]]:border-b-gray-700 [&_[role=tab]]:px-3 [&_[role=tab]]:py-2 [&_[role=tab]]:text-[0.8125rem] [&_[role=tab]]:rounded-t [&_[role=tab]]:bg-transparent [&_[role=tab]]:transition-colors [&_[role=tab]:hover]:bg-black/5 dark:[&_[role=tab]:hover]:bg-white/5 [&_[role=tab][aria-selected=true]]:bg-blue-500/10 dark:[&_[role=tab][aria-selected=true]]:bg-blue-500/15"
             >
                 <Tab
-                    id="nuzlocke"
-                    title="Nuzlocke"
-                    icon={<Icon icon="cube" />}
+                    id="data"
+                    title="Data"
+                    icon={<Icon icon="database" />}
                     panel={
                         <div className="pt-1">
                             <ErrorBoundary key={2}>
@@ -174,16 +179,26 @@ export function Editor() {
                                     <NuzlockeSaveControls />
                                 </React.Suspense>
                             </ErrorBoundary>
-                            <ErrorBoundary key={3}>
-                                <React.Suspense fallback={Skeleton}>
-                                    <GameEditor />
-                                </React.Suspense>
-                            </ErrorBoundary>
                             <ErrorBoundary key={4}>
                                 <React.Suspense fallback={Skeleton}>
                                     <DataEditor />
                                 </React.Suspense>
                             </ErrorBoundary>
+                        </div>
+                    }
+                />
+                <Tab
+                    id="nuzlocke"
+                    title="Nuzlocke"
+                    icon={<Icon icon="cube" />}
+                    panel={
+                        <div className="pt-1">
+                            <ErrorBoundary key={3}>
+                                <React.Suspense fallback={Skeleton}>
+                                    <GameEditor />
+                                </React.Suspense>
+                            </ErrorBoundary>
+
                             <ErrorBoundary key={5}>
                                 <React.Suspense fallback={Skeleton}>
                                     <TrainerEditor />
@@ -257,7 +272,7 @@ export function Editor() {
                     }
                 />
             </Tabs>
-            
+
             {/* Resize handle */}
             {!minimized && (
                 <div
@@ -271,7 +286,8 @@ export function Editor() {
                         "before:bg-gray-300 dark:before:bg-gray-600",
                         "hover:before:bg-blue-500 hover:before:w-[5px] hover:before:shadow-[0_0_8px_rgba(59,130,246,0.4)]",
                         "dark:hover:before:bg-blue-400 dark:hover:before:shadow-[0_0_8px_rgba(96,165,250,0.4)]",
-                        isResizing && "before:bg-blue-600 before:w-[5px] before:shadow-[0_0_12px_rgba(59,130,246,0.6)] dark:before:bg-blue-500"
+                        isResizing &&
+                            "before:bg-blue-600 before:w-[5px] before:shadow-[0_0_12px_rgba(59,130,246,0.6)] dark:before:bg-blue-500"
                     )}
                     role="separator"
                     aria-orientation="vertical"
@@ -286,7 +302,7 @@ export function Editor() {
                     }}
                 />
             )}
-            
+
             {/* Overlay to capture mouse events during resize and prevent them from hitting other components */}
             {isResizing && (
                 <div className="fixed inset-0 z-[9999] cursor-ew-resize" />
