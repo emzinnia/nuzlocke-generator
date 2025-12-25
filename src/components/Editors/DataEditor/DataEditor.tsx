@@ -564,11 +564,6 @@ export class DataEditorBase extends React.Component<
                                 </ErrorBoundary>
                             </div>
                             <div className={Classes.DIALOG_FOOTER}>
-                                {/*<Checkbox
-                                    checked={this.state.overrideImport}
-                                    label='Overwrite current save data (will otherwise merge into nuzlocke saves)'
-                                    onChange={e => this.setState({ overrideImport: e.currentTarget.checked })}
-                                />*/}
                                 <div
                                     style={{
                                         display: "flex",
