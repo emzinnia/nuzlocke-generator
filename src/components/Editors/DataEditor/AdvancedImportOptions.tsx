@@ -147,9 +147,8 @@ export const AdvancedImportOptions = React.forwardRef<
                 isOpen={isSettingsOpen}
                 onClose={() => setIsSettingsOpen(false)}
                 title="Save Upload Settings"
-                className={isDarkMode ? Classes.DARK : ""}
+                className={`w-[700px] ${isDarkMode ? Classes.DARK : ""}`}
                 icon="floppy-disk"
-                style={{ width: "700px" }}
             >
                 <SaveGameSettingsDialog
                     mergeDataMode={mergeDataMode}
