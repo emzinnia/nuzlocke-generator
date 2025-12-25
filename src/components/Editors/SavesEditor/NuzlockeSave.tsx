@@ -216,8 +216,12 @@ export function NuzlockeSave() {
         (() => void) | undefined
     >(undefined);
 
+    const [sortOption, setSortOption] = useState("name");
+
     const { currentId } = nuzlockes;
     const saves = [...nuzlockes.saves].sort(sortById);
+
+    
 
     // Initialize nuzlocke if none exists
     useEffect(() => {
