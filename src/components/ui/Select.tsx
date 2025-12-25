@@ -8,6 +8,8 @@
 import * as React from "react";
 import { ChevronDown } from "lucide-react";
 
+import './Select.css';
+
 export interface SelectOption {
     value: string;
     label: string;
