@@ -8,7 +8,7 @@ import {
     MenuItem,
     Intent,
 } from "components/ui/shims";
-import { ButtonGroup, Icon, Select } from "components/ui";
+import { ButtonGroup, Icon, Label, Select } from "components/ui";
 import { useSelector, useDispatch } from "react-redux";
 import { State } from "state";
 import {
