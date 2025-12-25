@@ -12,6 +12,7 @@
     font-size: var(--text-sm);
     transition: border-color var(--duration-normal) var(--ease-out),
                 box-shadow var(--duration-normal) var(--ease-out);
+    width: 100%;
 
     &:hover {
         border-color: var(--color-primary-400);
