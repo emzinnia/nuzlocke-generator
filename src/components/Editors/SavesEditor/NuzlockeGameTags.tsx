@@ -2,7 +2,7 @@ import { Tag } from "components/ui/shims";
 import { PokemonIcon } from "components";
 import * as React from "react";
 import { State } from "state";
-import { Game, gameOfOriginToColor } from "utils";
+import { Game, gameOfOriginToColor, getContrastColor } from "utils";
 
 export interface NuzlockeGameTagsProps {
     isCurrent?: boolean;
@@ -17,9 +17,6 @@ export interface NuzlockeGameTagsProps {
 export function NuzlockeGameTags({
     isCurrent,
     game,
-    darkMode,
-    data,
-    color,
     isCopy,
     size,
 }: NuzlockeGameTagsProps) {
@@ -32,6 +29,7 @@ export function NuzlockeGameTags({
                     className="mx-0.5"
                     style={{
                         background: gameOfOriginToColor(game),
+                        color: getContrastColor(gameOfOriginToColor(game)),
                     }}
                 >
                     {game}
@@ -44,7 +42,7 @@ export function NuzlockeGameTags({
                 {isCopy && (
                     <Tag
                         round
-                        className={`mx-0.5 ${darkMode ? "text-[#eee]" : "text-[#444]"} bg-[rgba(128,128,128,0.15)]`}
+                        className={`mx-0.5 bg-[rgba(128,128,128,0.15)]`}
                     >
                         Copy
                     </Tag>
@@ -52,7 +50,7 @@ export function NuzlockeGameTags({
                 {size && (
                     <Tag
                         round
-                        className={`mx-0.5 ${darkMode ? "text-[#eee]" : "text-[#444]"} bg-[rgba(128,128,128,0.15)]`}
+                        className={`mx-0.5 bg-[rgba(128,128,128,0.15)]`}
                     >
                         {size}KB
                     </Tag>
