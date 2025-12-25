@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { Alert, Intent, AlertProps, Classes } from "components/ui/shims";
 import { State } from "state";
 
-// @TODO add back trubbish
 export type WarningText = { warningText?: string };
 export function DeleteAlert({
     warningText = "This will permanently delete all your local storage data, with no way to retrieve it. Are you sure you want to do this?",
