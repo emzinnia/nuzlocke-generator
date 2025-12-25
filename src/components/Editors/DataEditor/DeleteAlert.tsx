@@ -21,7 +21,7 @@ export function DeleteAlert({
         >
             <div style={{ display: "flex" }}>
                 <img
-                    style={{ height: "10rem" }}
+                    className="h-10"
                     src={"./assets/img/trash.png"}
                     alt="Sad Trubbish"
                 />
