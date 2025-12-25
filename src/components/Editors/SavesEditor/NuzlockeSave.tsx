@@ -8,7 +8,7 @@ import {
     MenuItem,
     Intent,
 } from "components/ui/shims";
-import { ButtonGroup, Icon } from "components/ui";
+import { ButtonGroup, Icon, Select } from "components/ui";
 import { useSelector, useDispatch } from "react-redux";
 import { State } from "state";
 import {
@@ -271,14 +271,15 @@ export function NuzlockeSave() {
             </Button>
             <div>
                 <span>Sort by:</span>
-                <ButtonGroup>
-                    <Button icon="sort-asc" onClick={() => {}} small>
-                        Name
-                    </Button>
-                    <Button icon="sort-desc" onClick={() => {}} small>
-                        Date
-                    </Button>
-                </ButtonGroup>
+                <Select
+                    value={sortOption}
+                    onChange={(e) => setSortOption(e.target.value)}
+                    className="ml-2"
+                    style={{ height: "2rem", fontSize: "0.9rem" }}
+                >
+                    <option value="name">Sort by Name</option>
+                    <option value="date">Sort by Date</option>
+                </Select>
             </div>
             <div className="flex flex-col gap-2">
                 {saves.map((nuzlocke) => (
