@@ -47,7 +47,7 @@ select {
   }
 }
 
-select {
+.ui-select {
   display: flex;
   justify-content: space-between;
   min-width: 300px;
