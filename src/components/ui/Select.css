@@ -82,6 +82,7 @@ option {
     &:where(:hover, :focus, :active) {
         background: var(--color-primary-600);
         color: var(--color-text-inverse);
+        outline: none;
     }
 
     &:checked {
