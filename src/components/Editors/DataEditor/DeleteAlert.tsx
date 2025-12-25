@@ -14,7 +14,6 @@ export function DeleteAlert({
         <Alert
             cancelButtonText="Nevermind"
             confirmButtonText="Delete Anyway"
-            className={style.editorDarkMode ? Classes.DARK : ""}
             className="max-w-[600px]"
             intent={Intent.DANGER}
             {...props}
