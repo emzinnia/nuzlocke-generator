@@ -224,10 +224,42 @@ export function NuzlockeSave() {
         (() => void) | undefined
     >(undefined);
 
-    const [sortOption, setSortOption] = useState("name");
+    const [sortOption, setSortOption] = useState("last-edited");
 
     const { currentId } = nuzlockes;
-    const saves = [...nuzlockes.saves].sort(sortById);
+
+    const saves = useMemo(() => {
+        const rawSaves = [...nuzlockes.saves] as NuzlockeSaveData[];
+
+        switch (sortOption) {
+            case "last-edited":
+                return rawSaves.sort(
+                    (a, b) => (b.lastEdited ?? 0) - (a.lastEdited ?? 0)
+                );
+            case "name":
+                return rawSaves.sort((a, b) =>
+                    getGameName(a).localeCompare(getGameName(b))
+                );
+            case "size":
+                return rawSaves.sort(
+                    (a, b) => (b.data?.length ?? 0) - (a.data?.length ?? 0)
+                );
+            case "game-a-z":
+                return rawSaves.sort((a, b) =>
+                    getGameName(a).localeCompare(getGameName(b))
+                );
+            case "game-chrono":
+                return rawSaves.sort((a, b) => {
+                    const gameA = getGameName(a);
+                    const gameB = getGameName(b);
+                    const indexA = listOfGames.indexOf(gameA as typeof listOfGames[number]);
+                    const indexB = listOfGames.indexOf(gameB as typeof listOfGames[number]);
+                    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+                });
+            default:
+                return rawSaves;
+        }
+    }, [nuzlockes.saves, sortOption]);
 
     // Initialize nuzlocke if none exists
     useEffect(() => {
