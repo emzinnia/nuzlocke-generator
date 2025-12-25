@@ -11,42 +11,6 @@
     }
 }
 
-@property --hue {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 180deg;
-}
-
-@keyframes rotateHue {
-  0% {
-    --hue: 180deg;
-  }
-  25% {
-    --hue: 360deg;
-  }
-  100% {
-    --hue: 180deg;
-  }
-}
-
-select {
-  appearance: none;
-  @supports (appearance: base-select) {
-    &,
-    &::picker(select) {
-      appearance: base-select;
-      animation: rotateHue 10s infinite;
-      animation-play-state: paused;
-    }
-    &:open {
-      animation-play-state: running;
-      @media (prefers-reduced-motion) {
-        animation-play-state: paused;
-      }
-    }
-  }
-}
-
 .ui-select {
   display: flex;
   justify-content: space-between;
