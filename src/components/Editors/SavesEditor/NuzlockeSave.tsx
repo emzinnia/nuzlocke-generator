@@ -233,9 +233,12 @@ export function NuzlockeSave() {
 
         switch (sortOption) {
             case "last-edited":
-                return rawSaves.sort(
-                    (a, b) => (b.lastEdited ?? 0) - (a.lastEdited ?? 0)
-                );
+                // Current nuzlocke is always considered most recently edited
+                return rawSaves.sort((a, b) => {
+                    if (a.id === currentId) return -1;
+                    if (b.id === currentId) return 1;
+                    return (b.lastEdited ?? 0) - (a.lastEdited ?? 0);
+                });
             case "name":
                 return rawSaves.sort((a, b) =>
                     getGameName(a).localeCompare(getGameName(b))
