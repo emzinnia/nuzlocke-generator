@@ -10,7 +10,9 @@ import * as React from "react";
 
 const hofImage = "assets/hall-of-fame.png";
 
-export type HallOfFameDialogProps = DialogProps & {};
+export type HallOfFameDialogProps = Omit<DialogProps, 'icon'> & {
+    icon?: string;
+};
 
 export function HallOfFameDialog(props: HallOfFameDialogProps) {
     return (
