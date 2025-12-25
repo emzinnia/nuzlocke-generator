@@ -64,6 +64,19 @@
     }
 }
 
+.ui-select-button {
+    display: flex;
+  min-width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  background-color: hotpink;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid plum;
+  cursor: pointer;
+}
+
 .ui-select-option {
     &::checkmark {
         display: none;
