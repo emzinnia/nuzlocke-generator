@@ -23,7 +23,6 @@ export function NuzlockeGameTags({
     isCopy,
     size,
 }: NuzlockeGameTagsProps) {
-    const textColor = game === "None" ? "#fff" : color;
     const secondaryTagClasses = `mx-0.5 bg-black/20 dark:text-white text-black`;
 
     return (
@@ -33,7 +32,6 @@ export function NuzlockeGameTags({
                     className="mx-0.5"
                     style={{
                         background: gameOfOriginToColor(game),
-                        color: textColor,
                     }}
                 >
                     {game}
