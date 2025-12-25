@@ -221,7 +221,7 @@ export function NuzlockeSave() {
     const { currentId } = nuzlockes;
     const saves = [...nuzlockes.saves].sort(sortById);
 
-    
+
 
     // Initialize nuzlocke if none exists
     useEffect(() => {
@@ -278,11 +278,10 @@ export function NuzlockeSave() {
                 <Select
                     value={sortOption}
                     onChange={(e) => setSortOption(e.target.value)}
-                    className="ml-2"
-                    style={{ height: "2rem", fontSize: "0.9rem" }}
+                    className="ml-2 h-8 text-sm"
                 >
-                    <option value="name">Sort by Name</option>
-                    <option value="date">Sort by Date</option>
+                    <option value="name">Name</option>
+                    <option value="date">Date</option>
                 </Select>
             </div>
             <div className="flex flex-col gap-2">
