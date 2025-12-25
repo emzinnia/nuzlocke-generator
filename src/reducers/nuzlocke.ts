@@ -38,6 +38,7 @@ export function nuzlockes(
                         id,
                         data: action?.data || null,
                         isCopy: action?.isCopy || false,
+                        lastEdited: Date.now(),
                     },
                 ],
             };
