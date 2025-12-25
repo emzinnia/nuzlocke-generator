@@ -15,17 +15,17 @@ export function DeleteAlert({
             cancelButtonText="Nevermind"
             confirmButtonText="Delete Anyway"
             className={style.editorDarkMode ? Classes.DARK : ""}
-            style={{ maxWidth: "600px" }}
+            className="max-w-[600px]"
             intent={Intent.DANGER}
             {...props}
         >
-            <div style={{ display: "flex" }}>
+            <div className="flex">
                 <img
                     className="h-[10rem]"
                     src={"./assets/img/trash.png"}
                     alt="Sad Trubbish"
                 />
-                <p style={{ fontSize: "1.2rem", padding: "1rem" }}>
+                <p className="text-lg p-4">
                     {warningText}
                 </p>
             </div>
