@@ -48,6 +48,7 @@
         opacity: 1;
         height: calc-size(auto, size);
         overflow: auto;
+        rotate: 180deg;
         @starting-style {
             opacity: 0;
             height: 0;
