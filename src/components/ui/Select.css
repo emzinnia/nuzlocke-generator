@@ -70,7 +70,7 @@
   justify-content: space-between;
   align-items: center;
   color: var(--color-text-primary);
-  background-color: var(--color-bg-primary);
+  background-color: transparent;
   padding: var(--space-2);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border-default);
