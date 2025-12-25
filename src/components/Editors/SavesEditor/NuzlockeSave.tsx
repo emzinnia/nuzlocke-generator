@@ -260,7 +260,6 @@ export function NuzlockeSave() {
                 <Button
                     intent={Intent.SUCCESS}
                     icon="add"
-                    className="mb-1"
                     onClick={handleNewNuzlocke}
                 >
                     <span className="whitespace-nowrap">
