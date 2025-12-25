@@ -1,6 +1,7 @@
 import * as React from "react";
 
-export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+export interface LabelProps
+    extends React.LabelHTMLAttributes<HTMLLabelElement> {
     /** Whether to display inline (default) or block */
     inline?: boolean;
     /** Disabled appearance */
@@ -25,7 +26,7 @@ export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
             children,
             ...props
         },
-        ref,
+        ref
     ) => {
         return (
             <label
@@ -38,13 +39,18 @@ export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
                     text-fg-secondary
                     ${disabled ? "opacity-50 cursor-not-allowed" : ""}
                     ${className}
-                `.trim().replace(/\s+/g, " ")}
+                `
+                    .trim()
+                    .replace(/\s+/g, " ")}
                 {...props}
             >
                 <span>
                     {children}
                     {required && (
-                        <span className="ml-0.5 text-danger-500" aria-hidden="true">
+                        <span
+                            className="ml-0.5 text-danger-500"
+                            aria-hidden="true"
+                        >
                             *
                         </span>
                     )}
@@ -56,10 +62,9 @@ export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
                 )}
             </label>
         );
-    },
+    }
 );
 
 Label.displayName = "Label";
 
 export default Label;
-
