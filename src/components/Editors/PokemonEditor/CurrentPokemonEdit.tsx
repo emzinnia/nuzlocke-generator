@@ -532,7 +532,7 @@ export const CurrentPokemonEditBase: React.FC<CurrentPokemonEditProps> = ({
 
     if (currentPokemon == null) {
         return (
-            <div className="border border-gray-300 dark:border-gray-700 rounded m-1 p-1 flex items-center p-2">
+            <div className="border border-gray-300 dark:border-gray-700 rounded m-1 p-2 flex items-center">
                 <img alt="pokeball" src={pokeball} />{" "}
                 <p className="m-1 pl-1">Select a Pok&eacute;mon to edit</p>
             </div>
