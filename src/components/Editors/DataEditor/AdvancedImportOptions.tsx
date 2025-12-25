@@ -48,10 +48,7 @@ export const AdvancedImportOptions = React.forwardRef<
 
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-    const gen3Enabled = import.meta.env.VITE_GEN3_SAVES === "true";
-    const allowedGames: GameSaveFormat[] = gen3Enabled
-        ? ["RBY", "GS", "Crystal", "RS", "FRLG", "Emerald"]
-        : ["RBY", "GS", "Crystal"];
+    const allowedGames: GameSaveFormat[] = ["RBY", "GS", "Crystal", "RS", "FRLG", "Emerald"];
 
     // Expose openFileDialog to parent via ref
     React.useImperativeHandle(ref, () => ({
