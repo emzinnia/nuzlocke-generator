@@ -1,11 +1,12 @@
 .ui-select {
-    &, &::picker(select) {
-        appearance: base-select;    
+    &,
+    &::picker(select) {
+        appearance: base-select;
     }
 }
 
 .ui-select-option {
     &::checkmark {
         display: none;
-      }
+    }
 }
