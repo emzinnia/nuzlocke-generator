@@ -7,6 +7,7 @@ import {
     Dialog,
     HTMLSelect,
     Intent,
+    Select,
 } from "components/ui/shims";
 import { GameSaveFormat } from "utils";
 import { State } from "state";
@@ -113,7 +114,7 @@ export const AdvancedImportOptions = React.forwardRef<
                     }`}
                 >
                     <ButtonGroup>
-                        <HTMLSelect
+                        <Select
                             value={selectedGame}
                             onChange={handleGameChange}
                         >
@@ -125,7 +126,7 @@ export const AdvancedImportOptions = React.forwardRef<
                                     {game}
                                 </option>
                             ))}
-                        </HTMLSelect>
+                        </Select>
                         <Button
                             onClick={() => setIsSettingsOpen(true)}
                             intent={Intent.PRIMARY}
