@@ -84,7 +84,6 @@ option {
 
     &:checked {
         background: var(--color-primary-700);
-        color: var(--color-text-inverse);
     }
 
     &::checkmark {
