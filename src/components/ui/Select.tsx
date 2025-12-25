@@ -62,10 +62,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
                     })}
                     {children}
                 </select>
-                <ChevronDown
-                    size={16}
-                    className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
-                />
+                
             </div>
         );
     }
