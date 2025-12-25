@@ -262,7 +262,7 @@ export function NuzlockeSave() {
             default:
                 return rawSaves;
         }
-    }, [nuzlockes.saves, sortOption]);
+    }, [nuzlockes.saves, sortOption, currentId]);
 
     // Initialize nuzlocke if none exists
     useEffect(() => {
