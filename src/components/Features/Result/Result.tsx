@@ -40,6 +40,15 @@ import { resultSelector } from "selectors";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { normalizeSpeciesName } from "utils/getters/normalizeSpeciesName";
 
+const waitForNextFrame = () =>
+    new Promise<void>((resolve) => {
+        if (typeof requestAnimationFrame === "function") {
+            requestAnimationFrame(() => resolve());
+            return;
+        }
+        setTimeout(resolve, 0);
+    });
+
 async function load() {
     const resource = await import("@emmaramirez/dom-to-image");
     return resource.domToImage;
@@ -366,8 +375,13 @@ export const ResultBase = React.forwardRef<ResultHandle, ResultProps>(
 
         const toImage = React.useCallback(async () => {
             const resultNode = resultRef.current;
+            if (!resultNode) return;
+
             setIsDownloading(true);
             notifyDownloadState(true);
+            // Ensure layout updates (margin removal, transforms) apply before capture.
+            await waitForNextFrame();
+
             try {
                 const domToImage = await load();
                 const dataUrl = await domToImage.toPng(resultNode, {
@@ -379,13 +393,12 @@ export const ResultBase = React.forwardRef<ResultHandle, ResultProps>(
                 link.href = dataUrl;
                 link.click();
                 setDownloadError(null);
-                setIsDownloading(false);
-                notifyDownloadState(false);
             } catch (e) {
                 console.log(e);
                 setDownloadError(
                     "Failed to download. This is likely due to your image containing an image resource that does not allow Cross-Origin",
                 );
+            } finally {
                 setIsDownloading(false);
                 notifyDownloadState(false);
             }
