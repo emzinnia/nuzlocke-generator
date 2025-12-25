@@ -3,3 +3,9 @@
         appearance: base-select;    
     }
 }
+
+.ui-select-option {
+    &::checkmark {
+        display: none;
+      }
+}
