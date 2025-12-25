@@ -23,6 +23,10 @@
                     0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--focus-ring-color);
     }
 
+    &:open svg {
+        rotate: 180deg;
+    }
+
     &::picker(select) {
         margin-left: auto;
         padding: 0;
