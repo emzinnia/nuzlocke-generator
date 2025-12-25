@@ -87,24 +87,23 @@ export const Alert: React.FC<AlertProps> = ({
     children,
     ...rest
 }) => {
-    const close = React.useCallback(() => {
-        // Treat dismiss as cancel (Blueprint-ish), but keep onClose for legacy callers.
-        onCancel?.();
-        onClose?.();
+    const dismiss = React.useCallback(() => {
+        // Dismiss should behave like "cancel" when available, otherwise fall back to onClose.
+        (onCancel ?? onClose)?.();
     }, [onCancel, onClose]);
 
     const handleConfirm = React.useCallback(() => {
+        // Do NOT auto-dismiss here: many callers close the alert themselves inside onConfirm.
+        // Auto-dismiss can accidentally re-open the alert when the "close" handler is a toggle.
         onConfirm?.();
-        // Most call sites expect the alert to dismiss after confirming.
-        close();
-    }, [onConfirm, close]);
+    }, [onConfirm]);
 
     const confirmIntent = normalizeIntent(intent);
 
     return (
         <Dialog
             isOpen={isOpen}
-            onClose={close}
+            onClose={dismiss}
             title={title}
             icon={icon}
             canEscapeKeyClose={canEscapeKeyCancel}
@@ -117,7 +116,7 @@ export const Alert: React.FC<AlertProps> = ({
             {children}
 
             <div className="mt-4 flex items-center justify-end gap-2">
-                <Button outlined onClick={close}>
+                <Button outlined onClick={dismiss}>
                     {cancelButtonText}
                 </Button>
                 <Button intent={confirmIntent} onClick={handleConfirm}>
