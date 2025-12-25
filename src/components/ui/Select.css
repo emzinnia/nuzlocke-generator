@@ -17,31 +17,29 @@
         background: oklch(94% 0.49 242);
         border-radius: 12px;
         font-weight: 400;
-  
+
         opacity: 0;
         height: 0;
         overflow: clip;
         transition: height 0.5s ease-out, opacity 0.5s ease-out, overlay 0.5s,
-          display 0.5s;
-  
+            display 0.5s;
+
         transition-behavior: allow-discrete;
-      }
-      &:open::picker(select) {
+    }
+    &:open::picker(select) {
         opacity: 1;
         height: calc-size(auto, size);
         overflow: auto;
         @starting-style {
-          opacity: 0;
-          height: 0;
+            opacity: 0;
+            height: 0;
         }
-      }
+    }
 
     &,
     &::picker(select) {
         appearance: base-select;
     }
-
-  
 }
 
 .ui-select-option {
@@ -61,20 +59,20 @@ option {
     transition-duration: 0.2s;
     transition-timing-function: ease-out;
     img {
-      width: 30px;
+        width: 30px;
     }
     &:where(:hover, :focus, :active) {
-      background: oklch(24% 0.49 242);
-      color: white;
+        background: oklch(24% 0.49 242);
+        color: white;
     }
     &:checked {
-      background: oklch(10% 0.49 242);
-      color: white;
+        background: oklch(10% 0.49 242);
+        color: white;
     }
     &::checkmark {
-      display: none;
+        display: none;
     }
     &:first-child {
-      border: 0;
+        border: 0;
     }
-  }
+}
