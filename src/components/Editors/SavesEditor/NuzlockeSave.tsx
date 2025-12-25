@@ -253,7 +253,7 @@ export function NuzlockeSave() {
     };
 
     return (
-        <div style={{ padding: "0.5rem" }}>
+        <div className="p-2 flex justify-between">
             <Button
                 intent={Intent.SUCCESS}
                 icon="add"
