@@ -23,6 +23,7 @@ export { Radio, RadioGroup, type RadioProps, type RadioGroupProps } from "./Radi
 export { Select, type SelectProps, type SelectOption } from "./Select";
 export { Slider, type SliderProps } from "./Slider";
 export { TagInput, Tag, type TagInputProps, type TagProps } from "./TagInput";
+export { Label, type LabelProps } from "./Label";
 
 // Navigation & layout
 export { Tabs, Tab, type TabsProps, type TabProps } from "./Tabs";

@@ -273,7 +273,7 @@ export function NuzlockeSave() {
                     </span>
                 </Button>
                 <div>
-                    <span>Sort by:</span>
+                    <Label>Sort by:</Label>
                     <Select
                         value={sortOption}
                         onChange={(e) => setSortOption(e.target.value)}
