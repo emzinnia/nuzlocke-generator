@@ -19,7 +19,7 @@ import {
     replaceState,
     updateSwitchNuzlocke,
 } from "actions";
-import { feature, gameOfOriginToColor, getContrastColor, Styles } from "utils";
+import { feature, gameOfOriginToColor, getContrastColor, Styles, listOfGames } from "utils";
 import { omit } from "ramda";
 import { createStore } from "redux";
 import { appReducers } from "reducers";
@@ -37,8 +37,15 @@ interface NuzlockeSaveData {
     lastEdited?: number;
 }
 
-const sortById = (a: NuzlockeSaveData, b: NuzlockeSaveData) =>
-    a.id.localeCompare(b.id);
+/** Helper to safely parse save data and extract game name */
+const getGameName = (save: NuzlockeSaveData): string => {
+    try {
+        const parsed = JSON.parse(save.data);
+        return parsed?.game?.name || "None";
+    } catch {
+        return "None";
+    }
+};
 
 const stripEditorDarkModeFromState = (state: State) => {
     const baseState = omit(["nuzlockes", "editorHistory"], state) as {
