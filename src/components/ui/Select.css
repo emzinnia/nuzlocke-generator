@@ -1,8 +1,47 @@
 .ui-select {
+    display: flex;
+    justify-content: space-between;
+    min-width: 300px;
+    align-items: center;
+    color: black;
+    padding-block: 10px;
+    padding-inline: 20px 30px;
+    border-radius: 30px;
+    border: 4px solid oklch(54% 0.29 var(--hue));
+    cursor: pointer;
+
+    &::picker(select) {
+        padding: 0;
+        margin-top: 5px;
+        border: 4px solid oklch(54% 0.29 var(--hue));
+        background: oklch(94% 0.49 242);
+        border-radius: 12px;
+        font-weight: 400;
+  
+        opacity: 0;
+        height: 0;
+        overflow: clip;
+        transition: height 0.5s ease-out, opacity 0.5s ease-out, overlay 0.5s,
+          display 0.5s;
+  
+        transition-behavior: allow-discrete;
+      }
+      &:open::picker(select) {
+        opacity: 1;
+        height: calc-size(auto, size);
+        overflow: auto;
+        @starting-style {
+          opacity: 0;
+          height: 0;
+        }
+      }
+
     &,
     &::picker(select) {
         appearance: base-select;
     }
+
+  
 }
 
 .ui-select-option {
