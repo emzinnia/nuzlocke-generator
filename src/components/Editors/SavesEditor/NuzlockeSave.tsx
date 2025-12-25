@@ -256,7 +256,7 @@ export function NuzlockeSave() {
 
     return (
         <div className="p-2">
-            <div className="flex justify-between">
+            <div className="flex justify-between items-end">
                 <Button
                     intent={Intent.SUCCESS}
                     icon="add"
