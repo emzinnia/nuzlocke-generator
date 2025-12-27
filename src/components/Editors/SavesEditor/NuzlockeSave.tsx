@@ -27,7 +27,6 @@ import { NuzlockeGameTags } from "./NuzlockeGameTags";
 import { DeleteAlert } from "components/Editors/DataEditor/DeleteAlert";
 import { HallOfFameDialog } from "./HallOfFameDialog";
 import { showToast } from "components/Common/Shared/appToaster";
-import { HotkeyIndicator } from "components/Common/Shared";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 
 interface NuzlockeSaveData {
@@ -294,6 +293,10 @@ export function NuzlockeSave() {
         setIsDeletingNuzlocke(true);
     };
 
+    const handleSubmitToHallOfFame = () => {
+        console.log("Submit to Hall of Fame");
+    };
+
     return (
         <div className="p-2">
             <div className="flex justify-between items-end pb-2">
@@ -301,15 +304,9 @@ export function NuzlockeSave() {
                     intent={Intent.SUCCESS}
                     icon="add"
                     onClick={handleNewNuzlocke}
+                    hotkey={{ key: "shift+n", showModifier: false }}
                 >
-                    <span className="whitespace-nowrap">
-                        New Nuzlocke{" "}
-                        <HotkeyIndicator
-                            hotkey="shift+n"
-                            showModifier={false}
-                            className="ml-1"
-                        />
-                    </span>
+                    New Nuzlocke
                 </Button>
                 <div className="flex flex-col">
                     <Label htmlFor="saves-sort-by">sort by</Label>
@@ -354,6 +351,7 @@ export function NuzlockeSave() {
                 isOpen={isHofOpen}
                 onClose={toggleIsHofOpen}
                 title="Hall of Fame"
+                onSubmit={handleSubmitToHallOfFame}
             />
         </div>
     );
