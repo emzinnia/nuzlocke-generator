@@ -39,7 +39,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             <div className={`relative inline-block ${fill ? "w-full" : ""}`}>
                 <select
                     ref={ref}
-                    className={`ui-select rounded border bg-white outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-gray-800  ${sizeClass} ${
+                    className={`ui-select rounded border bg-white outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-input ${sizeClass} ${
                         fill ? "w-full" : ""
                     } ${
                         minimal
@@ -53,7 +53,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
                         const label = typeof option === "string" ? option : option.label;
                         const disabled = typeof option === "string" ? false : option.disabled;
                         return (
-                            <option className="ui-select-option p-1 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700" key={value} value={value} disabled={disabled}>
+                            <option className="ui-select-option p-1 bg-white dark:bg-[var(--color-bg-secondary)] hover:bg-gray-100 dark:hover:bg-[var(--color-bg-secondary)]" key={value} value={value} disabled={disabled}>
                                 {label}
                             </option>
                         );
