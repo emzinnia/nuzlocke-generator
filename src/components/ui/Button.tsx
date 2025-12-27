@@ -2,6 +2,16 @@ import * as React from "react";
 import { Icon, type IconName } from "./Icon";
 import { Intent, intentToBgClass, intentToOutlineClass } from "./intent";
 import { Spinner } from "./Spinner";
+import { HotkeyIndicator } from "components/Common/Shared";
+
+export interface ButtonHotkeyProps {
+    /** The key to display (e.g., "Z", "Y", "S") */
+    key: string;
+    /** Whether to show the modifier key (Cmd/Ctrl). Defaults to true */
+    showModifier?: boolean;
+    /** Custom modifier to use instead of the platform default */
+    modifier?: string;
+}
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     /** Button intent/color scheme */
@@ -28,6 +38,8 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
     alignText?: "left" | "center" | "right";
     /** Active/pressed state */
     active?: boolean;
+    /** Hotkey indicator to display after the button text */
+    hotkey?: ButtonHotkeyProps;
 }
 
 /**
@@ -51,6 +63,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             className = "",
             alignText = "center",
             active = false,
+            hotkey,
             href,
             type = "button",
             ...props
@@ -117,7 +130,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 ) : icon ? (
                     <Icon icon={icon} size={iconSize} />
                 ) : null}
-                {children && <span>{children}</span>}
+                {children && <span className="whitespace-nowrap">{children}</span>}
+                {hotkey && (
+                    <HotkeyIndicator
+                        hotkey={hotkey.key}
+                        showModifier={hotkey.showModifier}
+                        modifier={hotkey.modifier}
+                        style={{ marginLeft: "0.35rem" }}
+                    />
+                )}
                 {rightIcon && !loading && <Icon icon={rightIcon} size={iconSize} />}
             </>
         );

@@ -47,7 +47,6 @@ export const Dialog: React.FC<DialogProps> = ({
 }) => {
     const dialogRef = React.useRef<HTMLDivElement>(null);
 
-    // Handle escape key
     React.useEffect(() => {
         if (!isOpen || !canEscapeKeyClose) return;
 
@@ -61,7 +60,6 @@ export const Dialog: React.FC<DialogProps> = ({
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, [isOpen, canEscapeKeyClose, onClose]);
 
-    // Prevent body scroll when dialog is open
     React.useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = "hidden";
@@ -73,7 +71,6 @@ export const Dialog: React.FC<DialogProps> = ({
         };
     }, [isOpen]);
 
-    // Focus trap (basic implementation)
     React.useEffect(() => {
         if (isOpen && dialogRef.current) {
             dialogRef.current.focus();
@@ -93,23 +90,19 @@ export const Dialog: React.FC<DialogProps> = ({
             className="fixed inset-0 z-50 flex items-center justify-center"
             onClick={handleBackdropClick}
         >
-            {/* Backdrop */}
             <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
-
-            {/* Dialog panel */}
             <div
                 ref={dialogRef}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby={title ? "dialog-title" : undefined}
                 tabIndex={-1}
-                className={`relative z-10 max-h-[85vh] w-full max-w-lg overflow-auto rounded-lg bg-white shadow-xl dark:bg-gray-800 ${className}`}
+                className={`relative z-10 max-h-[85vh] w-full max-w-lg overflow-auto rounded-lg bg-white shadow-xl dark:bg-[var(--color-bg-secondary)] border border-[var(--color-border-default)] ${className}`}
                 style={style}
                 {...rest}
             >
-                {/* Header */}
                 {(title || isCloseButtonShown) && (
-                    <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">
+                    <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-[var(--color-border-default)]">
                         <div className="flex items-center gap-2">
                             {icon && <Icon icon={icon} size={18} className="text-gray-500" />}
                             {title && (
@@ -130,8 +123,6 @@ export const Dialog: React.FC<DialogProps> = ({
                         )}
                     </div>
                 )}
-
-                {/* Body */}
                 <div className="p-4">{children}</div>
             </div>
         </div>

@@ -7,7 +7,6 @@ import { redoEditorHistory, syncStateFromHistory, undoEditorHistory } from "acti
 import { useEvent } from "utils/hooks";
 import { HistoryPanel } from "./HistoryPanel";
 import { reconstructPreviousState, reconstructNextState } from "reducers/editorHistory";
-import { HotkeyIndicator } from "components/Common/Shared";
 
 export function EditorControls({ editorDarkMode, minimized }) {
     const editorHistory = useSelector<State, State["editorHistory"]>(
@@ -85,12 +84,8 @@ export function EditorControls({ editorDarkMode, minimized }) {
                     active={isHistoryPanelOpen}
                     title="View History"
                     data-testid="history-timeline-button"
-                >
-                    <HotkeyIndicator
-                        hotkey={customHotkeys?.toggleHistoryTimeline ?? "h"}
-                        showModifier={false}
-                    />
-                </Button>
+                    hotkey={{ key: customHotkeys?.toggleHistoryTimeline ?? "h", showModifier: false }}
+                />
                 <Button
                     disabled={!canUndo}
                     onClick={dispatchUndo}
@@ -99,9 +94,8 @@ export function EditorControls({ editorDarkMode, minimized }) {
                     icon="undo"
                     title="Undo"
                     style={{ fontSize: "0.6875rem" }}
-                >
-                    <HotkeyIndicator hotkey="Z" />
-                </Button>
+                    hotkey={{ key: "Z" }}
+                />
                 <Button
                     disabled={!canRedo}
                     onClick={dispatchRedo}
@@ -110,9 +104,8 @@ export function EditorControls({ editorDarkMode, minimized }) {
                     icon="redo"
                     title="Redo"
                     style={{ fontSize: "0.6875rem" }}
-                >
-                    <HotkeyIndicator hotkey="Y" />
-                </Button>
+                    hotkey={{ key: "Y" }}
+                />
             </ButtonGroup>
             <HistoryPanel
                 isOpen={isHistoryPanelOpen}

@@ -12,7 +12,6 @@ import { AddPokemonButton } from "components";
 import { BaseEditor } from "components";
 import { Box, BoxForm } from "components";
 import { ErrorBoundary } from "components";
-import { HotkeyIndicator } from "components/Common/Shared";
 import { PokemonSearchBar, SearchFeedback } from "./PokemonSearchBar";
 import { addPokemon, toggleDialog } from "actions";
 
@@ -132,29 +131,17 @@ export const PokemonEditorBase: React.FC<PokemonEditorProps> = ({
                                 icon="layout-group-by"
                                 intent={Intent.PRIMARY}
                                 onClick={() => toggleDialog("typeMatchups")}
+                                hotkey={{ key: "t", showModifier: false }}
                             >
-                                <span style={{ whiteSpace: "nowrap" }}>
-                                    Type Matchups{" "}
-                                    <HotkeyIndicator
-                                        hotkey="t"
-                                        showModifier={false}
-                                        style={{ marginLeft: "0.35rem" }}
-                                    />
-                                </span>
+                                Type Matchups
                             </Button>
                             <Button
                                 icon={"heat-grid"}
                                 intent={Intent.PRIMARY}
                                 onClick={openMassEditor}
+                                hotkey={{ key: "m", showModifier: false }}
                             >
-                                <span style={{ whiteSpace: "nowrap" }}>
-                                    Mass Editor{" "}
-                                    <HotkeyIndicator
-                                        hotkey="m"
-                                        showModifier={false}
-                                        style={{ marginLeft: "0.35rem" }}
-                                    />
-                                </span>
+                                Mass Editor
                             </Button>
                         </ButtonGroup>
                     </div>

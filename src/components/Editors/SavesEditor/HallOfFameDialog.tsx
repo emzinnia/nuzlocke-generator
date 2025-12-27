@@ -12,7 +12,7 @@ import { useEffect, useCallback } from "react";
 
 const hofImage = "assets/hall-of-fame.png";
 
-export type HallOfFameDialogProps = Omit<DialogProps, 'icon'> & {
+export type HallOfFameDialogProps = Omit<DialogProps, "icon"> & {
     icon?: string;
     onSubmit: () => void;
 };
@@ -46,18 +46,21 @@ export function HallOfFameDialog(props: HallOfFameDialogProps) {
                     persistent record.
                 </p>
                 <div className="flex gap-2 justify-between">
-                        <Button
-                            intent={Intent.DANGER}
-                            minimal
-                            onClick={props.onClose}
-                            hotkey={{ key: "ESC", showModifier: false }}
-                        >
-                            Cancel
-                        </Button>
-                        <Button onClick={props.onSubmit} intent={Intent.SUCCESS}>
-                            Submit to Hall of Fame{" "}
-                            <HotkeyIndicator hotkey="↵" style={{ marginLeft: "0.35rem" }} />
-                        </Button>
+                    <Button
+                        intent={Intent.DANGER}
+                        minimal
+                        onClick={props.onClose}
+                        hotkey={{ key: "ESC", showModifier: false }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button onClick={props.onSubmit} intent={Intent.SUCCESS}>
+                        Submit to Hall of Fame{" "}
+                        <HotkeyIndicator
+                            hotkey="↵"
+                            style={{ marginLeft: "0.35rem" }}
+                        />
+                    </Button>
                 </div>
             </div>
         </Dialog>

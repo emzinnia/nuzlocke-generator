@@ -19,7 +19,7 @@ import {
     reconstructPreviousState,
     reconstructNextState,
 } from "reducers/editorHistory";
-import { ErrorBoundary, HotkeyIndicator, ReleaseDialog } from "components/Common/Shared";
+import { ErrorBoundary, ReleaseDialog } from "components/Common/Shared";
 import { version } from "package";
 import { getPatchlessVersion } from "utils";
 import { css, cx } from "emotion";
@@ -212,30 +212,24 @@ export function EditorToolbar({ editorDarkMode, minimized }: EditorToolbarProps)
                         active={isHistoryPanelOpen}
                         title="View History"
                         data-testid="history-timeline-button"
-                    >
-                        <HotkeyIndicator
-                            hotkey={customHotkeys?.toggleHistoryTimeline ?? "h"}
-                            showModifier={false}
-                        />
-                    </Button>
+                        hotkey={{ key: customHotkeys?.toggleHistoryTimeline ?? "h", showModifier: false }}
+                    />
                     <Button
                         disabled={!canUndo}
                         onClick={dispatchUndo}
                         minimal
                         icon="undo"
                         title="Undo"
-                    >
-                        <HotkeyIndicator hotkey="Z" />
-                    </Button>
+                        hotkey={{ key: "Z" }}
+                    />
                     <Button
                         disabled={!canRedo}
                         onClick={dispatchRedo}
                         minimal
                         icon="redo"
                         title="Redo"
-                    >
-                        <HotkeyIndicator hotkey="Y" />
-                    </Button>
+                        hotkey={{ key: "Y" }}
+                    />
                 </ButtonGroup>
 
                 <div className={toolbarStyles.divider} />
@@ -247,18 +241,16 @@ export function EditorToolbar({ editorDarkMode, minimized }: EditorToolbarProps)
                         minimal
                         icon={editor.minimized ? "minimize" : "maximize"}
                         title={editor.minimized ? "Maximize Editor" : "Minimize Editor"}
-                    >
-                        <HotkeyIndicator hotkey="M" showModifier={false} />
-                    </Button>
+                        hotkey={{ key: "M", showModifier: false }}
+                    />
                     <Button
                         data-testid="toggle-dark-mode-button"
                         onClick={handleToggleDarkMode}
                         minimal
                         icon={style.editorDarkMode ? "flash" : "moon"}
                         title={style.editorDarkMode ? "Light Mode" : "Dark Mode"}
-                    >
-                        <HotkeyIndicator hotkey="L" showModifier={false} />
-                    </Button>
+                        hotkey={{ key: "L", showModifier: false }}
+                    />
                 </ButtonGroup>
 
                 <div className={toolbarStyles.divider} />
@@ -275,9 +267,8 @@ export function EditorToolbar({ editorDarkMode, minimized }: EditorToolbarProps)
                             minimal
                             icon="download"
                             title="Download Image"
-                        >
-                            <HotkeyIndicator hotkey="D" showModifier={false} />
-                        </Button>
+                            hotkey={{ key: "D", showModifier: false }}
+                        />
                     )}
                     <Select
                         className={cx("zoom-select", { dark: editorDarkMode })}
@@ -297,9 +288,8 @@ export function EditorToolbar({ editorDarkMode, minimized }: EditorToolbarProps)
                     minimal
                     icon="star"
                     title={`Version ${version}`}
-                >
-                    <HotkeyIndicator hotkey="V" showModifier={false} />
-                </Button>
+                    hotkey={{ key: "V", showModifier: false }}
+                />
             </div>
 
             <HistoryPanel

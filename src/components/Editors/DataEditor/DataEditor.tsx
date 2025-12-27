@@ -11,7 +11,7 @@ import {
 } from "components/ui";
 import { Classes } from "components/ui/shims";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
-import { ErrorBoundary, HotkeyIndicator } from "components/Common/Shared";
+import { ErrorBoundary } from "components/Common/Shared";
 import { v4 as uuid } from "uuid";
 import { persistor } from "store";
 import { newNuzlocke, replaceState } from "actions";
@@ -615,43 +615,25 @@ export class DataEditorBase extends React.Component<
                             onClick={() => this.importState()}
                             icon="import"
                             intent={Intent.PRIMARY}
+                            hotkey={{ key: "i", showModifier: false }}
                         >
-                            <span className="whitespace-nowrap">
-                                Import Data{" "}
-                                <HotkeyIndicator
-                                    hotkey="i"
-                                    showModifier={false}
-                                    style={{ marginLeft: "0.35rem" }}
-                                />
-                            </span>
+                            Import Data
                         </Button>
                         <Button
                             data-testid="export-data-button"
                             onClick={() => this.exportState(this.props.state)}
                             icon="export"
+                            hotkey={{ key: "e", showModifier: false }}
                         >
-                            <span style={{ whiteSpace: "nowrap" }}>
-                                Export Data{" "}
-                                <HotkeyIndicator
-                                    hotkey="e"
-                                    showModifier={false}
-                                    style={{ marginLeft: "0.35rem" }}
-                                />
-                            </span>
+                            Export Data
                         </Button>
                         <Button
                             icon="folder-open"
                             data-testid="import-save-file-button"
                             onClick={() => this.advancedImportRef.current?.openFileDialog()}
+                            hotkey={{ key: "o", showModifier: false }}
                         >
-                            <span style={{ whiteSpace: "nowrap" }}>
-                                Import Save{" "}
-                                <HotkeyIndicator
-                                    hotkey="o"
-                                    showModifier={false}
-                                    style={{ marginLeft: "0.35rem" }}
-                                />
-                            </span>
+                            Import Save
                         </Button>
                     </ButtonGroup>
 
@@ -660,15 +642,9 @@ export class DataEditorBase extends React.Component<
                             intent={Intent.SUCCESS}
                             onClick={this.writeAllData}
                             icon="floppy-disk"
+                            hotkey={{ key: "s", showModifier: false }}
                         >
-                            <span style={{ whiteSpace: "nowrap" }}>
-                                Force Save{" "}
-                                <HotkeyIndicator
-                                    hotkey="s"
-                                    showModifier={false}
-                                    style={{ marginLeft: "0.35rem" }}
-                                />
-                            </span>
+                            Force Save
                         </Button>
                         <Button
                             icon="trash"
