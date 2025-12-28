@@ -41,7 +41,7 @@ function parseShowdownEntry(
     if (lines.length === 0) return null;
 
     const firstLine = lines[0];
-    const { species, nickname, item, forme } = parseFirstLine(firstLine);
+    const { species, nickname, item, forme, gender } = parseFirstLine(firstLine);
 
     if (!species) return null;
 
@@ -55,6 +55,7 @@ function parseShowdownEntry(
         nickname: nickname || undefined,
         item: item || undefined,
         forme: forme || undefined,
+        gender: gender || undefined,
         types,
         status: "Team",
         position,
@@ -106,16 +107,27 @@ function parseFirstLine(line: string): {
     nickname: string | null;
     item: string | null;
     forme: Forme | undefined;
+    gender: "Male" | "Female" | null;
 } {
     let species = "";
     let nickname: string | null = null;
     let item: string | null = null;
     let forme: Forme | undefined = undefined;
+    let gender: "Male" | "Female" | null = null;
 
     const itemSplit = line.split("@");
     const namePart = itemSplit[0].trim();
     if (itemSplit.length > 1) {
         item = itemSplit[1].trim();
+    }
+
+    // Check for gender marker and extract it
+    const hasGenderMarker = /\([MF]\)\s*$/.test(namePart);
+    if (hasGenderMarker) {
+        const genderMarkerMatch = namePart.match(/\(([MF])\)\s*$/);
+        if (genderMarkerMatch) {
+            gender = genderMarkerMatch[1] === "M" ? "Male" : "Female";
+        }
     }
 
     const fullMatch = namePart.match(/^(.+?)\s*\((.+?)\)\s*\([MF]\)\s*$/);
@@ -141,7 +153,7 @@ function parseFirstLine(line: string): {
     species = handled.species;
     forme = handled.forme;
 
-    return { species, nickname, item, forme };
+    return { species, nickname, item, forme, gender };
 }
 
 function handleShowdownSpecies(species: string): { species: string; forme: Forme | undefined } {
@@ -149,7 +161,9 @@ function handleShowdownSpecies(species: string): { species: string; forme: Forme
     if (species === "Nidoran-F") return { species: "Nidoran♀", forme: undefined };
 
     if (species.includes("-")) {
-        const [baseName, formName] = species.split("-", 2);
+        const hyphenIndex = species.indexOf("-");
+        const baseName = species.substring(0, hyphenIndex);
+        const formName = species.substring(hyphenIndex + 1);
         const formPokemon = [
             "Burmy", "Wormadam", "Shellos", "Gastrodon", 
             "Rotom", "Basculin", "Deerling", "Sawsbuck",
@@ -159,7 +173,11 @@ function handleShowdownSpecies(species: string): { species: string; forme: Forme
             "Polteageist", "Alcremie", "Indeedee", "Morpeko",
             "Urshifu", "Basculegion", "Oinkologne", "Maushold",
             "Squawkabilly", "Palafin", "Tatsugiri", "Dudunsparce",
-            "Unown", "Castform",
+            "Unown", "Castform", "Indeedee", "Stunfisk", "Toxtricity", "Meowth",
+            "Ponyta", "Rapidash", "Farfetch'd", "Weezing", "Mr. Rime",
+            "Corsola", "Zigzagoon", "Linoone", "Darumaka", "Darmanitan",
+            "Yamask", "Slowpoke", "Slowbro", "Slowking", "Articuno",
+            "Zapdos", "Moltres",
             "Venusaur", "Charizard", "Blastoise", "Alakazam", "Gengar",
             "Kangaskhan", "Pinsir", "Gyarados", "Aerodactyl", "Mewtwo",
             "Ampharos", "Scizor", "Heracross", "Houndoom", "Tyranitar",
@@ -220,7 +238,10 @@ function stringToForme(formeStr: string): Forme | undefined {
         "Pa'u": Forme["Pa'u"],
         "Sensu": Forme.Sensu,
         "Lowkey": Forme.Lowkey,
+        "Low-Key": Forme.Lowkey,
         "Amped": Forme.AmpedUp,
+        "F": Forme.F,
+        "M": Forme.M,
         "Therian": Forme.Therian,
         "Origin": Forme.Origin,
         "Attack": Forme.Attack,

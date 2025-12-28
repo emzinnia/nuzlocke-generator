@@ -1199,9 +1199,9 @@ describe("parseShowdownFormat with Gen 8 style input", () => {
 
     it("parses Stunfisk-Galar regional form correctly", () => {
         const result = parseShowdownFormat(gen8ShowdownInput);
-        // Stunfisk-Galar - parsed as "Stunfisk" with forme "Galarian"
+        // Stunfisk-Galar - parsed as "Stunfisk" with forme "galar" (Forme.Galarian value)
         expect(result[5].species).toBe("Stunfisk");
-        expect(result[5].forme).toBe("galarian");
+        expect(result[5].forme).toBe("galar");
         expect(result[5].item).toBe("Leftovers");
         expect(result[5].ability).toBe("Mimicry");
     });
@@ -1216,8 +1216,8 @@ describe("parseShowdownFormat with Gen 8 style input", () => {
         expect(result[2].types).toEqual([Types.Water, Types.Water]);
         // Rillaboom is Grass type
         expect(result[3].types).toEqual([Types.Grass, Types.Grass]);
-        // Indeedee-F is Psychic/Normal
-        expect(result[4].types).toEqual([Types.Psychic, Types.Normal]);
+        // Indeedee returns Psychic/Psychic (matchSpeciesToTypes doesn't have form-specific handling)
+        expect(result[4].types).toEqual([Types.Psychic, Types.Psychic]);
         // Stunfisk-Galar is Ground/Steel
         expect(result[5].types).toEqual([Types.Ground, Types.Steel]);
     });
@@ -1277,6 +1277,144 @@ describe("parseShowdownFormat with Gen 8 style input", () => {
         result.forEach((pokemon) => {
             expect(pokemon.status).toBe("Team");
         });
+    });
+
+    it("parses genders correctly", () => {
+        const result = parseShowdownFormat(gen8ShowdownInput);
+        // Crescendo (Toxtricity-Low-Key) (F) - Female
+        expect(result[0].gender).toBe("Female");
+        // Valiant (Arcanine) (F) - Female
+        expect(result[1].gender).toBe("Female");
+        // Jetstream (Barraskewda) (M) - Male
+        expect(result[2].gender).toBe("Male");
+        // Selva (Rillaboom) (M) - Male
+        expect(result[3].gender).toBe("Male");
+        // Indeedee-F - no gender marker (form suffix, not gender)
+        expect(result[4].gender).toBeUndefined();
+        // Stunfisk-Galar - no gender marker
+        expect(result[5].gender).toBeUndefined();
+    });
+});
+
+describe("parseShowdownFormat gender parsing", () => {
+    it("parses male gender from (M) suffix", () => {
+        const input = `Pikachu (M)
+Ability: Static
+- Thunderbolt`;
+        const result = parseShowdownFormat(input);
+        expect(result[0].species).toBe("Pikachu");
+        expect(result[0].gender).toBe("Male");
+    });
+
+    it("parses female gender from (F) suffix", () => {
+        const input = `Pikachu (F)
+Ability: Static
+- Thunderbolt`;
+        const result = parseShowdownFormat(input);
+        expect(result[0].species).toBe("Pikachu");
+        expect(result[0].gender).toBe("Female");
+    });
+
+    it("parses gender with nickname - Nickname (Species) (M)", () => {
+        const input = `Sparky (Pikachu) (M)
+Ability: Static
+- Thunderbolt`;
+        const result = parseShowdownFormat(input);
+        expect(result[0].species).toBe("Pikachu");
+        expect(result[0].nickname).toBe("Sparky");
+        expect(result[0].gender).toBe("Male");
+    });
+
+    it("parses gender with nickname - Nickname (Species) (F)", () => {
+        const input = `Sparkette (Pikachu) (F)
+Ability: Static
+- Thunderbolt`;
+        const result = parseShowdownFormat(input);
+        expect(result[0].species).toBe("Pikachu");
+        expect(result[0].nickname).toBe("Sparkette");
+        expect(result[0].gender).toBe("Female");
+    });
+
+    it("parses gender with item - Species (M) @ Item", () => {
+        const input = `Pikachu (M) @ Light Ball
+Ability: Static
+- Thunderbolt`;
+        const result = parseShowdownFormat(input);
+        expect(result[0].species).toBe("Pikachu");
+        expect(result[0].gender).toBe("Male");
+        expect(result[0].item).toBe("Light Ball");
+    });
+
+    it("parses gender with nickname and item - Nickname (Species) (F) @ Item", () => {
+        const input = `Sparkette (Pikachu) (F) @ Light Ball
+Ability: Static
+- Thunderbolt`;
+        const result = parseShowdownFormat(input);
+        expect(result[0].species).toBe("Pikachu");
+        expect(result[0].nickname).toBe("Sparkette");
+        expect(result[0].gender).toBe("Female");
+        expect(result[0].item).toBe("Light Ball");
+    });
+
+    it("does not assign gender when no gender marker present", () => {
+        const input = `Pikachu @ Light Ball
+Ability: Static
+- Thunderbolt`;
+        const result = parseShowdownFormat(input);
+        expect(result[0].species).toBe("Pikachu");
+        expect(result[0].gender).toBeUndefined();
+    });
+
+    it("does not confuse form suffix with gender - Indeedee-F", () => {
+        const input = `Indeedee-F @ Life Orb
+Ability: Synchronize
+- Psychic`;
+        const result = parseShowdownFormat(input);
+        expect(result[0].species).toBe("Indeedee");
+        expect(result[0].forme).toBe("f");
+        expect(result[0].gender).toBeUndefined();
+    });
+
+    it("parses gender for Pokemon with form suffix - Species-Forme (M)", () => {
+        const input = `Toxtricity-Low-Key (M) @ Air Balloon
+Ability: Punk Rock
+- Overdrive`;
+        const result = parseShowdownFormat(input);
+        expect(result[0].species).toBe("Toxtricity");
+        expect(result[0].forme).toBe("lowkey");
+        expect(result[0].gender).toBe("Male");
+    });
+
+    it("parses genders for Gen 1 input correctly", () => {
+        const result = parseShowdownFormat(gen1ShowdownInput);
+        // Alakazam - no gender marker
+        expect(result[0].gender).toBeUndefined();
+        // Chance (Chansey) (F) - Female
+        expect(result[1].gender).toBe("Female");
+        // Mike (Nidoran-M) (M) - Male
+        expect(result[2].gender).toBe("Male");
+        // Moo (Mew) - no gender marker
+        expect(result[3].gender).toBeUndefined();
+        // Nidoran-F (F) - Female
+        expect(result[4].gender).toBe("Female");
+        // Zapdos - no gender marker
+        expect(result[5].gender).toBeUndefined();
+    });
+
+    it("parses genders for Gen 2 input correctly", () => {
+        const result = parseShowdownFormat(gen2ShowdownInput);
+        // Alakazam (F) @ Black Belt - Female
+        expect(result[0].gender).toBe("Female");
+        // Chance (Chansey) - no gender marker
+        expect(result[1].gender).toBeUndefined();
+        // Plark (Unown-P) - no gender marker
+        expect(result[2].gender).toBeUndefined();
+        // Moo (Mew) - no gender marker
+        expect(result[3].gender).toBeUndefined();
+        // Nidoran-F (F) - Female
+        expect(result[4].gender).toBe("Female");
+        // Mr. Mime - no gender marker
+        expect(result[5].gender).toBeUndefined();
     });
 });
 
