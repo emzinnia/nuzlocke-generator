@@ -161,8 +161,12 @@ export function PokemonIconPlain({
     customIcon,
     includeTitle,
     imageStyle,
-}: PokemonIconProps & { imageStyle: any }) {
-    // className={`${isDragging ? 'opacity-medium' : ''} ${canDrop ? 'droppable' : ''}`}
+    editorDarkMode,
+}: PokemonIconProps & { imageStyle: any; editorDarkMode?: boolean }) {
+    const isUnknown = normalizeSpeciesName(
+        species as Species,
+    ) === "unknown";
+
     return (
         <div
             role="presentation"
@@ -192,7 +196,7 @@ export function PokemonIconPlain({
                 </PokemonImage>
             ) : (
                 <img
-                    style={imageStyle}
+                    style={{...imageStyle, filter: isUnknown && editorDarkMode ? "invert(100%)" : undefined}}
                     alt={species}
                     onError={({ currentTarget }) => {
                         currentTarget.onerror = null; // prevents looping
@@ -230,7 +234,6 @@ export const PokemonIcon = (props: BasePokemonIconProps) => {
         height: "32px",
         maxWidth: "auto",
         imageRendering: styles?.iconRendering,
-        filter: style?.editorDarkMode ? "invert(100%)" : undefined,
     };
 
     return (
@@ -240,6 +243,7 @@ export const PokemonIcon = (props: BasePokemonIconProps) => {
                 imageStyle={imageStyle}
                 selectedId={selectedId}
                 style={style}
+                editorDarkMode={style?.editorDarkMode}
                 {...props}
             />
         </div>

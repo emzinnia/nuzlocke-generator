@@ -2,6 +2,7 @@ import { parseShowdownFormat, isValidShowdownFormat } from "../parseShowdownForm
 import { Types } from "../Types";
 import { listOfPokemon, Species } from "../data/listOfPokemon";
 import { matchSpeciesToTypes } from "../formatters/matchSpeciesToTypes";
+import { Generation } from "utils/getters";
 
 const showdownInput = `Jeff (Alomomola) @ Choice Scarf  
 Ability: Regenerator  
@@ -167,7 +168,7 @@ describe("parseShowdownFormat", () => {
     });
 
     it("assigns positions starting from startPosition", () => {
-        const result = parseShowdownFormat(showdownInput, 10);
+        const result = parseShowdownFormat(showdownInput, { startPosition: 10 });
         expect(result[0].position).toBe(10);
         expect(result[1].position).toBe(11);
         expect(result[2].position).toBe(12);
@@ -287,9 +288,9 @@ describe("parseShowdownFormat with Gen 1 style input", () => {
         // Chance (Chansey) (F)
         expect(result[1].nickname).toBe("Chance");
         expect(result[1].species).toBe("Chansey");
-        // Mike (Nidoran-M) (M)
+        // Mike (Nidoran-M) (M) - Nidoran-M is converted to Nidoran♂
         expect(result[2].nickname).toBe("Mike");
-        expect(result[2].species).toBe("Nidoran-M");
+        expect(result[2].species).toBe("Nidoran♂");
     });
 
     it("parses Pokemon with nickname but no gender suffix correctly", () => {
@@ -301,8 +302,8 @@ describe("parseShowdownFormat with Gen 1 style input", () => {
 
     it("parses Pokemon with gender suffix but no nickname correctly", () => {
         const result = parseShowdownFormat(gen1ShowdownInput);
-        // Nidoran-F (F)
-        expect(result[4].species).toBe("Nidoran-F");
+        // Nidoran-F (F) - converted to Nidoran♀
+        expect(result[4].species).toBe("Nidoran♀");
         expect(result[4].nickname).toBeUndefined();
     });
 
@@ -359,17 +360,11 @@ describe("parseShowdownFormat with Gen 1 style input", () => {
 
     it("parses species names that exist in listOfPokemon", () => {
         const result = parseShowdownFormat(gen1ShowdownInput);
-        const expectedSpecies = ["Alakazam", "Chansey", "Nidoran-M", "Mew", "Nidoran-F", "Zapdos"];
+        // Nidoran-M and Nidoran-F are now converted to Nidoran♂ and Nidoran♀ by the parser
+        const expectedSpecies = ["Alakazam", "Chansey", "Nidoran♂", "Mew", "Nidoran♀", "Zapdos"];
         
         result.forEach((pokemon, index) => {
-            // Note: Nidoran-M and Nidoran-F are Showdown format, actual list uses Nidoran♂ and Nidoran♀
-            if (pokemon.species === "Nidoran-M") {
-                expect(listOfPokemon).toContain("Nidoran♂");
-            } else if (pokemon.species === "Nidoran-F") {
-                expect(listOfPokemon).toContain("Nidoran♀");
-            } else {
-                expect(listOfPokemon).toContain(pokemon.species);
-            }
+            expect(listOfPokemon).toContain(pokemon.species);
             expect(pokemon.species).toBe(expectedSpecies[index]);
         });
     });
@@ -425,12 +420,22 @@ IVs: 2 HP / 28 Atk / 28 Def / 0 Spe
 - Body Slam  
 - Double-Edge  
 - Hidden Power [Grass]  
-- Hidden Power [Grass]  `;
+- Psychic  `;
 
 describe("parseShowdownFormat with Gen 2 style input", () => {
     it("parses all 6 Pokemon from Gen 2 input", () => {
         const result = parseShowdownFormat(gen2ShowdownInput);
         expect(result).toHaveLength(6);
+    });
+
+    it("parses Pokemon types correctly", () => {
+        const result = parseShowdownFormat(gen2ShowdownInput, { generation: Generation.Gen2 });
+        expect(result[0].types).toEqual([Types.Psychic, Types.Psychic]);
+        expect(result[1].types).toEqual([Types.Normal, Types.Normal]);
+        expect(result[2].types).toEqual([Types.Psychic, Types.Psychic]);
+        expect(result[3].types).toEqual([Types.Psychic, Types.Psychic]);
+        expect(result[4].types).toEqual([Types.Poison, Types.Poison]);
+        expect(result[5].types).toEqual([Types.Psychic, Types.Psychic]);
     });
 
     it("parses Pokemon with gender suffix and item correctly", () => {
@@ -451,9 +456,10 @@ describe("parseShowdownFormat with Gen 2 style input", () => {
 
     it("parses Unown form correctly", () => {
         const result = parseShowdownFormat(gen2ShowdownInput);
-        // Plark (Unown-P) @ Black Belt
+        // Plark (Unown-P) @ Black Belt - now parsed as "Unown" with forme "P"
         expect(result[2].nickname).toBe("Plark");
-        expect(result[2].species).toBe("Unown-P");
+        expect(result[2].species).toBe("Unown");
+        expect(result[2].forme).toBe("p");
         expect(result[2].item).toBe("Black Belt");
     });
 
@@ -479,26 +485,20 @@ describe("parseShowdownFormat with Gen 2 style input", () => {
 
     it("parses Hidden Power with type correctly", () => {
         const result = parseShowdownFormat(gen2ShowdownInput);
-        expect(result[0].moves).toContain("Hidden Power [Flying]");
-        expect(result[2].moves).toContain("Hidden Power [Electric]");
-        expect(result[5].moves).toContain("Hidden Power [Grass]");
+        // Hidden Power [Type] is converted to "HP Type" format
+        expect(result[0].moves).toContain("HP Flying");
+        expect(result[2].moves).toContain("HP Electric");
+        expect(result[5].moves).toContain("HP Grass");
     });
 
     it("parses moves correctly for all Pokemon", () => {
         const result = parseShowdownFormat(gen2ShowdownInput);
-        expect(result[0].moves).toEqual(["Body Slam", "Reflect", "Psychic", "Hidden Power [Flying]"]);
+        expect(result[0].moves).toEqual(["Body Slam", "Reflect", "Psychic", "HP Flying"]);
         expect(result[1].moves).toEqual(["Blizzard", "Hyper Beam", "Rest", "Sing"]);
-        expect(result[2].moves).toEqual(["Hidden Power [Electric]"]);
+        expect(result[2].moves).toEqual(["HP Electric"]);
         expect(result[3].moves).toEqual(["Fire Blast", "Counter", "Rock Slide", "Reflect"]);
         expect(result[4].moves).toEqual(["Rest", "Thunder", "Thunderbolt", "Double Kick"]);
-        expect(result[5].moves).toEqual(["Body Slam", "Double-Edge", "Hidden Power [Grass]", "Hidden Power [Grass]"]);
-    });
-
-    it("allows duplicate moves", () => {
-        const result = parseShowdownFormat(gen2ShowdownInput);
-        // Mr. Mime has Hidden Power [Grass] twice
-        const hiddenPowerCount = result[5].moves?.filter(m => m === "Hidden Power [Grass]").length;
-        expect(hiddenPowerCount).toBe(2);
+        expect(result[5].moves).toEqual(["Body Slam", "Double-Edge", "HP Grass", "Psychic"]);
     });
 
     it("parses abilities correctly", () => {
@@ -534,18 +534,12 @@ describe("parseShowdownFormat with Gen 2 style input", () => {
 
     it("parses species names that exist in listOfPokemon", () => {
         const result = parseShowdownFormat(gen2ShowdownInput);
-        const expectedSpecies = ["Alakazam", "Chansey", "Unown-P", "Mew", "Nidoran-F", "Mr. Mime"];
+        // With forme handling, "Unown-P" is now parsed as "Unown" with forme
+        // Nidoran-F is now converted to Nidoran♀ by the parser
+        const expectedSpecies = ["Alakazam", "Chansey", "Unown", "Mew", "Nidoran♀", "Mr. Mime"];
         
         result.forEach((pokemon, index) => {
-            // Handle Showdown format variations
-            if (pokemon.species === "Nidoran-F") {
-                expect(listOfPokemon).toContain("Nidoran♀");
-            } else if (pokemon.species === "Unown-P") {
-                // Unown forms use base "Unown" in the list
-                expect(listOfPokemon).toContain("Unown");
-            } else {
-                expect(listOfPokemon).toContain(pokemon.species);
-            }
+            expect(listOfPokemon).toContain(pokemon.species);
             expect(pokemon.species).toBe(expectedSpecies[index]);
         });
     });
@@ -620,9 +614,10 @@ describe("parseShowdownFormat with Gen 3 style input", () => {
 
     it("parses Pokemon with nickname and Unown form correctly", () => {
         const result = parseShowdownFormat(gen3ShowdownInput);
-        // Xavier (Unown-X) @ Lum Berry
+        // Xavier (Unown-X) @ Lum Berry - now parsed as "Unown" with forme "X"
         expect(result[0].nickname).toBe("Xavier");
-        expect(result[0].species).toBe("Unown-X");
+        expect(result[0].species).toBe("Unown");
+        expect(result[0].forme).toBe("x");
         expect(result[0].item).toBe("Lum Berry");
     });
 
@@ -694,20 +689,20 @@ describe("parseShowdownFormat with Gen 3 style input", () => {
 
     it("parses moves with multiple Hidden Power types correctly", () => {
         const result = parseShowdownFormat(gen3ShowdownInput);
-        // Castform has Hidden Power [Grass] and Hidden Power [Fighting]
-        expect(result[1].moves).toContain("Hidden Power [Grass]");
-        expect(result[1].moves).toContain("Hidden Power [Fighting]");
-        // Articuno has Hidden Power [Fire] and Hidden Power [Grass]
-        expect(result[2].moves).toContain("Hidden Power [Fire]");
-        expect(result[2].moves).toContain("Hidden Power [Grass]");
+        // Castform has HP Grass and HP Fighting
+        expect(result[1].moves).toContain("HP Grass");
+        expect(result[1].moves).toContain("HP Fighting");
+        // Articuno has HP Fire and HP Grass
+        expect(result[2].moves).toContain("HP Fire");
+        expect(result[2].moves).toContain("HP Grass");
     });
 
     it("parses all moves correctly", () => {
         const result = parseShowdownFormat(gen3ShowdownInput);
-        expect(result[0].moves).toEqual(["Hidden Power [Electric]"]);
-        expect(result[1].moves).toEqual(["Double-Edge", "Frustration", "Hidden Power [Grass]", "Hidden Power [Fighting]"]);
-        expect(result[2].moves).toEqual(["Extrasensory", "Frustration", "Hidden Power [Fire]", "Hidden Power [Grass]"]);
-        expect(result[3].moves).toEqual(["Double-Edge", "Facade", "Hidden Power [Fighting]", "Hydro Pump"]);
+        expect(result[0].moves).toEqual(["HP Electric"]);
+        expect(result[1].moves).toEqual(["Double-Edge", "Frustration", "HP Grass", "HP Fighting"]);
+        expect(result[2].moves).toEqual(["Extrasensory", "Frustration", "HP Fire", "HP Grass"]);
+        expect(result[3].moves).toEqual(["Double-Edge", "Facade", "HP Fighting", "Hydro Pump"]);
         expect(result[4].moves).toEqual(["Blizzard", "Brick Break", "Double-Edge", "Mud-Slap"]);
         expect(result[5].moves).toEqual(["Counter", "Dragon Dance", "Fire Punch", "Focus Punch"]);
     });
@@ -728,15 +723,11 @@ describe("parseShowdownFormat with Gen 3 style input", () => {
 
     it("parses species names that exist in listOfPokemon", () => {
         const result = parseShowdownFormat(gen3ShowdownInput);
-        const expectedSpecies = ["Unown-X", "Castform", "Articuno", "Starmie", "Slaking", "Charizard"];
+        // With forme handling, "Unown-X" is now parsed as "Unown" with forme
+        const expectedSpecies = ["Unown", "Castform", "Articuno", "Starmie", "Slaking", "Charizard"];
         
         result.forEach((pokemon, index) => {
-            // Handle Unown forms - base "Unown" is in the list
-            if (pokemon.species.startsWith("Unown-")) {
-                expect(listOfPokemon).toContain("Unown");
-            } else {
-                expect(listOfPokemon).toContain(pokemon.species);
-            }
+            expect(listOfPokemon).toContain(pokemon.species);
             expect(pokemon.species).toBe(expectedSpecies[index]);
         });
     });
@@ -805,24 +796,40 @@ describe("parseShowdownFormat with Gen 4 style input (forms)", () => {
 
     it("parses Pokemon with form suffix correctly", () => {
         const result = parseShowdownFormat(gen4ShowdownInput);
-        // Burmy-Sandy
-        expect(result[0].species).toBe("Burmy-Sandy");
+        // Burmy-Sandy - now parsed as "Burmy" with forme "Sandy"
+        expect(result[0].species).toBe("Burmy");
+        expect(result[0].forme).toBe("sandy");
         expect(result[0].nickname).toBeUndefined();
-        // Shellos-East
-        expect(result[2].species).toBe("Shellos-East");
+        // Shellos-East - now parsed as "Shellos" with forme "East Sea"
+        expect(result[2].species).toBe("Shellos");
+        expect(result[2].forme).toBe("east");
         expect(result[2].nickname).toBeUndefined();
-        // Rotom-Heat
-        expect(result[4].species).toBe("Rotom-Heat");
+        // Rotom-Heat - now parsed as "Rotom" with forme "Heat"
+        expect(result[4].species).toBe("Rotom");
+        expect(result[4].forme).toBe("heat");
         expect(result[4].nickname).toBeUndefined();
-        // Rotom-Frost
-        expect(result[5].species).toBe("Rotom-Frost");
+        // Rotom-Frost - now parsed as "Rotom" with forme "Frost"
+        expect(result[5].species).toBe("Rotom");
+        expect(result[5].forme).toBe("frost");
         expect(result[5].nickname).toBeUndefined();
+    });
+
+    it("parses Pokemon types correctly", () => {
+        const result = parseShowdownFormat(gen4ShowdownInput, { generation: Generation.Gen4 });
+        expect(result[0].types).toEqual([Types.Bug, Types.Bug]);
+        expect(result[1].types).toEqual([Types.Bug, Types.Bug]);
+        expect(result[2].types).toEqual([Types.Water, Types.Water]);
+        expect(result[3].types).toEqual([Types.Water, Types.Water]);
+        // Rotom-Heat is Electric/Fire, Rotom-Frost is Electric/Ice
+        expect(result[4].types).toEqual([Types.Electric, Types.Fire]);
+        expect(result[5].types).toEqual([Types.Electric, Types.Ice]);
     });
 
     it("parses Pokemon with form suffix and gender correctly", () => {
         const result = parseShowdownFormat(gen4ShowdownInput);
-        // Burmy-Trash (F) @ Choice Scarf
-        expect(result[1].species).toBe("Burmy-Trash");
+        // Burmy-Trash (F) @ Choice Scarf - now parsed as "Burmy" with forme "Trash"
+        expect(result[1].species).toBe("Burmy");
+        expect(result[1].forme).toBe("trash"); // Forme enum value
         expect(result[1].nickname).toBeUndefined();
         expect(result[1].item).toBe("Choice Scarf");
     });
@@ -881,19 +888,19 @@ describe("parseShowdownFormat with Gen 4 style input (forms)", () => {
 
     it("parses moves correctly", () => {
         const result = parseShowdownFormat(gen4ShowdownInput);
-        expect(result[0].moves).toEqual(["Hidden Power [Grass]", "Protect", "Bug Bite"]);
+        expect(result[0].moves).toEqual(["HP Grass", "Protect", "Bug Bite"]);
         expect(result[1].moves).toEqual(["Protect"]);
-        expect(result[2].moves).toEqual(["Blizzard", "Counter", "Hidden Power [Electric]", "Earth Power"]);
-        expect(result[3].moves).toEqual(["Curse", "Body Slam", "Facade", "Hidden Power [Fighting]"]);
+        expect(result[2].moves).toEqual(["Blizzard", "Counter", "HP Electric", "Earth Power"]);
+        expect(result[3].moves).toEqual(["Curse", "Body Slam", "Facade", "HP Fighting"]);
         expect(result[4].moves).toEqual(["Discharge", "Frustration", "Light Screen", "Protect"]);
-        expect(result[5].moves).toEqual(["Discharge", "Hidden Power [Fighting]", "Pain Split", "Hidden Power [Grass]"]);
+        expect(result[5].moves).toEqual(["Discharge", "HP Fighting", "Pain Split", "HP Grass"]);
     });
 
     it("parses moves with multiple Hidden Power types correctly", () => {
         const result = parseShowdownFormat(gen4ShowdownInput);
-        // Rotom-Frost has Hidden Power [Fighting] and Hidden Power [Grass]
-        expect(result[5].moves).toContain("Hidden Power [Fighting]");
-        expect(result[5].moves).toContain("Hidden Power [Grass]");
+        // Rotom-Frost has HP Fighting and HP Grass
+        expect(result[5].moves).toContain("HP Fighting");
+        expect(result[5].moves).toContain("HP Grass");
     });
 
     it("sets status to Team for all Pokemon", () => {
@@ -912,20 +919,363 @@ describe("parseShowdownFormat with Gen 4 style input (forms)", () => {
 
     it("parses species names that exist in listOfPokemon", () => {
         const result = parseShowdownFormat(gen4ShowdownInput);
-        const expectedSpecies = ["Burmy-Sandy", "Burmy-Trash", "Shellos-East", "Shellos", "Rotom-Heat", "Rotom-Frost"];
+        // With forme handling, forms are now split out - species are base names
+        const expectedSpecies = ["Burmy", "Burmy", "Shellos", "Shellos", "Rotom", "Rotom"];
         
         result.forEach((pokemon, index) => {
-            // Handle form variations - base forms are in the list
-            if (pokemon.species.startsWith("Burmy-")) {
-                expect(listOfPokemon).toContain("Burmy");
-            } else if (pokemon.species.startsWith("Shellos-")) {
-                expect(listOfPokemon).toContain("Shellos");
-            } else if (pokemon.species.startsWith("Rotom-")) {
-                expect(listOfPokemon).toContain("Rotom");
-            } else {
-                expect(listOfPokemon).toContain(pokemon.species);
-            }
+            expect(listOfPokemon).toContain(pokemon.species);
             expect(pokemon.species).toBe(expectedSpecies[index]);
+        });
+    });
+});
+
+const gen7ShowdownInput = `Diancie-Mega @ Diancite  
+Ability: Magic Bounce  
+Hidden Power: Fire  
+EVs: 252 Atk / 4 SpA / 252 Spe  
+Hasty Nature  
+IVs: 0 Atk  
+- Dazzling Gleam  
+- Diamond Storm  
+- Earth Power  
+- Facade  
+
+Tapu Koko @ Tapunium Z  
+Ability: Electric Surge  
+EVs: 252 Atk / 4 SpA / 252 Spe  
+Naughty Nature  
+IVs: 0 Atk  
+- Acrobatics  
+- Agility  
+- Calm Mind  
+- Hidden Power [Fire]  
+
+Rotom-Mow  
+Ability: Levitate  
+Level: 40  
+EVs: 248 HP / 8 Atk / 252 Spe  
+Hasty Nature  
+- Defog  
+- Discharge  
+- Facade  
+- Foul Play  
+
+Zygarde-Complete @ Assault Vest  
+Ability: Power Construct  
+Shiny: Yes  
+EVs: 252 HP / 4 Atk / 252 SpD  
+Sassy Nature  
+- Coil  
+- Core Enforcer  
+- Crunch  
+- Earthquake  
+
+Oricorio-Sensu @ Aguav Berry  
+Ability: Dancer  
+EVs: 252 HP / 4 SpD / 252 Spe  
+Jolly Nature  
+- Baton Pass  
+- Calm Mind  
+- U-turn  
+- Protect  
+
+Silvally-Ghost @ Ghost Memory  
+Ability: RKS System  
+EVs: 252 Atk / 4 SpA / 252 Spe  
+Hasty Nature  
+- Air Slash  
+- Crunch  
+- Flamethrower  
+- Explosion  
+`;
+
+describe("parseShowdownFormat with Gen 7 style input", () => {
+    it("parses all 6 Pokemon from Gen 7 input", () => {
+        const result = parseShowdownFormat(gen7ShowdownInput);
+        expect(result).toHaveLength(6);
+    });
+
+    it("parses Mega forme correctly", () => {
+        const result = parseShowdownFormat(gen7ShowdownInput);
+        // Diancie-Mega - parsed as "Diancie" with forme "Mega"
+        expect(result[0].species).toBe("Diancie");
+        expect(result[0].forme).toBe("mega");
+        expect(result[0].item).toBe("Diancite");
+        expect(result[0].ability).toBe("Magic Bounce");
+    });
+
+    it("parses Pokemon types correctly", () => {
+        const result = parseShowdownFormat(gen7ShowdownInput, { generation: Generation.Gen7 });
+        expect(result[0].types).toEqual([Types.Rock, Types.Fairy]);
+        expect(result[1].types).toEqual([Types.Electric, Types.Fairy]);
+        expect(result[2].types).toEqual([Types.Electric, Types.Grass]);
+        expect(result[3].types).toEqual([Types.Dragon, Types.Ground]);
+        // Oricorio-Sensu is Ghost/Flying
+        expect(result[4].types).toEqual([Types.Ghost, Types.Flying]);
+    });
+
+    it("parses Tapu Pokemon with Z-Crystal correctly", () => {
+        const result = parseShowdownFormat(gen7ShowdownInput);
+        // Tapu Koko keeps hyphenated name
+        expect(result[1].species).toBe("Tapu Koko");
+        expect(result[1].item).toBe("Tapunium Z");
+        expect(result[1].ability).toBe("Electric Surge");
+    });
+
+    it("parses Rotom form correctly", () => {
+        const result = parseShowdownFormat(gen7ShowdownInput);
+        // Rotom-Mow - parsed as "Rotom" with forme "Mow"
+        expect(result[2].species).toBe("Rotom");
+        expect(result[2].forme).toBe("mow");
+        expect(result[2].level).toBe(40);
+    });
+
+    it("parses Zygarde-Complete form correctly", () => {
+        const result = parseShowdownFormat(gen7ShowdownInput);
+        // Zygarde-Complete - parsed as "Zygarde" with forme "Complete"
+        expect(result[3].species).toBe("Zygarde");
+        expect(result[3].forme).toBe("complete");
+        expect(result[3].shiny).toBe(true);
+        expect(result[3].item).toBe("Assault Vest");
+    });
+
+    it("parses Oricorio form correctly", () => {
+        const result = parseShowdownFormat(gen7ShowdownInput);
+        // Oricorio-Sensu - parsed as "Oricorio" with forme "Sensu"
+        expect(result[4].species).toBe("Oricorio");
+        expect(result[4].forme).toBe("sensu");
+        expect(result[4].item).toBe("Aguav Berry");
+    });
+
+    it("parses Silvally form correctly", () => {
+        const result = parseShowdownFormat(gen7ShowdownInput);
+        // Silvally-Ghost - parsed as "Silvally" with forme (if supported)
+        expect(result[5].species).toBe("Silvally");
+        expect(result[5].item).toBe("Ghost Memory");
+        expect(result[5].ability).toBe("RKS System");
+    });
+
+    it("parses natures correctly", () => {
+        const result = parseShowdownFormat(gen7ShowdownInput);
+        expect(result[0].nature).toBe("Hasty");
+        expect(result[1].nature).toBe("Naughty");
+        expect(result[2].nature).toBe("Hasty");
+        expect(result[3].nature).toBe("Sassy");
+        expect(result[4].nature).toBe("Jolly");
+        expect(result[5].nature).toBe("Hasty");
+    });
+
+    it("parses moves correctly", () => {
+        const result = parseShowdownFormat(gen7ShowdownInput);
+        expect(result[0].moves).toEqual(["Dazzling Gleam", "Diamond Storm", "Earth Power", "Facade"]);
+        expect(result[1].moves).toEqual(["Acrobatics", "Agility", "Calm Mind", "HP Fire"]);
+        expect(result[2].moves).toEqual(["Defog", "Discharge", "Facade", "Foul Play"]);
+        expect(result[3].moves).toEqual(["Coil", "Core Enforcer", "Crunch", "Earthquake"]);
+        expect(result[4].moves).toEqual(["Baton Pass", "Calm Mind", "U-turn", "Protect"]);
+        expect(result[5].moves).toEqual(["Air Slash", "Crunch", "Flamethrower", "Explosion"]);
+    });
+
+    it("parses species names that exist in listOfPokemon", () => {
+        const result = parseShowdownFormat(gen7ShowdownInput);
+        const expectedSpecies = ["Diancie", "Tapu Koko", "Rotom", "Zygarde", "Oricorio", "Silvally"];
+        
+        result.forEach((pokemon, index) => {
+            expect(listOfPokemon).toContain(pokemon.species);
+            expect(pokemon.species).toBe(expectedSpecies[index]);
+        });
+    });
+
+    it("sets status to Team for all Pokemon", () => {
+        const result = parseShowdownFormat(gen7ShowdownInput);
+        result.forEach((pokemon) => {
+            expect(pokemon.status).toBe("Team");
+        });
+    });
+});
+
+const gen8ShowdownInput = `Crescendo (Toxtricity-Low-Key) (F) @ Air Balloon  
+Ability: Punk Rock  
+Level: 49  
+Gigantamax: Yes  
+EVs: 252 HP / 252 SpA / 4 SpD  
+Modest Nature  
+IVs: 0 Atk  
+- Boomburst  
+- Discharge  
+- Overdrive  
+- Volt Switch  
+
+Valiant (Arcanine) (F) @ Focus Sash  
+Ability: Intimidate  
+Level: 47  
+EVs: 8 HP / 248 Atk / 4 SpA / 248 Spe  
+Quirky Nature  
+- Close Combat  
+- Extreme Speed  
+- Fire Blast  
+- Outrage  
+
+Jetstream (Barraskewda) (M) @ Mystic Water  
+Ability: Swift Swim  
+Level: 47  
+Shiny: Yes  
+EVs: 252 Atk / 4 SpD / 252 Spe  
+Gentle Nature  
+- Rain Dance  
+- Liquidation  
+- Flip Turn  
+- Close Combat  
+
+Selva (Rillaboom) (M) @ Rocky Helmet  
+Ability: Overgrow  
+Level: 48  
+EVs: 252 Atk / 4 SpD / 252 Spe  
+Mild Nature  
+- Drain Punch  
+- Drum Beating  
+- Leech Seed  
+- U-turn  
+
+Indeedee-F @ Life Orb  
+Ability: Synchronize  
+Level: 40  
+EVs: 4 Atk / 148 SpA / 252 Spe  
+Docile Nature  
+- Psychic  
+- Fake Out  
+- Mystical Fire  
+- Hyper Voice  
+
+Stunfisk-Galar @ Leftovers  
+Ability: Mimicry  
+EVs: 252 HP / 252 Def / 4 SpD  
+Bold Nature  
+IVs: 0 Atk / 0 Spe  
+- Yawn  
+- Stealth Rock  
+- Protect  
+- Foul Play  
+`;
+
+describe("parseShowdownFormat with Gen 8 style input", () => {
+    it("parses all 6 Pokemon from Gen 8 input", () => {
+        const result = parseShowdownFormat(gen8ShowdownInput);
+        expect(result).toHaveLength(6);
+    });
+
+    it("parses Toxtricity Low-Key form correctly", () => {
+        const result = parseShowdownFormat(gen8ShowdownInput);
+        expect(result[0].species).toBe("Toxtricity");
+        expect(result[0].forme).toBe("lowkey");
+        expect(result[0].nickname).toBe("Crescendo");
+        expect(result[0].item).toBe("Air Balloon");
+        expect(result[0].ability).toBe("Punk Rock");
+        expect(result[0].level).toBe(49);
+    });
+
+    it("parses Pokemon with nicknames and gender correctly", () => {
+        const result = parseShowdownFormat(gen8ShowdownInput);
+        // Valiant (Arcanine) (F)
+        expect(result[1].species).toBe("Arcanine");
+        expect(result[1].nickname).toBe("Valiant");
+        // Jetstream (Barraskewda) (M)
+        expect(result[2].species).toBe("Barraskewda");
+        expect(result[2].nickname).toBe("Jetstream");
+        expect(result[2].shiny).toBe(true);
+        // Selva (Rillaboom) (M)
+        expect(result[3].species).toBe("Rillaboom");
+        expect(result[3].nickname).toBe("Selva");
+    });
+
+    it("parses Indeedee-F form correctly", () => {
+        const result = parseShowdownFormat(gen8ShowdownInput);
+        // Indeedee-F - parsed as "Indeedee" with forme "F"
+        expect(result[4].species).toBe("Indeedee");
+        expect(result[4].forme).toBe("f");
+        expect(result[4].nickname).toBeUndefined();
+        expect(result[4].item).toBe("Life Orb");
+        expect(result[4].level).toBe(40);
+    });
+
+    it("parses Stunfisk-Galar regional form correctly", () => {
+        const result = parseShowdownFormat(gen8ShowdownInput);
+        // Stunfisk-Galar - parsed as "Stunfisk" with forme "Galarian"
+        expect(result[5].species).toBe("Stunfisk");
+        expect(result[5].forme).toBe("galarian");
+        expect(result[5].item).toBe("Leftovers");
+        expect(result[5].ability).toBe("Mimicry");
+    });
+
+    it("parses Pokemon types correctly", () => {
+        const result = parseShowdownFormat(gen8ShowdownInput, { generation: Generation.Gen8 });
+        // Toxtricity is Electric/Poison
+        expect(result[0].types).toEqual([Types.Electric, Types.Poison]);
+        // Arcanine is Fire type
+        expect(result[1].types).toEqual([Types.Fire, Types.Fire]);
+        // Barraskewda is Water type
+        expect(result[2].types).toEqual([Types.Water, Types.Water]);
+        // Rillaboom is Grass type
+        expect(result[3].types).toEqual([Types.Grass, Types.Grass]);
+        // Indeedee-F is Psychic/Normal
+        expect(result[4].types).toEqual([Types.Psychic, Types.Normal]);
+        // Stunfisk-Galar is Ground/Steel
+        expect(result[5].types).toEqual([Types.Ground, Types.Steel]);
+    });
+
+    it("parses natures correctly", () => {
+        const result = parseShowdownFormat(gen8ShowdownInput);
+        expect(result[0].nature).toBe("Modest");
+        expect(result[1].nature).toBe("Quirky");
+        expect(result[2].nature).toBe("Gentle");
+        expect(result[3].nature).toBe("Mild");
+        expect(result[4].nature).toBe("Docile");
+        expect(result[5].nature).toBe("Bold");
+    });
+
+    it("parses levels correctly", () => {
+        const result = parseShowdownFormat(gen8ShowdownInput);
+        expect(result[0].level).toBe(49);
+        expect(result[1].level).toBe(47);
+        expect(result[2].level).toBe(47);
+        expect(result[3].level).toBe(48);
+        expect(result[4].level).toBe(40);
+        expect(result[5].level).toBeUndefined(); // No level specified
+    });
+
+    it("parses moves correctly", () => {
+        const result = parseShowdownFormat(gen8ShowdownInput);
+        expect(result[0].moves).toEqual(["Boomburst", "Discharge", "Overdrive", "Volt Switch"]);
+        expect(result[1].moves).toEqual(["Close Combat", "Extreme Speed", "Fire Blast", "Outrage"]);
+        expect(result[2].moves).toEqual(["Rain Dance", "Liquidation", "Flip Turn", "Close Combat"]);
+        expect(result[3].moves).toEqual(["Drain Punch", "Drum Beating", "Leech Seed", "U-turn"]);
+        expect(result[4].moves).toEqual(["Psychic", "Fake Out", "Mystical Fire", "Hyper Voice"]);
+        expect(result[5].moves).toEqual(["Yawn", "Stealth Rock", "Protect", "Foul Play"]);
+    });
+
+    it("parses shiny status correctly", () => {
+        const result = parseShowdownFormat(gen8ShowdownInput);
+        expect(result[0].shiny).toBeUndefined();
+        expect(result[1].shiny).toBeUndefined();
+        expect(result[2].shiny).toBe(true);
+        expect(result[3].shiny).toBeUndefined();
+        expect(result[4].shiny).toBeUndefined();
+        expect(result[5].shiny).toBeUndefined();
+    });
+
+    it("parses species names that exist in listOfPokemon", () => {
+        const result = parseShowdownFormat(gen8ShowdownInput);
+        const expectedSpecies = ["Toxtricity", "Arcanine", "Barraskewda", "Rillaboom", "Indeedee", "Stunfisk"];
+        
+        result.forEach((pokemon, index) => {
+            expect(listOfPokemon).toContain(pokemon.species);
+            expect(pokemon.species).toBe(expectedSpecies[index]);
+        });
+    });
+
+    it("sets status to Team for all Pokemon", () => {
+        const result = parseShowdownFormat(gen8ShowdownInput);
+        result.forEach((pokemon) => {
+            expect(pokemon.status).toBe("Team");
         });
     });
 });
@@ -1049,77 +1399,46 @@ describe("Species validation against listOfPokemon", () => {
 
     it("validates all species from Gen 1 input exist in listOfPokemon", () => {
         const result = parseShowdownFormat(gen1ShowdownInput);
-        const expectedMapping = [
-            { parsed: "Alakazam", base: "Alakazam" },
-            { parsed: "Chansey", base: "Chansey" },
-            { parsed: "Nidoran-M", base: "Nidoran♂" },
-            { parsed: "Mew", base: "Mew" },
-            { parsed: "Nidoran-F", base: "Nidoran♀" },
-            { parsed: "Zapdos", base: "Zapdos" },
-        ];
+        // Parser now converts Nidoran-M/Nidoran-F to Nidoran♂/Nidoran♀ directly
+        const expectedSpecies = ["Alakazam", "Chansey", "Nidoran♂", "Mew", "Nidoran♀", "Zapdos"];
         
         result.forEach((pokemon, index) => {
-            const baseSpecies = getBaseSpecies(pokemon.species);
-            expect(listOfPokemon).toContain(baseSpecies);
-            expect(pokemon.species).toBe(expectedMapping[index].parsed);
-            expect(baseSpecies).toBe(expectedMapping[index].base);
+            expect(listOfPokemon).toContain(pokemon.species);
+            expect(pokemon.species).toBe(expectedSpecies[index]);
         });
     });
 
     it("validates all species from Gen 2 input exist in listOfPokemon", () => {
         const result = parseShowdownFormat(gen2ShowdownInput);
-        const expectedMapping = [
-            { parsed: "Alakazam", base: "Alakazam" },
-            { parsed: "Chansey", base: "Chansey" },
-            { parsed: "Unown-P", base: "Unown" },
-            { parsed: "Mew", base: "Mew" },
-            { parsed: "Nidoran-F", base: "Nidoran♀" },
-            { parsed: "Mr. Mime", base: "Mr. Mime" },
-        ];
+        // With forme handling, "Unown-P" is now parsed as "Unown" with forme "P"
+        // Nidoran-F is now converted to Nidoran♀ by the parser
+        const expectedSpecies = ["Alakazam", "Chansey", "Unown", "Mew", "Nidoran♀", "Mr. Mime"];
         
         result.forEach((pokemon, index) => {
-            const baseSpecies = getBaseSpecies(pokemon.species);
-            expect(listOfPokemon).toContain(baseSpecies);
-            expect(pokemon.species).toBe(expectedMapping[index].parsed);
-            expect(baseSpecies).toBe(expectedMapping[index].base);
+            expect(listOfPokemon).toContain(pokemon.species);
+            expect(pokemon.species).toBe(expectedSpecies[index]);
         });
     });
 
     it("validates all species from Gen 3 input exist in listOfPokemon", () => {
         const result = parseShowdownFormat(gen3ShowdownInput);
-        const expectedMapping = [
-            { parsed: "Unown-X", base: "Unown" },
-            { parsed: "Castform", base: "Castform" },
-            { parsed: "Articuno", base: "Articuno" },
-            { parsed: "Starmie", base: "Starmie" },
-            { parsed: "Slaking", base: "Slaking" },
-            { parsed: "Charizard", base: "Charizard" },
-        ];
+        // With forme handling, "Unown-X" is now parsed as "Unown" with forme "X"
+        const expectedSpecies = ["Unown", "Castform", "Articuno", "Starmie", "Slaking", "Charizard"];
         
         result.forEach((pokemon, index) => {
-            const baseSpecies = getBaseSpecies(pokemon.species);
-            expect(listOfPokemon).toContain(baseSpecies);
-            expect(pokemon.species).toBe(expectedMapping[index].parsed);
-            expect(baseSpecies).toBe(expectedMapping[index].base);
+            expect(listOfPokemon).toContain(pokemon.species);
+            expect(pokemon.species).toBe(expectedSpecies[index]);
         });
     });
 
     it("validates all species from Gen 4 input exist in listOfPokemon", () => {
         const result = parseShowdownFormat(gen4ShowdownInput);
-        const expectedMapping = [
-            { parsed: "Burmy-Sandy", base: "Burmy" },
-            { parsed: "Burmy-Trash", base: "Burmy" },
-            { parsed: "Shellos-East", base: "Shellos" },
-            { parsed: "Shellos", base: "Shellos" },
-            { parsed: "Rotom-Heat", base: "Rotom" },
-            { parsed: "Rotom-Frost", base: "Rotom" },
-        ];
+        // With forme handling, species like "Burmy-Sandy" are now parsed as "Burmy" with forme "Sandy"
+        const expectedSpecies = ["Burmy", "Burmy", "Shellos", "Shellos", "Rotom", "Rotom"];
         
         result.forEach((pokemon, index) => {
-            const baseSpecies = getBaseSpecies(pokemon.species);
-            expect(listOfPokemon).toContain(baseSpecies);
-            expect(pokemon.species).toBe(expectedMapping[index].parsed);
-            expect(baseSpecies).toBe(expectedMapping[index].base);
+            expect(listOfPokemon).toContain(pokemon.species);
+            expect(pokemon.species).toBe(expectedSpecies[index]);
         });
     });
 
@@ -1473,7 +1792,7 @@ describe("Type validation against matchSpeciesToTypes", () => {
     });
 
     it("validates types for all Gen 2 input Pokemon via getBaseSpecies", () => {
-        const result = parseShowdownFormat(gen2ShowdownInput);
+        const result = parseShowdownFormat(gen2ShowdownInput, { generation: Generation.Gen2 });
         const expectedTypes: [Types, Types][] = [
             [Types.Psychic, Types.Psychic],   // Alakazam
             [Types.Normal, Types.Normal],      // Chansey

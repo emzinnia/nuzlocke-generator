@@ -286,25 +286,26 @@ export function PokemonDoubleSelectInput({
     edit,
     setEdit,
 }: PokemonInputProps) {
-    if (!Array.isArray(edit[inputName])) {
-        throw new Error("Could not read input as Array");
-    }
+    // Ensure we have a valid array - fallback to default types if not
+    const editValue = Array.isArray(edit[inputName]) 
+        ? edit[inputName] 
+        : (Array.isArray(value) ? value : ["Normal", "Normal"]);
 
     const onSelect = React.useMemo(
         () => (position: number) => (e) => {
             onChange(e);
-            const newEdit = [...edit[inputName]];
+            const newEdit = [...editValue];
             newEdit[position] = e.currentTarget.value;
             setEdit({ [inputName]: newEdit });
         },
-        [inputName, edit],
+        [inputName, editValue],
     );
 
     return (
         <span className="double-select-wrapper">
             <HTMLSelect
                 onChange={onSelect(0)}
-                value={edit?.[inputName]?.[0]}
+                value={editValue[0]}
                 name={inputName}
             >
                 {options
@@ -318,7 +319,7 @@ export function PokemonDoubleSelectInput({
             <span>&nbsp;</span>
             <HTMLSelect
                 onChange={onSelect(1)}
-                value={edit?.[inputName]?.[1]}
+                value={editValue[1]}
                 name={inputName}
             >
                 {options

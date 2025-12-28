@@ -9,6 +9,7 @@ import {
     Intent,
     Switch,
     Classes,
+    HTMLSelect,
 } from "@blueprintjs/core";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { ErrorBoundary, HotkeyIndicator } from "components/Common/Shared";
@@ -34,6 +35,7 @@ import {
     parseShowdownFormat,
     isValidShowdownFormat,
 } from "utils/parseShowdownFormat";
+import { Generation, getGameGeneration } from "utils/getters/getGameGeneration";
 // @TODO: fix codegen imports
 // import codegen from 'codegen.macro';
 import { BoxMappings } from "parsers/utils/boxMappings";
@@ -54,6 +56,7 @@ export interface DataEditorState {
     mode: "import" | "export";
     data: string;
     showdownData: string;
+    showdownGeneration: Generation;
     href: string;
     overrideImport: boolean;
 }
@@ -211,8 +214,9 @@ export class DataEditorBase extends React.Component<
     public nuzlockeJsonFileInput: HTMLInputElement | null;
     public advancedImportRef = React.createRef<import("./AdvancedImportOptions").AdvancedImportOptionsHandle>();
 
-    public constructor(props) {
+    public constructor(props: DataEditorProps) {
         super(props);
+        const gameGeneration = getGameGeneration(props.state.game.name);
         this.state = {
             isOpen: false,
             isClearAllDataOpen: false,
@@ -220,6 +224,7 @@ export class DataEditorBase extends React.Component<
             mode: "export",
             data: "",
             showdownData: "",
+            showdownGeneration: gameGeneration,
             href: "",
             overrideImport: true,
         };
@@ -485,7 +490,12 @@ export class DataEditorBase extends React.Component<
         this.setState({ isClearAllDataOpen: !this.state.isClearAllDataOpen });
 
     private openShowdownImport = () => {
-        this.setState({ isShowdownOpen: true, showdownData: "" });
+        const gameGeneration = getGameGeneration(this.props.state.game.name);
+        this.setState({ 
+            isShowdownOpen: true, 
+            showdownData: "",
+            showdownGeneration: gameGeneration,
+        });
     };
 
     private closeShowdownImport = () => {
@@ -498,8 +508,14 @@ export class DataEditorBase extends React.Component<
         this.setState({ showdownData: e.target.value });
     };
 
+    private handleShowdownGenerationChange = (
+        e: React.ChangeEvent<HTMLSelectElement>,
+    ) => {
+        this.setState({ showdownGeneration: parseInt(e.target.value, 10) as Generation });
+    };
+
     private confirmShowdownImport = () => {
-        const { showdownData } = this.state;
+        const { showdownData, showdownGeneration } = this.state;
         const { state, replaceState } = this.props;
 
         if (!isValidShowdownFormat(showdownData)) {
@@ -511,7 +527,10 @@ export class DataEditorBase extends React.Component<
         }
 
         const startPosition = state.pokemon.length;
-        const newPokemon = parseShowdownFormat(showdownData, startPosition);
+        const newPokemon = parseShowdownFormat(showdownData, {
+            startPosition,
+            generation: showdownGeneration,
+        });
 
         if (newPokemon.length === 0) {
             showToast({
@@ -728,6 +747,23 @@ export class DataEditorBase extends React.Component<
                             Paste your Pokemon Showdown format text below. Each Pokemon
                             will be added to your Team.
                         </Callout>
+                        <div style={{ marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            <span>Generation:</span>
+                            <HTMLSelect
+                                value={this.state.showdownGeneration}
+                                onChange={this.handleShowdownGenerationChange}
+                            >
+                                <option value={Generation.Gen1}>Gen 1 (RBY)</option>
+                                <option value={Generation.Gen2}>Gen 2 (GSC)</option>
+                                <option value={Generation.Gen3}>Gen 3 (RSE/FRLG)</option>
+                                <option value={Generation.Gen4}>Gen 4 (DPPt/HGSS)</option>
+                                <option value={Generation.Gen5}>Gen 5 (BW/B2W2)</option>
+                                <option value={Generation.Gen6}>Gen 6 (XY/ORAS)</option>
+                                <option value={Generation.Gen7}>Gen 7 (SM/USUM)</option>
+                                <option value={Generation.Gen8}>Gen 8 (SwSh/BDSP/LA)</option>
+                                <option value={Generation.Gen9}>Gen 9 (SV)</option>
+                            </HTMLSelect>
+                        </div>
                         <TextArea
                             className={cx("custom-css-input", Classes.FILL)}
                             onChange={this.handleShowdownDataChange}
@@ -811,13 +847,6 @@ export class DataEditorBase extends React.Component<
 
                     <ButtonGroup>
                         <Button
-                            icon="document"
-                            data-testid="import-showdown-button"
-                            onClick={this.openShowdownImport}
-                        >
-                            Import from Showdown
-                        </Button>
-                        <Button
                             intent={Intent.SUCCESS}
                             onClick={this.writeAllData}
                             icon="floppy-disk"
@@ -844,6 +873,7 @@ export class DataEditorBase extends React.Component<
                     boxes={this.props.state.box}
                     isDarkMode={this.props.state.style.editorDarkMode ?? false}
                     onFileSelect={this.handleFileSelect}
+                    onShowdownImport={this.openShowdownImport}
                 />
             </BaseEditor>
         );
