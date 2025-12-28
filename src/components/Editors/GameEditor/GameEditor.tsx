@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { connect } from "react-redux";
 import {
     editGame,
@@ -6,115 +6,81 @@ import {
     resetCheckpoints,
 } from "actions";
 import { gameOfOriginToColor, listOfGames, Game } from "utils";
+import { Game as GameModel } from "models";
 
-import { Button, Intent, Classes, HTMLSelect } from "components/ui/shims";
-import { RulesEditorDialog } from "components/Editors/RulesEditor/RulesEditor";
+import { Select } from "components/ui/shims";
 import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
+import { Input, Label } from "components/ui";
 
 export interface GameEditorProps {
-    game: any;
-    editGame: any;
+    game: GameModel;
+    editGame: typeof editGame;
     style: State["style"];
     editStyle: editStyle;
     resetCheckpoints: resetCheckpoints;
 }
 
-const gameSubEditorStyle: any = {
-    display: "flex",
-    justifyContent: "space-between",
-    paddingBottom: ".25rem",
-};
-
+const labelWidth = "50px";
 const controlWidth = "170px";
 
-export class GameEditorBase extends React.Component<
-    GameEditorProps,
-    { isOpen: boolean }
-> {
-    public state = {
-        isOpen: false,
-    };
-
-    private onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        this.props.editGame({ name: e.target.value });
-        this.props.editStyle({
+export function GameEditorBase({
+    game,
+    editGame,
+    editStyle,
+    resetCheckpoints,
+}: GameEditorProps) {
+    const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        editGame({ name: e.target.value });
+        editStyle({
             bgColor: gameOfOriginToColor(e.target.value as Game),
         });
-        this.props.resetCheckpoints(e.target.value as Game);
+        resetCheckpoints(e.target.value as Game);
     };
 
-    private onInputName = (e: React.ChangeEvent<HTMLInputElement>) => {
-        this.props.editGame({ customName: e.target.value });
+    const onInputName = (value: string) => {
+        editGame({ customName: value });
     };
 
-    private toggleDialog = () => this.setState({ isOpen: !this.state.isOpen });
-
-    public render() {
-        const { game } = this.props;
-        // Awful hack to get rid of `isOpen` conflict warning
-        const RED: any = RulesEditorDialog;
-        return (
-            <>
-                <RED isOpen={this.state.isOpen} onClose={this.toggleDialog} />
-                <BaseEditor icon="ninja" name="Game">
-                    <div style={gameSubEditorStyle}>
-                        <div>
-                            <label
-                                className={Classes.INLINE}
-                                style={{
-                                    fontSize: "80%",
-                                    marginRight: ".5rem",
-                                }}
-                            >
-                                Version
-                            </label>
-                            <HTMLSelect
-                                value={game.name}
-                                onChange={this.onChange}
-                                style={{ width: controlWidth }}
-                            >
-                                {listOfGames.map((game) => (
-                                    <option key={game}>{game}</option>
-                                ))}
-                            </HTMLSelect>
-                        </div>
-                        <Button
-                            onClick={this.toggleDialog}
-                            icon="list"
-                            intent={Intent.PRIMARY}
+    return (
+        <>
+            <BaseEditor icon="ninja" name="Game">
+                <div className="flex flex-col gap-2 pb-2">
+                    <div className="flex items-center">
+                        <Label className="text-xs" style={{ width: labelWidth }}>
+                            Version
+                        </Label>
+                        <Select
+                            value={game.name}
+                            onChange={onChange}
+                            style={{ width: controlWidth }}
                         >
-                            Modify Rules
-                        </Button>
+                            {listOfGames.map((g) => (
+                                <option key={g}>{g}</option>
+                            ))}
+                        </Select>
                     </div>
-                    <div style={gameSubEditorStyle}>
-                        <div style={{ fontSize: "80%" }}>
-                            <label
-                                className={Classes.INLINE}
-                                style={{ marginRight: "calc(.75rem + 2px)" }}
-                            >
-                                Name
-                            </label>
-                            <input
-                                onChange={this.onInputName}
-                                value={game.customName}
-                                autoComplete={"false"}
-                                size={20}
-                                style={{ width: controlWidth }}
-                                className={Classes.INPUT}
-                                type="text"
-                                placeholder={game.name}
-                            />
-                        </div>
+                    <div className="flex items-center">
+                        <Label className="text-xs" style={{ width: labelWidth }}>
+                            Name
+                        </Label>
+                        <Input
+                            onChange={(e) => onInputName(e.target.value)}
+                            value={game.customName}
+                            autoComplete={"false"}
+                            style={{ width: controlWidth }}
+                            type="text"
+                            placeholder={game.name}
+                        />
                     </div>
-                </BaseEditor>
-            </>
-        );
-    }
+                </div>
+            </BaseEditor>
+        </>
+    );
 }
 
 export const GameEditor = connect(
-    (state: Pick<State, keyof State>) => ({
+    (state: State) => ({
         game: state.game,
         style: state.style,
     }),
@@ -123,4 +89,4 @@ export const GameEditor = connect(
         editStyle,
         resetCheckpoints,
     },
-)(GameEditorBase as any);
+)(GameEditorBase);

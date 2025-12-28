@@ -18,7 +18,8 @@ export * from "./Features/Result";
 // Layout
 export * from "./Layout/App";
 export * from "./Layout/Layout";
-// TopBar has been deprecated - functionality moved to EditorToolbar
+// Header is intentionally not exported here to avoid circular dependencies
+// Import directly from "components/Layout/Header" when needed
 
 // Editors
 export * from "./Editors/BaseEditor";

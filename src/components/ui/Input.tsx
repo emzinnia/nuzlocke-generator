@@ -62,7 +62,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
         return (
             <div
-                className={`relative inline-flex items-center rounded border bg-input transition-colors ${intentBorderClass[intent]} ${fill ? "w-full" : ""} ${disabled ? "opacity-50 cursor-not-allowed" : ""} ${className}`}
+                className={`relative inline-flex items-center rounded border dark:border-gray-600 focus:border-focus bg-input transition-colors ${intentBorderClass[intent]} ${fill ? "w-full" : ""} ${disabled ? "opacity-50 cursor-not-allowed" : ""} ${className}`}
             >
                 {hasLeftContent && (
                     <span className="flex items-center pl-2.5 text-fg-tertiary">

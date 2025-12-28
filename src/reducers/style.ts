@@ -4,16 +4,21 @@ import {
     REPLACE_STATE,
     SYNC_STATE_FROM_HISTORY,
 } from "actions";
-import {
-    getEditorDarkModePreference,
-    styleDefaults,
-    Styles,
-} from "utils";
+// Import directly to avoid circular dependency through utils barrel
+import { getEditorDarkModePreference } from "utils/editorDarkModePreference";
+import { styleDefaults, Styles } from "utils/styleDefaults";
 
-const initialStyleState: Styles = {
-    ...styleDefaults,
-    editorDarkMode: getEditorDarkModePreference(),
-};
+// Lazy-initialize default state to avoid circular dependency issues
+let initialStyleState: Styles | null = null;
+function getDefaultStyleState(): Styles {
+    if (initialStyleState === null) {
+        initialStyleState = {
+            ...styleDefaults,
+            editorDarkMode: getEditorDarkModePreference(),
+        };
+    }
+    return initialStyleState;
+}
 
 const mergeStyleWithoutDarkMode = (
     state: Styles,
@@ -28,7 +33,7 @@ const mergeStyleWithoutDarkMode = (
 };
 
 export function style(
-    state = initialStyleState,
+    state = getDefaultStyleState(),
     action: Action<EDIT_STYLE | REPLACE_STATE | SYNC_STATE_FROM_HISTORY>,
 ) {
     switch (action.type) {

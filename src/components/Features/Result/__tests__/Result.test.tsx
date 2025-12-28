@@ -33,9 +33,9 @@ vi.mock("components/Features/Result/TrainerResult", () => ({
     TrainerResult: () => <div data-testid="trainer-result" />,
 }));
 
-vi.mock("components/Layout/TopBar/TopBar", () => ({
-    TopBar: ({ children }: any) => (
-        <div data-testid="top-bar">{children}</div>
+vi.mock("components/Layout/Header/Header", () => ({
+    Header: () => (
+        <div data-testid="header" />
     ),
 }));
 

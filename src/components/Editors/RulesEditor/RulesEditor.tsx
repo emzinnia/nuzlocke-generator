@@ -1,20 +1,21 @@
 import * as React from "react";
+import { useState } from "react";
 import {
     Button,
     Dialog,
     Intent,
     TextArea,
+    Input,
+    Label,
     Classes,
-    HTMLSelect,
     Divider,
     Spinner,
 } from "components/ui/shims";
-import { Icon } from "components/ui";
+import { Icon, Select } from "components/ui";
 import { connect } from "react-redux";
 import { editRule, addRule, deleteRule, resetRules, setRules } from "actions";
 import { showToast } from "components/Common/Shared/appToaster";
 
-import "./RulesEditor.css";
 import { State } from "state";
 import { nuzlockeRulesets, NuzlockeRuleset } from "utils/data";
 import { feature } from "utils/feature";
@@ -30,151 +31,35 @@ export interface RulesEditorProps {
     setRules: setRules;
 }
 
-export interface RulesEditorState {
-    selectedRuleset: string;
-    suggestDialogOpen: boolean;
-    suggestName: string;
-    suggestDescription: string;
-    isSending: boolean;
-}
+export function RulesEditor({
+    rules,
+    editRule,
+    addRule,
+    deleteRule,
+    resetRules,
+    setRules,
+}: RulesEditorProps) {
+    const [selectedRuleset, setSelectedRuleset] = useState("");
+    const [suggestDialogOpen, setSuggestDialogOpen] = useState(false);
+    const [suggestName, setSuggestName] = useState("");
+    const [suggestDescription, setSuggestDescription] = useState("");
+    const [isSending, setIsSending] = useState(false);
 
-export class RulesEditor extends React.Component<RulesEditorProps, RulesEditorState> {
-    constructor(props: RulesEditorProps) {
-        super(props);
-        this.state = {
-            selectedRuleset: "",
-            suggestDialogOpen: false,
-            suggestName: "",
-            suggestDescription: "",
-            isSending: false,
-        };
-    }
+    const selectedRulesetData = presetRules.find((p) => p.name === selectedRuleset);
 
-    public renderRulesets() {
-        const { selectedRuleset } = this.state;
-        const selectedRulesetData = presetRules.find((p) => p.name === selectedRuleset);
-
-        return (
-            <div className="preset-rules-section">
-                <div className="preset-rules-header">
-                    <strong>Rulesets</strong>
-                </div>
-                <div className="preset-rules-controls">
-                    <HTMLSelect
-                        value={selectedRuleset}
-                        onChange={(e) => this.setState({ selectedRuleset: e.target.value })}
-                        className="preset-select"
-                    >
-                        <option value="">Select a ruleset...</option>
-                        {presetRules.map((preset) => (
-                            <option key={preset.name} value={preset.name}>
-                                {preset.name}
-                            </option>
-                        ))}
-                    </HTMLSelect>
-                    <Button
-                        onClick={() => {
-                            if (selectedRulesetData) {
-                                this.props.setRules(selectedRulesetData.rules);
-                                this.forceUpdate();
-                            }
-                        }}
-                        intent={Intent.SUCCESS}
-                        disabled={!selectedRuleset}
-                        icon="tick"
-                    >
-                        Apply Ruleset
-                    </Button>
-                </div>
-                {selectedRulesetData && (
-                    <div className="preset-description">
-                        <em>{selectedRulesetData.description}</em>
-                        <ul className="preset-preview">
-                            {selectedRulesetData.rules.map((rule, index) => (
-                                <li key={index}>{rule}</li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-                <Divider style={{ margin: "1rem 0" }} />
-            </div>
-        );
-    }
-
-    public renderRules() {
-        return this.props.rules.map((rule, index) => (
-            <li className="rules-list-item" key={index}>
-                <div className="rule-no">{index + 1}</div>
-                <TextArea
-                    value={rule}
-                    className={Classes.FILL}
-                    onChange={(e: any) =>
-                        this.props.editRule(index, e.target.value)
-                    }
-                    dir="auto"
-                />
-                <div
-                    onClick={() => this.props.deleteRule(index)}
-                    onKeyPress={() => this.props.deleteRule(index)}
-                    role="none"
-                    className="rule-delete"
-                    title="Delete Rule"
-                >
-                    <Icon
-                        intent={Intent.DANGER}
-                        style={{ cursor: "pointer" }}
-                        icon={"trash"}
-                    />
-                </div>
-            </li>
-        ));
-    }
-
-    public renderButtons() {
-        return (
-            <>
-                <Button
-                    onClick={(_) => this.props.addRule()}
-                    intent={Intent.PRIMARY}
-                >
-                    Add Rule
-                </Button>
-                <Button
-                    style={{ marginLeft: "1rem" }}
-                    onClick={() => {
-                        this.props.resetRules();
-                        this.forceUpdate();
-                    }}
-                    intent={Intent.WARNING}
-                >
-                    Reset Rules
-                </Button>
-            </>
-        );
-    }
-
-    private openSuggestDialog = () => {
-        this.setState({ suggestDialogOpen: true });
+    const closeSuggestDialog = () => {
+        setSuggestDialogOpen(false);
+        setSuggestName("");
+        setSuggestDescription("");
+        setIsSending(false);
     };
 
-    private closeSuggestDialog = () => {
-        this.setState({
-            suggestDialogOpen: false,
-            suggestName: "",
-            suggestDescription: "",
-            isSending: false,
-        });
-    };
-
-    private submitRulesetSuggestion = () => {
-        const { suggestName, suggestDescription } = this.state;
-        const { rules } = this.props;
-
+    const submitRulesetSuggestion = () => {
         if (!suggestName.trim() || rules.length === 0) {
             return;
         }
 
-        this.setState({ isSending: true });
+        setIsSending(true);
 
         const url = `${window.location.origin}/suggest-ruleset`;
 
@@ -197,139 +82,195 @@ export class RulesEditor extends React.Component<RulesEditorProps, RulesEditorSt
                         message: "Ruleset suggestion submitted! Thank you for contributing.",
                         intent: Intent.SUCCESS,
                     });
-                    this.setState({ isSending: false }, this.closeSuggestDialog);
+                    setIsSending(false);
+                    closeSuggestDialog();
                 } else {
                     showToast({
                         message: "Submission failed. Please try again.",
                         intent: Intent.DANGER,
                     });
                 }
-                this.setState({ isSending: false });
+                setIsSending(false);
             })
             .catch((err) => {
                 showToast({
                     message: `Submission failed. Please try again. ${err}`,
                     intent: Intent.DANGER,
                 });
-                this.setState({ isSending: false });
+                setIsSending(false);
             });
     };
 
-    public renderSuggestDialog() {
-        const { suggestDialogOpen, suggestName, suggestDescription, isSending } = this.state;
-        const { rules } = this.props;
-
-        return (
-            <Dialog
-                isOpen={suggestDialogOpen}
-                onClose={this.closeSuggestDialog}
-                title="Suggest as Community Ruleset"
-                icon="lightbulb"
-            >
-                <div className={Classes.DIALOG_BODY}>
-                    <p className="suggest-dialog-intro">
-                        Share your custom ruleset with the community! If approved, it will be added
-                        to the presets for everyone to use.
-                    </p>
-                    <div className="suggest-form">
-                        <label className={Classes.LABEL}>
-                            Ruleset Name
-                            <input
-                                className={Classes.INPUT}
-                                type="text"
-                                placeholder="e.g., Ironmon Challenge"
-                                value={suggestName}
-                                onChange={(e) => this.setState({ suggestName: e.target.value })}
-                                style={{ width: "100%" }}
-                            />
-                        </label>
-                        <label className={Classes.LABEL}>
-                            Description
-                            <TextArea
-                                placeholder="Brief description of this ruleset..."
-                                value={suggestDescription}
-                                onChange={(e) =>
-                                    this.setState({ suggestDescription: e.target.value })
-                                }
-                                style={{ width: "100%" }}
-                                rows={2}
-                            />
-                        </label>
-                        <div className="suggest-preview">
-                            <strong>Rules to submit ({rules.length}):</strong>
-                            <ul>
-                                {rules.map((rule, i) => (
-                                    <li key={i}>{rule || <em>(empty rule)</em>}</li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
+    return (
+        <>
+            <div className="m-2">
+                <div className="flex gap-2 items-center mb-3">
+                    <Select
+                        value={selectedRuleset}
+                        onChange={(e) => setSelectedRuleset(e.target.value)}
+                        className="flex-1"
+                    >
+                        <option value="">Select a ruleset...</option>
+                        {presetRules.map((preset) => (
+                            <option key={preset.name} value={preset.name}>
+                                {preset.name}
+                            </option>
+                        ))}
+                    </Select>
+                    <Button
+                        onClick={() => {
+                            if (selectedRulesetData) {
+                                setRules(selectedRulesetData.rules);
+                            }
+                        }}
+                        intent={Intent.SUCCESS}
+                        disabled={!selectedRuleset}
+                        icon="tick"
+                    >
+                        Apply Ruleset
+                    </Button>
                 </div>
-                <div className={Classes.DIALOG_FOOTER}>
-                    <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-                        <Button onClick={this.closeSuggestDialog}>Cancel</Button>
-                        <Button
-                            intent={Intent.PRIMARY}
-                            onClick={this.submitRulesetSuggestion}
-                            disabled={!suggestName.trim() || rules.length === 0 || isSending}
+                {selectedRulesetData && (
+                    <div className="bg-black/5 dark:bg-white/5 rounded p-3 text-sm">
+                        <em>{selectedRulesetData.description}</em>
+                        <ul className="mt-2 pl-5 not-italic">
+                            {selectedRulesetData.rules.map((rule, index) => (
+                                <li className="my-1 text-[0.85rem] opacity-85" key={index}>
+                                    {rule}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+                <Divider style={{ margin: "1rem 0" }} />
+            </div>
+
+            <ul className="list-none m-2 p-0">
+                {rules.map((rule, index) => (
+                    <li
+                        className="bg-black/5 dark:bg-white/5 rounded flex items-center justify-around my-1 min-h-8"
+                        key={index}
+                    >
+                        <div className="p-1 text-center h-full w-6">{index + 1}</div>
+                        <TextArea
+                            value={rule}
+                            fill
+                            onChange={(e: any) => editRule(index, e.target.value)}
+                            dir="auto"
+                        />
+                        <div
+                            onClick={() => deleteRule(index)}
+                            onKeyPress={() => deleteRule(index)}
+                            role="none"
+                            className="p-1 text-center h-full w-6 cursor-pointer"
+                            title="Delete Rule"
                         >
-                            {isSending ? (
-                                <>
-                                    <Spinner size={16} /> Submitting...
-                                </>
-                            ) : (
-                                "Submit Suggestion"
-                            )}
+                            <Icon className="cursor-pointer text-red-500" icon="trash" />
+                        </div>
+                    </li>
+                ))}
+            </ul>
+
+            <Button onClick={() => addRule()} intent={Intent.PRIMARY}>
+                Add Rule
+            </Button>
+            <Button className="ml-4" onClick={() => resetRules()} intent={Intent.WARNING}>
+                Reset Rules
+            </Button>
+
+            {feature.rulesetSubmission && (
+                <>
+                    <Divider style={{ margin: "1rem 0" }} />
+                    <div className="m-2 text-center">
+                        <Button
+                            icon="lightbulb"
+                            onClick={() => setSuggestDialogOpen(true)}
+                            minimal
+                            small
+                        >
+                            Suggest as Community Ruleset
                         </Button>
                     </div>
-                </div>
-            </Dialog>
-        );
-    }
 
-    public render() {
-        return (
-            <>
-                {this.renderRulesets()}
-                <ul
-                    style={{
-                        listStyleType: "none",
-                        margin: ".5rem",
-                        padding: "0",
-                    }}
-                >
-                    {this.renderRules()}
-                </ul>
-                {this.renderButtons()}
-                {feature.rulesetSubmission && (
-                    <>
-                        <Divider style={{ margin: "1rem 0" }} />
-                        <div className="suggest-ruleset-section">
-                            <Button
-                                icon="lightbulb"
-                                onClick={this.openSuggestDialog}
-                                minimal
-                                small
-                            >
-                                Suggest as Community Ruleset
-                            </Button>
+                    <Dialog
+                        isOpen={suggestDialogOpen}
+                        onClose={closeSuggestDialog}
+                        title="Suggest as Community Ruleset"
+                        icon="lightbulb"
+                    >
+                        <div className={Classes.DIALOG_BODY}>
+                            <p className="mb-4 text-[#5c7080] dark:text-[#a7b6c2]">
+                                Share your custom ruleset with the community! If approved, it will
+                                be added to the presets for everyone to use.
+                            </p>
+                            <div className="flex flex-col gap-3">
+                                <Label>
+                                    Ruleset Name
+                                    <Input
+                                        type="text"
+                                        placeholder="e.g., Ironmon Challenge"
+                                        value={suggestName}
+                                        onChange={(e) => setSuggestName(e.target.value)}
+                                        fill
+                                    />
+                                </Label>
+                                <Label>
+                                    Description
+                                    <TextArea
+                                        placeholder="Brief description of this ruleset..."
+                                        value={suggestDescription}
+                                        onChange={(e) => setSuggestDescription(e.target.value)}
+                                        fill
+                                        rows={2}
+                                    />
+                                </Label>
+                                <div className="bg-black/5 dark:bg-white/5 rounded p-3 text-sm max-h-[150px] overflow-y-auto">
+                                    <strong>Rules to submit ({rules.length}):</strong>
+                                    <ul className="mt-2 pl-5">
+                                        {rules.map((rule, i) => (
+                                            <li className="my-1 text-[0.85rem]" key={i}>
+                                                {rule || <em>(empty rule)</em>}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                        {this.renderSuggestDialog()}
-                    </>
-                )}
-            </>
-        );
-    }
+                        <div className={Classes.DIALOG_FOOTER}>
+                            <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+                                <Button onClick={closeSuggestDialog}>Cancel</Button>
+                                <Button
+                                    intent={Intent.PRIMARY}
+                                    onClick={submitRulesetSuggestion}
+                                    disabled={
+                                        !suggestName.trim() || rules.length === 0 || isSending
+                                    }
+                                >
+                                    {isSending ? (
+                                        <>
+                                            <Spinner size={16} /> Submitting...
+                                        </>
+                                    ) : (
+                                        "Submit Suggestion"
+                                    )}
+                                </Button>
+                            </div>
+                        </div>
+                    </Dialog>
+                </>
+            )}
+        </>
+    );
 }
 
-export const RulesEditorDialogBase = (
+export function RulesEditorDialogBase(
     props: RulesEditorProps & { onClose: any; isOpen: boolean; style: any },
-) => {
+) {
     return (
         <Dialog
             isOpen={props.isOpen}
             onClose={props.onClose}
-            className={`rules-editor-dialog ${props.style.editorDarkMode ? Classes.DARK : ""}`}
+            className={`!pb-0 min-w-[500px] ${props.style.editorDarkMode ? Classes.DARK : ""}`}
             data-theme={props.style.editorDarkMode ? "dark" : "light"}
             title="Rules Editor"
             icon="edit"
@@ -346,7 +287,7 @@ export const RulesEditorDialogBase = (
             </div>
         </Dialog>
     );
-};
+}
 
 export const RulesEditorDialog = connect(
     (state: State) => ({

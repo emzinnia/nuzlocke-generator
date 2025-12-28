@@ -73,6 +73,10 @@ module.exports = {
                     800: "var(--color-danger-800)",
                     900: "var(--color-danger-900)",
                 },
+                // Component backgrounds
+                input: "var(--input-bg)",
+                dialog: "var(--dialog-bg)",
+                card: "var(--card-bg)",
             },
             spacing: {
                 0: "var(--space-0)",

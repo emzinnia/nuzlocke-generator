@@ -1,4 +1,5 @@
-import { TeamImagesType } from "utils";
+// Import directly to avoid circular dependency through utils barrel
+import type { TeamImagesType } from "utils/styleDefaults";
 
 export interface Box {
     id: number;

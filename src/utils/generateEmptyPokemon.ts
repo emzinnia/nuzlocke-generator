@@ -1,7 +1,10 @@
 import { v4 as uuid } from "uuid";
-import { Pokemon } from "models";
-import { sortPokes } from ".";
+import { sortPokes } from "./sortPokes";
 import { Types } from "./Types";
+
+// Import Pokemon type only for type-checking to avoid circular dependency at runtime
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import type { Pokemon } from "models";
 
 export function generateEmptyPokemon(
     pokemon?: Pokemon[],

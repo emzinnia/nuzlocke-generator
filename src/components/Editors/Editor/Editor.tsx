@@ -30,6 +30,11 @@ const TrainerEditor = React.lazy(() =>
         default: res.TrainerEditor,
     }))
 );
+const RulesEditorSection = React.lazy(() =>
+    import("components/Editors/RulesEditor").then((res) => ({
+        default: res.RulesEditorSection,
+    }))
+);
 const HotkeysEditor = React.lazy(() =>
     import("components/Editors/HotkeysEditor").then((res) => ({
         default: res.HotkeysEditor,
@@ -53,11 +58,6 @@ const StyleEditor = React.lazy(() =>
 const DataEditor = React.lazy(() =>
     import("components/Editors/DataEditor").then((res) => ({
         default: res.DataEditor,
-    }))
-);
-const EditorToolbar = React.lazy(() =>
-    import("components/Editors/Editor/EditorToolbar").then((res) => ({
-        default: res.EditorToolbar,
     }))
 );
 const Credits = React.lazy(() =>
@@ -137,8 +137,8 @@ export function Editor() {
                 editorStyles.base,
                 editorDarkMode ? "dark" : "",
                 // Tailwind classes for editor styling
-                "min-h-screen p-1 relative overflow-y-auto overflow-x-hidden",
-                "border border-[var(--color-border-default)] border-r-0",
+                "h-full p-1 relative overflow-y-auto overflow-x-hidden",
+                "border border-[var(--color-border-default)] border-r-0 border-t-0",
                 "bg-[var(--color-bg-primary)]",
                 "hover:shadow-[0_0_4px_var(--color-border-default)]"
             )}
@@ -153,15 +153,6 @@ export function Editor() {
                 clipPath: "inset(0 -20px 0 0)", // Allow resize handle to show outside
             }}
         >
-            <ErrorBoundary key={1}>
-                <React.Suspense fallback={Skeleton}>
-                    <EditorToolbar
-                        editorDarkMode={editorDarkMode}
-                        minimized={minimized}
-                    />
-                </React.Suspense>
-            </ErrorBoundary>
-
             <Tabs
                 id="editor-tabs"
                 defaultSelectedTabId="nuzlocke"
@@ -202,6 +193,11 @@ export function Editor() {
                             <ErrorBoundary key={5}>
                                 <React.Suspense fallback={Skeleton}>
                                     <TrainerEditor />
+                                </React.Suspense>
+                            </ErrorBoundary>
+                            <ErrorBoundary key={13}>
+                                <React.Suspense fallback={Skeleton}>
+                                    <RulesEditorSection />
                                 </React.Suspense>
                             </ErrorBoundary>
                             <ErrorBoundary key={6}>

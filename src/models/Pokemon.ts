@@ -1,6 +1,13 @@
 import { GenderElementProps } from "components/Common/Shared";
-import { Checkpoints } from "reducers/checkpoints";
-import { Types, Game, Forme } from "utils";
+import { Badge } from "./Badge";
+// Import directly to avoid circular dependency through utils barrel
+import { Types } from "utils/Types";
+import { Forme } from "utils/Forme";
+// Use type-only import for Game since it's only used as a type
+import type { Game } from "utils/data/listOfGames";
+
+// Define Checkpoints locally to avoid circular dependency with reducers
+type Checkpoints = Badge[];
 
 export interface Pokemon {
     id: string;

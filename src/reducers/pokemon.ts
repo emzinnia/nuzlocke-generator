@@ -7,12 +7,21 @@ import {
     SYNC_STATE_FROM_HISTORY,
     CLEAR_BOX,
 } from "../actions";
-import { generateEmptyPokemon } from "utils";
+// Import directly to avoid circular dependency through utils barrel
+import { generateEmptyPokemon } from "utils/generateEmptyPokemon";
 
-const pokemonState = [generateEmptyPokemon()];
+// Lazy-initialize default state to avoid circular dependency issues
+// The state will be initialized on first reducer call
+let pokemonState: ReturnType<typeof generateEmptyPokemon>[] | null = null;
+function getDefaultPokemonState() {
+    if (pokemonState === null) {
+        pokemonState = [generateEmptyPokemon()];
+    }
+    return pokemonState;
+}
 
 export function pokemon(
-    state = pokemonState,
+    state = getDefaultPokemonState(),
     action:
         | Action<ADD_POKEMON>
         | Action<DELETE_POKEMON>
