@@ -30,6 +30,10 @@ import { DeleteAlert } from "./DeleteAlert";
 import { AdvancedImportOptions } from "./AdvancedImportOptions";
 import { isEmpty } from "utils/isEmpty";
 import { showToast } from "components/Common/Shared/appToaster";
+import {
+    parseShowdownFormat,
+    isValidShowdownFormat,
+} from "utils/parseShowdownFormat";
 // @TODO: fix codegen imports
 // import codegen from 'codegen.macro';
 import { BoxMappings } from "parsers/utils/boxMappings";
@@ -46,8 +50,10 @@ export interface DataEditorProps {
 export interface DataEditorState {
     isOpen: boolean;
     isClearAllDataOpen: boolean;
+    isShowdownOpen: boolean;
     mode: "import" | "export";
     data: string;
+    showdownData: string;
     href: string;
     overrideImport: boolean;
 }
@@ -210,8 +216,10 @@ export class DataEditorBase extends React.Component<
         this.state = {
             isOpen: false,
             isClearAllDataOpen: false,
+            isShowdownOpen: false,
             mode: "export",
             data: "",
+            showdownData: "",
             href: "",
             overrideImport: true,
         };
@@ -476,6 +484,93 @@ export class DataEditorBase extends React.Component<
     private toggleClearingData = () =>
         this.setState({ isClearAllDataOpen: !this.state.isClearAllDataOpen });
 
+    private openShowdownImport = () => {
+        this.setState({ isShowdownOpen: true, showdownData: "" });
+    };
+
+    private closeShowdownImport = () => {
+        this.setState({ isShowdownOpen: false, showdownData: "" });
+    };
+
+    private handleShowdownDataChange = (
+        e: React.ChangeEvent<HTMLTextAreaElement>,
+    ) => {
+        this.setState({ showdownData: e.target.value });
+    };
+
+    private confirmShowdownImport = () => {
+        const { showdownData } = this.state;
+        const { state, replaceState } = this.props;
+
+        if (!isValidShowdownFormat(showdownData)) {
+            showToast({
+                message: "Invalid Showdown format. Please check your input.",
+                intent: Intent.DANGER,
+            });
+            return;
+        }
+
+        const startPosition = state.pokemon.length;
+        const newPokemon = parseShowdownFormat(showdownData, startPosition);
+
+        if (newPokemon.length === 0) {
+            showToast({
+                message: "No Pokemon found in the input.",
+                intent: Intent.WARNING,
+            });
+            return;
+        }
+
+        // Merge new Pokemon with existing
+        const mergedPokemon = [...state.pokemon, ...newPokemon];
+        const newState = { ...state, pokemon: mergedPokemon };
+        replaceState(newState);
+
+        showToast({
+            message: `Imported ${newPokemon.length} Pokemon from Showdown format!`,
+            intent: Intent.SUCCESS,
+        });
+
+        this.closeShowdownImport();
+        this.writeAllData();
+    };
+
+    private getShowdownPreview() {
+        const { showdownData } = this.state;
+        if (!showdownData.trim()) return null;
+
+        if (!isValidShowdownFormat(showdownData)) {
+            return (
+                <Callout intent={Intent.WARNING} style={{ marginTop: "0.5rem" }}>
+                    This doesn&apos;t appear to be valid Showdown format.
+                </Callout>
+            );
+        }
+
+        const pokemon = parseShowdownFormat(showdownData);
+        if (pokemon.length === 0) return null;
+
+        return (
+            <div
+                style={{
+                    background: "rgba(0, 0, 0, 0.1)",
+                    borderRadius: ".25rem",
+                    margin: ".25rem",
+                    marginTop: ".5rem",
+                    padding: ".5rem",
+                }}
+            >
+                <div style={{ marginBottom: "0.5rem", fontWeight: 500 }}>
+                    Preview: {pokemon.length} Pokemon found
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
+                    {pokemon.map((p) => (
+                        <PokemonIcon key={p.id} {...p} />
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     public render() {
         return (
@@ -612,6 +707,67 @@ export class DataEditorBase extends React.Component<
                     )}
                 </Dialog>
 
+                <Dialog
+                    isOpen={this.state.isShowdownOpen}
+                    onClose={this.closeShowdownImport}
+                    title="Import from Showdown"
+                    className={
+                        this.props.state.style.editorDarkMode
+                            ? Classes.DARK
+                            : ""
+                    }
+                    icon="import"
+                >
+                    <div
+                        className={cx(
+                            Classes.DIALOG_BODY,
+                            "has-nice-scrollbars",
+                        )}
+                    >
+                        <Callout intent={Intent.PRIMARY} style={{ marginBottom: "0.5rem" }}>
+                            Paste your Pokemon Showdown format text below. Each Pokemon
+                            will be added to your Team.
+                        </Callout>
+                        <TextArea
+                            className={cx("custom-css-input", Classes.FILL)}
+                            onChange={this.handleShowdownDataChange}
+                            placeholder={`Example format:\n\nPikachu @ Light Ball\nAbility: Static\nTera Type: Electric\nNaive Nature\n- Thunderbolt\n- Volt Tackle\n- Iron Tail\n- Quick Attack`}
+                            value={this.state.showdownData}
+                            large={true}
+                            rows={12}
+                            style={{ fontFamily: "monospace", fontSize: "0.85rem" }}
+                        />
+                        <ErrorBoundary>
+                            {this.getShowdownPreview()}
+                        </ErrorBoundary>
+                    </div>
+                    <div className={Classes.DIALOG_FOOTER}>
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                gap: "0.5rem",
+                            }}
+                        >
+                            <Button onClick={this.closeShowdownImport}>
+                                Cancel
+                            </Button>
+                            <Button
+                                icon="tick"
+                                intent={
+                                    this.state.showdownData.trim() === ""
+                                        ? Intent.NONE
+                                        : Intent.SUCCESS
+                                }
+                                onClick={this.confirmShowdownImport}
+                                disabled={this.state.showdownData.trim() === ""}
+                            >
+                                Import Pokemon
+                            </Button>
+                        </div>
+                    </div>
+                </Dialog>
+
                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.25rem", margin: "0.25rem" }}>
                     <ButtonGroup>
                         <Button
@@ -654,6 +810,13 @@ export class DataEditorBase extends React.Component<
                     </ButtonGroup>
 
                     <ButtonGroup>
+                        <Button
+                            icon="document"
+                            data-testid="import-showdown-button"
+                            onClick={this.openShowdownImport}
+                        >
+                            Import from Showdown
+                        </Button>
                         <Button
                             intent={Intent.SUCCESS}
                             onClick={this.writeAllData}

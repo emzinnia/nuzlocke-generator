@@ -230,6 +230,7 @@ export const PokemonIcon = (props: BasePokemonIconProps) => {
         height: "32px",
         maxWidth: "auto",
         imageRendering: styles?.iconRendering,
+        filter: style?.editorDarkMode ? "invert(100%)" : undefined,
     };
 
     return (
