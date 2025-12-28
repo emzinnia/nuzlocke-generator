@@ -47,6 +47,8 @@ export interface PopoverProps {
     className?: string;
 }
 
+const EDGE_PADDING = 8; // Minimum distance from screen edge
+
 export const Popover: React.FC<PopoverProps> = ({
     content,
     children,
@@ -62,7 +64,11 @@ export const Popover: React.FC<PopoverProps> = ({
     const [internalIsOpen, setInternalIsOpen] = React.useState(false);
     const triggerRef = React.useRef<HTMLDivElement>(null);
     const popoverRef = React.useRef<HTMLDivElement>(null);
-    const [popoverPosition, setPopoverPosition] = React.useState({ top: 0, left: 0 });
+    const [popoverStyle, setPopoverStyle] = React.useState<React.CSSProperties>({
+        top: 0,
+        left: 0,
+        visibility: "hidden",
+    });
 
     const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
 
@@ -74,43 +80,117 @@ export const Popover: React.FC<PopoverProps> = ({
         }
     };
 
-    // Calculate position
-    React.useEffect(() => {
-        if (isOpen && triggerRef.current) {
-            const rect = triggerRef.current.getBoundingClientRect();
-            let top = 0;
-            let left = 0;
+    // Calculate position and keep within viewport
+    const updatePosition = React.useCallback(() => {
+        if (!triggerRef.current || !popoverRef.current) return;
 
-            switch (position) {
-                case "bottom":
-                case "bottom-start":
-                case "bottom-end":
-                    top = rect.bottom + 8;
-                    left = position === "bottom-end" ? rect.right : position === "bottom-start" ? rect.left : rect.left + rect.width / 2;
-                    break;
-                case "top":
-                case "top-start":
-                case "top-end":
-                    top = rect.top - 8;
-                    left = position === "top-end" ? rect.right : position === "top-start" ? rect.left : rect.left + rect.width / 2;
-                    break;
-                case "left":
-                case "left-start":
-                case "left-end":
-                    top = rect.top + rect.height / 2;
-                    left = rect.left - 8;
-                    break;
-                case "right":
-                case "right-start":
-                case "right-end":
-                    top = rect.top + rect.height / 2;
-                    left = rect.right + 8;
-                    break;
-            }
+        const triggerRect = triggerRef.current.getBoundingClientRect();
+        const popoverRect = popoverRef.current.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
 
-            setPopoverPosition({ top, left });
+        let top = 0;
+        let left = 0;
+
+        // Calculate initial position based on preferred position
+        switch (position) {
+            case "bottom":
+                top = triggerRect.bottom + 8;
+                left = triggerRect.left + triggerRect.width / 2 - popoverRect.width / 2;
+                break;
+            case "bottom-start":
+                top = triggerRect.bottom + 8;
+                left = triggerRect.left;
+                break;
+            case "bottom-end":
+                top = triggerRect.bottom + 8;
+                left = triggerRect.right - popoverRect.width;
+                break;
+            case "top":
+                top = triggerRect.top - popoverRect.height - 8;
+                left = triggerRect.left + triggerRect.width / 2 - popoverRect.width / 2;
+                break;
+            case "top-start":
+                top = triggerRect.top - popoverRect.height - 8;
+                left = triggerRect.left;
+                break;
+            case "top-end":
+                top = triggerRect.top - popoverRect.height - 8;
+                left = triggerRect.right - popoverRect.width;
+                break;
+            case "left":
+                top = triggerRect.top + triggerRect.height / 2 - popoverRect.height / 2;
+                left = triggerRect.left - popoverRect.width - 8;
+                break;
+            case "left-start":
+                top = triggerRect.top;
+                left = triggerRect.left - popoverRect.width - 8;
+                break;
+            case "left-end":
+                top = triggerRect.bottom - popoverRect.height;
+                left = triggerRect.left - popoverRect.width - 8;
+                break;
+            case "right":
+                top = triggerRect.top + triggerRect.height / 2 - popoverRect.height / 2;
+                left = triggerRect.right + 8;
+                break;
+            case "right-start":
+                top = triggerRect.top;
+                left = triggerRect.right + 8;
+                break;
+            case "right-end":
+                top = triggerRect.bottom - popoverRect.height;
+                left = triggerRect.right + 8;
+                break;
         }
-    }, [isOpen, position]);
+
+        // Clamp to viewport bounds
+        // Horizontal clamping
+        if (left < EDGE_PADDING) {
+            left = EDGE_PADDING;
+        } else if (left + popoverRect.width > viewportWidth - EDGE_PADDING) {
+            left = viewportWidth - popoverRect.width - EDGE_PADDING;
+        }
+
+        // Vertical clamping
+        if (top < EDGE_PADDING) {
+            top = EDGE_PADDING;
+        } else if (top + popoverRect.height > viewportHeight - EDGE_PADDING) {
+            top = viewportHeight - popoverRect.height - EDGE_PADDING;
+        }
+
+        setPopoverStyle({
+            top,
+            left,
+            visibility: "visible",
+        });
+    }, [position]);
+
+    // Update position when open or position changes
+    React.useEffect(() => {
+        if (isOpen) {
+            // Use requestAnimationFrame to ensure the popover is rendered before measuring
+            const rafId = requestAnimationFrame(() => {
+                updatePosition();
+            });
+            return () => cancelAnimationFrame(rafId);
+        }
+    }, [isOpen, updatePosition]);
+
+    // Handle window resize/scroll
+    React.useEffect(() => {
+        if (!isOpen) return;
+
+        const handleUpdate = () => updatePosition();
+
+        window.addEventListener("resize", handleUpdate);
+        window.addEventListener("scroll", handleUpdate, true);
+
+        return () => {
+            window.removeEventListener("resize", handleUpdate);
+            window.removeEventListener("scroll", handleUpdate, true);
+        };
+    }, [isOpen, updatePosition]);
 
     // Handle click outside
     React.useEffect(() => {
@@ -155,24 +235,28 @@ export const Popover: React.FC<PopoverProps> = ({
         onMouseLeave: handleMouseLeave,
     });
 
-    const popoverContent = isOpen && !disabled ? (
-        createPortal(
-            <div
-                ref={popoverRef}
-                className={`fixed z-50 rounded-md bg-white shadow-lg dark:bg-gray-800 ${minimal ? "" : "border border-gray-200 dark:border-gray-700 p-3"} ${popoverClassName}`}
-                style={{
-                    top: popoverPosition.top,
-                    left: popoverPosition.left,
-                    transform: position.startsWith("bottom") ? "translateX(-50%)" : position.startsWith("top") ? "translateX(-50%) translateY(-100%)" : undefined,
-                }}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-            >
-                {content}
-            </div>,
-            document.body
-        )
-    ) : null;
+    const popoverContent =
+        isOpen && !disabled
+            ? createPortal(
+                  <div
+                      ref={popoverRef}
+                      className={`fixed z-[1060] rounded-lg shadow-xl ${
+                          minimal ? "p-0" : "border p-3"
+                      } ${popoverClassName}`}
+                      style={{
+                          ...popoverStyle,
+                          backgroundColor: "var(--color-bg-primary)",
+                          borderColor: "var(--color-border-default)",
+                          color: "var(--color-text-primary)",
+                      }}
+                      onMouseEnter={handleMouseEnter}
+                      onMouseLeave={handleMouseLeave}
+                  >
+                      {content}
+                  </div>,
+                  document.body,
+              )
+            : null;
 
     return (
         <div ref={triggerRef} className={`inline-block ${className}`}>

@@ -25,11 +25,11 @@ export const intentToBgClass: Record<Intent, string> = {
  * Maps Intent to Tailwind color classes for outlined/minimal variants.
  */
 export const intentToOutlineClass: Record<Intent, string> = {
-    [Intent.NONE]: "border-border text-fg-primary hover:bg-slate-100 dark:hover:bg-slate-700",
-    [Intent.PRIMARY]: "border-primary-500 text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/30",
-    [Intent.SUCCESS]: "border-success-500 text-success-600 hover:bg-success-50 dark:text-success-400 dark:hover:bg-success-900/30",
-    [Intent.WARNING]: "border-warning-500 text-warning-600 hover:bg-warning-50 dark:text-warning-400 dark:hover:bg-warning-900/30",
-    [Intent.DANGER]: "border-danger-500 text-danger-600 hover:bg-danger-50 dark:text-danger-400 dark:hover:bg-danger-900/30",
+    [Intent.NONE]: "border-border hover:bg-black/10 dark:hover:bg-white/10",
+    [Intent.PRIMARY]: "border-primary-500 text-primary-600 hover:bg-primary-500/15 dark:text-primary-400 dark:hover:bg-primary-500/20",
+    [Intent.SUCCESS]: "border-success-500 text-success-600 hover:bg-success-500/15 dark:text-success-400 dark:hover:bg-success-500/20",
+    [Intent.WARNING]: "border-warning-500 text-warning-600 hover:bg-warning-500/15 dark:text-warning-400 dark:hover:bg-warning-500/20",
+    [Intent.DANGER]: "border-danger-500 text-danger-600 hover:bg-danger-500/15 dark:text-danger-400 dark:hover:bg-danger-500/20",
 };
 
 /**

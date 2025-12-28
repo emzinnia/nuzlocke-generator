@@ -22,8 +22,12 @@ export const Menu: React.FC<MenuProps> = ({ children, className = "", style }) =
     return (
         <div
             role="menu"
-            style={style}
-            className={`min-w-[180px] rounded-md bg-white py-1 shadow-lg dark:bg-gray-800 ${className}`}
+            style={{
+                backgroundColor: "var(--color-bg-primary)",
+                borderColor: "var(--color-border-default)",
+                ...style,
+            }}
+            className={`min-w-[180px] rounded-lg border py-2 px-1 shadow-lg ${className}`}
         >
             {children}
         </div>
@@ -83,17 +87,18 @@ export const MenuItem: React.FC<MenuItemProps> = ({
                     onClick?.(e as unknown as React.MouseEvent<HTMLDivElement>);
                 }
             }}
-            className={`flex cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors ${
+            className={`flex cursor-pointer items-center gap-2 px-3 py-2 text-sm rounded transition-colors ${
                 disabled
-                    ? "cursor-not-allowed text-gray-400"
+                    ? "cursor-not-allowed opacity-50"
                     : active
-                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                    : `text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 ${intentClass}`
+                    ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"
+                    : `hover:bg-black/5 dark:hover:bg-white/10 ${intentClass}`
             } ${className}`}
+            style={{ color: disabled ? undefined : "var(--color-text-primary)" }}
         >
             {icon && <Icon icon={icon} size={16} className="flex-shrink-0" />}
             <span className="flex-grow">{children ?? text}</span>
-            {labelElement && <span className="text-xs text-gray-400">{labelElement}</span>}
+            {labelElement && <span className="text-xs opacity-60">{labelElement}</span>}
         </div>
     );
 };

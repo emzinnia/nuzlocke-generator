@@ -37,11 +37,11 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
 
         return (
             <label
-                className={`flex cursor-pointer items-center gap-2 ${inline ? "inline-flex" : ""} ${
+                className={`flex cursor-pointer items-center gap-2 px-2 py-1.5 rounded transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${inline ? "inline-flex" : ""} ${
                     disabled ? "cursor-not-allowed opacity-50" : ""
                 } ${className}`}
             >
-                <div className="relative">
+                <div className="relative flex-shrink-0">
                     <input
                         ref={combinedRef}
                         type="checkbox"
@@ -51,10 +51,10 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
                         {...props}
                     />
                     <div
-                        className={`${size} flex items-center justify-center rounded border transition-colors ${
+                        className={`${size} flex items-center justify-center rounded border-2 transition-colors ${
                             checked || indeterminate
                                 ? "border-blue-500 bg-blue-500 text-white"
-                                : "border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700"
+                                : "border-gray-400 bg-transparent dark:border-gray-500"
                         } ${disabled ? "" : "peer-focus:ring-2 peer-focus:ring-blue-500 peer-focus:ring-offset-2"}`}
                     >
                         {indeterminate ? (
@@ -64,7 +64,11 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
                         ) : null}
                     </div>
                 </div>
-                {label && <span className="text-sm text-gray-700 dark:text-gray-200">{label}</span>}
+                {label && (
+                    <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+                        {label}
+                    </span>
+                )}
             </label>
         );
     }

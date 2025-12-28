@@ -1,3 +1,4 @@
+import React from "react";
 import { TrainerInfoEditor } from "./TrainerInfoEditor";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 

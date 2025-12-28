@@ -160,7 +160,7 @@ export function RulesEditor({
                         />
                         <div
                             onClick={() => deleteRule(index)}
-                            onKeyPress={() => deleteRule(index)}
+                            onKeyUp={() => deleteRule(index)}
                             role="none"
                             className="p-1 text-center h-full w-6 cursor-pointer"
                             title="Delete Rule"

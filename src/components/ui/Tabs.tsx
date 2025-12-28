@@ -1,10 +1,3 @@
-/**
- * Tabs Component
- *
- * A tabs component built with native HTML and React.
- * Provides Blueprint-compatible API.
- */
-
 import * as React from "react";
 
 export interface TabProps {
@@ -23,7 +16,6 @@ export interface TabProps {
 }
 
 export const Tab: React.FC<TabProps> = ({ id, title, panel, disabled, className, icon }) => {
-    // Tab is just a data component, rendering is handled by Tabs
     return null;
 };
 
@@ -65,7 +57,6 @@ export const Tabs: React.FC<TabsProps> = ({
     children,
     renderActiveTabPanelOnly = true,
 }) => {
-    // Extract Tab children
     const tabs = React.Children.toArray(children).filter(
         (child): child is React.ReactElement<TabProps> =>
             React.isValidElement(child) && (child.type as any) === Tab
@@ -89,7 +80,6 @@ export const Tabs: React.FC<TabsProps> = ({
 
     return (
         <div className={`${vertical ? "flex" : ""} ${className}`}>
-            {/* Tab list */}
             <div
                 role="tablist"
                 aria-orientation={vertical ? "vertical" : "horizontal"}
@@ -121,7 +111,6 @@ export const Tabs: React.FC<TabsProps> = ({
                     >
                         {tab.props.icon}
                         {tab.props.title}
-                        {/* Active indicator */}
                         {tab.props.id === selectedTabId && (
                             <span
                                 className={`absolute bg-blue-500 ${
@@ -135,8 +124,7 @@ export const Tabs: React.FC<TabsProps> = ({
                 ))}
             </div>
 
-            {/* Tab panels */}
-            <div className={`${vertical ? "flex-1 pl-4" : "pt-4"}`}>
+            <div className={`${vertical ? "flex-1 pl-4" : " "}`}>
                 {renderActiveTabPanelOnly ? (
                     selectedTab?.props.panel && (
                         <div

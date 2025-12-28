@@ -36,7 +36,7 @@ export function BaseEditor({
     return (
         <div
             data-testid="base-editor"
-            className={`${toSlug(name)}-editor p-1 bg-background-secondary rounded`}
+            className={`${toSlug(name)}-editor p-1 rounded`}
         >
             <h4
                 title={`${isOpen ? "Collapse" : "Open"} this editor.`}

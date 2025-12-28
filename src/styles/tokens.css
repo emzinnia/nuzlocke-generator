@@ -237,6 +237,59 @@ html.dark {
    UTILITY CLASSES (for use before full Tailwind integration)
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* Input classes for Blueprint compatibility */
+.ui-input {
+  background-color: var(--input-bg);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  height: var(--input-height);
+  padding: 0 0.75rem;
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-in-out);
+}
+
+.ui-input::placeholder {
+  color: var(--input-placeholder);
+}
+
+.ui-input:focus {
+  border-color: var(--color-border-focus);
+}
+
+/* Dark mode support for ui-input */
+.dark .ui-input,
+html.dark .ui-input {
+  background-color: #1a1a1a;
+  border-color: #333;
+  color: #f5ede4;
+}
+
+.dark .ui-input::placeholder,
+html.dark .ui-input::placeholder {
+  color: #8a7560;
+}
+
+.ui-input-group {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.ui-input-group > .ui-input {
+  flex: 1;
+  padding-left: 2rem;
+}
+
+.ui-input-group > .icon,
+.ui-input-group > [data-icon] {
+  position: absolute;
+  left: 0.5rem;
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+}
+
 /* Focus ring utility */
 .focus-ring {
   outline: none;

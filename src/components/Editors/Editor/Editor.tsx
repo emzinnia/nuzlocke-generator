@@ -150,7 +150,7 @@ export function Editor() {
                 position: "relative",
                 overflow: minimized ? "hidden" : undefined,
                 visibility: minimized ? "hidden" : "visible",
-                clipPath: "inset(0 -20px 0 0)", // Allow resize handle to show outside
+                clipPath: "inset(0 -24px 0 0)", // Allow resize handle to show outside
             }}
         >
             <Tabs
@@ -274,16 +274,16 @@ export function Editor() {
                 <div
                     onMouseDown={handleMouseDown}
                     className={cx(
-                        // Resize handle positioning and interaction
-                        "absolute top-0 -right-3 w-3 h-full cursor-ew-resize z-[100]",
+                        // Resize handle positioning and interaction - wider hitbox for easier grabbing
+                        "absolute top-0 -right-4 w-6 h-full cursor-ew-resize z-[100]",
                         "flex items-center justify-center touch-none bg-transparent",
-                        // Before pseudo-element for visual handle
-                        "before:content-[''] before:w-1 before:h-full before:rounded-sm before:transition-all before:duration-150",
-                        "before:bg-gray-300 dark:before:bg-gray-600",
-                        "hover:before:bg-blue-500 hover:before:w-[5px] hover:before:shadow-[0_0_8px_rgba(59,130,246,0.4)]",
-                        "dark:hover:before:bg-blue-400 dark:hover:before:shadow-[0_0_8px_rgba(96,165,250,0.4)]",
+                        // Before pseudo-element for visual handle - thicker and more visible
+                        "before:content-[''] before:w-1.5 before:h-full before:rounded before:transition-all before:duration-150",
+                        "before:bg-gray-400 dark:before:bg-gray-500",
+                        "hover:before:bg-blue-500 hover:before:w-2 hover:before:shadow-[0_0_10px_rgba(59,130,246,0.5)]",
+                        "dark:hover:before:bg-blue-400 dark:hover:before:shadow-[0_0_10px_rgba(96,165,250,0.5)]",
                         isResizing &&
-                            "before:bg-blue-600 before:w-[5px] before:shadow-[0_0_12px_rgba(59,130,246,0.6)] dark:before:bg-blue-500"
+                            "before:bg-blue-500 before:w-2.5 before:shadow-[0_0_16px_rgba(59,130,246,0.7)] dark:before:bg-blue-400 dark:before:shadow-[0_0_16px_rgba(96,165,250,0.7)]"
                     )}
                     role="separator"
                     aria-orientation="vertical"
