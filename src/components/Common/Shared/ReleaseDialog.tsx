@@ -31,9 +31,12 @@ const floette = "icons/pokemon/regular/floette-eternal.png";
 const hoopa = "icons/pokemon/regular/hoopa.png";
 const rayquaza = "icons/pokemon/regular/rayquaza.png";
 const darkrai = "icons/pokemon/regular/darkrai.png";
+const keldeo = "icons/pokemon/regular/keldeo.png";
 
 export const getMascot = (v) => {
     switch (v) {
+        case "1.23":
+            return keldeo;
         case "1.22":
             return darkrai;
         case "1.21":
