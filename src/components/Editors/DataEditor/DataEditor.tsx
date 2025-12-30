@@ -790,7 +790,7 @@ export class DataEditorBase extends React.Component<
                                 <option value={Generation.Gen6}>Gen 6 (XY/ORAS)</option>
                                 <option value={Generation.Gen7}>Gen 7 (SM/USUM)</option>
                                 <option value={Generation.Gen8}>Gen 8 (SwSh/BDSP/LA)</option>
-                                <option value={Generation.Gen9}>Gen 9 (SV)</option>
+                                <option value={Generation.Gen9}>Gen 9 (SV/ZA)</option>
                             </HTMLSelect>
                         </div>
                         <TextArea
