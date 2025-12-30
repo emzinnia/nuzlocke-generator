@@ -6,7 +6,8 @@ import { Types } from "utils/Types";
 import { listOfPokemon, Species } from "utils/data/listOfPokemon";
 import { MOVES_ARRAY } from "./utils";
 import { ParserOptions } from "./utils/parserOptions";
-import { ABILITY_MAP, GEN_3_HELD_ITEM_MAP } from "./utils/gen3";
+import { ABILITY_MAP } from "./utils/gen3";
+import { GEN4_ITEM_MAP } from "./utils/gen4";
 
 type Gen4Game = "DP" | "Platinum" | "HGSS";
 
@@ -53,7 +54,7 @@ const STORAGE_HEADER_DPPT = 0x04;
 const BOX_STRIDE_HGSS = 0x1000;
 const BOX_PADDING_HGSS = 0x10;
 const PARTY_OFFSET = 0x98;
-const PARTY_COUNT_OFFSET = 0x9c;
+const PARTY_COUNT_OFFSET = 0x94;
 
 const GEN4_LAYOUTS: Layout[] = [
     {
@@ -256,20 +257,106 @@ const shinyCheck = (pid: number, otId: number) => {
     return value < 8;
 };
 
+// Gen 4 character table constants (DS games use 16-bit character codes)
+// Uppercase A-Z: 0x012B - 0x0144
+// Lowercase a-z: 0x0145 - 0x015E
+// Digits 0-9: 0x0121 - 0x012A
+const GEN4_CHAR_UPPER_START = 0x012b;
+const GEN4_CHAR_LOWER_START = 0x0145;
+const GEN4_CHAR_DIGIT_START = 0x0121;
+
+const decodeGen4Char = (code: number): string | null => {
+    if (code === 0xffff || code === 0x0000) return null;
+    // Uppercase A-Z
+    if (code >= GEN4_CHAR_UPPER_START && code < GEN4_CHAR_UPPER_START + 26) {
+        return String.fromCharCode("A".charCodeAt(0) + (code - GEN4_CHAR_UPPER_START));
+    }
+    // Lowercase a-z
+    if (code >= GEN4_CHAR_LOWER_START && code < GEN4_CHAR_LOWER_START + 26) {
+        return String.fromCharCode("a".charCodeAt(0) + (code - GEN4_CHAR_LOWER_START));
+    }
+    // Digits 0-9
+    if (code >= GEN4_CHAR_DIGIT_START && code < GEN4_CHAR_DIGIT_START + 10) {
+        return String.fromCharCode("0".charCodeAt(0) + (code - GEN4_CHAR_DIGIT_START));
+    }
+    // Space and common punctuation (near ASCII range)
+    if (code === 0x0000) return " ";
+    // Fallback: try ASCII if in printable range
+    if (code >= 0x20 && code <= 0x7e) {
+        return String.fromCharCode(code);
+    }
+    return null;
+};
+
 const decodeGen4String = (buffer: Buffer, maxChars: number) => {
     const chars: string[] = [];
-    for (let i = 0; i < maxChars; i++) {
+    for (let i = 0; i < maxChars && i * 2 < buffer.length; i++) {
         const code = buffer.readUInt16LE(i * 2);
-        if (code === 0xffff || code === 0x0000) break;
-        if (code >= 0x20 && code <= 0x7e) {
-            chars.push(String.fromCharCode(code));
-        } else {
-            // Fallback: treat lower bytes as ASCII if plausible
-            const low = code & 0xff;
-            if (low >= 0x20 && low <= 0x7e) chars.push(String.fromCharCode(low));
-        }
+        const ch = decodeGen4Char(code);
+        if (ch === null) break;
+        chars.push(ch);
     }
     return chars.join("").trim();
+};
+
+// High-priority species for brute-force recovery: final evolutions and legendaries
+// that are commonly used in party teams. Lower numbers = higher priority.
+const PRIORITY_SPECIES: Record<number, number> = {
+    // Legendary/Mythical Pokemon (highest priority)
+    150: 1, 151: 1, // Mewtwo, Mew
+    249: 1, 250: 1, 251: 1, // Lugia, Ho-Oh, Celebi
+    382: 1, 383: 1, 384: 1, 385: 1, 386: 1, // Weather trio, Jirachi, Deoxys
+    483: 1, 484: 1, 487: 1, 491: 1, 492: 1, 493: 1, // Sinnoh legends
+    // Ghost-type final evolutions (high priority for party)
+    94: 2, // Gengar
+    477: 2, // Dusknoir
+    429: 2, // Mismagius
+    // Dragon-type final evolutions
+    149: 2, // Dragonite
+    373: 2, // Salamence
+    445: 2, // Garchomp
+    // Other popular final evolutions
+    130: 3, 131: 3, 143: 3, 248: 3, 376: 3, 448: 3, // Gyarados, Lapras, Snorlax, T-tar, Metagross, Lucario
+    400: 3, // Bibarel (HM slave common in DP)
+};
+
+const validateEvs = (evsBlock: Buffer): boolean => {
+    const evs = [
+        evsBlock.readUInt8(0x00),
+        evsBlock.readUInt8(0x01),
+        evsBlock.readUInt8(0x02),
+        evsBlock.readUInt8(0x03),
+        evsBlock.readUInt8(0x04),
+        evsBlock.readUInt8(0x05),
+    ];
+    const sum = evs.reduce((a, b) => a + b, 0);
+    return sum <= 510 && evs.every((v) => v <= 252);
+};
+
+const bruteForceDecrypt = (
+    encrypted: Buffer,
+    pid: number,
+): { decrypted: Buffer; blocks: Record<"A" | "B" | "C" | "D", Buffer>; speciesId: number } | null => {
+    // Collect all valid candidates, then pick the best one based on priority
+    let bestResult: { decrypted: Buffer; blocks: Record<"A" | "B" | "C" | "D", Buffer>; speciesId: number } | null = null;
+    let bestPriority = Infinity;
+
+    for (let checksum = 0; checksum <= 0xffff; checksum++) {
+        const decrypted = decryptPk4Payload(encrypted, checksum);
+        const blocks = unshufflePk4Blocks(decrypted, pid);
+        const speciesId = blocks.A.readUInt16LE(0x00);
+
+        if (speciesId > 0 && speciesId <= 493 && validateEvs(blocks.C)) {
+            const priority = PRIORITY_SPECIES[speciesId] ?? 100;
+            if (priority < bestPriority) {
+                bestResult = { decrypted, blocks, speciesId };
+                bestPriority = priority;
+                // If we found a priority 1 species, stop searching
+                if (priority === 1) break;
+            }
+        }
+    }
+    return bestResult;
 };
 
 const parsePartyStats = (buffer: Buffer) => {
@@ -301,20 +388,32 @@ const decodePokemon = (buffer: Buffer, context: PokemonContext): Pokemon | null 
     const pid = buffer.readUInt32LE(0x00);
     if (pid === 0) return null;
 
-    const checksumStored = buffer.readUInt16LE(0x04);
+    // Checksum is at offset 0x06 (not 0x04)
+    const checksumStored = buffer.readUInt16LE(0x06);
     const encrypted = buffer.slice(0x08, 0x08 + 0x80);
-    const decrypted = decryptPk4Payload(encrypted, checksumStored);
-    const checksumComputed = sumPk4Checksum(decrypted);
-    if (checksumComputed !== checksumStored) return null;
 
-    const blocks = unshufflePk4Blocks(decrypted, pid);
+    // Try decryption with stored checksum first
+    let finalDecrypted = decryptPk4Payload(encrypted, checksumStored);
+    let finalBlocks = unshufflePk4Blocks(finalDecrypted, pid);
+    let speciesId = finalBlocks.A.readUInt16LE(0x00);
 
-    const growth = blocks.A;
-    const attacks = blocks.B;
-    const evsBlock = blocks.C;
-    const misc = blocks.D;
+    // If species is invalid, try brute-forcing to recover the data
+    if (speciesId === 0 || speciesId > 493) {
+        const recovered = bruteForceDecrypt(encrypted, pid);
+        if (recovered) {
+            finalDecrypted = recovered.decrypted;
+            finalBlocks = recovered.blocks;
+            speciesId = recovered.speciesId;
+        } else {
+            return null;
+        }
+    }
 
-    const speciesId = growth.readUInt16LE(0x00);
+    const growth = finalBlocks.A;
+    const attacks = finalBlocks.B;
+    const evsBlock = finalBlocks.C;
+    const misc = finalBlocks.D;
+
     if (!speciesId) return null;
     const speciesName = getSpeciesName(speciesId);
     const itemId = growth.readUInt16LE(0x02);
@@ -402,7 +501,7 @@ const decodePokemon = (buffer: Buffer, context: PokemonContext): Pokemon | null 
         shiny,
         forme,
         item: itemId
-            ? GEN_3_HELD_ITEM_MAP[itemId] ?? `Item #${itemId}`
+            ? GEN4_ITEM_MAP[itemId] ?? `Item #${itemId}`
             : undefined,
         met: metLocation ? `Location #${metLocation}` : undefined,
         metLevel: metLevel || undefined,
@@ -425,7 +524,6 @@ const decodePokemon = (buffer: Buffer, context: PokemonContext): Pokemon | null 
             ivs,
             exp,
             checksumStored,
-            checksumComputed,
             box: context.boxIndex !== undefined ? context.boxIndex + 1 : undefined,
             slot: context.slotIndex,
             stats: statsSection?.stats,
@@ -633,17 +731,46 @@ const parseBoxes = (
     return boxed;
 };
 
+const titleCase = (str: string): string => {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+
 const parseTrainer = (general: Buffer) => {
-    const name = decodeGen4String(general.slice(0x68, 0x68 + 16), 8);
-    const tid = general.readUInt16LE(0x78);
-    const sid = general.readUInt16LE(0x7a);
-    const money = general.readUInt32LE(0x7c);
+    // Trainer name at 0x64 (8 characters max, 16 bytes)
+    // Apply title case as DS games store names in uppercase
+    const rawName = decodeGen4String(general.slice(0x64, 0x64 + 16), 8);
+    const name = titleCase(rawName);
+    // TID at 0x74, SID at 0x76
+    const tid = general.readUInt16LE(0x74);
+    // Money at 0x78
+    const money = general.readUInt32LE(0x78);
+    // Play time at 0x86: hours (u16), minutes (u8), seconds (u8)
+    const hours = general.readUInt16LE(0x86);
+    const minutes = general.readUInt8(0x88);
+    const seconds = general.readUInt8(0x89);
+    const time = `${hours}:${minutes}:${seconds}`;
+    // Badges at 0x7E (1 byte bitfield, each bit = 1 badge)
+    const badgeByte = general.readUInt8(0x7e);
+    const badgeCount = countBits(badgeByte);
+    const badges = Array.from({ length: badgeCount }, (_, i) => `Badge ${i + 1}`);
+
     return {
         name,
-        id: `${tid}/${sid}`,
-        money: `$${money}`,
-        badges: [],
+        id: tid.toString().padStart(5, "0"),
+        money: money.toString(),
+        time,
+        badges,
     };
+};
+
+const countBits = (n: number): number => {
+    let count = 0;
+    while (n) {
+        count += n & 1;
+        n >>= 1;
+    }
+    return count;
 };
 
 export const parseGen4Save = async (

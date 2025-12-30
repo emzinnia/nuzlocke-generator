@@ -334,21 +334,6 @@ For each 136-byte record:
 
 ---
 
-## 9) Checklist (write-safe editor / re-serializer)
-
-If you later extend this parser into an editor:
-
-- [ ] When modifying a PK4:
-  - [ ] update PK4 checksum (sum-of-u16)
-  - [ ] re-encrypt payload (checksum-seeded LCG)
-  - [ ] re-shuffle blocks (PID-derived permutation)
-- [ ] When modifying any bytes inside a small/big block:
-  - [ ] recompute and write the block’s CRC-16-CCITT footer checksum
-- [ ] If you change storage contents:
-  - [ ] update save-count semantics (general vs storage counts) consistent with the game’s logic (Project Pokémon D/P behavior)
-
----
-
 ## Appendix A — Quick “what lives where” (absolute offsets)
 
 These offsets are commonly used as sanity checks and are widely referenced:

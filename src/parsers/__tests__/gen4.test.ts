@@ -37,7 +37,6 @@ describe("Gen 4 Save Parser", () => {
             expect(result.trainer.name).toBe("Roy");
             expect(result.trainer.id).toBe("01081");
             expect(result.trainer.money).toBe("120881");
-            // @ts-expect-error play time should be surfaced by the parser
             expect(result.trainer.time).toBe("345:13:7");
         });
 
