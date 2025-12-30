@@ -24,6 +24,7 @@ export interface AdvancedImportOptionsProps {
     boxes: State["box"];
     isDarkMode: boolean;
     onFileSelect: (file: File, settings: AdvancedImportSettings) => void;
+    onShowdownImport: () => void;
 }
 
 export interface AdvancedImportOptionsHandle {
@@ -34,7 +35,7 @@ export const AdvancedImportOptions = React.forwardRef<
     AdvancedImportOptionsHandle,
     AdvancedImportOptionsProps
 >(function AdvancedImportOptions(
-    { boxes, isDarkMode, onFileSelect },
+    { boxes, isDarkMode, onFileSelect, onShowdownImport },
     ref
 ) {
     const dispatch = useDispatch();
@@ -153,6 +154,14 @@ export const AdvancedImportOptions = React.forwardRef<
                             {fileName || "Choose .sav file..."}
                         </Button>
                     </ButtonGroup>
+
+                    <Button
+                        icon="document"
+                        data-testid="import-showdown-button"
+                        onClick={onShowdownImport}
+                    >
+                        Import from Showdown
+                    </Button>
                 </div>
             )}
 

@@ -9,6 +9,7 @@ import {
     Intent,
     Switch,
     Classes,
+    HTMLSelect,
 } from "@blueprintjs/core";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { ErrorBoundary, HotkeyIndicator } from "components/Common/Shared";
@@ -30,6 +31,11 @@ import { DeleteAlert } from "./DeleteAlert";
 import { AdvancedImportOptions } from "./AdvancedImportOptions";
 import { isEmpty } from "utils/isEmpty";
 import { showToast } from "components/Common/Shared/appToaster";
+import {
+    parseShowdownFormat,
+    isValidShowdownFormat,
+} from "utils/parseShowdownFormat";
+import { Generation, getGameGeneration } from "utils/getters/getGameGeneration";
 // @TODO: fix codegen imports
 // import codegen from 'codegen.macro';
 import { BoxMappings } from "parsers/utils/boxMappings";
@@ -46,8 +52,11 @@ export interface DataEditorProps {
 export interface DataEditorState {
     isOpen: boolean;
     isClearAllDataOpen: boolean;
+    isShowdownOpen: boolean;
     mode: "import" | "export";
     data: string;
+    showdownData: string;
+    showdownGeneration: Generation;
     href: string;
     overrideImport: boolean;
 }
@@ -205,13 +214,17 @@ export class DataEditorBase extends React.Component<
     public nuzlockeJsonFileInput: HTMLInputElement | null;
     public advancedImportRef = React.createRef<import("./AdvancedImportOptions").AdvancedImportOptionsHandle>();
 
-    public constructor(props) {
+    public constructor(props: DataEditorProps) {
         super(props);
+        const gameGeneration = getGameGeneration(props.state.game.name);
         this.state = {
             isOpen: false,
             isClearAllDataOpen: false,
+            isShowdownOpen: false,
             mode: "export",
             data: "",
+            showdownData: "",
+            showdownGeneration: gameGeneration,
             href: "",
             overrideImport: true,
         };
@@ -476,6 +489,136 @@ export class DataEditorBase extends React.Component<
     private toggleClearingData = () =>
         this.setState({ isClearAllDataOpen: !this.state.isClearAllDataOpen });
 
+    private openShowdownImport = () => {
+        const gameGeneration = getGameGeneration(this.props.state.game.name);
+        this.setState({ 
+            isShowdownOpen: true, 
+            showdownData: "",
+            showdownGeneration: gameGeneration,
+        });
+    };
+
+    private closeShowdownImport = () => {
+        this.setState({ isShowdownOpen: false, showdownData: "" });
+    };
+
+    private handleShowdownDataChange = (
+        e: React.ChangeEvent<HTMLTextAreaElement>,
+    ) => {
+        this.setState({ showdownData: e.target.value });
+    };
+
+    private handleShowdownGenerationChange = (
+        e: React.ChangeEvent<HTMLSelectElement>,
+    ) => {
+        this.setState({ showdownGeneration: parseInt(e.target.value, 10) as Generation });
+    };
+
+    private isEmptyPokemonSlot = (pokemon?: Pokemon | null): boolean => {
+        if (!pokemon) return false;
+
+        const speciesValue = pokemon.species?.trim();
+        const isSpeciesEmpty =
+            !speciesValue || speciesValue.toLowerCase() === "none";
+
+        const hasNoNickname = !pokemon.nickname || pokemon.nickname.trim() === "";
+        const hasNoItem = !pokemon.item;
+        const hasNoMoves = !pokemon.moves || pokemon.moves.length === 0;
+        const hasNoAbility = !pokemon.ability;
+        const hasNoCustomizations =
+            !pokemon.customImage && !pokemon.customIcon && !pokemon.notes;
+
+        return (
+            isSpeciesEmpty &&
+            hasNoNickname &&
+            hasNoItem &&
+            hasNoMoves &&
+            hasNoAbility &&
+            hasNoCustomizations
+        );
+    };
+
+    private confirmShowdownImport = () => {
+        const { showdownData, showdownGeneration } = this.state;
+        const { state, replaceState } = this.props;
+
+        if (!isValidShowdownFormat(showdownData)) {
+            showToast({
+                message: "Invalid Showdown format. Please check your input.",
+                intent: Intent.DANGER,
+            });
+            return;
+        }
+
+        const hasSingleEmptySlot =
+            state.pokemon.length === 1 &&
+            this.isEmptyPokemonSlot(state.pokemon[0]);
+
+        const existingPokemon = hasSingleEmptySlot ? [] : state.pokemon;
+        const startPosition = existingPokemon.length;
+        const newPokemon = parseShowdownFormat(showdownData, {
+            startPosition,
+            generation: showdownGeneration,
+        });
+
+        if (newPokemon.length === 0) {
+            showToast({
+                message: "No Pokemon found in the input.",
+                intent: Intent.WARNING,
+            });
+            return;
+        }
+
+        // Merge new Pokemon with existing
+        const mergedPokemon = [...existingPokemon, ...newPokemon];
+        const newState = { ...state, pokemon: mergedPokemon };
+        replaceState(newState);
+
+        showToast({
+            message: `Imported ${newPokemon.length} Pokemon from Showdown format!`,
+            intent: Intent.SUCCESS,
+        });
+
+        this.closeShowdownImport();
+        this.writeAllData();
+    };
+
+    private getShowdownPreview() {
+        const { showdownData } = this.state;
+        if (!showdownData.trim()) return null;
+
+        if (!isValidShowdownFormat(showdownData)) {
+            return (
+                <Callout intent={Intent.WARNING} style={{ marginTop: "0.5rem" }}>
+                    This doesn&apos;t appear to be valid Showdown format.
+                </Callout>
+            );
+        }
+
+        const pokemon = parseShowdownFormat(showdownData);
+        if (pokemon.length === 0) return null;
+
+        return (
+            <div
+                style={{
+                    background: "rgba(0, 0, 0, 0.1)",
+                    borderRadius: ".25rem",
+                    margin: ".25rem",
+                    marginTop: ".5rem",
+                    padding: ".5rem",
+                }}
+            >
+                <div style={{ marginBottom: "0.5rem", fontWeight: 500 }}>
+                    Preview: {pokemon.length} Pokemon found
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
+                    {pokemon.map((p) => (
+                        <PokemonIcon key={p.id} {...p} />
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     public render() {
         return (
@@ -612,6 +755,84 @@ export class DataEditorBase extends React.Component<
                     )}
                 </Dialog>
 
+                <Dialog
+                    isOpen={this.state.isShowdownOpen}
+                    onClose={this.closeShowdownImport}
+                    title="Import from Showdown"
+                    className={
+                        this.props.state.style.editorDarkMode
+                            ? Classes.DARK
+                            : ""
+                    }
+                    icon="import"
+                >
+                    <div
+                        className={cx(
+                            Classes.DIALOG_BODY,
+                            "has-nice-scrollbars",
+                        )}
+                    >
+                        <Callout intent={Intent.PRIMARY} style={{ marginBottom: "0.5rem" }}>
+                            Paste your Pokemon Showdown format text below. Each Pokemon
+                            will be added to your Team.
+                        </Callout>
+                        <div style={{ marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            <span>Generation:</span>
+                            <HTMLSelect
+                                value={this.state.showdownGeneration}
+                                onChange={this.handleShowdownGenerationChange}
+                            >
+                                <option value={Generation.Gen1}>Gen 1 (RBY)</option>
+                                <option value={Generation.Gen2}>Gen 2 (GSC)</option>
+                                <option value={Generation.Gen3}>Gen 3 (RSE/FRLG)</option>
+                                <option value={Generation.Gen4}>Gen 4 (DPPt/HGSS)</option>
+                                <option value={Generation.Gen5}>Gen 5 (BW/B2W2)</option>
+                                <option value={Generation.Gen6}>Gen 6 (XY/ORAS)</option>
+                                <option value={Generation.Gen7}>Gen 7 (SM/USUM)</option>
+                                <option value={Generation.Gen8}>Gen 8 (SwSh/BDSP/LA)</option>
+                                <option value={Generation.Gen9}>Gen 9 (SV/ZA)</option>
+                            </HTMLSelect>
+                        </div>
+                        <TextArea
+                            className={cx("custom-css-input", Classes.FILL)}
+                            onChange={this.handleShowdownDataChange}
+                            placeholder={`Example format:\n\nPikachu @ Light Ball\nAbility: Static\nTera Type: Electric\nNaive Nature\n- Thunderbolt\n- Volt Tackle\n- Iron Tail\n- Quick Attack`}
+                            value={this.state.showdownData}
+                            large={true}
+                            rows={12}
+                            style={{ fontFamily: "monospace", fontSize: "0.85rem" }}
+                        />
+                        <ErrorBoundary>
+                            {this.getShowdownPreview()}
+                        </ErrorBoundary>
+                    </div>
+                    <div className={Classes.DIALOG_FOOTER}>
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                gap: "0.5rem",
+                            }}
+                        >
+                            <Button onClick={this.closeShowdownImport}>
+                                Cancel
+                            </Button>
+                            <Button
+                                icon="tick"
+                                intent={
+                                    this.state.showdownData.trim() === ""
+                                        ? Intent.NONE
+                                        : Intent.SUCCESS
+                                }
+                                onClick={this.confirmShowdownImport}
+                                disabled={this.state.showdownData.trim() === ""}
+                            >
+                                Import Pokemon
+                            </Button>
+                        </div>
+                    </div>
+                </Dialog>
+
                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.25rem", margin: "0.25rem" }}>
                     <ButtonGroup>
                         <Button
@@ -681,6 +902,7 @@ export class DataEditorBase extends React.Component<
                     boxes={this.props.state.box}
                     isDarkMode={this.props.state.style.editorDarkMode ?? false}
                     onFileSelect={this.handleFileSelect}
+                    onShowdownImport={this.openShowdownImport}
                 />
             </BaseEditor>
         );

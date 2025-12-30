@@ -172,9 +172,24 @@ export class BugReporterBase extends React.Component<
                         stage: this.state.stage + 1,
                         isSending: false,
                     });
+                } else if (res.error === "BODY_TOO_LARGE" || res.status === 413) {
+                    // The nuzlocke.json is too large for GitHub's issue body limit
+                    showToast({
+                        message: res.message || "Your nuzlocke.json is too large. Please uncheck 'include nuzlocke.json file' and try again.",
+                        intent: Intent.WARNING,
+                        timeout: 8000,
+                    });
+                    this.setState({ isSending: false });
+                } else if (res.error === "GITHUB_VALIDATION_ERROR" || res.status === 422) {
+                    showToast({
+                        message: res.message || "GitHub rejected the report. Try unchecking 'include nuzlocke.json file'.",
+                        intent: Intent.WARNING,
+                        timeout: 8000,
+                    });
+                    this.setState({ isSending: false });
                 } else {
                     showToast({
-                        message: "Bug report failed. Please try again.",
+                        message: res.message || "Bug report failed. Please try again.",
                         intent: Intent.DANGER,
                     });
                     this.setState({ isSending: false });

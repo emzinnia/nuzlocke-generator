@@ -723,6 +723,7 @@ export const matchSpeciesToTypes = (
         case "Tandemaus":
         case "Maushold":
         case "Dudunsparce":
+        case "Castform":
             return [Types.Normal, Types.Normal];
         case "Tarountula":
         case "Spidops":
@@ -907,7 +908,6 @@ export const matchSpeciesToTypes = (
         case "Corphish":
         case "Feebas":
         case "Milotic":
-        case "Castform":
         case "Clamperl":
         case "Huntail":
         case "Gorebyss":
