@@ -35,6 +35,7 @@ export enum Forme {
     Mega = "mega",
     "Mega-X" = "mega-x",
     "Mega-Y" = "mega-y",
+    "Mega-Z" = "mega-z",
 
     Alolan = "alola",
     Galarian = "galar",

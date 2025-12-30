@@ -1296,6 +1296,144 @@ describe("parseShowdownFormat with Gen 8 style input", () => {
     });
 });
 
+const gen9MegaShowdownInput = `Lucario-Mega-Z @ Lucarionite Z  
+Ability: Adaptability  
+Tera Type: Fighting  
+EVs: 252 Atk / 4 SpD / 252 Spe  
+Jolly Nature  
+- Body Slam  
+- Brick Break  
+- Calm Mind  
+- Close Combat  
+
+Darkrai-Mega @ Darkranite  
+Ability: Bad Dreams  
+Tera Type: Dark  
+EVs: 248 HP / 8 Atk / 252 SpD  
+Careful Nature  
+- Disable  
+- Curse  
+- Focus Punch  
+- Haze  
+
+Heatran-Mega @ Heatranite  
+Ability: Flash Fire  
+Tera Type: Fire  
+EVs: 252 HP / 4 Atk / 252 SpA  
+Quiet Nature  
+- Earthquake  
+- Dark Pulse  
+- Fire Blast  
+- Heat Wave  
+
+Absol-Mega-Z @ Absolite Z  
+Ability: Magic Bounce  
+Tera Type: Dark  
+EVs: 252 Atk / 4 SpD / 252 Spe  
+Jolly Nature  
+- Shadow Sneak  
+- Play Rough  
+- Crunch  
+- Slash  
+
+Zygarde-Mega @ Zygardite  
+Ability: Aura Break  
+Tera Type: Dragon  
+EVs: 252 HP / 4 Atk / 252 SpA  
+Rash Nature  
+- Earth Power  
+- Nihil Light  
+- Land's Wrath  
+- Thousand Arrows  
+
+Floette-Mega (F) @ Floettite  
+Ability: Flower Veil  
+Tera Type: Fairy  
+EVs: 252 SpA / 4 SpD / 252 Spe  
+Timid Nature  
+IVs: 0 Atk  
+- Giga Drain  
+- Energy Ball  
+- Moonblast  
+- Psychic  `;
+
+describe("parseShowdownFormat with Gen 9 Mega-Z style input", () => {
+    it("parses all 6 Pokemon from Gen 9 Mega-Z input", () => {
+        const result = parseShowdownFormat(gen9MegaShowdownInput);
+        expect(result).toHaveLength(6);
+    });
+
+    it("parses species, formes, and gender correctly", () => {
+        const result = parseShowdownFormat(gen9MegaShowdownInput);
+        expect(result[0].species).toBe("Lucario");
+        expect(result[0].forme).toBe("mega-z");
+
+        expect(result[1].species).toBe("Darkrai");
+        expect(result[1].forme).toBe("mega");
+
+        expect(result[2].species).toBe("Heatran");
+        expect(result[2].forme).toBe("mega");
+
+        expect(result[3].species).toBe("Absol");
+        expect(result[3].forme).toBe("mega-z");
+
+        expect(result[4].species).toBe("Zygarde");
+        expect(result[4].forme).toBe("mega");
+
+        expect(result[5].species).toBe("Floette");
+        expect(result[5].forme).toBe("mega");
+        expect(result[5].gender).toBe("Female");
+    });
+
+    it("parses items, abilities, and Tera Types correctly", () => {
+        const result = parseShowdownFormat(gen9MegaShowdownInput);
+        expect(result[0].item).toBe("Lucarionite Z");
+        expect(result[0].ability).toBe("Adaptability");
+        expect(result[0].teraType).toBe(Types.Fighting);
+
+        expect(result[1].item).toBe("Darkranite");
+        expect(result[1].ability).toBe("Bad Dreams");
+        expect(result[1].teraType).toBe(Types.Dark);
+
+        expect(result[2].item).toBe("Heatranite");
+        expect(result[2].ability).toBe("Flash Fire");
+        expect(result[2].teraType).toBe(Types.Fire);
+
+        expect(result[3].item).toBe("Absolite Z");
+        expect(result[3].ability).toBe("Magic Bounce");
+        expect(result[3].teraType).toBe(Types.Dark);
+
+        expect(result[4].item).toBe("Zygardite");
+        expect(result[4].ability).toBe("Aura Break");
+        expect(result[4].teraType).toBe(Types.Dragon);
+
+        expect(result[5].item).toBe("Floettite");
+        expect(result[5].ability).toBe("Flower Veil");
+        expect(result[5].teraType).toBe(Types.Fairy);
+    });
+
+    it("parses natures and moves correctly", () => {
+        const result = parseShowdownFormat(gen9MegaShowdownInput);
+        expect(result[0].nature).toBe("Jolly");
+        expect(result[0].moves).toEqual(["Body Slam", "Brick Break", "Calm Mind", "Close Combat"]);
+
+        expect(result[1].nature).toBe("Careful");
+        expect(result[1].moves).toEqual(["Disable", "Curse", "Focus Punch", "Haze"]);
+
+        expect(result[2].nature).toBe("Quiet");
+        expect(result[2].moves).toEqual(["Earthquake", "Dark Pulse", "Fire Blast", "Heat Wave"]);
+
+        expect(result[3].nature).toBe("Jolly");
+        expect(result[3].moves).toEqual(["Shadow Sneak", "Play Rough", "Crunch", "Slash"]);
+
+        expect(result[4].nature).toBe("Rash");
+        expect(result[4].moves).toEqual(["Earth Power", "Nihil Light", "Land's Wrath", "Thousand Arrows"]);
+
+        expect(result[5].nature).toBe("Timid");
+        expect(result[5].moves).toEqual(["Giga Drain", "Energy Ball", "Moonblast", "Psychic"]);
+    });
+});
+
 describe("parseShowdownFormat gender parsing", () => {
     it("parses male gender from (M) suffix", () => {
         const input = `Pikachu (M)
