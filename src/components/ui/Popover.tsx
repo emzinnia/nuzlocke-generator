@@ -168,13 +168,15 @@ export const Popover: React.FC<PopoverProps> = ({
 
     // Update position when open or position changes
     React.useEffect(() => {
-        if (isOpen) {
-            // Use requestAnimationFrame to ensure the popover is rendered before measuring
-            const rafId = requestAnimationFrame(() => {
-                updatePosition();
-            });
-            return () => cancelAnimationFrame(rafId);
+        if (!isOpen) {
+            return;
         }
+
+        // Use requestAnimationFrame to ensure the popover is rendered before measuring
+        const rafId = requestAnimationFrame(() => {
+            updatePosition();
+        });
+        return () => cancelAnimationFrame(rafId);
     }, [isOpen, updatePosition]);
 
     // Handle window resize/scroll

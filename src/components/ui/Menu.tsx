@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { Icon } from "./Icon";
+import { Icon, type IconName } from "@blueprintjs/core";
 import type { Intent } from "./intent";
 
 export interface MenuProps {
@@ -96,7 +96,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
             } ${className}`}
             style={{ color: disabled ? undefined : "var(--color-text-primary)" }}
         >
-            {icon && <Icon icon={icon} size={16} className="flex-shrink-0" />}
+            {icon && <Icon icon={icon as IconName} iconSize={16} className="flex-shrink-0" />}
             <span className="flex-grow">{children ?? text}</span>
             {labelElement && <span className="text-xs opacity-60">{labelElement}</span>}
         </div>

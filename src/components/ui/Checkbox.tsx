@@ -6,7 +6,45 @@
  */
 
 import * as React from "react";
-import { Check, Minus } from "lucide-react";
+
+interface InlineIconProps {
+    size: number;
+    strokeWidth?: number;
+}
+
+const CheckIcon: React.FC<InlineIconProps> = ({ size, strokeWidth = 3 }) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        focusable="false"
+    >
+        <polyline points="20 6 9 17 4 12" />
+    </svg>
+);
+
+const MinusIcon: React.FC<InlineIconProps> = ({ size, strokeWidth = 3 }) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        focusable="false"
+    >
+        <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+);
 
 export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> {
     /** Label text */
@@ -58,9 +96,9 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
                         } ${disabled ? "" : "peer-focus:ring-2 peer-focus:ring-blue-500 peer-focus:ring-offset-2"}`}
                     >
                         {indeterminate ? (
-                            <Minus size={iconSize} strokeWidth={3} />
+                            <MinusIcon size={iconSize} strokeWidth={3} />
                         ) : checked ? (
-                            <Check size={iconSize} strokeWidth={3} />
+                            <CheckIcon size={iconSize} strokeWidth={3} />
                         ) : null}
                     </div>
                 </div>
