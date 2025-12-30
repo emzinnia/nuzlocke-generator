@@ -1,0 +1,681 @@
+import { Buffer } from "buffer";
+import { Pokemon } from "models";
+import { matchSpeciesToTypes } from "utils/formatters/matchSpeciesToTypes";
+import { Forme } from "utils/Forme";
+import { Types } from "utils/Types";
+import { listOfPokemon, Species } from "utils/data/listOfPokemon";
+import { MOVES_ARRAY } from "./utils";
+import { ParserOptions } from "./utils/parserOptions";
+import { ABILITY_MAP, GEN_3_HELD_ITEM_MAP } from "./utils/gen3";
+
+type Gen4Game = "DP" | "Platinum" | "HGSS";
+
+type Layout = {
+    name: Gen4Game;
+    generalStart: number;
+    generalSize: number;
+    storageStart: number;
+    storageSize: number;
+    pairStride: number;
+    storageKind: "dppt" | "hgss";
+};
+
+type ValidatedBlock = {
+    ok: boolean;
+    saveCount: number;
+    linkValue: number;
+    checksumStored: number;
+    checksumComputed: number;
+    buffer: Buffer;
+};
+
+type ActiveBlocks = {
+    layout: Layout;
+    general: ValidatedBlock;
+    storage: ValidatedBlock;
+};
+
+type PokemonContext = {
+    status: string;
+    position: number;
+    isParty: boolean;
+    boxIndex?: number;
+    slotIndex?: number;
+    pidTracker: Map<string, number>;
+};
+
+const FOOTER_SIZE = 0x14;
+const PARTY_POKEMON_SIZE = 236;
+const PC_POKEMON_SIZE = 136;
+const BOX_COUNT = 18;
+const BOX_CAPACITY = 30;
+const STORAGE_HEADER_DPPT = 0x04;
+const BOX_STRIDE_HGSS = 0x1000;
+const BOX_PADDING_HGSS = 0x10;
+const PARTY_OFFSET = 0x98;
+const PARTY_COUNT_OFFSET = 0x9c;
+
+const GEN4_LAYOUTS: Layout[] = [
+    {
+        name: "DP",
+        generalStart: 0x00000,
+        generalSize: 0x0c100,
+        storageStart: 0x0c100,
+        storageSize: 0x121e0,
+        pairStride: 0x40000,
+        storageKind: "dppt",
+    },
+    {
+        name: "Platinum",
+        generalStart: 0x00000,
+        generalSize: 0x0cf2c,
+        storageStart: 0x0cf2c,
+        storageSize: 0x121e4,
+        pairStride: 0x40000,
+        storageKind: "dppt",
+    },
+    {
+        name: "HGSS",
+        generalStart: 0x00000,
+        generalSize: 0x0f700,
+        storageStart: 0x0f700,
+        storageSize: 0x12311,
+        pairStride: 0x40000,
+        storageKind: "hgss",
+    },
+];
+
+// 24-entry shuffle table (Bulbapedia) for Gen 4 PKM block order.
+const BLOCK_PERMUTATIONS = [
+    "ABCD",
+    "ABDC",
+    "ACBD",
+    "ACDB",
+    "ADBC",
+    "ADCB",
+    "BACD",
+    "BADC",
+    "BCAD",
+    "BCDA",
+    "BDAC",
+    "BDCA",
+    "CABD",
+    "CADB",
+    "CBAD",
+    "CBDA",
+    "CDAB",
+    "CDBA",
+    "DABC",
+    "DACB",
+    "DBAC",
+    "DBCA",
+    "DCAB",
+    "DCBA",
+];
+
+const BALL_MAP: Record<number, string> = {
+    0: "None",
+    1: "Master Ball",
+    2: "Ultra Ball",
+    3: "Great Ball",
+    4: "Poké Ball",
+    5: "Safari Ball",
+    6: "Net Ball",
+    7: "Dive Ball",
+    8: "Nest Ball",
+    9: "Repeat Ball",
+    10: "Timer Ball",
+    11: "Luxury Ball",
+    12: "Premier Ball",
+    13: "Dusk Ball",
+    14: "Heal Ball",
+    15: "Quick Ball",
+    16: "Cherish Ball",
+};
+
+const listSpeciesByDex = new Map<number, Species>(
+    listOfPokemon.map((s, i) => [i + 1, s]),
+);
+
+const getSpeciesName = (id: number) => listSpeciesByDex.get(id);
+
+const getAbilityForSpecies = (species: Species | undefined, abilitySlot: number) => {
+    if (!species) return undefined;
+    const dex = listOfPokemon.indexOf(species) + 1;
+    const abilities = ABILITY_MAP[dex] ?? [];
+    const index = abilitySlot === 1 ? 1 : 0;
+    return abilities[index] || abilities[0];
+};
+
+const determineUnownForme = (personality: number): Forme => {
+    const value =
+        ((personality & 0x3000000) >> 18) |
+        ((personality & 0x30000) >> 12) |
+        ((personality & 0x300) >> 6) |
+        (personality & 0x3);
+    const formes: Forme[] = [
+        Forme.A,
+        Forme.B,
+        Forme.C,
+        Forme.D,
+        Forme.E,
+        Forme.F,
+        Forme.G,
+        Forme.H,
+        Forme.I,
+        Forme.J,
+        Forme.K,
+        Forme.L,
+        Forme.M,
+        Forme.N,
+        Forme.O,
+        Forme.P,
+        Forme.Q,
+        Forme.R,
+        Forme.S,
+        Forme.T,
+        Forme.U,
+        Forme.V,
+        Forme.W,
+        Forme.X,
+        Forme.Y,
+        Forme.Z,
+        Forme["!"],
+        Forme["?"],
+    ];
+    return formes[value % formes.length];
+};
+
+const crc16Ccitt = (buffer: Buffer) => {
+    let crc = 0xffff;
+    for (let i = 0; i < buffer.length; i++) {
+        crc ^= buffer[i] << 8;
+        for (let b = 0; b < 8; b++) {
+            const carry = crc & 0x8000;
+            crc = (crc << 1) & 0xffff;
+            if (carry) crc ^= 0x1021;
+        }
+    }
+    return crc & 0xffff;
+};
+
+const sumPk4Checksum = (buffer: Buffer) => {
+    let sum = 0;
+    for (let i = 0; i < buffer.length; i += 2) {
+        sum = (sum + buffer.readUInt16LE(i)) & 0xffff;
+    }
+    return sum & 0xffff;
+};
+
+const decryptPk4Payload = (encrypted: Buffer, checksum: number) => {
+    const out = Buffer.alloc(encrypted.length);
+    let seed = checksum & 0xffff;
+    for (let i = 0; i < encrypted.length; i += 2) {
+        seed = (seed * 0x41c64e6d + 0x6073) >>> 0;
+        const key = (seed >>> 16) & 0xffff;
+        const value = encrypted.readUInt16LE(i) ^ key;
+        out.writeUInt16LE(value & 0xffff, i);
+    }
+    return out;
+};
+
+const unshufflePk4Blocks = (decrypted: Buffer, personality: number) => {
+    const order = BLOCK_PERMUTATIONS[((personality & 0x3e000) >> 0xd) % 24];
+    const blocks = [0, 1, 2, 3].map((i) =>
+        decrypted.slice(i * 32, (i + 1) * 32),
+    );
+    const byLetter: Record<"A" | "B" | "C" | "D", Buffer> = {
+        A: Buffer.alloc(32),
+        B: Buffer.alloc(32),
+        C: Buffer.alloc(32),
+        D: Buffer.alloc(32),
+    };
+    for (let i = 0; i < 4; i++) {
+        const letter = order[i] as "A" | "B" | "C" | "D";
+        byLetter[letter] = blocks[i];
+    }
+    return byLetter;
+};
+
+const parseIvs = (value: number) => ({
+    hp: value & 0x1f,
+    attack: (value >> 5) & 0x1f,
+    defense: (value >> 10) & 0x1f,
+    speed: (value >> 15) & 0x1f,
+    specialAttack: (value >> 20) & 0x1f,
+    specialDefense: (value >> 25) & 0x1f,
+    isEgg: Boolean((value >> 30) & 0x1),
+    abilitySlot: (value >> 31) & 0x1,
+});
+
+const shinyCheck = (pid: number, otId: number) => {
+    const tid = otId & 0xffff;
+    const sid = (otId >> 16) & 0xffff;
+    const value =
+        (tid ^ sid ^ (pid & 0xffff) ^ ((pid >> 16) & 0xffff)) & 0xffff;
+    return value < 8;
+};
+
+const decodeGen4String = (buffer: Buffer, maxChars: number) => {
+    const chars: string[] = [];
+    for (let i = 0; i < maxChars; i++) {
+        const code = buffer.readUInt16LE(i * 2);
+        if (code === 0xffff || code === 0x0000) break;
+        if (code >= 0x20 && code <= 0x7e) {
+            chars.push(String.fromCharCode(code));
+        } else {
+            // Fallback: treat lower bytes as ASCII if plausible
+            const low = code & 0xff;
+            if (low >= 0x20 && low <= 0x7e) chars.push(String.fromCharCode(low));
+        }
+    }
+    return chars.join("").trim();
+};
+
+const parsePartyStats = (buffer: Buffer) => {
+    // Party stats region is 100 bytes; offsets here follow common PK4 structure.
+    const level = buffer.readUInt8(0x04);
+    const currentHp = buffer.readUInt16LE(0x08);
+    const maxHp = buffer.readUInt16LE(0x0a);
+    const attack = buffer.readUInt16LE(0x0c);
+    const defense = buffer.readUInt16LE(0x0e);
+    const speed = buffer.readUInt16LE(0x10);
+    const specialAttack = buffer.readUInt16LE(0x12);
+    const specialDefense = buffer.readUInt16LE(0x14);
+    return {
+        level,
+        stats: {
+            currentHp,
+            maxHp,
+            attack,
+            defense,
+            speed,
+            specialAttack,
+            specialDefense,
+        },
+    };
+};
+
+const decodePokemon = (buffer: Buffer, context: PokemonContext): Pokemon | null => {
+    if (buffer.length < PC_POKEMON_SIZE) return null;
+    const pid = buffer.readUInt32LE(0x00);
+    if (pid === 0) return null;
+
+    const checksumStored = buffer.readUInt16LE(0x04);
+    const encrypted = buffer.slice(0x08, 0x08 + 0x80);
+    const decrypted = decryptPk4Payload(encrypted, checksumStored);
+    const checksumComputed = sumPk4Checksum(decrypted);
+    if (checksumComputed !== checksumStored) return null;
+
+    const blocks = unshufflePk4Blocks(decrypted, pid);
+
+    const growth = blocks.A;
+    const attacks = blocks.B;
+    const evsBlock = blocks.C;
+    const misc = blocks.D;
+
+    const speciesId = growth.readUInt16LE(0x00);
+    if (!speciesId) return null;
+    const speciesName = getSpeciesName(speciesId);
+    const itemId = growth.readUInt16LE(0x02);
+    const otId = growth.readUInt32LE(0x04); // TID/SID combined
+    const exp = growth.readUInt32LE(0x08);
+    const ppBonuses = growth.readUInt8(0x0c);
+    const friendship = growth.readUInt8(0x0d);
+    const language = growth.readUInt8(0x17);
+
+    const moveIds = [
+        attacks.readUInt16LE(0x00),
+        attacks.readUInt16LE(0x02),
+        attacks.readUInt16LE(0x04),
+        attacks.readUInt16LE(0x06),
+    ];
+    const movePP = [
+        attacks.readUInt8(0x08),
+        attacks.readUInt8(0x09),
+        attacks.readUInt8(0x0a),
+        attacks.readUInt8(0x0b),
+    ];
+
+    const evs = {
+        hp: evsBlock.readUInt8(0x00),
+        attack: evsBlock.readUInt8(0x01),
+        defense: evsBlock.readUInt8(0x02),
+        speed: evsBlock.readUInt8(0x03),
+        specialAttack: evsBlock.readUInt8(0x04),
+        specialDefense: evsBlock.readUInt8(0x05),
+    };
+
+    const contest = {
+        cool: evsBlock.readUInt8(0x06),
+        beauty: evsBlock.readUInt8(0x07),
+        cute: evsBlock.readUInt8(0x08),
+        smart: evsBlock.readUInt8(0x09),
+        tough: evsBlock.readUInt8(0x0a),
+        sheen: evsBlock.readUInt8(0x0b),
+    };
+
+    const pokerus = misc.readUInt8(0x00);
+    const metLocation = misc.readUInt8(0x01);
+    const originInfo = misc.readUInt16LE(0x02);
+    const ivData = misc.readUInt32LE(0x04);
+    const ribbons = misc.readUInt32LE(0x08);
+
+    const ivs = parseIvs(ivData);
+    const metLevel = originInfo & 0x7f;
+    const originGame = (originInfo >> 7) & 0xf;
+    const ballId = (originInfo >> 11) & 0xf;
+    const otGender = (originInfo >> 15) & 0x1 ? "F" : "M";
+
+    const statsSection =
+        context.isParty && buffer.length >= PARTY_POKEMON_SIZE
+            ? parsePartyStats(buffer.slice(PC_POKEMON_SIZE))
+            : undefined;
+
+    const level = statsSection?.level || undefined;
+
+    const moves = moveIds.map((id) => MOVES_ARRAY?.[id]).filter(Boolean);
+    const pokeball = BALL_MAP[ballId] || `Ball #${ballId}`;
+    const ability = getAbilityForSpecies(
+        speciesName,
+        ivs.abilitySlot === 1 ? 1 : 0,
+    );
+    const types = speciesName
+        ? (Array.from(new Set(matchSpeciesToTypes(speciesName))) as [Types, Types])
+        : undefined;
+    const shiny = shinyCheck(pid, otId);
+    const forme =
+        speciesName === "Unown" ? determineUnownForme(pid) : undefined;
+
+    const basePid = pid.toString(16);
+    const currentCount = context.pidTracker.get(basePid) || 0;
+    context.pidTracker.set(basePid, currentCount + 1);
+    const id = currentCount > 0 ? `${basePid}-${currentCount}` : basePid;
+
+    const pokemon: Pokemon = {
+        species: speciesName || `Species ${speciesId}`,
+        nickname: undefined,
+        status: context.status,
+        id,
+        level,
+        moves,
+        shiny,
+        forme,
+        item: itemId
+            ? GEN_3_HELD_ITEM_MAP[itemId] ?? `Item #${itemId}`
+            : undefined,
+        met: metLocation ? `Location #${metLocation}` : undefined,
+        metLevel: metLevel || undefined,
+        position: context.position,
+        egg: ivs.isEgg,
+        pokeball,
+        ability,
+        types,
+        extraData: {
+            language,
+            friendship,
+            ppBonuses,
+            movePP,
+            evs,
+            contest,
+            pokerus,
+            originGame,
+            otGender,
+            ribbons,
+            ivs,
+            exp,
+            checksumStored,
+            checksumComputed,
+            box: context.boxIndex !== undefined ? context.boxIndex + 1 : undefined,
+            slot: context.slotIndex,
+            stats: statsSection?.stats,
+        },
+    };
+
+    return pokemon;
+};
+
+const validateBlock = (buffer: Buffer): ValidatedBlock => {
+    if (buffer.length < FOOTER_SIZE)
+        return {
+            ok: false,
+            buffer,
+            saveCount: 0,
+            linkValue: 0,
+            checksumStored: 0,
+            checksumComputed: 0,
+        };
+    const footerStart = buffer.length - FOOTER_SIZE;
+    const linkValue = buffer.readUInt32LE(footerStart + 0x00);
+    const saveCount = buffer.readUInt32LE(footerStart + 0x04);
+    const checksumStored = buffer.readUInt16LE(footerStart + 0x12);
+    const checksumComputed = crc16Ccitt(buffer.slice(0, footerStart));
+    return {
+        ok: checksumStored === checksumComputed,
+        buffer,
+        saveCount,
+        linkValue,
+        checksumStored,
+        checksumComputed,
+    };
+};
+
+const selectLayoutAndBlocks = (file: Buffer, preferred?: Gen4Game): ActiveBlocks => {
+    const layouts = preferred
+        ? GEN4_LAYOUTS.filter((l) => l.name === preferred)
+        : GEN4_LAYOUTS;
+
+    let best: ActiveBlocks | undefined;
+
+    for (const layout of layouts) {
+        const pairs = [0, layout.pairStride];
+        const validated: {
+            base: number;
+            general: ValidatedBlock;
+            storage: ValidatedBlock;
+        }[] = [];
+
+        for (const base of pairs) {
+            const generalStart = base + layout.generalStart;
+            const storageStart = base + layout.storageStart;
+            if (
+                generalStart + layout.generalSize > file.length ||
+                storageStart + layout.storageSize > file.length
+            ) {
+                continue;
+            }
+            const generalBuf = file.slice(
+                generalStart,
+                generalStart + layout.generalSize,
+            );
+            const storageBuf = file.slice(
+                storageStart,
+                storageStart + layout.storageSize,
+            );
+            const general = validateBlock(generalBuf);
+            const storage = validateBlock(storageBuf);
+            validated.push({ base, general, storage });
+        }
+
+        const validGenerals = validated.filter((v) => v.general.ok);
+        if (!validGenerals.length) continue;
+        const selectedGeneral = validGenerals.reduce((a, b) =>
+            b.general.saveCount > a.general.saveCount ? b : a,
+        );
+
+        const candidateStorage = validated
+            .filter((v) => v.storage.ok)
+            .sort((a, b) => b.storage.saveCount - a.storage.saveCount);
+
+        let chosenStorage = candidateStorage.find(
+            (v) => v.storage.linkValue === selectedGeneral.general.saveCount,
+        );
+        if (!chosenStorage && candidateStorage.length) {
+            chosenStorage = candidateStorage[0];
+        }
+        if (!chosenStorage) continue;
+
+        best = {
+            layout,
+            general: selectedGeneral.general,
+            storage: chosenStorage.storage,
+        };
+        break;
+    }
+
+    if (!best) {
+        const fallbackLayout =
+            layouts.find(
+                (l) =>
+                    file.length >= l.storageStart + l.storageSize &&
+                    file.length >= l.generalStart + l.generalSize,
+            ) || layouts[0];
+        const general = validateBlock(
+            file.slice(
+                fallbackLayout.generalStart,
+                fallbackLayout.generalStart + fallbackLayout.generalSize,
+            ),
+        );
+        const storage = validateBlock(
+            file.slice(
+                fallbackLayout.storageStart,
+                fallbackLayout.storageStart + fallbackLayout.storageSize,
+            ),
+        );
+        best = { layout: fallbackLayout, general, storage };
+    }
+    return best;
+};
+
+const getBoxStatus = (boxIndex: number, options: ParserOptions) => {
+    const mapping = options.boxMappings?.find(
+        (entry) => entry.key === boxIndex + 1,
+    );
+    return mapping?.status || "Boxed";
+};
+
+const parseParty = (
+    general: Buffer,
+    options: ParserOptions,
+    pidTracker: Map<string, number>,
+) => {
+    const count = general.readUInt8(PARTY_COUNT_OFFSET) || 0;
+    const party: Pokemon[] = [];
+    const capped = Math.min(count, 6);
+    for (let i = 0; i < capped; i++) {
+        const start = PARTY_OFFSET + i * PARTY_POKEMON_SIZE;
+        const slice = general.slice(start, start + PARTY_POKEMON_SIZE);
+        const context: PokemonContext = {
+            status: "Team",
+            position: i + 1,
+            isParty: true,
+            boxIndex: undefined,
+            slotIndex: i,
+            pidTracker,
+        };
+        const pokemon = decodePokemon(slice, context);
+        if (pokemon) party.push(pokemon);
+    }
+    return party;
+};
+
+const parseBoxes = (
+    storage: Buffer,
+    layout: Layout,
+    options: ParserOptions,
+    pidTracker: Map<string, number>,
+) => {
+    const boxed: Pokemon[] = [];
+    if (layout.storageKind === "dppt") {
+        const boxArea = storage.slice(
+            STORAGE_HEADER_DPPT,
+            STORAGE_HEADER_DPPT + BOX_COUNT * BOX_CAPACITY * PC_POKEMON_SIZE,
+        );
+        for (let boxIndex = 0; boxIndex < BOX_COUNT; boxIndex++) {
+            for (let slotIndex = 0; slotIndex < BOX_CAPACITY; slotIndex++) {
+                const offset =
+                    boxIndex * BOX_CAPACITY * PC_POKEMON_SIZE +
+                    slotIndex * PC_POKEMON_SIZE;
+                const slice = boxArea.slice(offset, offset + PC_POKEMON_SIZE);
+                const context: PokemonContext = {
+                    status: getBoxStatus(boxIndex, options),
+                    position: (slotIndex + 1) * (boxIndex + 1),
+                    isParty: false,
+                    boxIndex,
+                    slotIndex,
+                    pidTracker,
+                };
+                const pokemon = decodePokemon(slice, context);
+                if (pokemon) boxed.push(pokemon);
+            }
+        }
+    } else {
+        // HGSS: each box is padded to 0x1000 bytes with 0x10 bytes spacing.
+        for (let boxIndex = 0; boxIndex < BOX_COUNT; boxIndex++) {
+            const boxStart = boxIndex * BOX_STRIDE_HGSS;
+            const boxArea = storage.slice(boxStart, boxStart + BOX_STRIDE_HGSS);
+            for (let slotIndex = 0; slotIndex < BOX_CAPACITY; slotIndex++) {
+                const offset = slotIndex * PC_POKEMON_SIZE;
+                const slice = boxArea.slice(offset, offset + PC_POKEMON_SIZE);
+                const context: PokemonContext = {
+                    status: getBoxStatus(boxIndex, options),
+                    position: (slotIndex + 1) * (boxIndex + 1),
+                    isParty: false,
+                    boxIndex,
+                    slotIndex,
+                    pidTracker,
+                };
+                const pokemon = decodePokemon(slice, context);
+                if (pokemon) boxed.push(pokemon);
+            }
+        }
+    }
+    return boxed;
+};
+
+const parseTrainer = (general: Buffer) => {
+    const name = decodeGen4String(general.slice(0x68, 0x68 + 16), 8);
+    const tid = general.readUInt16LE(0x78);
+    const sid = general.readUInt16LE(0x7a);
+    const money = general.readUInt32LE(0x7c);
+    return {
+        name,
+        id: `${tid}/${sid}`,
+        money: `$${money}`,
+        badges: [],
+    };
+};
+
+export const parseGen4Save = async (
+    file: Buffer,
+    options: ParserOptions & { selectedGame?: Gen4Game },
+) => {
+    const buffer = Buffer.isBuffer(file) ? file : Buffer.from(file);
+    const preferred = options.selectedGame;
+
+    const active = selectLayoutAndBlocks(buffer, preferred);
+    const pidTracker = new Map<string, number>();
+
+    const trainer = parseTrainer(active.general.buffer);
+    const party = parseParty(active.general.buffer, options, pidTracker);
+    const boxed = parseBoxes(
+        active.storage.buffer,
+        active.layout,
+        options,
+        pidTracker,
+    );
+
+    return {
+        trainer,
+        pokemon: [...party, ...boxed],
+        debug: options.debug
+            ? {
+                  layout: active.layout.name,
+                  generalSave: active.general.saveCount,
+                  storageSave: active.storage.saveCount,
+                  generalChecksum: `0x${active.general.checksumStored.toString(16)}`,
+                  storageChecksum: `0x${active.storage.checksumStored.toString(16)}`,
+              }
+            : undefined,
+    };
+};

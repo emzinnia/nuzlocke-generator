@@ -1,4 +1,4 @@
-import { parseGen1Save, parseGen2Save, parseGen3Save } from ".";
+import { parseGen1Save, parseGen2Save, parseGen3Save, parseGen4Save } from ".";
 import { BoxMappings } from "./utils/boxMappings";
 import { Buffer } from "buffer";
 import type { GameSaveFormat } from "utils/gameSaveFormat";
@@ -21,6 +21,7 @@ self.onmessageerror = (err) => {
 const SAVE_SIZE_GEN1_GEN2 = 0x8000; // 32 KiB
 const SAVE_SIZE_GEN3 = 0x20000; // 128 KiB
 const SAVE_SIZE_GEN3_TRIMMED = 0x1c000; // 114,688 bytes (2 * 0xE000)
+const SAVE_SIZE_GEN4 = 0x80000; // 512 KiB typical DS save
 // Some emulators append small headers/footers; treat "slightly > 32KiB" as Gen1/2.
 const SAVE_SIZE_GEN1_GEN2_MAX_WITH_PADDING = 0x9000;
 
@@ -60,6 +61,228 @@ const detectGen3SaveFormatFromString = (text: string): GameSaveFormat | undefine
     if (name === "Emerald") return "Emerald";
     if (name === "Ruby" || name === "Sapphire") return "RS";
     return undefined;
+};
+
+type Gen4Variant = "DP" | "Platinum" | "HGSS";
+
+const detectGen4GameNameFromString = (text: string): Gen4Variant | undefined => {
+    const s = normalizeForTokenSearch(text);
+
+    // HeartGold / SoulSilver
+    if (s.includes("HEARTGOLD") || s.includes("HG")) return "HGSS";
+    if (s.includes("SOULSILVER") || s.includes("SS")) return "HGSS";
+    if (s.includes("HGSS")) return "HGSS";
+
+    // Platinum
+    if (s.includes("PLATINUM") || s.includes("PT")) return "Platinum";
+
+    // Diamond / Pearl
+    if (s.includes("DIAMOND")) return "DP";
+    if (s.includes("PEARL")) return "DP";
+
+    return undefined;
+};
+
+/**
+ * Gen 4 save file detection heuristics.
+ *
+ * Gen 4 .sav files are 512 KiB (0x80000) with two block pairs:
+ *   - Pair #1: starts at 0x00000
+ *   - Pair #2: starts at 0x40000
+ *
+ * Each pair has a General (small) block and a Storage (big) block.
+ * The blocks have different sizes per game variant:
+ *   - D/P:      General ~0xC100,  Storage ~0x121E0
+ *   - Platinum: General ~0xCF2C,  Storage ~0x121E4
+ *   - HGSS:     General ~0xF628,  Storage ~0x12310
+ *
+ * Each block ends with a 20-byte footer containing:
+ *   - Offset +0x08: Block size (u32 little-endian)
+ *   - Offset +0x12: CRC-16-CCITT checksum
+ *
+ * Detection approach:
+ * 1. Check file size is 512KB
+ * 2. Locate blocks by looking for valid block sizes at expected footer offsets
+ * 3. Match the block sizes to known game patterns
+ * 4. Verify checksums (when possible - some regions/versions may differ)
+ */
+
+// Block size ranges for each Gen 4 game variant
+// These ranges account for regional/version differences
+const GEN4_SIZE_RANGES = {
+    DP: {
+        generalMin: 0x0c000,
+        generalMax: 0x0c200,
+        storageMin: 0x12000,
+        storageMax: 0x12300,
+    },
+    Platinum: {
+        generalMin: 0x0cf00,
+        generalMax: 0x0d000,
+        storageMin: 0x12100,
+        storageMax: 0x12300,
+    },
+    HGSS: {
+        generalMin: 0x0f500,
+        generalMax: 0x0f800,
+        storageMin: 0x12200,
+        storageMax: 0x12400,
+    },
+} as const;
+
+// Known Gen 4 block sizes (from various save files and documentation)
+const GEN4_KNOWN_GENERAL_SIZES = [0x0c100, 0x0cf2c, 0x0f628, 0x0f700];
+const GEN4_KNOWN_STORAGE_SIZES = [0x121e0, 0x121e4, 0x12310, 0x12311];
+
+/**
+ * CRC-16-CCITT with 0xFFFF initial value (used by Gen 4 saves for D/P/Pt)
+ */
+const crc16CcittGen4 = (data: Buffer): number => {
+    let crc = 0xffff;
+    for (let i = 0; i < data.length; i++) {
+        crc ^= data[i] << 8;
+        for (let b = 0; b < 8; b++) {
+            crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+            crc &= 0xffff;
+        }
+    }
+    return crc;
+};
+
+/**
+ * Find a Gen 4 block at the given start offset.
+ * Scans known block sizes to find a footer with matching block size field.
+ * Optionally validates CRC.
+ */
+const findGen4Block = (
+    buf: Buffer,
+    blockStart: number,
+    candidates: number[],
+    requireCrcValidation: boolean,
+): { found: boolean; blockSize: number; crcValid: boolean } => {
+    for (const size of candidates) {
+        const footerOffset = blockStart + size - 0x14;
+        if (footerOffset < blockStart || footerOffset + 0x14 > buf.length) continue;
+
+        // Check if block size in footer matches expected size
+        const storedBlockSize = buf.readUInt32LE(footerOffset + 0x08);
+        if (storedBlockSize !== size) continue;
+
+        // Check if footer looks valid (has reasonable values)
+        // Save count should be reasonable (not 0xFFFFFFFF)
+        const saveCount = buf.readUInt32LE(footerOffset + 0x04);
+        if (saveCount === 0xffffffff) continue;
+
+        if (requireCrcValidation) {
+            const dataEnd = footerOffset;
+            const blockData = buf.subarray(blockStart, dataEnd);
+            const stored = buf.readUInt16LE(footerOffset + 0x12);
+            const computed = crc16CcittGen4(blockData);
+            if (stored !== computed) continue;
+            return { found: true, blockSize: size, crcValid: true };
+        }
+
+        return { found: true, blockSize: size, crcValid: false };
+    }
+
+    return { found: false, blockSize: 0, crcValid: false };
+};
+
+/**
+ * Match a block size to a game variant
+ */
+const matchBlockSizeToVariant = (
+    generalSize: number,
+    storageSize: number,
+): Gen4Variant | undefined => {
+    for (const [variant, ranges] of Object.entries(GEN4_SIZE_RANGES)) {
+        if (
+            generalSize >= ranges.generalMin &&
+            generalSize <= ranges.generalMax &&
+            storageSize >= ranges.storageMin &&
+            storageSize <= ranges.storageMax
+        ) {
+            return variant as Gen4Variant;
+        }
+    }
+    return undefined;
+};
+
+/**
+ * Attempt to detect Gen 4 game variant from save file structure.
+ *
+ * First pass: Try CRC-validated detection (most reliable for D/P/Pt)
+ * Second pass: Fall back to size-based detection (for HGSS and unusual saves)
+ *
+ * Returns the detected variant or undefined if no match.
+ */
+const detectGen4VariantFromBuffer = (buf: Buffer): Gen4Variant | undefined => {
+    if (buf.length < SAVE_SIZE_GEN4) return undefined;
+
+    const PAIR_OFFSETS = [0x00000, 0x40000];
+
+    // First pass: Try with CRC validation (works reliably for D/P/Pt)
+    for (const pairBase of PAIR_OFFSETS) {
+        const generalStart = pairBase;
+        const generalResult = findGen4Block(buf, generalStart, GEN4_KNOWN_GENERAL_SIZES, true);
+        if (!generalResult.found) continue;
+
+        // Try storage at adjacent position first
+        const storageStart = pairBase + generalResult.blockSize;
+        let storageResult = findGen4Block(buf, storageStart, GEN4_KNOWN_STORAGE_SIZES, true);
+
+        // For HGSS, storage may start at fixed offset 0xF700
+        if (!storageResult.found && generalResult.blockSize >= 0x0f500) {
+            const hgssStorageStart = pairBase + 0x0f700;
+            storageResult = findGen4Block(buf, hgssStorageStart, GEN4_KNOWN_STORAGE_SIZES, true);
+        }
+        if (!storageResult.found) continue;
+
+        const variant = matchBlockSizeToVariant(generalResult.blockSize, storageResult.blockSize);
+        if (variant) return variant;
+    }
+
+    // Second pass: Try without CRC validation (for HGSS which may use different checksum)
+    for (const pairBase of PAIR_OFFSETS) {
+        const generalStart = pairBase;
+        const generalResult = findGen4Block(buf, generalStart, GEN4_KNOWN_GENERAL_SIZES, false);
+        if (!generalResult.found) continue;
+
+        // Try storage at adjacent position first
+        const storageStart = pairBase + generalResult.blockSize;
+        let storageResult = findGen4Block(buf, storageStart, GEN4_KNOWN_STORAGE_SIZES, false);
+
+        // For HGSS, storage may start at fixed offset 0xF700
+        if (!storageResult.found && generalResult.blockSize >= 0x0f500) {
+            const hgssStorageStart = pairBase + 0x0f700;
+            storageResult = findGen4Block(buf, hgssStorageStart, GEN4_KNOWN_STORAGE_SIZES, false);
+        }
+        if (!storageResult.found) continue;
+
+        const variant = matchBlockSizeToVariant(generalResult.blockSize, storageResult.blockSize);
+        if (variant) return variant;
+    }
+
+    return undefined;
+};
+
+/**
+ * Detect the Gen 4 save format (DP, Platinum, or HGSS) from buffer and/or filename.
+ * Falls back to "DP" if no specific variant can be determined.
+ */
+const detectGen4SaveFormat = (buf: Buffer, fileName?: string): GameSaveFormat => {
+    // First try filename hints
+    if (fileName) {
+        const hint = detectGen4GameNameFromString(fileName);
+        if (hint) return hint;
+    }
+
+    // Then try structural detection
+    const detected = detectGen4VariantFromBuffer(buf);
+    if (detected) return detected;
+
+    // Default to DP as fallback
+    return "DP";
 };
 
 // Matches the checksum logic used in `src/parsers/gen1.ts`.
@@ -176,22 +399,31 @@ self.onmessage = async ({
         buf.length === SAVE_SIZE_GEN3 || buf.length === SAVE_SIZE_GEN3_TRIMMED
             ? (fileName ? detectGen3SaveFormatFromString(fileName) : undefined)
             : undefined;
+
+    // Auto-detect Gen 4 variant based on file structure and filename
+    const gen4SaveFormatHint =
+        buf.length >= SAVE_SIZE_GEN4
+            ? detectGen4SaveFormat(buf, fileName)
+            : undefined;
+
     const gameChoice: GameSaveFormat =
         selectedGame && selectedGame !== "Auto"
             ? selectedGame
-            : buf.length === SAVE_SIZE_GEN3 || buf.length === SAVE_SIZE_GEN3_TRIMMED
-              ? gen3SaveFormatHint ?? "Emerald"
-              : buf.length >= SAVE_SIZE_GEN1_GEN2 &&
-                  buf.length <= SAVE_SIZE_GEN1_GEN2_MAX_WITH_PADDING
-                ? isLikelyGen1Save(gen1Gen2Buf)
-                    ? "RBY"
-                    : detectGen2IsCrystal(gen1Gen2Buf)
-                      ? "Crystal"
-                      : "GS"
-                : // fallback: try gen3 if it's "large-ish", else assume gen2
-                  buf.length > SAVE_SIZE_GEN1_GEN2
-                  ? "Emerald"
-                  : "GS";
+            : buf.length >= SAVE_SIZE_GEN4
+              ? gen4SaveFormatHint ?? "DP"
+              : buf.length === SAVE_SIZE_GEN3 || buf.length === SAVE_SIZE_GEN3_TRIMMED
+                ? gen3SaveFormatHint ?? "Emerald"
+                : buf.length >= SAVE_SIZE_GEN1_GEN2 &&
+                    buf.length <= SAVE_SIZE_GEN1_GEN2_MAX_WITH_PADDING
+                  ? isLikelyGen1Save(gen1Gen2Buf)
+                      ? "RBY"
+                      : detectGen2IsCrystal(gen1Gen2Buf)
+                        ? "Crystal"
+                        : "GS"
+                  : // fallback: try gen3 if it's "large-ish", else assume gen2
+                    buf.length > SAVE_SIZE_GEN1_GEN2
+                    ? "Emerald"
+                    : "GS";
 
     if (gameChoice === "RBY") {
         result = await parseGen1Save(gen1Gen2Buf, { boxMappings });
@@ -237,6 +469,17 @@ self.onmessage = async ({
         } else {
             result = await parseGen3Save(buf, { boxMappings, selectedGame: gameChoice });
         }
+    } else if (gameChoice === "DP" || gameChoice === "Platinum" || gameChoice === "HGSS") {
+        const preferredGen4 =
+            selectedGame === "DP" ||
+            selectedGame === "Platinum" ||
+            selectedGame === "HGSS"
+                ? selectedGame
+                : undefined;
+        result = await parseGen4Save(buf, {
+            boxMappings,
+            selectedGame: preferredGen4,
+        });
     } else {
         throw new Error(`Unsupported game type: ${gameChoice}`);
     }
@@ -251,6 +494,22 @@ self.onmessage = async ({
         detectedGame = makeGame("Crystal");
     } else if (gameChoice === "GS") {
         detectedGame = makeGame("Gold");
+    } else if (gameChoice === "DP" || gameChoice === "Platinum" || gameChoice === "HGSS") {
+        // Gen 4: use filename hints or default based on detected format
+        const gen4Hint = fileName ? detectGen4GameNameFromString(fileName) : undefined;
+        if (gen4Hint === "HGSS") {
+            detectedGame = makeGame("HeartGold");
+        } else if (gen4Hint === "Platinum") {
+            detectedGame = makeGame("Platinum");
+        } else if (gen4Hint === "DP") {
+            detectedGame = makeGame("Diamond");
+        } else if (gameChoice === "HGSS") {
+            detectedGame = makeGame("HeartGold");
+        } else if (gameChoice === "Platinum") {
+            detectedGame = makeGame("Platinum");
+        } else {
+            detectedGame = makeGame("Diamond");
+        }
     } else {
         const hinted = fileName ? detectGen3GameNameFromString(fileName) : undefined;
         if (hinted) {
