@@ -514,6 +514,30 @@ export class DataEditorBase extends React.Component<
         this.setState({ showdownGeneration: parseInt(e.target.value, 10) as Generation });
     };
 
+    private isEmptyPokemonSlot = (pokemon?: Pokemon | null): boolean => {
+        if (!pokemon) return false;
+
+        const speciesValue = pokemon.species?.trim();
+        const isSpeciesEmpty =
+            !speciesValue || speciesValue.toLowerCase() === "none";
+
+        const hasNoNickname = !pokemon.nickname || pokemon.nickname.trim() === "";
+        const hasNoItem = !pokemon.item;
+        const hasNoMoves = !pokemon.moves || pokemon.moves.length === 0;
+        const hasNoAbility = !pokemon.ability;
+        const hasNoCustomizations =
+            !pokemon.customImage && !pokemon.customIcon && !pokemon.notes;
+
+        return (
+            isSpeciesEmpty &&
+            hasNoNickname &&
+            hasNoItem &&
+            hasNoMoves &&
+            hasNoAbility &&
+            hasNoCustomizations
+        );
+    };
+
     private confirmShowdownImport = () => {
         const { showdownData, showdownGeneration } = this.state;
         const { state, replaceState } = this.props;
@@ -526,7 +550,12 @@ export class DataEditorBase extends React.Component<
             return;
         }
 
-        const startPosition = state.pokemon.length;
+        const hasSingleEmptySlot =
+            state.pokemon.length === 1 &&
+            this.isEmptyPokemonSlot(state.pokemon[0]);
+
+        const existingPokemon = hasSingleEmptySlot ? [] : state.pokemon;
+        const startPosition = existingPokemon.length;
         const newPokemon = parseShowdownFormat(showdownData, {
             startPosition,
             generation: showdownGeneration,
@@ -541,7 +570,7 @@ export class DataEditorBase extends React.Component<
         }
 
         // Merge new Pokemon with existing
-        const mergedPokemon = [...state.pokemon, ...newPokemon];
+        const mergedPokemon = [...existingPokemon, ...newPokemon];
         const newState = { ...state, pokemon: mergedPokemon };
         replaceState(newState);
 
