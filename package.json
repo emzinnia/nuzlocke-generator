@@ -41,7 +41,9 @@
         "validate": "npm run typecheck && npm run lint && npm run test:run",
         "todos": "npx leasot 'src/**/*.tsx' 'src/**/*.ts'",
         "lh": "npx lighthouse http://localhost:8080 --output-path=./lighthouse/audit.html --save-assets --preset=desktop --quiet --chrome-flags=headless",
-        "images:check": "npx tsx scripts/imageCheck.ts"
+        "images:check": "npx tsx scripts/imageCheck.ts",
+        "sprites:pokesprite": "npx tsx scripts/download-pokesprite-icons.ts",
+        "sprites:pokesprite:dry-run": "npx tsx scripts/download-pokesprite-icons.ts --dry-run"
     },
     "engines": {
         "node": "^24",
