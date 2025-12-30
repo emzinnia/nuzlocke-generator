@@ -1,0 +1,101 @@
+.ui-select {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--color-text-primary);
+    background: var(--input-bg);
+    padding-block: var(--space-2);
+    padding-inline: var(--space-2) var(--space-2);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    transition: border-color var(--duration-normal) var(--ease-out),
+                box-shadow var(--duration-normal) var(--ease-out);
+    
+    &:hover {
+        border-color: var(--color-primary-400);
+    }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 var(--focus-ring-offset) var(--color-bg-primary),
+                    0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--focus-ring-color);
+    }
+
+    &:open svg {
+        rotate: 180deg;
+    }
+
+    &::picker(select) {
+        margin-left: auto;
+        padding: 0;
+        margin-top: var(--space-1);
+        border: 0.125rem solid var(--color-border-default);
+        background: var(--color-bg-secondary);
+        border-radius: var(--radius-md);
+        font-weight: var(--weight-normal);
+        box-shadow: var(--shadow-lg);
+
+        opacity: 0;
+        height: 0;
+        overflow: clip;
+        transition: height var(--duration-slower) var(--ease-out),
+                    opacity var(--duration-slower) var(--ease-out),
+                    overlay var(--duration-slower),
+                    display var(--duration-slower);
+
+        transition-behavior: allow-discrete;
+    }
+
+    &:open::picker(select) {
+        opacity: 1;
+        height: calc-size(auto, size);
+        overflow: auto;
+        @starting-style {
+            opacity: 0;
+            height: 0;
+        }
+    }
+
+    &,
+    &::picker(select) {
+        appearance: base-select;
+    }
+}
+
+.ui-select-option {
+    &::checkmark {
+        display: none;
+    }
+}
+
+option {
+    display: flex;
+    align-items: center;
+    border-top: 0.0625rem solid var(--color-border-muted);
+    cursor: pointer;
+    color: var(--color-text-primary);
+    background: var(--color-bg-secondary);
+    transition-property: color, background;
+    transition-duration: var(--duration-normal);
+    transition-timing-function: var(--ease-out);
+    padding: var(--space-2);
+
+    &:where(:hover, :focus, :active) {
+        background: var(--color-primary-600);
+        outline: none;
+    }
+
+    &:checked {
+        background: var(--color-primary-700);
+    }
+
+    &::checkmark {
+        display: none;
+    }
+
+    &:first-child {
+        border: 0;
+    }
+}

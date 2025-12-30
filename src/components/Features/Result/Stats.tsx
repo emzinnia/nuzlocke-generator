@@ -40,13 +40,13 @@ export class StatsBase extends React.Component<
                 const type1 = poke.types[0];
                 const type2 = poke.types[1];
 
-                if (typesFreq.hasOwnProperty(type1)) {
+                if (Object.prototype.hasOwnProperty.call(typesFreq, type1)) {
                     typesFreq[type1]++;
                 } else {
                     typesFreq[type1] = 1;
                 }
 
-                if (typesFreq.hasOwnProperty(type2)) {
+                if (Object.prototype.hasOwnProperty.call(typesFreq, type2)) {
                     if (type1 !== type2) {
                         typesFreq[type2]++;
                     }
@@ -91,7 +91,7 @@ export class StatsBase extends React.Component<
             ) {
                 return;
             }
-            if (wm.hasOwnProperty(key)) {
+            if (Object.prototype.hasOwnProperty.call(wm, key)) {
                 wm[key]++;
             } else {
                 wm[key] = 1;

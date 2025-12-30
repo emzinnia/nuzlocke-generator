@@ -9,12 +9,13 @@ import {
     getContrastColor,
     matchNatureToToxtricityForme,
     Species,
+    normalizePokeballName,
 } from "utils";
 import { editPokemon } from "actions";
 
 import { ErrorBoundary } from "components/Common/Shared";
 
-import { TagInput, TextArea, HTMLSelect } from "components/Common/ui";
+import { TagInput, Classes, TextArea, HTMLSelect } from "components/ui/shims";
 import { State } from "state";
 import { Pokemon } from "models";
 import { cx } from "emotion";
@@ -44,6 +45,7 @@ interface CurrentPokemonInputProps {
     usesKeyValue?: boolean;
     className?: string;
     items?: string[];
+    rightElement?: React.ReactNode;
     key: string;
 }
 interface ChangeArgs {
@@ -113,7 +115,6 @@ export function PokemonAutocompleteInput({
     inputName,
     edit,
     disabled,
-    _onChange,
     setEdit,
     items,
 }: PokemonInputProps) {
@@ -121,7 +122,6 @@ export function PokemonAutocompleteInput({
     const [visibleItems, setVisibleItems] = React.useState(items);
     const [selectedItem, setSelectedItem] = React.useState();
     const handleKeyDown = () => {};
-    const _updateItems = () => {};
     const closeList = () => setIsOpen(false);
     const openList = () => setIsOpen(true);
 
@@ -138,7 +138,12 @@ export function PokemonAutocompleteInput({
                 type="text"
                 value={edit[inputName]}
                 disabled={disabled}
-                onInput={(e) => setEdit({ [inputName]: e.currentTarget.value })}
+                onInput={(e) => {
+                    setEdit({ [inputName]: e.currentTarget.value });
+                    setVisibleItems(items?.filter(item => 
+                        item.toLowerCase().includes(e.currentTarget.value.toLowerCase())
+                    ));
+                }}
             />
             {isOpen ? (
                 <ul className="autocomplete-items has-nice-scrollbars">
@@ -152,10 +157,8 @@ export function PokemonAutocompleteInput({
 export function PokemonTextInput({
     inputName,
     type,
-    _value,
     placeholder,
     disabled,
-    _selectedId,
     edit,
     setEdit,
     onChange,
@@ -178,8 +181,6 @@ export function PokemonTextInput({
 
 export function PokemonTextAreaInput({
     inputName,
-    _type,
-    _value,
     placeholder,
     disabled,
     onChange,
@@ -231,20 +232,22 @@ export function PokemonNumberInput({
 export function PokemonSelectInput({
     inputName,
     value,
-    _type,
     usesKeyValue,
     options,
-    _placeholder,
     onChange,
-    _edit,
     setEdit,
 }: PokemonInputProps) {
+    const normalizedValue =
+        inputName === "pokeball" ? normalizePokeballName(value) : value;
+
     const _pokeball =
-        inputName === "pokeball" && value && value !== "None" ? (
+        inputName === "pokeball" &&
+        normalizedValue &&
+        normalizedValue !== "None" ? (
             <img
                 style={{ position: "absolute" }}
-                alt={value}
-                src={`/icons/pokeball/${formatBallText(value)}.png`}
+                alt={normalizedValue}
+                src={`icons/pokeball/${formatBallText(normalizedValue)}.png`}
             />
         ) : null;
 
@@ -265,7 +268,7 @@ export function PokemonSelectInput({
                 onChange(e);
                 setEdit({ [inputName]: e.currentTarget.value });
             }}
-            value={value}
+            value={normalizedValue}
             name={inputName}
             options={formattedOptions}
         />
@@ -303,7 +306,7 @@ export function PokemonDoubleSelectInput({
     }));
 
     return (
-        <span className="double-select-wrapper">
+        <span className="flex">
             <HTMLSelect
                 onChange={onSelect(0)}
                 value={edit?.[inputName]?.[0]}
@@ -323,11 +326,7 @@ export function PokemonDoubleSelectInput({
 
 export function PokemonCheckboxInput({
     inputName,
-    _value,
     type,
-    _usesKeyValue,
-    _options,
-    _placeholder,
     onChange,
     edit,
     setEdit,
@@ -349,15 +348,7 @@ export function PokemonCheckboxInput({
 }
 
 export function PokemonMoveInput({
-    _inputName,
     value,
-    _type,
-    _usesKeyValue,
-    _options,
-    _placeholder,
-    _onChange,
-    _edit,
-    _setEdit,
     customTypes,
     customMoveMap,
     selectedId,
@@ -425,17 +416,35 @@ export function CurrentPokemonInput(props: CurrentPokemonInputProps) {
 
     return (
         <span
-            className={`current-pokemon-input-wrapper current-pokemon-${props.type} ${props.type === "autocomplete" && "autocomplete"} current-pokemon-${props.inputName} ${className}`}
+            className={`inline-flex flex-col p-1 ${props.type === "autocomplete" ? "autocomplete" : ""} ${className || ""} [&_label]:text-[10px] [&_input]:border [&_input]:border-gray-200 [&_input]:p-1 dark:[&_input]:bg-[rgba(16,22,26,0.3)] dark:[&_input]:border-none dark:[&_input]:text-gray-100 dark:[&_input]:shadow-[inset_0_0_0_1px_rgba(16,22,26,0.3),inset_0_1px_1px_rgba(16,22,26,0.4)]`}
         >
             <label>{props.labelName}</label>
-            {getInput({
-                ...props,
-                selectedId,
-                onChange,
-                setEdit,
-                edit,
-                customMoveMap,
-            })}
+            {props.rightElement ? (
+                <div style={{ display: "flex", gap: "0.25rem", alignItems: "center" }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        {getInput({
+                            ...props,
+                            selectedId,
+                            onChange,
+                            setEdit,
+                            edit,
+                            customMoveMap,
+                        })}
+                    </div>
+                    <span style={{ display: "inline-flex", alignItems: "center" }}>
+                        {props.rightElement}
+                    </span>
+                </div>
+            ) : (
+                getInput({
+                    ...props,
+                    selectedId,
+                    onChange,
+                    setEdit,
+                    edit,
+                    customMoveMap,
+                })
+            )}
         </span>
     );
 }

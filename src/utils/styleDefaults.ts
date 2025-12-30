@@ -67,6 +67,7 @@ export interface Styles {
     linkedPokemonText: string;
     customTeamHTML: string;
     zoomLevel: number;
+    useAbilityMatchups: boolean;
 }
 
 export const styleDefaults: Styles = {
@@ -124,4 +125,5 @@ export const styleDefaults: Styles = {
     },
     customTeamHTML: "",
     zoomLevel: 1,
+    useAbilityMatchups: false,
 };

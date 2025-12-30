@@ -22,14 +22,16 @@ export interface ShapeInputState {
 export class ShapeInput extends React.Component<ShapeInputProps> {
     public state = { selectedShape: Shape.Circle };
 
-    public renderShape() {}
+    public renderShape(): React.ReactNode {
+        return null;
+    }
 
     public render() {
         return (
-            <div className="px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md">
+            <div className="rounded border border-border bg-input px-3 py-2">
                 <div className="shape">
-                    {this.renderShape}
-                    <input type="text" />
+                    {this.renderShape()}
+                    <input type="text" className="bg-transparent outline-none" />
                 </div>
             </div>
         );

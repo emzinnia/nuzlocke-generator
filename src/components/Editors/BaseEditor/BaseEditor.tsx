@@ -1,50 +1,57 @@
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { Icon, type IconName } from "components/ui";
+import { setBaseEditorState } from "actions";
 import * as React from "react";
-
-export interface BaseEditorState {
-    isOpen: boolean;
-}
+import { useDispatch, useSelector } from "react-redux";
+import { State } from "state";
 
 export interface BaseEditorProps {
     name: string;
-    icon?: React.ReactNode;
+    icon?: IconName | string;
     defaultOpen?: boolean;
+    children?: React.ReactNode;
+    id?: string;
 }
 
-export class BaseEditor extends React.Component<
-    BaseEditorProps,
-    BaseEditorState
-> {
-    public static defaultProps = {
-        defaultOpen: true,
-    };
+const toSlug = (value: string) => value.toLowerCase().replace(/\s/g, "-");
 
-    public state = {
-        isOpen: this.props.defaultOpen ?? BaseEditor.defaultProps.defaultOpen,
-    };
+export function BaseEditor({
+    name,
+    icon,
+    defaultOpen = true,
+    children,
+    id,
+}: BaseEditorProps) {
+    const dispatch = useDispatch();
+    const baseEditors = useSelector(
+        (state: State) => state.editor.baseEditors ?? {},
+    );
 
-    private toggleEditor = () => {
-        this.setState({ isOpen: !this.state.isOpen });
-    };
+    const storageKey = React.useMemo(() => id ?? toSlug(name), [id, name]);
+    const isOpen = baseEditors[storageKey] ?? defaultOpen;
 
-    public render() {
-        return (
-            <div
-                data-testid="base-editor"
-                className={`${this.props.name.toLowerCase().replace(/\s/g, "-")}-editor base-editor`}
+    const toggleEditor = React.useCallback(() => {
+        dispatch(setBaseEditorState(storageKey, !isOpen));
+    }, [dispatch, storageKey, isOpen]);
+
+    return (
+        <div
+            data-testid="base-editor"
+            className={`${toSlug(name)}-editor p-1 rounded`}
+        >
+            <h4
+                title={`${isOpen ? "Collapse" : "Open"} this editor.`}
+                className="font-bold flex content-center justify-between m-1 mb-2 cursor-pointer text-base"
+                onClick={toggleEditor}
             >
-                <h4
-                    title={`${this.state.isOpen ? "Collapse" : "Open"} this editor.`}
-                    className="font-bold flex content-center justify-between m-1 mb-2 cursor-pointer text-base"
-                    onClick={this.toggleEditor}
-                >
+                <div className="flex items-center gap-2">
+                    {icon && <Icon icon={icon} />}
                     <span>
-                        {this.props.name}
+                        {name}
                     </span>
-                    {this.state.isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </h4>
-                {this.state.isOpen ? this.props.children : null}
-            </div>
-        );
-    }
+                </div>
+                <Icon icon={isOpen ? "caret-up" : "caret-down"} />
+            </h4>
+            {isOpen ? children : null}
+        </div>
+    );
 }

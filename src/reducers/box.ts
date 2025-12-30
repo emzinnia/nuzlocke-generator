@@ -1,6 +1,7 @@
 import {
     EDIT_BOX,
     REPLACE_STATE,
+    SYNC_STATE_FROM_HISTORY,
     VERSION_0_0_6_BETA,
     Action,
     ADD_BOX,
@@ -37,6 +38,7 @@ export function box(
     action: Action<
         | EDIT_BOX
         | REPLACE_STATE
+        | SYNC_STATE_FROM_HISTORY
         | VERSION_0_0_6_BETA
         | ADD_BOX
         | DELETE_BOX
@@ -54,6 +56,8 @@ export function box(
         }
         case REPLACE_STATE:
             return action.replaceWith.box;
+        case SYNC_STATE_FROM_HISTORY:
+            return action.syncWith.box;
         case ADD_BOX: {
             const { name, background = "grass-meadow", inheritFrom } = action;
             const id = state.length;

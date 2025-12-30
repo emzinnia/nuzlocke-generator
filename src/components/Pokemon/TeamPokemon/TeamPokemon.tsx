@@ -12,6 +12,7 @@ import {
     getContrastColor,
     TemplateName,
     Types,
+    Forme,
 } from "utils";
 import { GenderElement, ErrorBoundary } from "components/Common/Shared";
 import { selectPokemon } from "actions";
@@ -25,6 +26,8 @@ import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { PokemonItem } from "./PokemonItem";
 import { PokemonPokeball } from "./PokemonPokeball";
 import { PokemonFriendship } from "./PokemonFriendship";
+import { normalizePokeballName } from "utils";
+import { PokemonExtraDataStats } from "./PokemonExtraDataStats";
 
 export interface TeamPokemonInfoProps {
     generation: Generation;
@@ -64,8 +67,9 @@ function getSpriteStyle({ spritesMode, scaleSprites, teamImages }) {
 
 export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
     public render() {
-        const { pokemon, style, customTypes, linkedPokemon, game } = this.props;
-        const generation = getGameGeneration(game.name);
+        const { pokemon, style, customTypes, linkedPokemon, game, generation } =
+            this.props;
+        const effectiveGeneration = generation ?? getGameGeneration(game.name);
 
         if (!pokemon) {
             return null;
@@ -97,8 +101,8 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                     margin: "0 2px",
                 }}
             >
-                <div>{statName}</div>
-                <div>{stat}</div>
+                <div className={`pokemon-stat-name pokemon-stat-name-${statName}`}>{statName}</div>
+                <div className={`pokemon-stat-value pokemon-stat-value-${statName}`}>{stat}</div>
             </div>
         );
 
@@ -188,7 +192,7 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                                     style.oldMetLocationFormat,
                             })}
                             {pokemon.pokeball && style.pokeballStyle === "text"
-                                ? ` (in ${pokemon.pokeball})`
+                                ? ` (in ${normalizePokeballName(pokemon.pokeball)})`
                                 : null}
                         </div>
                         {pokemon.nature && pokemon.nature !== "None" ? (
@@ -238,57 +242,11 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                                         {stat(pokemon?.extraData?.[key], key)}
                                     </React.Fragment>;
                                 })} */}
-                                {generation === Generation.Gen1 ? (
-                                    <>
-                                        {stat(
-                                            pokemon.extraData["currentHp"],
-                                            "HP",
-                                        )}
-                                        {stat(
-                                            pokemon.extraData["attack"],
-                                            "ATK",
-                                        )}
-                                        {stat(
-                                            pokemon.extraData["defense"],
-                                            "DEF",
-                                        )}
-                                        {stat(
-                                            pokemon.extraData["special"],
-                                            "SPC",
-                                        )}
-                                        {stat(
-                                            pokemon.extraData["speed"],
-                                            "SPE",
-                                        )}
-                                    </>
-                                ) : (
-                                    <>
-                                        {stat(
-                                            pokemon.extraData["currentHp"],
-                                            "HP",
-                                        )}
-                                        {stat(
-                                            pokemon.extraData["attack"],
-                                            "ATK",
-                                        )}
-                                        {stat(
-                                            pokemon.extraData["defense"],
-                                            "DEF",
-                                        )}
-                                        {stat(
-                                            pokemon.extraData["specialAttack"],
-                                            "SPATK",
-                                        )}
-                                        {stat(
-                                            pokemon.extraData["specialDefense"],
-                                            "SPDEF",
-                                        )}
-                                        {stat(
-                                            pokemon.extraData["speed"],
-                                            "SPE",
-                                        )}
-                                    </>
-                                )}
+                                <PokemonExtraDataStats
+                                    effectiveGeneration={effectiveGeneration}
+                                    extraData={pokemon.extraData}
+                                    renderStat={stat}
+                                />
                             </div>
                         ) : null}
                         {style.displayExtraData && pokemon.extraData ? (
@@ -332,44 +290,51 @@ export function TeamPokemonBaseMinimal(
     props: TeamPokemonBaseProps & { spriteStyle?: object },
 ) {
     const { pokemon, style, game, editor } = props;
-    const poke = pokemon;
 
     if (!pokemon) {
         return <div>A Pokémon could not be rendered.</div>;
     }
+
+    const poke = pokemon;
 
     return (
         <div
             className="pokemon-container minimal"
             style={{ color: getContrastColor(props?.style?.bgColor) }}
         >
-            <PokemonImage
-                species={poke?.species}
-                gender={poke?.gender}
-                forme={poke?.forme}
-                customImage={poke?.customImage}
-                style={style}
-                editor={editor}
-                shiny={poke?.shiny}
-                egg={poke?.egg}
-                name={game.name}
+            <div
+                role="presentation"
+                onClick={() => props.selectPokemon?.(poke.id)}
+                style={{ cursor: "pointer" }}
             >
-                {(backgroundImage) => {
-                    return (
-                        <div
-                            style={{
-                                backgroundImage,
-                                ...(props.spriteStyle as React.CSSProperties),
-                            }}
-                            className={`pokemon-image ${(poke?.species || "missingno").toLowerCase()} ${
-                                props.style.imageStyle === "round"
-                                    ? "round"
-                                    : "square"
-                            }`}
-                        />
-                    );
-                }}
-            </PokemonImage>
+                <PokemonImage
+                    species={poke?.species}
+                    gender={poke?.gender}
+                    forme={poke?.forme}
+                    customImage={poke?.customImage}
+                    style={style}
+                    editor={editor}
+                    shiny={poke?.shiny}
+                    egg={poke?.egg}
+                    name={game.name}
+                >
+                    {(backgroundImage) => {
+                        return (
+                            <div
+                                style={{
+                                    backgroundImage,
+                                    ...(props.spriteStyle as React.CSSProperties),
+                                }}
+                                className={`pokemon-image ${(poke?.species || "missingno").toLowerCase()} ${
+                                    props.style.imageStyle === "round"
+                                        ? "round"
+                                        : "square"
+                                }`}
+                            />
+                        );
+                    }}
+                </PokemonImage>
+            </div>
             <div className="pokemon-info">
                 <div className="pokemon-info-inner">
                     <span className="pokemon-nickname">{pokemon.nickname}</span>
@@ -399,9 +364,20 @@ export class TeamPokemonBase extends React.Component<
         const { pokemon, style, game, editor } = this.props;
         const poke = pokemon;
 
+        const normalizeFormeKey = (
+            forme?: Pokemon["forme"],
+        ): keyof typeof Forme | undefined => {
+            if (!forme) return undefined;
+            const match = (
+                Object.entries(Forme) as Array<[keyof typeof Forme, string]>
+            ).find(([, v]) => v === forme);
+            // Fall back to a cast so we don't block rendering if data already uses enum keys.
+            return match?.[0] ?? (forme as unknown as keyof typeof Forme);
+        };
+
         const image = await getPokemonImage({
             customImage: poke?.customImage,
-            forme: poke?.forme as any,
+            forme: normalizeFormeKey(poke?.forme),
             species: poke?.species,
             shiny: poke?.shiny,
             style: style,
@@ -440,15 +416,21 @@ export class TeamPokemonBase extends React.Component<
             teamImages,
         });
 
-        const addProp = (item: any) => {
-            const propName = `data-${item.toLowerCase()}`;
-            if (item === "type") return { [propName]: poke[item].join(" ") };
-            if (poke[item] == null || poke[item] === "") return {};
-            return { [propName]: poke[item].toString() };
+        const addProp = (item: keyof Pokemon) => {
+            const propName = `data-${item.toString().toLowerCase()}`;
+            if (item === "types")
+                return {
+                    [propName]:
+                        poke.types?.join(" ") ??
+                        (poke.types as unknown as string),
+                };
+            const value = poke[item];
+            if (value == null || value === "") return {};
+            return { [propName]: value.toString() };
         };
 
         // @TODO: update with new keys
-        const dataKeys = [
+        const dataKeys: Array<keyof Pokemon> = [
             "id",
             "position",
             "species",
@@ -470,7 +452,8 @@ export class TeamPokemonBase extends React.Component<
             "wonderTradedFor",
             "mvp",
             "customImage",
-        ].sort();
+        ];
+        dataKeys.sort();
         const data = dataKeys.reduce((prev, curr) => {
             return { ...prev, ...addProp(curr) };
         }, {});

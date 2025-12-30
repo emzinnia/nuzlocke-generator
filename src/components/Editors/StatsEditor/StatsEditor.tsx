@@ -2,7 +2,7 @@ import * as React from "react";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { connect } from "react-redux";
 import { State } from "state";
-import { Checkbox, Switch, Button } from "components/Common/ui";
+import { Checkbox, Switch, Button, Intent, Classes } from "components/ui/shims";
 import { editStyle, addStat, deleteStat, editStat } from "actions";
 import { ErrorBoundary } from "components";
 

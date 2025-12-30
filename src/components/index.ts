@@ -18,7 +18,8 @@ export * from "./Features/Result";
 // Layout
 export * from "./Layout/App";
 export * from "./Layout/Layout";
-export * from "./Layout/TopBar";
+// Header is intentionally not exported here to avoid circular dependencies
+// Import directly from "components/Layout/Header" when needed
 
 // Editors
 export * from "./Editors/BaseEditor";

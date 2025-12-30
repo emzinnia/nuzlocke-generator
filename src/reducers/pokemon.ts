@@ -4,18 +4,28 @@ import {
     DELETE_POKEMON,
     EDIT_POKEMON,
     REPLACE_STATE,
+    SYNC_STATE_FROM_HISTORY,
     CLEAR_BOX,
 } from "../actions";
-import { generateEmptyPokemon } from "utils";
+// Import directly to avoid circular dependency through utils barrel
+import { generateEmptyPokemon } from "utils/generateEmptyPokemon";
 
-const pokemonState = [generateEmptyPokemon()];
+// Lazy-initialize default state to avoid circular dependency issues
+// The state will be initialized on first reducer call
+let pokemonState: ReturnType<typeof generateEmptyPokemon>[] | null = null;
+function getDefaultPokemonState() {
+    if (pokemonState === null) {
+        pokemonState = [generateEmptyPokemon()];
+    }
+    return pokemonState;
+}
 
 export function pokemon(
-    state = pokemonState,
+    state = getDefaultPokemonState(),
     action:
         | Action<ADD_POKEMON>
         | Action<DELETE_POKEMON>
-        | Action<EDIT_POKEMON | REPLACE_STATE | CLEAR_BOX>,
+        | Action<EDIT_POKEMON | REPLACE_STATE | SYNC_STATE_FROM_HISTORY | CLEAR_BOX>,
 ) {
     switch (action.type) {
         case ADD_POKEMON:
@@ -49,6 +59,8 @@ export function pokemon(
         }
         case REPLACE_STATE:
             return action.replaceWith.pokemon;
+        case SYNC_STATE_FROM_HISTORY:
+            return action.syncWith?.pokemon ?? state;
         default:
             return state;
     }

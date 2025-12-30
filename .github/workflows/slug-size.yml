@@ -1,0 +1,61 @@
+name: Heroku Slug Size Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  check-slug-size:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install all dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Prune to production dependencies
+        run: npm prune --omit=dev
+
+      - name: Calculate slug size
+        id: slug-size
+        run: |
+          # Calculate sizes of components that would be in the Heroku slug
+          # Heroku slug includes: node_modules, dist, and source files
+          
+          NODE_MODULES_SIZE=$(du -sb node_modules 2>/dev/null | cut -f1 || echo 0)
+          DIST_SIZE=$(du -sb dist 2>/dev/null | cut -f1 || echo 0)
+          
+          # Include essential files that Heroku needs
+          ROOT_FILES_SIZE=$(find . -maxdepth 1 -type f \( -name "*.ts" -o -name "*.js" -o -name "*.json" -o -name "Procfile" \) -exec du -sb {} + 2>/dev/null | awk '{sum += $1} END {print sum}' || echo 0)
+          
+          TOTAL_SIZE=$((NODE_MODULES_SIZE + DIST_SIZE + ROOT_FILES_SIZE))
+          TOTAL_SIZE_MB=$((TOTAL_SIZE / 1024 / 1024))
+          
+          echo "node_modules: $((NODE_MODULES_SIZE / 1024 / 1024)) MB"
+          echo "dist: $((DIST_SIZE / 1024 / 1024)) MB"
+          echo "root files: $((ROOT_FILES_SIZE / 1024)) KB"
+          echo "---"
+          echo "Total estimated slug size: ${TOTAL_SIZE_MB} MB"
+          
+          echo "size_mb=${TOTAL_SIZE_MB}" >> $GITHUB_OUTPUT
+          
+          MAX_SIZE_MB=500
+          if [ "$TOTAL_SIZE_MB" -gt "$MAX_SIZE_MB" ]; then
+            echo "::error::Slug size (${TOTAL_SIZE_MB} MB) exceeds Heroku limit of ${MAX_SIZE_MB} MB"
+            exit 1
+          else
+            echo "✅ Slug size (${TOTAL_SIZE_MB} MB) is within the ${MAX_SIZE_MB} MB limit"
+          fi
+

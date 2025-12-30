@@ -1,56 +1,68 @@
-import { Button, ButtonGroup, Dialog, DialogBody, DialogFooter } from "components/Common/ui";
-import { css, cx } from "emotion";
+import {
+    Button,
+    ButtonGroup,
+    Classes,
+    Dialog,
+    DialogProps,
+    Intent,
+} from "components/ui/shims";
+import { HotkeyIndicator } from "components/Common/Shared";
 import * as React from "react";
+import { useEffect, useCallback } from "react";
 
 const hofImage = "/assets/hall-of-fame.png";
 
-const styles = {
-    hallOfFameDialog: css`
-        padding: 0.25rem;
-    `,
-    hallOfFameImage: css`
-        height: 10rem;
-        display: block;
-        margin: 1rem auto;
-        margin-top: 0.5rem;
-        image-rendering: pixelated;
-    `,
-    hallOfFameText: css``,
+export type HallOfFameDialogProps = Omit<DialogProps, "icon"> & {
+    icon?: string;
+    onSubmit: () => void;
 };
 
-export interface HallOfFameDialogProps {
-    isOpen: boolean;
-    onClose: (e?: React.SyntheticEvent) => void;
-    title: string;
-    icon?: string | React.ReactNode;
-}
-
 export function HallOfFameDialog(props: HallOfFameDialogProps) {
+    const handleKeyDown = useCallback(
+        (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && props.isOpen) {
+                e.preventDefault();
+                props.onSubmit();
+            }
+        },
+        [props.isOpen, props.onSubmit]
+    );
+
+    useEffect(() => {
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [handleKeyDown]);
+
     return (
         <Dialog {...props}>
-            <DialogBody className={cx(styles.hallOfFameDialog)}>
+            <div className={`p-1 ${Classes.DIALOG_BODY}`}>
                 <img
                     alt="Hall of Fame"
-                    className={styles.hallOfFameImage}
+                    className="h-40 block mx-auto mt-2 mb-4 [image-rendering:pixelated]"
                     src={hofImage}
                 />
-                <p className={styles.hallOfFameText}>
+                <p>
                     Submitting to the Hall of Fame uploads your nuzlocke to a
                     persistent record.
                 </p>
-            </DialogBody>
-            <DialogFooter>
-                <Button
-                    intent="danger"
-                    minimal
-                    onClick={props.onClose}
-                >
-                    Cancel
-                </Button>
-                <Button intent="success">
-                    Submit to Hall of Fame
-                </Button>
-            </DialogFooter>
+                <div className="flex gap-2 justify-between">
+                    <Button
+                        intent={Intent.DANGER}
+                        minimal
+                        onClick={props.onClose}
+                        hotkey={{ key: "ESC", showModifier: false }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button onClick={props.onSubmit} intent={Intent.SUCCESS}>
+                        Submit to Hall of Fame{" "}
+                        <HotkeyIndicator
+                            hotkey="↵"
+                            style={{ marginLeft: "0.35rem" }}
+                        />
+                    </Button>
+                </div>
+            </div>
         </Dialog>
     );
 }

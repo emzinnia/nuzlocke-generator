@@ -32,3 +32,6 @@ export * from "./wrapImageInCORS";
 export * from "./gameSaveFormat";
 export * from "./getters/normalizeSpeciesName";
 export * from "./isEqual";
+export * from "./editorDarkModePreference";
+export * from "./search";
+export * from "./searchTermStorage";

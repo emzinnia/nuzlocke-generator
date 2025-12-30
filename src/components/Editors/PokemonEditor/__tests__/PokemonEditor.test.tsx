@@ -2,6 +2,7 @@ import * as React from "react";
 import { PokemonEditorBase } from "..";
 import { styleDefaults } from "utils";
 import { render, screen } from "utils/testUtils";
+import { vi } from "vitest";
 
 describe("<PokemonEditor />", () => {
     it("renders its contents", () => {
@@ -13,6 +14,8 @@ describe("<PokemonEditor />", () => {
                 game={{ name: "Red", customName: "" }}
                 excludedAreas={[]}
                 customAreas={[]}
+                toggleDialog={vi.fn()}
+                isMassEditorOpen={false}
             />,
         );
         expect(screen.getByTestId("pokemon-editor")).toBeDefined();

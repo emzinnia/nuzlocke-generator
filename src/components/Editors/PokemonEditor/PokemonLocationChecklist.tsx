@@ -3,7 +3,15 @@ import { Game, Pokemon, Boxes } from "models";
 import { Game as GameName, getEncounterMap, listOfGames } from "utils";
 import { State } from "state";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon/PokemonIcon";
-import { Tooltip, TextArea, HTMLSelect } from "components/Common/ui";
+import {
+    Callout,
+    Classes,
+    HTMLSelect,
+    Intent,
+    TextArea,
+    Tooltip,
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { Check, X, AlertTriangle } from "lucide-react";
 import { cx } from "emotion";
 import { useDispatch } from "react-redux";
@@ -15,11 +23,13 @@ const EncounterMap = ({
     pokemon,
     currentGame,
     excludeGifts,
+    locationLookup,
     displayHideArea,
     onClickHideArea,
 }) => {
     return encounterMap.map((area) => {
         if (area === "") return null;
+        const found = locationLookup?.get(area.trim().toLocaleLowerCase());
         return (
             <div
                 key={area.toString()}
@@ -35,6 +45,7 @@ const EncounterMap = ({
                     pokemon={pokemon}
                     currentGame={currentGame}
                     excludeGifts={excludeGifts}
+                    poke={found}
                 />
                 <div style={{ marginLeft: "4px" }}>{area}</div>
                 {displayHideArea && (
@@ -60,18 +71,14 @@ const LocationIcon = ({
     currentGame,
     excludeGifts,
     pokemon,
+    poke,
 }: {
     area: string;
     currentGame: GameName;
     excludeGifts: boolean;
     pokemon: Pokemon[];
+    poke?: Pokemon;
 }) => {
-    const poke = pokemon.find(
-        (poke) =>
-            poke.met?.trim().toLocaleLowerCase() === area.toLocaleLowerCase() &&
-            (currentGame === "None" || poke.gameOfOrigin === currentGame),
-    );
-
     if (poke && !poke.hidden && (!poke.gift || !excludeGifts)) {
         return (
             <>
@@ -106,36 +113,49 @@ export const PokemonLocationChecklist = ({
     excludedAreas: string[];
     customAreas: string[];
 }) => {
-    const calcTotals = (boxes, pokemon, encounterMap, currentGame) => {
-        const encounterTotal = encounterMap.length;
-        const totals = new Map();
+    const calcTotals = (
+        boxes,
+        pokemon,
+        encounterMap,
+        currentGame: GameName,
+    ) => {
+        const encounterTotal = encounterMap.length || 1;
+        const encounterSet = new Set(encounterMap);
 
-        for (const box of boxes) {
-            totals.set(box.name, 0);
-            for (const poke of pokemon) {
-                if (
-                    poke.status === box.name &&
-                    (currentGame === "None" ||
-                        poke.gameOfOrigin === currentGame) &&
-                    encounterMap.includes(poke.met)
-                ) {
-                    const value = totals.get(box.name);
-                    totals.set(box.name, value + 1);
-                }
-            }
+        // Count pokemon per status in a single pass (avoid boxes × pokemon nested loop)
+        const counts = new Map<string, number>();
+        for (const poke of pokemon) {
+            if (!poke || poke.hidden) continue;
+            if (currentGame !== "None" && poke.gameOfOrigin !== currentGame)
+                continue;
+            if (!encounterSet.has(poke.met)) continue;
+
+            const key = poke.status ?? "";
+            counts.set(key, (counts.get(key) ?? 0) + 1);
         }
 
-        const percentages: { key: string; percentage: string }[] = [];
-        totals.forEach((total, key) => {
+        return boxes.map((box) => {
+            const total = counts.get(box.name) ?? 0;
             const percentage = `${((total / encounterTotal) * 100).toFixed(1)}%`;
-            percentages.push({ key, percentage });
+            return { key: box.name, percentage };
         });
-        return percentages;
     };
 
     const [excludeGifts, setExcludeGifts] = React.useState(false);
     const [currentGame, setCurrentGame] = React.useState<GameName>("None");
     const dispatch = useDispatch();
+    const locationLookup = React.useMemo(() => {
+        const map = new Map<string, Pokemon>();
+        for (const poke of pokemon) {
+            const met = poke?.met?.trim();
+            if (!met) continue;
+            if (currentGame !== "None" && poke.gameOfOrigin !== currentGame)
+                continue;
+            const key = met.toLocaleLowerCase();
+            if (!map.has(key)) map.set(key, poke);
+        }
+        return map;
+    }, [pokemon, currentGame]);
     const encounterMap = React.useMemo(
         () =>
             getEncounterMap(game.name)
@@ -145,7 +165,7 @@ export const PokemonLocationChecklist = ({
     );
     const totals = React.useMemo(
         () => calcTotals(boxes, pokemon, encounterMap, currentGame),
-        [boxes, JSON.stringify(pokemon), encounterMap, currentGame],
+        [boxes, pokemon, encounterMap, currentGame],
     );
     const hideArea = (area: string) => () =>
         dispatch(updateExcludedAreas([...excludedAreas, area]));
@@ -153,20 +173,14 @@ export const PokemonLocationChecklist = ({
     const updateExcludedAreasFromText = (event) => {
         const value = event.currentTarget.value;
         const areas = value.split("\n");
-        console.log("areas", value, areas);
         dispatch(updateExcludedAreas(areas));
     };
 
     const updateCustomAreasFromText = (event) => {
         const value = event.currentTarget.value;
         const areas = value.split("\n");
-        console.log("areas", value, areas);
         dispatch(updateCustomAreas(areas));
     };
-
-    React.useEffect(() => {
-        console.log("excludedAreas", excludedAreas);
-    }, [excludedAreas]);
 
     const colors = [
         "#0e1d6b",
@@ -271,6 +285,7 @@ export const PokemonLocationChecklist = ({
                 style={style}
                 currentGame={currentGame}
                 excludeGifts={excludeGifts}
+                locationLookup={locationLookup}
                 displayHideArea={true}
                 onClickHideArea={hideArea}
             />

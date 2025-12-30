@@ -11,16 +11,22 @@ const featuresFromEnv = {
     imageUploads: import.meta.env.VITE_IMAGE_UPLOADS,
     emmaMode: import.meta.env.VITE_EMMA_MODE,
     tcgImages: import.meta.env.VITE_TCG_IMAGES,
+    rulesetSubmission: import.meta.env.VITE_RULESET_SUBMISSION,
 };
 
 type FeatureObject = {
     [K in keyof typeof featuresFromEnv]: boolean;
 };
 
+const toBool = (v: unknown) => {
+    if (typeof v === "string") return v.trim().toLowerCase() === "true";
+    return Boolean(v);
+};
+
 const featuresToBooleans = (f: typeof featuresFromEnv): FeatureObject => {
     const obj: Partial<FeatureObject> = {};
     for (const feature in f) {
-        obj[feature] = Boolean(f[feature]);
+        obj[feature] = toBool(f[feature]);
     }
     return obj as FeatureObject;
 };

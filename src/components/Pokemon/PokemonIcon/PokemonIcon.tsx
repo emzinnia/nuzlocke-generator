@@ -16,16 +16,14 @@ import { useDrag, useDrop } from "react-dnd";
 import { State } from "state";
 import { Omit } from "ramda";
 import { normalizeSpeciesName } from "utils/getters/normalizeSpeciesName";
+import { PokemonImage } from "components/Common/Shared/PokemonImage";
+import { ResizedImage } from "components/Common/Shared/ResizedImage";
 import { Pokemon } from "models";
 
 export interface PokemonIconProps {
-    /** The id of the Pokemon, used for selection **/
     id?: Pokemon["id"];
-    /** The species of the Pokemon **/
     species: Pokemon["species"];
-    /** The forme of the Pokemon **/
     forme?: Pokemon["forme"];
-    /** The gender of the Pokemon */
     gender?: GenderElementProps;
     customIcon?: Pokemon["customIcon"];
     hidden?: Pokemon["hidden"];
@@ -33,7 +31,6 @@ export interface PokemonIconProps {
     position?: Pokemon["position"];
     onClick?: (e?: React.MouseEvent) => void;
     selectedId?: string | null;
-    /** Renders its shiny version if true **/
     shiny?: Pokemon["shiny"];
     status?: Pokemon["status"];
     className?: string;
@@ -66,10 +63,6 @@ const usePokemonDrag = (props: BasePokemonIconProps) => {
         collect: (monitor) => ({
             isDragging: monitor.isDragging(),
         }),
-        // @TODO: figure out where this piece should go
-        // item: () => {
-        //     store.dispatch(selectPokemon(props.id!));
-        // },
     });
 
     return dragRef;
@@ -93,91 +86,82 @@ export const getIconURL = ({
             ? "female/"
             : "";
 
-    if (species === "Egg" || egg) return `${baseURL}egg.png`;
-
-    return `${baseURL}${isShiny}/${isFemaleSpecific}${normalizeSpeciesName(
-        species as Species,
-    )}${getIconFormeSuffix(forme as keyof typeof Forme)}.png`;
+    if (egg) {
+        return `${baseURL}${isShiny}/egg.png`;
+    }
+    const normalizedName = normalizeSpeciesName(species);
+    const formeSuffix = getIconFormeSuffix(species, forme);
+    return `${baseURL}${isShiny}/${isFemaleSpecific}${normalizedName}${formeSuffix}.png`;
 };
 
-export function PokemonIconPlain({
-    isDragging,
-    canDrop,
-    id,
-    gender,
-    species,
-    forme,
-    onClick,
-    selectedId,
-    className,
-    shiny,
-    egg,
-    style,
-    customIcon,
-    includeTitle,
-    imageStyle,
-}: PokemonIconProps) {
-    const defaultImageStyle: React.CSSProperties = {
-        height: "32px",
-        maxWidth: "auto",
-    };
+export function PokemonIconPlain(
+    props: BasePokemonIconProps & {
+        selectedId: string | null;
+        onClick: PokemonIconProps["onClick"];
+        imageStyle?: React.CSSProperties;
+    },
+) {
+    const dragRef = usePokemonDrag(props);
+
+    const isSelected = props.id === props.selectedId;
+
+    if (props.hidden) return null;
 
     return (
         <div
-            role="presentation"
-            onClick={(e) => {
-                e.preventDefault();
-                onClick?.(e);
+            ref={dragRef}
+            className={props.className}
+            style={{
+                cursor: "grab",
+                display: "inline-block",
+                ...props.style,
             }}
-            id={id}
-            title={includeTitle ? species : undefined}
-            style={style}
-            className={`${id === selectedId ? "pokemon-icon selected" : "pokemon-icon"} ${className || ""} ${isDragging ? "opacity-medium" : ""} ${canDrop ? "droppable" : ""}`}
+            onClick={props.onClick}
         >
-                <img
-                style={imageStyle ?? defaultImageStyle}
-                alt={species}
-                onError={({ currentTarget }) => {
-                    currentTarget.onerror = null;
-                    currentTarget.src = "/icons/pokemon/unknown.png";
+            <ResizedImage
+                style={{
+                    filter: isSelected
+                        ? "drop-shadow(0px 0px 4px cyan)"
+                        : undefined,
+                    ...props.imageStyle,
                 }}
-                src={customIcon ?? getIconURL({
-                    id,
-                    species,
-                    forme,
-                    shiny,
-                    gender,
-                    egg,
-                    customIcon,
-                } as IconURLArgs)}
+                title={props.includeTitle ? props.species : undefined}
+                alt={props.species}
+                src={
+                    props.customIcon ||
+                    getIconURL({
+                        species: props.species,
+                        forme: props.forme,
+                        shiny: props.shiny,
+                        gender: props.gender as Pokemon["gender"],
+                        egg: props.egg,
+                    })
+                }
             />
         </div>
     );
 }
 
-export const PokemonIcon = (props: BasePokemonIconProps) => {
-    const { selectedId, appStyle } = useSelector<
-        State,
-        { selectedId: State["selectedId"]; appStyle: State["style"] }
-    >((state) => ({ selectedId: state.selectedId, appStyle: state.style }));
+export function PokemonIcon(props: PokemonIconProps) {
     const dispatch = useDispatch();
+    const selectedId = useSelector((state: State) => state.selectedId);
 
-    const { styles } = props;
-    const onClick = () => {
-        dispatch(selectPokemon(props.id!));
-    };
-    const imageStyle: React.CSSProperties = {
-        height: "32px",
-        maxWidth: "auto",
-        imageRendering: (styles ?? appStyle)?.iconRendering as React.CSSProperties["imageRendering"],
-    };
+    const handleClick = React.useCallback(
+        (e?: React.MouseEvent) => {
+            if (props.onClick) {
+                props.onClick(e);
+            } else if (props.id) {
+                dispatch(selectPokemon(props.id));
+            }
+        },
+        [dispatch, props],
+    );
 
     return (
-            <PokemonIconPlain
+        <PokemonIconPlain
             {...props}
-            onClick={onClick}
-            imageStyle={imageStyle}
             selectedId={selectedId}
+            onClick={handleClick}
         />
     );
-};
+}

@@ -3,6 +3,7 @@ import { css, cx } from "emotion";
 import { Pokemon } from "models";
 import { State } from "state";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
+import { ResizedImage } from "components/Common/Shared/ResizedImage";
 import { getBackgroundGradient, typeToColor } from "utils";
 
 const itemLabelStyle = {
@@ -79,7 +80,18 @@ export function PokemonItem({
             {pokemon.customItemImage ? (
                 <PokemonImage url={pokemon.customItemImage}>
                     {(image) => (
-                        <img alt={pokemon.item} src={pokemon.customItemImage} />
+                        <ResizedImage
+                            // Cap custom item image data at 64x64 for consistent rendering/export.
+                            src={image}
+                            width={64}
+                            height={64}
+                            alt={pokemon.item}
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "contain",
+                            }}
+                        />
                     )}
                 </PokemonImage>
             ) : (

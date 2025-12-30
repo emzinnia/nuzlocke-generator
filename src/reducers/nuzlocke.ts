@@ -38,6 +38,7 @@ export function nuzlockes(
                         id,
                         data: action?.data || null,
                         isCopy: action?.isCopy || false,
+                        lastEdited: Date.now(),
                     },
                 ],
             };
@@ -62,6 +63,7 @@ export function nuzlockes(
                     {
                         id: action.id,
                         data: action.data,
+                        lastEdited: Date.now(),
                     },
                 ],
             };
@@ -88,6 +90,7 @@ export function nuzlockes(
                     {
                         id: action.id,
                         data: action.data,
+                        lastEdited: Date.now(),
                     },
                 ],
             };

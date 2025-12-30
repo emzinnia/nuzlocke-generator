@@ -1,89 +1,115 @@
 import * as React from "react";
-import { Trash2 } from "lucide-react";
+import { Dialog, Tooltip, Icon, Button, Checkbox, Intent } from "components/ui";
+import { css } from "emotion";
 
 import { accentedE } from "utils";
-import { Alert, Checkbox, Icon, Tooltip } from "components/Common/ui";
-import { deletePokemonFromRun } from "api/runs";
+import { connect } from "react-redux";
+import { deletePokemon, modifyDeletionConfirmation } from "actions";
+import { State } from "state";
+
+const DeletePokemonButtonContainer = css`
+    position: absolute;
+    right: 0.5rem;
+    top: 0.5rem;
+    z-index: 2;
+`;
 
 export interface DeletePokemonButtonProps {
-    pokemonId?: string;
-    runId?: string;
-    pokemonList?: { id: string }[];
-    onDeleted?: () => void;
+    id?: string;
     confirmation?: boolean;
+    deletePokemon?: deletePokemon;
+    modifyDeletionConfirmation?: modifyDeletionConfirmation;
 }
 
-export function DeletePokemonButton({
-    pokemonId,
-    runId,
-    pokemonList,
-    onDeleted,
-    confirmation = true,
-}: DeletePokemonButtonProps) {
-    const [dialogOn, setDialogOn] = React.useState(false);
-    const [skipConfirmation, setSkipConfirmation] = React.useState(false);
-    const [isDeleting, setIsDeleting] = React.useState(false);
+export interface DeletePokemonButtonState {
+    dialogOn: boolean;
+}
 
-    const shouldConfirm = confirmation && !skipConfirmation;
+export class DeletePokemonButtonBase extends React.Component<
+    DeletePokemonButtonProps,
+    DeletePokemonButtonState
+> {
+    public static defaultProps = {
+        confirmation: true,
+    };
 
-    const toggleDialog = React.useCallback(() => {
-        setDialogOn((prev) => !prev);
-    }, []);
+    public state = { dialogOn: false };
 
-    const handleDelete = React.useCallback(async () => {
-        if (!pokemonId || !runId || !pokemonList) return;
+    public toggleDialog = () => {
+        this.setState({ dialogOn: !this.state.dialogOn });
+    };
 
-        setIsDeleting(true);
-        try {
-            await deletePokemonFromRun(runId, pokemonId, pokemonList);
-            onDeleted?.();
-        } catch (error) {
-            console.error("Failed to delete pokemon:", error);
-        } finally {
-            setIsDeleting(false);
-            setDialogOn(false);
-        }
-    }, [pokemonId, runId, pokemonList, onDeleted]);
-
-    const handleClick = React.useCallback(() => {
-        if (!pokemonId || !runId || !pokemonList) return;
-
-        if (shouldConfirm) {
-            toggleDialog();
-        } else {
-            handleDelete();
-        }
-    }, [pokemonId, runId, pokemonList, shouldConfirm, toggleDialog, handleDelete]);
-
-    if (!pokemonId || !runId || !pokemonList) return null;
-
-    return (
-        <div className="text-red-500 cursor-pointer">
-            <Alert
-                isOpen={dialogOn}
-                onCancel={toggleDialog}
-                onConfirm={handleDelete}
-                confirmButtonText={isDeleting ? "Deleting..." : "Delete Pokemon"}
-                cancelButtonText="Cancel"
-                intent="danger"
-            >
-                <p>
-                    This will delete the currently selected Pokemon. Are you
-                    sure you want to do that?
-                </p>
-
-                <Checkbox
-                    label="Don't Ask Me For Confirmation Again"
-                    onChange={(checked) => setSkipConfirmation(checked)}
-                />
-            </Alert>
-            <Tooltip content={`Delete Pok${accentedE}mon`} position="top">
-                <Icon
-                    icon={Trash2}
-                    onClick={handleClick}
+    public render() {
+        return (
+            <div className={DeletePokemonButtonContainer}>
+                <Dialog
+                    isOpen={this.state.dialogOn && this.props.confirmation}
+                    onClose={this.toggleDialog}
                     title="Delete Pokemon"
-                />
-            </Tooltip>
-        </div>
-    );
+                    icon={<Icon icon="trash" />}
+                    footer={
+                        <>
+                            <Button onClick={this.toggleDialog}>Cancel</Button>
+                            <Button
+                                intent={Intent.DANGER}
+                                onClick={(_e) => {
+                                    if (this.props.id) {
+                                        this.props.deletePokemon(this.props.id);
+                                    }
+                                    this.toggleDialog();
+                                }}
+                            >
+                                Delete Pokemon
+                            </Button>
+                        </>
+                    }
+                >
+                    <p>
+                        This will delete the currently selected Pokemon. Are you
+                        sure you want to do that?
+                    </p>
+
+                    <Checkbox
+                        onChange={(checked) =>
+                            this.props.modifyDeletionConfirmation &&
+                            this.props.modifyDeletionConfirmation(!checked)
+                        }
+                        label="Don't Ask Me For Confirmation Again"
+                    />
+                </Dialog>
+                <Tooltip
+                    content={`Delete Pok${accentedE}mon`}
+                    position="top"
+                >
+                    <span
+                        onClick={(_e) => {
+                            if (this.props.confirmation) {
+                                this.toggleDialog();
+                            } else {
+                                if (this.props.deletePokemon && this.props.id) {
+                                    this.props.deletePokemon(this.props.id);
+                                }
+                            }
+                        }}
+                        style={{ cursor: "pointer" }}
+                    >
+                        <Icon
+                            icon="trash"
+                            aria-label="Delete Pokemon"
+                        />
+                    </span>
+                </Tooltip>
+            </div>
+        );
+    }
 }
+
+export const DeletePokemonButton = connect(
+    (state: State) => ({
+        confirmation: state.confirmDeletion,
+    }),
+    {
+        deletePokemon,
+        modifyDeletionConfirmation,
+    },
+)(DeletePokemonButtonBase);

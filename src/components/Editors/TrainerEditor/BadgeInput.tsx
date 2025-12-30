@@ -4,7 +4,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { TrainerInfoEditField } from "./TrainerInfoEditField";
 import { editTrainer } from "actions";
 
-import { Popover, Menu, Button, Checkbox, Dialog, DialogBody } from "components/Common/ui";
+import {
+    Popover,
+    Menu,
+    Button,
+    Position,
+    Checkbox,
+    Dialog,
+    Classes,
+} from "components/ui/shims";
 import { CheckpointsEditor } from "./CheckpointsEditor";
 import { cx } from "emotion";
 import { State } from "state";
@@ -124,14 +132,15 @@ export function BadgeInput({ onChange, checkpointsCleared }: BadgeInputProps) {
                 title="Checkpoints Editor"
                 icon="edit"
             >
-                <DialogBody
+                <div
                     className={cx(
+                        Classes.DIALOG_BODY,
                         Styles.checkpointsEditor,
                         "has-nice-scrollbars",
                     )}
                 >
                     <CheckpointsEditor checkpoints={checkpoints} />
-                </DialogBody>
+                </div>
             </Dialog>
             <TrainerInfoEditField
                 data-testid="badge-input"

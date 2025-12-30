@@ -200,7 +200,6 @@ export function TeamPokemon({
         linkedPokemonData: linkedPokemon ?? null,
         extraData: "",
         movesColored: ReactDOMServer.renderToString(
-            // @ts-expect-error - MovesBase props type mismatch
             <MovesBase
                 style={style}
                 customMoveMap={customMoveMap}
@@ -212,7 +211,6 @@ export function TeamPokemon({
             />,
         ),
         movesColoredWithClasses: ReactDOMServer.renderToString(
-            // @ts-expect-error - MovesBase props type mismatch
             <MovesBase
                 style={style}
                 customMoveMap={customMoveMap}

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Heart, HeartCrack } from "lucide-react";
+import { Icon } from "components/ui";
 import { v4 as uuid } from "uuid";
 
 export const determineNumberOfHearts = (friendship: number) => {
@@ -15,7 +15,8 @@ export const generateHearts = (
     friendship: ReturnType<typeof determineNumberOfHearts>,
 ) => {
     return Array.from(Array(friendship).keys()).map((k) => (
-        <Heart
+        <Icon
+            icon="heart"
             size={12}
             data-testid="friendship-icon"
             key={uuid()}
@@ -34,7 +35,8 @@ export function PokemonFriendship({ friendship }: PokemonFriendshipProps) {
     const numberOfHearts = determineNumberOfHearts(friendship);
     if (numberOfHearts === 0)
         return (
-            <HeartCrack
+            <Icon
+                icon="heart-broken"
                 size={12}
                 data-testid="friendship-broken-icon"
             />

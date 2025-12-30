@@ -10,11 +10,6 @@ export interface HotkeyList {
 
 export const betaHotkeys: HotkeyList[] = [
     {
-        key: "m",
-        comment: "Toggle editor",
-        onKeyUp: "toggleEditor",
-    },
-    {
         key: "I",
         label: "shift+i",
         comment: "Toggle image uploader",
@@ -32,6 +27,11 @@ export const listOfHotkeys: HotkeyList[] = [
         comment: "Redo",
     },
     {
+        key: "h",
+        comment: "Toggle History Timeline",
+        onKeyUp: "toggleHistoryTimeline",
+    },
+    {
         key: "j",
         comment: "Previous Pok\xE9mon",
         onKeyUp: "previousPokemon",
@@ -42,9 +42,74 @@ export const listOfHotkeys: HotkeyList[] = [
         onKeyUp: "nextPokemon",
     },
     {
+        key: "J",
+        label: "shift+j",
+        comment: "Move Pok\xE9mon Left",
+        onKeyUp: "movePokemonLeft",
+    },
+    {
+        key: "K",
+        label: "shift+k",
+        comment: "Move Pok\xE9mon Right",
+        onKeyUp: "movePokemonRight",
+    },
+    {
+        key: "u",
+        comment: "Move Pok\xE9mon Up (Previous Status)",
+        onKeyUp: "movePokemonStatusUp",
+    },
+    {
+        key: "d",
+        comment: "Move Pok\xE9mon Down (Next Status)",
+        onKeyUp: "movePokemonStatusDown",
+    },
+    {
+        key: "M",
+        label: "shift+m",
+        comment: "Toggle editor",
+        onKeyUp: "toggleEditor",
+    },
+    {
         key: "n",
         comment: "Add new Pok\xE9mon",
         onKeyUp: "addPokemon",
+    },
+    {
+        key: "t",
+        comment: "Toggle Type Matchups",
+        onKeyUp: "toggleTypeMatchups",
+    },
+    {
+        key: "m",
+        comment: "Toggle Mass Editor",
+        onKeyUp: "toggleMassEditor",
+    },
+    {
+        key: "i",
+        comment: "Import data",
+        onKeyUp: "importData",
+    },
+    {
+        key: "e",
+        comment: "Export data",
+        onKeyUp: "exportData",
+    },
+    {
+        key: "o",
+        comment: "Import save file",
+        onKeyUp: "importSaveFile",
+    },
+    {
+        key: "D",
+        label: "shift+d",
+        comment: "Download image",
+        onKeyUp: "downloadImage",
+    },
+    {
+        key: "L",
+        label: "shift+l",
+        comment: "Toggle dark mode",
+        onKeyUp: "toggleDarkMode",
     },
     {
         key: "s",
@@ -57,10 +122,21 @@ export const listOfHotkeys: HotkeyList[] = [
         onKeyUp: "deletePokemon",
     },
     {
+        key: "/",
+        comment: "Focus Pokémon search",
+        onKeyUp: "focusPokemonSearch",
+    },
+    {
         key: "N",
         label: "shift+n",
         comment: "Create New Nuzlocke",
         onKeyUp: "newNuzlocke",
+    },
+    {
+        key: "V",
+        label: "shift+v",
+        comment: "Toggle release notes",
+        onKeyUp: "toggleReleaseDialog",
     },
     {
         label: "shift+scroll",

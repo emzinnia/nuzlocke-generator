@@ -1,66 +1,26 @@
 import * as React from "react";
 import { connect } from "react-redux";
+import {
+    Cell,
+    Column,
+    Table,
+    CellRenderer,
+    EditableCell,
+    JSONFormat,
+} from "components/ui";
 import { State } from "state";
-import { sortPokes, generateEmptyPokemon, normalizeSpeciesName } from "utils";
+import { generateEmptyPokemon, normalizeSpeciesName } from "utils";
 import { PokemonKeys, Pokemon } from "models";
 import { editPokemon as editPokemonType } from "actions";
 import { AddPokemonButton } from "components/Pokemon/AddPokemonButton/AddPokemonButton";
-import { Button, Input } from "components/Common/ui";
+import { Button, Input } from "components/ui/shims";
+import { sortedPokemonSelector } from "selectors";
 import { Download } from "lucide-react";
 
 export interface MassEditorTableProps {
     pokemon: State["pokemon"];
     editPokemon: editPokemonType;
 }
-
-interface EditableCellProps {
-    value: string;
-    onConfirm: (value: string) => void;
-}
-
-const EditableCell: React.FC<EditableCellProps> = ({ value, onConfirm }) => {
-    const [isEditing, setIsEditing] = React.useState(false);
-    const [editValue, setEditValue] = React.useState(value);
-
-    const handleBlur = () => {
-        setIsEditing(false);
-        if (editValue !== value) {
-            onConfirm(editValue);
-        }
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter") {
-            handleBlur();
-        }
-        if (e.key === "Escape") {
-            setEditValue(value);
-            setIsEditing(false);
-        }
-    };
-
-    if (isEditing) {
-        return (
-            <Input
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onBlur={handleBlur}
-                onKeyDown={handleKeyDown}
-                autoFocus
-                className="w-full h-full border-0 p-0 text-xs"
-            />
-        );
-    }
-
-    return (
-        <div
-            className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-1"
-            onClick={() => setIsEditing(true)}
-        >
-            {value || <span className="text-gray-400">—</span>}
-        </div>
-    );
-};
 
 const formatValue = (value: any): string => {
     if (value === null || value === undefined) return "";
@@ -224,7 +184,7 @@ export function MassEditorTableBase({
 }
 
 export const MassEditorTable = connect(
-    (state: State) => ({ pokemon: state.pokemon.sort(sortPokes) }),
+    (state: State) => ({ pokemon: sortedPokemonSelector(state) }),
     {
         editPokemon: editPokemonType,
     },

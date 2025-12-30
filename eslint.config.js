@@ -27,28 +27,26 @@ export default defineConfig([
             "massRename.ts",
             "scraper.js",
             "vite.config.js",
-            "cypress.config.ts",
             "tailwind.config.js",
+            "e2e/screenshots/**",
+            ".cursor/**",
         ],
+        linterOptions: {
+            reportUnusedDisableDirectives: "off",
+        },
     },
     {
-        files: ["src/**/*.{js,mjs,cjs,ts,jsx,tsx}"],
+        files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
         plugins: { js },
         extends: ["js/recommended"],
     },
     {
-        files: ["src/**/*.{js,mjs,cjs,ts,jsx,tsx}"],
+        files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
         languageOptions: { globals: { ...globals.browser, ...globals.node } },
+        settings: { react: { version: "detect" } },
     },
     tseslint.configs.recommended,
     pluginReact.configs.flat.recommended,
-    {
-        settings: {
-            react: {
-                version: "detect",
-            },
-        },
-    },
     {
         rules: {
             "react/prop-types": "off",
@@ -56,7 +54,7 @@ export default defineConfig([
             "@typescript-eslint/no-unused-vars": "off",
             "@typescript-eslint/no-empty-object-type": "warn",
             "@typescript-eslint/no-unsafe-function-type": "warn",
-            "no-prototype-builtins": "warn",
+            "no-prototype-builtins": "off",
             "jsx-a11y/no-onchange": "off",
             "@typescript-eslint/quotes": "off",
             "no-useless-escape": "off",

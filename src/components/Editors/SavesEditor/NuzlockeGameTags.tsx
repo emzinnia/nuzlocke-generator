@@ -1,8 +1,7 @@
-import { Tag } from "components/Common/ui";
-import { PokemonIcon } from "components";
+import { Tag } from "components/ui/shims";
 import * as React from "react";
 import { State } from "state";
-import { Game, gameOfOriginToColor } from "utils";
+import { Game, gameOfOriginToColor, getContrastColor } from "utils";
 
 export interface NuzlockeGameTagsProps {
     isCurrent?: boolean;
@@ -16,90 +15,45 @@ export interface NuzlockeGameTagsProps {
 
 export function NuzlockeGameTags({
     isCurrent,
-    darkMode,
     game,
-    data,
-    color,
     isCopy,
     size,
 }: NuzlockeGameTagsProps) {
+    const secondaryTagClasses = `mx-0.5 bg-black/20 dark:text-white text-black`;
+
     return (
-        <>
-            <div
-                style={{
-                    display: "flex",
-                    width: "20rem",
-                    alignItems: "center",
-                    pointerEvents: "none",
-                    flexDirection: "column",
-                    margin: "auto",
-                }}
-            >
-                <div
+            <div className="flex gap-0.5 flex-col justify-center min-w-1/2">
+                <Tag
+                    round
+                    className="mx-0.5"
                     style={{
-                        display: "flex",
+                        background: gameOfOriginToColor(game),
+                        color: getContrastColor(gameOfOriginToColor(game)),
                     }}
                 >
-                    {data?.pokemon
-                        ?.filter((p) => p.status === "Team")
-                        .map((poke) => <PokemonIcon key={poke.id} {...poke} />)}
-                </div>
-                <div
-                    className="flex justify-center"
-                    style={{ minWidth: "50%" }}
-                >
-                    <Tag
-                        className="rounded-full"
-                        style={{
-                            margin: "0 2px",
-                            background: gameOfOriginToColor(game),
-                            color: darkMode
-                                ? color
-                                : game === "None"
-                                  ? "#000"
-                                  : color,
-                        }}
-                    >
-                        {game}
+                    {game}
+                </Tag>
+                {isCurrent && (
+                    <Tag round className={secondaryTagClasses}>
+                        Current
                     </Tag>
-                    {isCurrent && (
-                        <Tag
-                            className="rounded-full"
-                            style={{
-                                margin: "0 2px",
-                                background: "rgba(0,0,0,0.1)",
-                                color: darkMode ? "#fff" : "#000",
-                            }}
-                        >
-                            Current
-                        </Tag>
-                    )}
-                    {isCopy && (
-                        <Tag
-                            className="rounded-full"
-                            style={{
-                                margin: "0 2px",
-                                background: "rgba(0,0,0,0.1)",
-                                color: darkMode ? "#fff" : "#000",
-                            }}
-                        >
-                            Copy
-                        </Tag>
-                    )}
-                    {size && (
-                        <Tag
-                            className="rounded-full"
-                            style={{
-                                margin: "0 2px",
-                                background: "rgba(0,0,0,0.1)",
-                                color: darkMode ? "#fff" : "#000",
-                            }}
-                        >
-                            {size}KB
-                        </Tag>
-                    )}
-                </div>
+                )}
+                {isCopy && (
+                    <Tag
+                        round
+                        className={`mx-0.5 bg-[rgba(128,128,128,0.15)]`}
+                    >
+                        Copy
+                    </Tag>
+                )}
+                {size && (
+                    <Tag
+                        round
+                        className={`mx-0.5 bg-[rgba(128,128,128,0.15)]`}
+                    >
+                        {size}KB
+                    </Tag>
+                )}
             </div>
-        </>
     );
 }

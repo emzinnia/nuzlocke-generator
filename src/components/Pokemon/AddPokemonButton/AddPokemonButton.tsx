@@ -1,8 +1,9 @@
 import * as React from "react";
 import { useDispatch } from "react-redux";
 import { addPokemon, selectPokemon } from "actions";
-import { Button } from "components/Common/ui";
+import { Button, Intent } from "components/ui";
 import { Pokemon } from "models";
+import { HotkeyIndicator } from "components/Common/Shared";
 
 export function AddPokemonButton({ pokemon }: { pokemon: Pokemon }) {
     const dispatch = useDispatch();
@@ -17,9 +18,16 @@ export function AddPokemonButton({ pokemon }: { pokemon: Pokemon }) {
             icon="add"
             intent="success"
             className="add-new-pokemon"
+            data-testid="add-pokemon-button"
             onClick={onClick}
+            style={{ whiteSpace: "nowrap" }}
         >
-            Add New Pokémon
+            Add New Pokémon{" "}
+            <HotkeyIndicator
+                hotkey="n"
+                showModifier={false}
+                style={{ marginLeft: "0.35rem" }}
+            />
         </Button>
     );
 }

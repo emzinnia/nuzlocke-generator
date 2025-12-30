@@ -1,5 +1,6 @@
 import { Buffer } from "buffer";
 
+// Used by Gen 1 and 2
 export const parseTime = (buf: Buffer) => {
     const time = Buffer.from(buf);
     const hours = time[0x01] + time[0x00];

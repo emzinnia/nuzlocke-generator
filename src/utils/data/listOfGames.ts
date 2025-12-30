@@ -1,5 +1,6 @@
 export type Game =
     | "None"
+    | "Custom"
     | "Red"
     | "Blue"
     | "Green"
@@ -44,6 +45,7 @@ export type Game =
 
 export const listOfGames: Game[] = [
     "None",
+    "Custom",
     "Red",
     "Blue",
     "Green",

@@ -6,12 +6,12 @@ import {
     Dialog,
     DialogBody,
     Button,
-    Icon,
+    Classes,
     HTMLSelect,
     Input,
     Label,
-    classNames,
-} from "components/Common/ui";
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { Move } from "components/Pokemon/TeamPokemon/Moves";
 import {
     editCustomMoveMap,

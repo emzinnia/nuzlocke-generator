@@ -1,4 +1,5 @@
-.bp5-light .release-notes {
+/* Light theme for release notes - use :not(.dark) selector */
+:root:not(.dark) .release-notes {
     background: #fafafa;
 }
 .release-notes-wrapper .release-notes {
@@ -21,8 +22,8 @@
 .release-notes-wrapper h4 {
     background: rgba(244, 244, 244, 0.1);
     border-radius: 0.25rem;
-    margin: 2px;
-    padding: 2px 4px;
+    margin: 0.125rem;
+    padding: 0.125rem 0.25rem;
     font-size: 80%;
     font-weight: normal;
     width: 8rem;
@@ -45,7 +46,6 @@
     display: flex;
 }
 .release-notes-wrapper p img {
-    max-height: 15rem;
     margin: 0 auto;
     max-width: 100%;
 }
@@ -54,22 +54,22 @@
 }
 .release-notes-wrapper ul {
     list-style-type: disc;
-    margin-left: 20px;
+    margin-left: 1.25rem;
 }
 .release-notes-wrapper li > ul {
-    margin-left: 40px;
+    margin-left: 2.5rem;
 }
 
-.bp5-dark .release-dialog h1,
-.bp5-dark .release-dialog h2,
-.bp5-dark .release-dialog h3,
-.bp5-dark .release-dialog h4 {
+.dark .release-dialog h1,
+.dark .release-dialog h2,
+.dark .release-dialog h3,
+.dark .release-dialog h4 {
     color: #fff !important;
 }
 .release-dialog {
-    width: 620px !important;
+    width: 38.75rem !important;
 }
-@media screen and (max-width: 720px) {
+@media screen and (max-width: 45rem) {
     .release-dialog {
         margin-top: 4rem !important;
         width: 88vw !important;
@@ -82,13 +82,46 @@
 .no-list-item-types {
     list-style-type: none;
 }
-.bp5-tag-input {
+/* Tag input styling */
+.ui-tag-input {
     align-items: center !important;
 }
-.bp5-tag-input-icon {
+.ui-tag-input-icon {
     margin: 0 !important;
-    margin-right: 4px !important;
+    margin-right: 0.25rem !important;
 }
-.bp5-switch {
+/* Switch styling */
+.ui-switch {
     margin-bottom: 0 !important;
+}
+
+html {
+    --app-bp-input-border: #BFC2C6;
+    --app-bp-input-border-focus: #187daf;
+}
+
+html.dark {
+    --app-bp-input-border: #30363d;
+    --app-bp-input-border-focus: #58a6ff;
+}
+
+/* Input styling */
+.ui-input:not(.ui-input-ghost),
+.ui-tag-input,
+.ui-select select {
+    border: 1px solid var(--app-bp-input-border) !important;
+    box-shadow: none !important;
+}
+
+.ui-input:not(.ui-input-ghost):focus,
+.ui-input:not(.ui-input-ghost).ui-active,
+.ui-tag-input:focus-within,
+.ui-select select:focus {
+    border-color: var(--app-bp-input-border-focus) !important;
+    box-shadow: none !important;
+}
+
+/* Tab panel styling */
+.ui-tab-panel {
+    margin-top: 0;
 }

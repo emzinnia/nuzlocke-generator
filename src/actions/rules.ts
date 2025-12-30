@@ -42,3 +42,14 @@ export function resetRules() {
         type: RESET_RULES,
     };
 }
+
+export type SET_RULES = "SET_RULES";
+export const SET_RULES: SET_RULES = "SET_RULES";
+
+export type setRules = (rules: string[]) => Action<SET_RULES>;
+export function setRules(rules: string[]) {
+    return {
+        type: SET_RULES,
+        rules,
+    };
+}

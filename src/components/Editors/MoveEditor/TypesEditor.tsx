@@ -2,8 +2,9 @@ import * as React from "react";
 import { State } from "state";
 import { getListOfTypes, typeToColor, Types, getContrastColor } from "utils";
 import { createCustomType, deleteCustomType, editCustomType } from "actions";
-import { ColorInput, Button } from "components/Common/ui";
-import { Trash2 } from "lucide-react";
+import { ColorEdit, rgbaOrHex } from "components/Common/Shared";
+import { Classes, Button, ColorInput } from "components/ui/shims";
+import { Icon } from "components/ui";
 
 export interface TypesEditorProps {
     customTypes: State["customTypes"];
@@ -78,8 +79,8 @@ export class TypesEditor extends React.Component<
                             customTypes={customTypes}
                             type={ct.type}
                         />
-                        <Trash2
-                            size={16}
+                        <Icon
+                            icon="trash"
                             className="text-red-500 cursor-pointer"
                             onClick={(_e) => deleteCustomType(ct.id)}
                         />

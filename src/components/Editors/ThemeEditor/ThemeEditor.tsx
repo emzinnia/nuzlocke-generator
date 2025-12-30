@@ -16,15 +16,16 @@ import {
     Button,
     Menu,
     MenuItem,
-    Icon,
     Switch,
     TextArea,
+    Intent,
     Input,
     Label,
-} from "components/Common/ui";
-import { Download, Upload, LayoutGrid, Palette } from "lucide-react";
-import { ColorInput } from "components/Common/ui";
-import { ChampsPokemon, PokemonIcon, ErrorBoundary, ThemeSelect } from "components";
+    Tree,
+} from "components/ui/shims";
+import { Icon } from "components/ui";
+import { ColorEdit, ThemeSelect } from "components/Common/Shared";
+import { ChampsPokemon, PokemonIcon, ErrorBoundary } from "components";
 import {} from "themes";
 import { BoxedPokemon } from "components/Pokemon/BoxedPokemon/BoxedPokemon";
 import { DeadPokemon } from "components/Pokemon/DeadPokemon/DeadPokemon";
@@ -267,12 +268,8 @@ export class ThemeEditorBase extends React.Component<
     ThemeEditorProps,
     ThemEditorState
 > {
-    public state = { componentTree: [] };
-
-    public UNSAFE_componentWillMount() {
-        // TODO: Refactor out as props
-        this.setState({ componentTree: componentTree });
-    }
+    // Initialize state directly with componentTree (replaces UNSAFE_componentWillMount)
+    public state: ThemEditorState = { componentTree: componentTree };
 
     private getCurrentNode() {
         let currentNode;

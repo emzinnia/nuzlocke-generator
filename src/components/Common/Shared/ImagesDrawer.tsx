@@ -1,68 +1,143 @@
-import { Button, Drawer, DrawerSize } from "components/Common/ui";
-import { toast } from "components/Common/ui/Toast";
-import { Trash2 } from "lucide-react";
+import {
+    Button,
+    ButtonGroup,
+    Card,
+    Classes,
+    Drawer,
+    DrawerSize,
+    H4,
+    Intent,
+    NonIdealState,
+} from "components/ui/shims";
 import { css, cx } from "emotion";
 import * as React from "react";
-import { ImageUpload } from "./ImageUpload";
 import Dexie from "dexie";
 import { useDispatch, useSelector } from "react-redux";
 import { State } from "state";
 import { isDarkModeSelector } from "selectors";
 import { Skeleton } from "./Skeletons";
 import { toggleDialog } from "actions";
+import { getAppToaster } from "./appToaster";
 
 const styles = {
     imagesDrawer: css`
-        padding: 2rem;
+        padding: 1.25rem;
+        overflow-y: auto;
+    `,
+    header: css`
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    `,
+    headerControls: css`
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     `,
     images: css`
         display: flex;
         flex-wrap: wrap;
-        overflow: auto;
+        gap: 1rem;
         min-height: 50vh;
-        padding-bottom: 6rem;
-        margin-top: 2rem;
-        max-height: 100vh;
+        padding-bottom: 2rem;
     `,
-    image: css`
-        margin-right: 1rem;
-        margin-bottom: 1rem;
-        width: calc(25% - 1rem);
-        height: 14rem;
-        justify-content: center;
-        align-items: center;
+    imagesGrid: css`
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: stretch;
+    `,
+    imagesList: css`
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: stretch;
+    `,
+    imageCard: css`
+        width: calc(33.333% - 0.75rem);
+        padding: 0 !important;
+        overflow: hidden;
+        
+        @media (max-width: 720px) {
+            width: calc(50% - 0.5rem);
+        }
+    `,
+    imageCardList: css`
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+    `,
+    imageWrapper: css`
         position: relative;
+        height: 10rem;
+        overflow: hidden;
+        
+        &:hover .image-overlay {
+            opacity: 1;
+        }
     `,
-    imageCaption: css``,
+    imageWrapperList: css`
+        height: 4rem;
+        width: 6rem;
+        flex: 0 0 6rem;
+    `,
     imageInner: css`
         object-fit: cover;
         width: 100%;
-        height: 14rem;
+        height: 100%;
+        display: block;
     `,
-    deleteIcon: css`
-        margin-left: auto;
-        cursor: pointer;
-    `,
-    input: css`
-        width: 24rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin-right: 1rem;
-    `,
-    inputGroup: css`
+    imageOverlay: css`
         position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        opacity: 0;
+        transition: opacity 0.2s ease;
         display: flex;
-        padding: 0.5rem;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    `,
+    imageFooter: css`
+        padding: 0.5rem 0.75rem;
+        display: flex;
         align-items: center;
         justify-content: space-between;
-        background: rgb(22, 22, 22);
+        gap: 0.5rem;
+        border-top: 1px solid rgba(128, 128, 128, 0.2);
     `,
-    layoutViewIcon: css`
+    imageFooterList: css`
+        flex: 1;
+        border-top: none;
+        border-left: 1px solid rgba(128, 128, 128, 0.2);
+    `,
+    imageName: css`
+        font-size: 0.8rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+        min-width: 0;
+    `,
+    loadMoreContainer: css`
+        display: flex;
+        justify-content: center;
+        padding: 1rem 0;
+    `,
+    uploadWrapper: css`
+        position: relative;
+        display: inline-block;
+    `,
+    hiddenInput: css`
         cursor: pointer;
-        margin: 0.25rem;
+        opacity: 0;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
     `,
 };
 
@@ -80,16 +155,31 @@ class NuzlockeGeneratorDB extends Dexie {
 
 export const db = new NuzlockeGeneratorDB();
 
-import { v4 as _uuid } from "uuid";
-
-const _userImages = new Set<Image>();
+export const getImagesPage = async (offset: number, limit: number) => {
+    return db.images.orderBy("id").reverse().offset(offset).limit(limit).toArray();
+};
 
 export const getImages = async () => {
-    const images = await db.images.toArray();
+    return db.images.toArray();
+};
 
-    console.log(images);
+export const getImageByName = async (name: string) => {
+    if (!name) return undefined;
+    try {
+        return await db.images.where("name").equals(name).first();
+    } catch {
+        return undefined;
+    }
+};
 
-    return images;
+export const searchImagesByNamePrefix = async (query: string, limit: number = 80) => {
+    const q = query?.trim();
+    if (!q) return [];
+    try {
+        return await db.images.where("name").startsWithIgnoreCase(q).limit(limit).toArray();
+    } catch {
+        return [];
+    }
 };
 
 export interface Image {
@@ -105,7 +195,11 @@ enum ImagesDrawerLayout {
 
 export function ImagesDrawerInner() {
     const [refresh, setRefresh] = React.useState<number | null>(null);
-    const [images, setImages] = React.useState<Image[]>();
+    const [images, setImages] = React.useState<Image[]>([]);
+    const [offset, setOffset] = React.useState(0);
+    const [hasMore, setHasMore] = React.useState(true);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const toaster = React.useMemo(() => getAppToaster(), []);
     const [layoutView, setLayoutView] = React.useState<ImagesDrawerLayout>(
         ImagesDrawerLayout.Grid,
     );
@@ -113,25 +207,123 @@ export function ImagesDrawerInner() {
         isDarkModeSelector,
     );
 
-    React.useEffect(() => {
-        (async () => setImages(await getImages()))();
-        setRefresh(null);
-    }, [refresh]);
+    const PAGE_SIZE = 40;
 
-    const setLayout = React.useCallback(() => {
-        setLayoutView(
-            layoutView === ImagesDrawerLayout.List
-                ? ImagesDrawerLayout.Grid
-                : ImagesDrawerLayout.List,
-        );
-    }, [layoutView]);
+    const reload = React.useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const firstPage = await getImagesPage(0, PAGE_SIZE);
+            setImages(firstPage);
+            setOffset(firstPage.length);
+            setHasMore(firstPage.length === PAGE_SIZE);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    const loadMore = React.useCallback(async () => {
+        if (isLoading || !hasMore) return;
+        setIsLoading(true);
+        try {
+            const nextPage = await getImagesPage(offset, PAGE_SIZE);
+            setImages((prev) => [...prev, ...nextPage]);
+            setOffset((prev) => prev + nextPage.length);
+            setHasMore(nextPage.length === PAGE_SIZE);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [hasMore, isLoading, offset]);
+
+    React.useEffect(() => {
+        void reload();
+        setRefresh(null);
+    }, [refresh, reload]);
 
     const deleteImage = (id: number) => async () => {
         try {
             const _deletion = await db.images.where("id").equals(id).delete();
             setRefresh(id);
         } catch (e) {
-            toast.error(`Error deleting item ocurred. ${e}`);
+            toaster?.show({
+                message: `Error deleting item ocurred. ${e}`,
+                intent: Intent.DANGER,
+            });
+        }
+    };
+
+    const copyToClipboard = (name: string | undefined) => async () => {
+        if (!name) return;
+        try {
+            await navigator.clipboard.writeText(name);
+            toaster?.show({
+                message: "Image name copied to clipboard!",
+                intent: Intent.SUCCESS,
+            });
+        } catch {
+            toaster?.show({
+                message: "Failed to copy to clipboard",
+                intent: Intent.DANGER,
+            });
+        }
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files: File[] = Array.from(e?.target?.files ?? []);
+        if (!files.length) return;
+
+        const toBase64 = (file: File) =>
+            new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result as string);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+
+        let uploaded = 0;
+        let tooLarge = 0;
+        let failed = 0;
+        let lastId: number | undefined;
+
+        for (const file of files) {
+            const size = (file.size ?? 0) / 1024 / 1024;
+            if (size > 0.5) {
+                tooLarge += 1;
+                continue;
+            }
+            try {
+                const image = await toBase64(file);
+                lastId = await db.images.put({
+                    image,
+                    name: file.name,
+                });
+                uploaded += 1;
+            } catch {
+                failed += 1;
+            }
+        }
+
+        try {
+            e.target.value = "";
+        } catch {
+            // ignore
+        }
+
+        if (lastId != null) {
+            setRefresh(lastId);
+        }
+
+        const skippedText = tooLarge > 0 ? ` Skipped ${tooLarge} too-large.` : "";
+        const failedText = failed > 0 ? ` Failed ${failed}.` : "";
+        if (uploaded > 0) {
+            toaster?.show({
+                message: `Uploaded ${uploaded} images.${skippedText}${failedText}`,
+                intent: failed > 0 ? Intent.WARNING : Intent.SUCCESS,
+            });
+        } else {
+            toaster?.show({
+                message: `No images uploaded.${skippedText}${failedText}`,
+                intent: Intent.DANGER,
+            });
         }
     };
 
@@ -143,58 +335,152 @@ export function ImagesDrawerInner() {
                 isDarkMode && "dark",
             )}
         >
-            <div className="p-2 relative">
-                <ImageUpload
-                    onSuccess={async (image, fileName) => {
-                        const id = await db.images.put({
-                            image: image,
-                            name: fileName,
-                        });
-                        setRefresh(id);
-                    }}
-                />
-                <span>
-                    <Button
-                        className={styles.layoutViewIcon}
-                        onClick={setLayout}
-                        icon={
-                            layoutView === ImagesDrawerLayout.Grid
-                                ? "list"
-                                : "grid-view"
-                        }
-                    >
-                        {layoutView === ImagesDrawerLayout.Grid
-                            ? "List"
-                            : "Grid"}
-                    </Button>
-                </span>
-            </div>
-            <div className={styles.images}>
-                {images?.map((image) => (
-                    <div key={image.id} className={styles.image}>
-                        <img
-                            className={styles.imageInner}
-                            src={image.image}
-                            alt={image.name}
-                            title={image.name}
+            <header className={styles.header}>
+                <H4 style={{ margin: 0 }}>Image Gallery</H4>
+                <div className={styles.headerControls}>
+                    <ButtonGroup>
+                        <Button
+                            icon="grid-view"
+                            active={layoutView === ImagesDrawerLayout.Grid}
+                            onClick={() => setLayoutView(ImagesDrawerLayout.Grid)}
+                        >
+                            Grid
+                        </Button>
+                        <Button
+                            icon="list"
+                            active={layoutView === ImagesDrawerLayout.List}
+                            onClick={() => setLayoutView(ImagesDrawerLayout.List)}
+                        >
+                            List
+                        </Button>
+                    </ButtonGroup>
+                    <div className={styles.uploadWrapper}>
+                        <Button icon="upload" intent={Intent.PRIMARY}>
+                            Upload Image
+                        </Button>
+                        <input
+                            accept="image/*"
+                            multiple
+                            className={styles.hiddenInput}
+                            onChange={handleFileUpload}
+                            type="file"
                         />
-                        <div className={styles.inputGroup}>
-                            <input
-                                readOnly
-                                className={cx(styles.input, "px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md")}
-                                value={image.name}
-                            />
-                            {image?.id && (
-                                <Trash2
-                                    size={16}
-                                    className={cx(styles.deleteIcon, "text-red-500")}
-                                    onClick={deleteImage(image?.id)}
-                                />
-                            )}
-                        </div>
                     </div>
+                </div>
+            </header>
+
+            <div
+                className={cx(
+                    styles.images,
+                    layoutView === ImagesDrawerLayout.List
+                        ? styles.imagesList
+                        : styles.imagesGrid,
+                )}
+            >
+                {images.length === 0 && !isLoading && (
+                    <NonIdealState
+                        icon="media"
+                        title="No images uploaded"
+                        description="Upload images to use as custom Pokemon artwork"
+                    />
+                )}
+                {images?.map((image) => (
+                    <Card
+                        key={image.id}
+                        className={cx(
+                            styles.imageCard,
+                            layoutView === ImagesDrawerLayout.List &&
+                                styles.imageCardList,
+                        )}
+                        elevation={1}
+                    >
+                        <div
+                            className={cx(
+                                styles.imageWrapper,
+                                layoutView === ImagesDrawerLayout.List &&
+                                    styles.imageWrapperList,
+                            )}
+                        >
+                            <img
+                                className={styles.imageInner}
+                                src={image.image}
+                                alt={image.name}
+                                title={image.name}
+                            />
+                            {layoutView === ImagesDrawerLayout.Grid ? (
+                                <div
+                                    className={cx(
+                                        "image-overlay",
+                                        styles.imageOverlay,
+                                    )}
+                                >
+                                    <Button
+                                        icon="clipboard"
+                                        small
+                                        onClick={copyToClipboard(image.name)}
+                                        title="Copy name"
+                                    >
+                                        Copy
+                                    </Button>
+                                    {image?.id && (
+                                        <Button
+                                            icon="trash"
+                                            small
+                                            intent={Intent.DANGER}
+                                            onClick={deleteImage(image.id)}
+                                            title="Delete image"
+                                        >
+                                            Delete
+                                        </Button>
+                                    )}
+                                </div>
+                            ) : null}
+                        </div>
+                        <div
+                            className={cx(
+                                styles.imageFooter,
+                                layoutView === ImagesDrawerLayout.List &&
+                                    styles.imageFooterList,
+                            )}
+                        >
+                            <span className={styles.imageName} title={image.name}>
+                                {image.name}
+                            </span>
+                            {layoutView === ImagesDrawerLayout.List ? (
+                                <div style={{ display: "flex", gap: "0.25rem" }}>
+                                    <Button
+                                        icon="clipboard"
+                                        small
+                                        onClick={copyToClipboard(image.name)}
+                                        title="Copy name"
+                                    />
+                                    {image?.id && (
+                                        <Button
+                                            icon="trash"
+                                            small
+                                            intent={Intent.DANGER}
+                                            onClick={deleteImage(image.id)}
+                                            title="Delete image"
+                                        />
+                                    )}
+                                </div>
+                            ) : null}
+                        </div>
+                    </Card>
                 ))}
             </div>
+
+            {hasMore && (
+                <div className={styles.loadMoreContainer}>
+                    <Button
+                        icon="more"
+                        loading={isLoading}
+                        onClick={() => void loadMore()}
+                    >
+                        Load more images
+                    </Button>
+                </div>
+            )}
         </div>
     );
 }

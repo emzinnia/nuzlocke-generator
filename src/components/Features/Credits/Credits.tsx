@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Dialog, Button } from "components/Common/ui";
+import { Dialog, Button, Icon, Intent } from "components/ui";
 import { useSelector } from "react-redux";
 import { State } from "state";
 import { css, cx } from "emotion";
@@ -50,7 +50,7 @@ export function Credits() {
             <Dialog
                 isOpen={creditsModal}
                 onClose={() => setCreditsModal(false)}
-                icon="edit"
+                icon={<Icon icon="edit" />}
                 className={style.editorDarkMode ? "dark" : ""}
                 title="Credits"
             >

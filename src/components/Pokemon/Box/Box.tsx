@@ -19,15 +19,25 @@ import {
     useDrag,
     useDrop,
 } from "react-dnd";
-
-import { MoreVertical, Check } from "lucide-react";
-import { Alert, Popover, Menu, MenuItem } from "components/Common/ui";
-import { toast } from "components/Common/ui/Toast";
+import {
+    Popover,
+    PopoverInteractionKind,
+    Menu,
+    MenuItem,
+    Position,
+    Button,
+    Intent,
+    Alert,
+    Classes,
+    Toast,
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { connect, useDispatch } from "react-redux";
 import {
     PokemonIcon,
     PokemonIconProps,
 } from "components/Pokemon/PokemonIcon/PokemonIcon";
+import { showToast } from "components/Common/Shared/appToaster";
 
 export type BoxProps = {
     pokemon: Pokemon[];
@@ -35,13 +45,15 @@ export type BoxProps = {
     connectDragSource?: ConnectDragSource;
     connectDropTargetBox?: ConnectDropTarget;
     canDrop?: boolean;
-    clearBox: clearBox;
-    editBox: editBox;
-    deletePokemon: deletePokemon;
+    clearBox?: clearBox;
+    editBox?: editBox;
+    deletePokemon?: deletePokemon;
     background?: string;
-    deleteBox: deleteBox;
-    updateBoxes: updateBoxes;
+    deleteBox?: deleteBox;
+    updateBoxes?: updateBoxes;
     searchTerm: string;
+    matchedIds: Set<string>;
+    hasSearchQuery: boolean;
 } & BoxType;
 
 export const wallpapers = [
@@ -101,6 +113,8 @@ export const Box: React.FC<BoxProps> = (props) => {
         background,
         collapsed: isCollapsed,
         searchTerm,
+        matchedIds,
+        hasSearchQuery,
     } = props;
 
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
@@ -108,32 +122,59 @@ export const Box: React.FC<BoxProps> = (props) => {
 
     const [{ isDragging }, dragRef] = useDrag(() => ({
         type: "BOX",
-        item: { id },
+        item: { id, position: props.position },
         collect: (monitor) => ({
             isDragging: monitor.isDragging(),
         }),
-    }));
+    }), [id, props.position]);
 
-    const [{ isOver }, dropRef] = useDrop(() => ({
-        accept: "POKEMON_ICON",
-        drop: (item: PokemonIconProps, monitor) => {
-            if (props.id == null || item.id == null) {
-                toast.error("Failed to move Pokémon");
-                return;
+    const [{ isOver, isOverBox }, dropRef] = useDrop(() => ({
+        accept: ["POKEMON_ICON", "BOX"],
+        drop: (item: PokemonIconProps | { id: number; position: number }, monitor) => {
+            const itemType = monitor.getItemType();
+            
+            if (itemType === "POKEMON_ICON") {
+                const pokemonItem = item as PokemonIconProps;
+                if (props.id == null || pokemonItem.id == null) {
+                    showToast({
+                        message: "Failed to move Pokémon",
+                        intent: Intent.DANGER,
+                    });
+                    return;
+                }
+                dispatch(
+                    editPokemon(
+                        {
+                            status: props.name,
+                        },
+                        pokemonItem.id,
+                    ),
+                );
             }
-            dispatch(
-                editPokemon(
-                    {
-                        status: props.name,
-                    },
-                    item.id,
-                ),
-            );
+            
+            if (itemType === "BOX") {
+                const boxItem = item as { id: number; position: number };
+                if (props.id == null || boxItem.id == null || boxItem.id === props.id) {
+                    return;
+                }
+                
+                dispatch(
+                    editBox(props.id, {
+                        position: boxItem.position,
+                    }),
+                );
+                dispatch(
+                    editBox(boxItem.id, {
+                        position: props.position,
+                    }),
+                );
+            }
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
+            isOverBox: monitor.isOver() && monitor.getItemType() === "BOX",
         }),
-    }));
+    }), [props.id, props.name, props.position, dispatch]);
 
     const toggleDialog = () =>
         setDeleteConfirmationOpen(!deleteConfirmationOpen);
@@ -194,12 +235,15 @@ export const Box: React.FC<BoxProps> = (props) => {
 
     return (
         <div
+            ref={dropRef}
             style={{
                 backgroundImage: getBoxBackground(),
                 opacity: isDragging ? 0.5 : 1,
+                outline: isOverBox ? "2px dashed #48aff0" : "none",
+                outlineOffset: "-2px",
                 ...collapsedStyle,
             }}
-            className={`box ${name.replace(/\s/g, "-")}-box`}
+            className={`box ${name.replace(/\s/g, "-")}-box rounded p-1 m-1 flex items-center bg-center flex-wrap shadow-[0_0_2px_rgba(0,0,0,0.33)] dark:shadow-[0_0_0.25rem_#000]`}
         >
             <Alert
                 isOpen={deleteConfirmationOpen}
@@ -246,7 +290,7 @@ export const Box: React.FC<BoxProps> = (props) => {
                                                     inheritFrom: b,
                                                 })
                                             }
-                                            icon={b === inheritFrom ? <Check size={14} /> : undefined}
+                                            icon={b === inheritFrom ? "tick" : undefined}
                                             text={b}
                                         />
                                     ),
@@ -283,21 +327,36 @@ export const Box: React.FC<BoxProps> = (props) => {
                         color: "#eee",
                         display: "inline-flex",
                         minHeight: "2rem",
-                        justifyContent: "space-around",
+                        gap: "0.25rem",
                         margin: ".25rem",
-                        padding: ".25rem",
+                        padding: ".25rem .5rem",
                         textAlign: "center",
                         minWidth: "5rem",
-                        cursor: "pointer",
                         userSelect: "none",
                     }}
                 >
-                    <MoreVertical size={16} />
+                    <span
+                        ref={dragRef}
+                        style={{
+                            cursor: isDragging ? "grabbing" : "grab",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            padding: "0.25rem",
+                            marginLeft: "-0.25rem",
+                            borderRadius: "0.125rem",
+                        }}
+                        title="Drag to reorder"
+                    >
+                        <Icon style={{ opacity: 0.5 }} icon="drag-handle-vertical" />
+                    </span>
                     {name}
+                    <Icon style={{ opacity: 0.7 }} icon="caret-down" />
                 </span>
             </Popover>
             <PokemonByFilter
                 searchTerm={searchTerm}
+                matchedIds={matchedIds}
+                hasSearchQuery={hasSearchQuery}
                 team={pokemon}
                 status={name}
             />

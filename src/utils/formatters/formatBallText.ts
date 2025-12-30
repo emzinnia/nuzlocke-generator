@@ -1,2 +1,6 @@
-export const formatBallText = (b: string) =>
-    b && b.replace(/\sBall/g, "").toLowerCase();
+import { normalizePokeballName } from "./normalizePokeballName";
+
+export const formatBallText = (b: string) => {
+    const normalized = normalizePokeballName(b);
+    return normalized && normalized.replace(/\s*Ball$/i, "").toLowerCase();
+};

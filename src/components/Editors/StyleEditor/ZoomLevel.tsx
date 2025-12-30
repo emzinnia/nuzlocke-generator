@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, ButtonGroup, Slider } from "components/Common/ui";
+import { Button, ButtonGroup, Slider } from "components/ui";
 import { useSelector, useDispatch } from "react-redux";
 import { State } from "state";
 import { editStyle } from "actions";
@@ -13,11 +13,11 @@ export function ZoomLevel() {
     const [zoomLevel, setZoomLevel] = React.useState(1);
     const styleZoomLevel = useSelector<State, number>(zoomLevelSelector);
     const darkMode = useSelector(editorModeSelector);
+    const dispatch = useDispatch();
     const onChange = useDebounceCallback(
         () => dispatch(editStyle({ zoomLevel })),
         300,
     );
-    const dispatch = useDispatch();
 
     React.useEffect(() => {
         setZoomLevel(styleZoomLevel);

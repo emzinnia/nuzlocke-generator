@@ -19,7 +19,6 @@ export enum Types {
     Dragon = "Dragon",
     Dark = "Dark",
     Ghost = "Ghost",
-
     Shadow = "Shadow",
 }
 

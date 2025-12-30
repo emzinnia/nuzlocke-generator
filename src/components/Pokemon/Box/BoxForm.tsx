@@ -1,12 +1,19 @@
 import * as React from "react";
-import { Button, Popover, HTMLSelect } from "components/Common/ui";
-import { toast } from "components/Common/ui/Toast";
-import { Info } from "lucide-react";
+import {
+    Button,
+    Intent,
+    Popover,
+    PopoverInteractionKind,
+    Classes,
+    HTMLSelect,
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { State } from "state";
 import { connect } from "react-redux";
 import { addBox, AddBoxArgs } from "actions";
 import { Autocomplete } from "components";
 import { wallpapers } from "./Box";
+import { showToast } from "components/Common/Shared/appToaster";
 
 export interface NewBox {
     name: string;
@@ -46,7 +53,10 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
             this.props.addBox(this.state.newBox as AddBoxArgs);
             this.setState({ newBox: baseBox });
         } catch (e) {
-            toast.error("Cannot name a box the same as a current one.");
+            showToast({
+                message: "Cannot name a box the same as a current one.",
+                intent: Intent.DANGER,
+            });
         }
     };
 
@@ -113,12 +123,12 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                         }}
                     >
                         <div style={inputStyle}>
-                            <label style={labelStyle} className="text-sm font-medium text-foreground">
+                            <label style={labelStyle} className={Classes.LABEL}>
                                 Name
                             </label>
                             <input
                                 required
-                                className="px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                                className={Classes.INPUT}
                                 autoComplete="false"
                                 onInput={this.editFormInput}
                                 value={this.state.newBox.name}
@@ -127,7 +137,7 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                             />
                         </div>
                         <div style={inputStyle}>
-                            <label style={labelStyle} className="text-sm font-medium text-foreground">
+                            <label style={labelStyle} className={Classes.LABEL}>
                                 Background{" "}
                                 <Popover
                                     minimal
@@ -146,14 +156,11 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                                         </div>
                                     }
                                 >
-                                    <Info
-                                        size={14}
-                                        style={{ marginLeft: ".25rem" }}
-                                    />
+                                    <Icon style={{ marginLeft: ".25rem", verticalAlign: "top" }} size={12} icon="info-sign" />
                                 </Popover>
                             </label>
                             <input
-                                className="px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                                className={Classes.INPUT}
                                 onInput={this.editFormInput}
                                 value={this.state.newBox.background}
                                 name="background"
@@ -162,15 +169,18 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                         </div>
 
                         <div style={inputStyle}>
-                            <label style={labelStyle} className="text-sm font-medium text-foreground">
+                            <label style={labelStyle} className={Classes.LABEL}>
                                 Inherit From...
                             </label>
                             <HTMLSelect
                                 onChange={this.editFormInput}
                                 value={this.state.newBox.inheritFrom}
                                 name="inheritFrom"
-                                options={["Team", "Boxed", "Dead", "Champs"]}
-                            />
+                            >
+                                {["Team", "Boxed", "Dead", "Champs"].map((o) => (
+                                    <option key={o} value={o}>{o}</option>
+                                ))}
+                            </HTMLSelect>
                         </div>
                         <div
                             style={{

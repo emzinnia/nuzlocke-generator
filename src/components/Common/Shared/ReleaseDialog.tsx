@@ -1,36 +1,45 @@
 /// <reference types="vite/client" />
 import * as React from "react";
-import { Dialog, DialogBody, Button } from "components/Common/ui";
+import { Dialog, Button, Icon } from "components/ui";
 import { css, cx } from "emotion";
 import * as styles from "components/Features/Result/styles";
 import { Styles, classWithDarkTheme, getPatchlessVersion } from "utils";
 import ReactMarkdown from "react-markdown";
 import useSwr from "swr";
 
-const calyrex = "/icons/pokemon/regular/calyrex.png";
-const croagunk = "/img/croagunk.gif";
-const dugtrio = "/icons/pokemon/regular/dugtrio.png";
-const kubfu = "/icons/pokemon/regular/kubfu.png";
-const lapras = "/icons/pokemon/regular/lapras.png";
-const magneton = "/icons/pokemon/regular/magneton.png";
-const mew = "/icons/pokemon/regular/mew.png";
-const noctowl = "/icons/pokemon/regular/noctowl.png";
-const porygon = "/icons/pokemon/regular/porygon.png";
-const porygon2 = "/icons/pokemon/regular/porygon2.png";
-const togepi = "/icons/pokemon/regular/togepi.png";
-const arceus = "/icons/pokemon/regular/arceus.png";
-const sprigatito = "/icons/pokemon/regular/sprigatito.png";
-const fuecoco = "/icons/pokemon/regular/fuecoco.png";
-const quaxly = "/icons/pokemon/regular/quaxly.png";
-const miraidon = "/icons/pokemon/regular/miraidon.png";
-const koraidon = "/icons/pokemon/regular/koraidon.png";
-const terapagos = "/icons/pokemon/regular/terapagos.png";
-const ogerpon = "/icons/pokemon/regular/ogerpon.png";
-const zygarde = "/icons/pokemon/regular/zygarde.png";
-const floette = "/icons/pokemon/regular/floette-eternal.png";
+const calyrex = "icons/pokemon/regular/calyrex.png";
+const croagunk = "./assets/img/croagunk.gif";
+const dugtrio = "icons/pokemon/regular/dugtrio.png";
+const kubfu = "icons/pokemon/regular/kubfu.png";
+const lapras = "icons/pokemon/regular/lapras.png";
+const magneton = "icons/pokemon/regular/magneton.png";
+const mew = "icons/pokemon/regular/mew.png";
+const noctowl = "icons/pokemon/regular/noctowl.png";
+const porygon = "icons/pokemon/regular/porygon.png";
+const porygon2 = "icons/pokemon/regular/porygon2.png";
+const togepi = "icons/pokemon/regular/togepi.png";
+const arceus = "icons/pokemon/regular/arceus.png";
+const sprigatito = "icons/pokemon/regular/sprigatito.png";
+const fuecoco = "icons/pokemon/regular/fuecoco.png";
+const quaxly = "icons/pokemon/regular/quaxly.png";
+const miraidon = "icons/pokemon/regular/miraidon.png";
+const koraidon = "icons/pokemon/regular/koraidon.png";
+const terapagos = "icons/pokemon/regular/terapagos.png";
+const ogerpon = "icons/pokemon/regular/ogerpon.png";
+const zygarde = "icons/pokemon/regular/zygarde.png";
+const floette = "icons/pokemon/regular/floette-eternal.png";
+const hoopa = "icons/pokemon/regular/hoopa.png";
+const rayquaza = "icons/pokemon/regular/rayquaza.png";
+const darkrai = "icons/pokemon/regular/darkrai.png";
 
 export const getMascot = (v) => {
     switch (v) {
+        case "1.22":
+            return darkrai;
+        case "1.21":
+            return rayquaza;
+        case "1.20":
+            return hoopa;
         case "1.19":
             return floette;
         case "1.18":
@@ -84,9 +93,9 @@ const mascot = css`
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export interface ReleaseDialogProps {
+    isOpen: boolean;
     onClose: (e?: React.SyntheticEvent) => void;
     style: Styles;
-    isOpen: boolean;
 }
 
 export interface ReleaseNote {
@@ -117,60 +126,58 @@ export function ReleaseDialog(props: ReleaseDialogProps) {
         <Dialog
             isOpen={props.isOpen}
             onClose={props.onClose}
-            icon="document"
+            icon={<Icon icon="document" />}
             title={`Release Notes ${version}`}
             className={`release-dialog ${props.style.editorDarkMode ? "dark" : ""}`}
         >
-            <DialogBody>
-                <div className="release-notes-wrapper">
-                    <h3
-                        className={cx(
-                            classWithDarkTheme(
-                                styles,
-                                "heading",
-                                props.style.editorDarkMode,
-                            ),
-                        )}
-                    >
-                        {version}{" "}
-                        <img
-                            className={mascot}
-                            alt="mascot"
-                            src={getMascot(getPatchlessVersion(version))}
-                        />
-                    </h3>
-                    {data && (
-                        <ReactMarkdown className="release-notes">
-                            {note.note}
-                        </ReactMarkdown>
+            <div className="release-notes-wrapper">
+                <h3
+                    className={cx(
+                        classWithDarkTheme(
+                            styles,
+                            "heading",
+                            props.style.editorDarkMode,
+                        ),
                     )}
-                    {error && (
-                        <div>There was an error retrieving release notes.</div>
-                    )}
-                    <Button
-                        onClick={() => setSeePrevious(!seePrevious)}
-                        icon={
-                            seePrevious
-                                ? "symbol-triangle-up"
-                                : "symbol-triangle-down"
-                        }
-                    >
-                        Previous Release Notes
-                    </Button>
-                    {seePrevious &&
-                        allNotes.map((note) => {
-                            const source = `#### ![${mascot}](${getMascot(getPatchlessVersion(note.version))}) ${note.version}\n${note.note}\n\n_Uploaded on ${new Date(note.timestamp).toLocaleString()}_`;
-                            return (
-                                <ReactMarkdown
-                                    key={note.id}
-                                    className="release-notes"
-                                >
-                                    {source}
-                                </ReactMarkdown>
-                            );
-                        })}
-                </div>
-            </DialogBody>
+                >
+                    {version}{" "}
+                    <img
+                        className={mascot}
+                        alt="mascot"
+                        src={getMascot(getPatchlessVersion(version))}
+                    />
+                </h3>
+                {data && (
+                    <ReactMarkdown className="release-notes">
+                        {note.note}
+                    </ReactMarkdown>
+                )}
+                {error && (
+                    <div>There was an error retrieving release notes.</div>
+                )}
+                <Button
+                    onClick={() => setSeePrevious(!seePrevious)}
+                    icon={
+                        seePrevious
+                            ? "symbol-triangle-up"
+                            : "symbol-triangle-down"
+                    }
+                >
+                    Previous Release Notes
+                </Button>
+                {seePrevious &&
+                    allNotes.map((note) => {
+                        const source = `#### ![${mascot}](${getMascot(getPatchlessVersion(note.version))}) ${note.version}\n${note.note}\n\n_Uploaded on ${new Date(note.timestamp).toLocaleString()}_`;
+                        return (
+                            <ReactMarkdown
+                                key={note.id}
+                                className="release-notes"
+                            >
+                                {source}
+                            </ReactMarkdown>
+                        );
+                    })}
+            </div>
         </Dialog>
     );
 }

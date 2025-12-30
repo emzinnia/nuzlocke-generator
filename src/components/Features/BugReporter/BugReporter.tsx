@@ -1,9 +1,15 @@
 import * as React from "react";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
-import { Button, TextArea, Checkbox, Spinner } from "components/Common/ui";
-import { toast } from "components/Common/ui/Toast";
+import {
+    Button,
+    TextArea,
+    Checkbox,
+    Spinner,
+    Intent,
+} from "components/ui";
 import { connect } from "react-redux";
 import { css } from "emotion";
+import { showToast } from "components/Common/Shared/appToaster";
 
 export interface BugReporterProps {
     reportingUrl?: string;
@@ -57,7 +63,7 @@ export class BugReporterBase extends React.Component<
                             width: "100%",
                             marginBottom: "0.25rem",
                         }}
-                        className="px-2 py-1.5 text-sm border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                        className="rounded border border-border bg-input px-3 py-2 outline-none"
                         required
                         type="text"
                         placeholder="Issue Title"
@@ -69,6 +75,7 @@ export class BugReporterBase extends React.Component<
                         style={{ width: "100%" }}
                         value={userReport}
                         onChange={this.updateReport("userReport")}
+                        fill
                     />
                     <div
                         style={{
@@ -80,12 +87,10 @@ export class BugReporterBase extends React.Component<
                     >
                         <Checkbox
                             onChange={(checked) =>
-                                this.setState((state) => ({
-                                    includeNuzlocke: !state.includeNuzlocke,
-                                }))
+                                this.setState({ includeNuzlocke: checked })
                             }
                             checked={includeNuzlocke}
-                            label={"include nuzlocke.json file"}
+                            label="include nuzlocke.json file"
                         />
                         <Button
                             disabled={!userReportTitle || isSending}
@@ -155,7 +160,10 @@ export class BugReporterBase extends React.Component<
             .then((res) => res.json())
             .then((res) => {
                 if (res.status === 200 || res.status === 201) {
-                    toast.success("Bug report sent!");
+                    showToast({
+                        message: "Bug report sent!",
+                        intent: Intent.SUCCESS,
+                    });
                     this.setState({
                         userReport: "",
                         userReportTitle: "",
@@ -163,12 +171,18 @@ export class BugReporterBase extends React.Component<
                         isSending: false,
                     });
                 } else {
-                    toast.error("Bug report failed. Please try again.");
+                    showToast({
+                        message: "Bug report failed. Please try again.",
+                        intent: Intent.DANGER,
+                    });
                     this.setState({ isSending: false });
                 }
             })
             .catch((err) => {
-                toast.error(`Bug report failed. Please try again. ${err}`);
+                showToast({
+                    message: `Bug report failed. Please try again. ${err}`,
+                    intent: Intent.DANGER,
+                });
                 this.setState({ isSending: false });
             });
     };

@@ -239,6 +239,15 @@ export const handleSpeciesTypeEdgeCases = ({
     if (
         match({
             ...data,
+            species: ["Slowpoke"],
+            forme: ["Galarian"],
+        })
+    )
+        return [Types.Psychic, Types.Psychic];
+
+    if (
+        match({
+            ...data,
             species: ["Slowbro", "Slowking"],
             forme: ["Galarian"],
         })
@@ -584,7 +593,7 @@ export const handleSpeciesTypeEdgeCases = ({
 export const matchSpeciesToTypes = (
     species: Species,
     forme?: keyof typeof Forme,
-    generation?: Generation,
+    generation?: Generation
 ): [Types, Types] => {
     const result = handleSpeciesTypeEdgeCases({ species, forme, generation });
     if (result) return result;

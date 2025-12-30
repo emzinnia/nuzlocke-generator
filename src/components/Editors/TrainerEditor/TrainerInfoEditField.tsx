@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Omit } from "ramda";
 import { debounce } from "utils/debounce";
+import { Input, Label } from "components/ui";
 
 export interface TrainerInfoEditFieldProps {
     label: React.ReactElement<any> | string;
@@ -32,15 +33,14 @@ export function TrainerInfoEditField({
         setValue(value);
     }, [value]);
 
-    const onChange = (e) => {
-        e.persist();
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setValue(e.target.value);
         delayedValue(e);
     };
 
     return (
-        <div className="trainer-info-field">
-            <label>{label}</label>
+        <div className="flex flex-col py-1">
+            <Label>{label}</Label>
             {element ? (
                 element({
                     label,
@@ -50,12 +50,13 @@ export function TrainerInfoEditField({
                     /*onInput,*/ value: innerValue,
                 })
             ) : (
-                <input
+                <Input
                     type="text"
                     value={innerValue}
                     onChange={onChange}
                     placeholder={placeholder}
                     name={name}
+                    small
                 />
             )}
         </div>

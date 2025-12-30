@@ -4,7 +4,40 @@ import { RouterProvider } from "react-router-dom";
 import { ErrorBoundary } from "components";
 import { DarkModeProvider } from "./hooks/useDarkMode";
 import { router } from "./router";
+import { isLocal } from "utils";
+import { AppToasterHost } from "components/Common/Shared/appToaster";
+
+import "normalize.css/normalize.css";
+import "./styles/tokens.css";
 import "./index.css";
+
+(window as any).global = window;
+
+async function getRollbar() {
+    const { default: Rollbar } = await import("rollbar");
+
+    const rollbarConfig = new Rollbar({
+        accessToken: "357eab6297524e6facb1c48b0403d869",
+        captureUncaught: true,
+        payload: {
+            environment: "production",
+        },
+        autoInstrument: {
+            network: false,
+            log: false,
+            dom: true,
+            navigation: false,
+            connectivity: true,
+        },
+        maxItems: 20,
+        captureIp: false,
+        enabled: isLocal() ? false : true,
+    });
+
+    Rollbar.init(rollbarConfig as any);
+}
+
+getRollbar().then((res) => res);
 
 void injectGlobal`
     *,
@@ -15,6 +48,19 @@ void injectGlobal`
 
     a {
         text-decoration: none;
+    }
+
+    body {
+        background: var(--color-bg-primary);
+        font-family: var(--font-sans);
+        color: var(--color-text-primary);
+    }
+
+    .app {
+        display: flex;
+        height: 100vh;
+        min-width: 100%;
+        overflow-y: hidden;
     }
 `;
 
@@ -27,6 +73,7 @@ async function createRender() {
     root.render(
         <ErrorBoundary>
             <DarkModeProvider>
+                <AppToasterHost />
                 <RouterProvider router={router} />
             </DarkModeProvider>
         </ErrorBoundary>

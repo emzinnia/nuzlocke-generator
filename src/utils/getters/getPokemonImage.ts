@@ -145,7 +145,6 @@ export async function getPokemonImage({
     name,
     style,
     shiny,
-    editor,
     gender,
     egg,
 }: GetPokemonImage): Promise<string> {
@@ -222,6 +221,18 @@ export async function getPokemonImage({
             return await wrapImageInCORS(url);
         } else {
             const url = `https://serebii.net/Shiny/SV/new/${leadingZerosNumber}.png`;
+
+            return await wrapImageInCORS(url);
+        }
+    }
+
+    if (style?.spritesMode && (name === "Diamond" || name === "Pearl" || name === "Platinum" || name === "HeartGold" || name === "SoulSilver")) {
+        if (!shiny) {
+            const url = `https://www.serebii.net/pokearth/sprites/dp/${leadingZerosNumber}.png`;
+
+            return await wrapImageInCORS(url);
+        } else {
+            const url = `https://www.serebii.net/Shiny/DP/${leadingZerosNumber}.png`;
 
             return await wrapImageInCORS(url);
         }

@@ -18,12 +18,12 @@ import {
     Checkbox,
     Button,
     Drawer,
-    Icon,
+    DrawerSize,
     HTMLSelect,
     Input,
     Label,
-    classNames,
-} from "components/Common/ui";
+} from "components/ui/shims";
+import { Icon } from "components/ui";
 import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { ColorInput } from "components/Common/ui";

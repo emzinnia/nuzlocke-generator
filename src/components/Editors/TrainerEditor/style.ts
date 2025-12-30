@@ -14,27 +14,33 @@ export const checkpointsList = css`
 
 export const checkpointsItem = css`
     align-items: center;
-    background: #fff;
-    border: 1px solid #eee;
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-default);
     border-radius: 0.25rem;
-    box-shadow: 0 0 0.25rem #ddd;
-    display: flex;
-    justify-content: space-between;
+    box-shadow: var(--shadow-sm);
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) 200px minmax(160px, 1fr) auto auto;
+    gap: 0.5rem;
     list-style-type: none;
-    margin: 0.25rem;
-    padding: 0.25rem;
+    margin: 0.5rem 0.25rem;
+    padding: 0.5rem;
 `;
 
 export const checkpointsItem_dark = css`
-    background: rgba(0, 0, 0, 0.33);
-    border: 1px solid rgba(0, 0, 0, 0.25);
-    box-shadow: 0 0 0.25rem #222;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-default);
+    box-shadow: var(--shadow-md);
 `;
 
 export const checkpointName = css`
     align-items: center;
     display: flex;
-    justify-content: space-around;
+    gap: 0.5rem;
+
+    input {
+        flex: 1;
+        min-width: 0;
+    }
 `;
 
 export const checkpointImage = (size = 2) => css`
@@ -59,5 +65,11 @@ export const checkpointButtons = css`
 `;
 
 export const checkpointDelete = css`
-    color: red;
+    color: var(--color-danger-500);
+    opacity: 0.7;
+    transition: opacity var(--duration-fast) var(--ease-in-out);
+    
+    &:hover {
+        opacity: 1;
+    }
 `;
