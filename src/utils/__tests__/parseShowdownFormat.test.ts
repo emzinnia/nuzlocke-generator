@@ -1368,10 +1368,10 @@ describe("parseShowdownFormat with Gen 9 Mega-Z style input", () => {
         expect(result[0].species).toBe("Lucario");
         expect(result[0].forme).toBe("mega-z");
 
-        expect(result[1].species).toBe("Darkrai-Mega");
+        expect(result[1].species).toBe("Darkrai");
         expect(result[1].forme).toBe("mega");
 
-        expect(result[2].species).toBe("Heatran-Mega");
+        expect(result[2].species).toBe("Heatran");
         expect(result[2].forme).toBe("mega");
 
         expect(result[3].species).toBe("Absol");

@@ -161,6 +161,13 @@ function handleShowdownSpecies(species: string): { species: string; forme: Forme
     if (species === "Nidoran-F") return { species: "Nidoran♀", forme: undefined };
 
     if (species.includes("-")) {
+        const megaMatch = species.match(/^(.*?)-(Mega(?:-[A-Za-z0-9]+)?)$/);
+        if (megaMatch) {
+            const baseName = megaMatch[1];
+            const formName = megaMatch[2];
+            return { species: baseName, forme: stringToForme(formName) };
+        }
+
         const hyphenIndex = species.indexOf("-");
         const baseName = species.substring(0, hyphenIndex);
         const formName = species.substring(hyphenIndex + 1);
@@ -250,6 +257,7 @@ function stringToForme(formeStr: string): Forme | undefined {
         "Mega": Forme.Mega,
         "Mega-X": Forme["Mega-X"],
         "Mega-Y": Forme["Mega-Y"],
+        "Mega-Z": Forme["Mega-Z"],
         "Alola": Forme.Alolan,
         "Galar": Forme.Galarian,
         "Hisui": Forme.Hisuian,
