@@ -2,8 +2,8 @@ import * as React from "react";
 import { useSelector } from "react-redux";
 import { isMobile } from "is-mobile";
 
-import { TypeMatchupDialog } from "components/Editors/PokemonEditor";
-import { Result, ResultBase } from "./Result";
+import { Result, ResultHandle } from "./Result";
+import { Resultv2, Resultv2Handle } from "./v2/Resultv2";
 import { EmptyStateView } from "./EmptyStateView";
 import { State } from "state";
 
@@ -20,7 +20,8 @@ function useIsEmptyState(): boolean {
 
 export function ResultView() {
     const editor = useSelector<State, State["editor"]>((state) => state.editor);
-    const resultRef = React.useRef<ReturnType<typeof ResultBase>>(null);
+    const resultRef = React.useRef<ResultHandle>(null);
+    const resultv2Ref = React.useRef<Resultv2Handle>(null);
     const prevDownloadRequested = React.useRef<number | null>(null);
     const isEmpty = useIsEmptyState();
 
@@ -33,6 +34,7 @@ export function ResultView() {
         if (downloadRequested > 0 && downloadRequested !== prevDownloadRequested.current) {
             prevDownloadRequested.current = downloadRequested;
             resultRef.current?.toImage();
+            resultv2Ref.current?.toImage();
         }
     }, [editor.downloadRequested]);
 
@@ -42,24 +44,14 @@ export function ResultView() {
     }, [editor.zoomLevel]);
 
     if (isMobile()) {
-        return <TypeMatchupDialog />;
+        return null;
     }
 
     if (isEmpty) {
-        return (
-            <>
-                <TypeMatchupDialog />
-                <EmptyStateView />
-            </>
-        );
+        return <EmptyStateView />;
     }
 
-    return (
-        <>
-            <TypeMatchupDialog />
-            <Result ref={resultRef} />
-        </>
-    );
+    return <Resultv2 ref={resultv2Ref} />;
 }
 
 export default ResultView;

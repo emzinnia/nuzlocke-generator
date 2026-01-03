@@ -15,7 +15,7 @@ import { generateEmptyPokemon } from "utils/generateEmptyPokemon";
 let pokemonState: ReturnType<typeof generateEmptyPokemon>[] | null = null;
 function getDefaultPokemonState() {
     if (pokemonState === null) {
-        pokemonState = [generateEmptyPokemon()];
+        pokemonState = [];
     }
     return pokemonState;
 }

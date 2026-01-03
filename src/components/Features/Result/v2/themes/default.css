@@ -1,0 +1,40 @@
+.result {
+    --trainer-background-color: #04030f;
+
+    --team-pokemon-background-color: #141414;
+}
+
+.result-content {
+}
+
+.trainer {
+
+}
+
+.trainer-content {
+    background-color: var(--trainer-background-color);
+}
+
+.team-pokemon {
+    background-color: var(--team-pokemon-background-color);
+
+}
+
+.team-pokemon-image-wrapper {
+}
+
+.team-pokemon-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+
+
+
+/** stuff that will go into a different theme file */
+.team-pokemon {
+    border: 1px solid #333;
+}

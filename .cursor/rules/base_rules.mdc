@@ -4,3 +4,10 @@ alwaysApply: true
 
 - Generally do not make comments
 - Do not make comments unless the code pattern is difficult to understand or requires explanation
+- Run `npm run validate` after every large feature or refactor
+- Generally do not make comments unless the pattern needs to be explained
+- Use `rem` values instead of pixel values
+- Use tailwind wherever possible. Do not use style={} syntax unless absolutely necessary
+
+## Result v2
+- It's VERY important that you respect css themes for v2 Results and use tailwind minimally as possible here, preferring that you use it for layout-related css

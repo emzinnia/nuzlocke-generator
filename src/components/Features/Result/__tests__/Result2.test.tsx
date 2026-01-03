@@ -33,10 +33,6 @@ vi.mock("../Result", () => {
     return { Result: MockResult, ResultBase: MockResult };
 });
 
-vi.mock("components/Editors/PokemonEditor", () => ({
-    TypeMatchupDialog: () => <div data-testid="type-matchup-dialog" />,
-}));
-
 describe("<ResultView />", () => {
     beforeEach(() => {
         editorState = {
@@ -52,11 +48,10 @@ describe("<ResultView />", () => {
         isMobileMock.mockReturnValue(false);
     });
 
-    it("renders Result and TypeMatchupDialog on desktop", () => {
+    it("renders Result on desktop", () => {
         render(<ResultView />);
 
         expect(screen.getByTestId("result-component")).toBeDefined();
-        expect(screen.getAllByTestId("type-matchup-dialog").length).toBeGreaterThan(0);
     });
 
     it("triggers download when downloadRequested increments", async () => {
@@ -79,12 +74,12 @@ describe("<ResultView />", () => {
         await waitFor(() => expect(setZoomLevelMock).toHaveBeenLastCalledWith(2));
     });
 
-    it("renders mobile fallback when on a mobile device", () => {
+    it("renders nothing when on a mobile device", () => {
         isMobileMock.mockReturnValue(true);
 
-        render(<ResultView />);
+        const { container } = render(<ResultView />);
 
-        expect(screen.getByTestId("type-matchup-dialog")).toBeDefined();
+        expect(container.innerHTML).toBe("");
         expect(screen.queryByTestId("result-component")).toBeNull();
     });
 });

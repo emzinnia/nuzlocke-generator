@@ -5,38 +5,18 @@ import { State } from "state";
 import { fullGameData } from "utils/data/fullGameData";
 import { Icon, Button } from "components/ui";
 import { useHotkeyListener } from "hooks/useHotkeys";
-import { addPokemon } from "actions";
-import { generateEmptyPokemon, normalizeSpeciesName } from "utils";
 import { cx } from "emotion";
 import type { RunSummary } from "api/runs";
+import { FullGameDataView } from "components/Common/ui/FullGameDataView";
+import { ErrorBoundary } from "components/Common/Shared/ErrorBoundary";
+import { addPokemon } from "actions";
+import { generateEmptyPokemon } from "utils";
 
 const MIN_WIDTH = 0;
 const MAX_WIDTH = 500;
 const DEFAULT_WIDTH = 320;
 const STORAGE_KEY = "local-right-sidebar-width";
 const COLLAPSED_KEY = "local-right-sidebar-collapsed";
-
-const STATUS_OPTIONS = ["Team", "Boxed", "Dead", "Champs", "Missed"] as const;
-type StatusOption = (typeof STATUS_OPTIONS)[number];
-
-const SimplePokemonIcon: React.FC<{ species: string; size?: number }> = ({ species, size = 32 }) => {
-    const normalizedName = normalizeSpeciesName(species);
-    const src = `/icons/pokemon/regular/${normalizedName}.png`;
-    
-    return (
-        <img 
-            src={src}
-            alt={species}
-            title={species}
-            width={size}
-            height={size}
-            className="[image-rendering:pixelated]"
-            onError={(e) => {
-                (e.target as HTMLImageElement).src = "/icons/pokemon/unknown.png";
-            }}
-        />
-    );
-};
 
 interface CollapsibleSectionProps {
     title: string;
@@ -95,8 +75,6 @@ export const EditorRightSidebar: React.FC<EditorRightSidebarProps> = ({
         return localStorage.getItem(COLLAPSED_KEY) === "true" ? 0 : parsed;
     });
     const [isResizing, setIsResizing] = React.useState(false);
-    const [completedRoutes, setCompletedRoutes] = React.useState<Set<string>>(new Set());
-    const [skippedRoutes, setSkippedRoutes] = React.useState<Set<string>>(new Set());
     const lastWidthRef = React.useRef<number>(width || DEFAULT_WIDTH);
 
     const handleMouseDown = (e: React.MouseEvent) => {
@@ -158,46 +136,32 @@ export const EditorRightSidebar: React.FC<EditorRightSidebarProps> = ({
     }, [isCollapsed]);
 
     useHotkeyListener('toggleRightSidebar', handleToggle);
-
-    const handleAddPokemon = React.useCallback((species: string, status: StatusOption, met: string, routeId: string) => {
-        const newPokemon = generateEmptyPokemon();
-        newPokemon.species = species;
-        newPokemon.nickname = species;
-        newPokemon.status = status;
-        newPokemon.met = met;
-        dispatch(addPokemon(newPokemon));
-        setCompletedRoutes(prev => new Set([...prev, routeId]));
-        setSkippedRoutes(prev => {
-            const next = new Set(prev);
-            next.delete(routeId);
-            return next;
-        });
-    }, [dispatch]);
-
-    const handleSkipRoute = React.useCallback((routeId: string) => {
-        setSkippedRoutes(prev => {
-            const next = new Set(prev);
-            if (next.has(routeId)) {
-                next.delete(routeId);
-            } else {
-                next.add(routeId);
-            }
-            return next;
-        });
-        setCompletedRoutes(prev => {
-            const next = new Set(prev);
-            next.delete(routeId);
-            return next;
-        });
-    }, []);
-
-    const routes = fullGameData.routes || [];
-    const bosses = fullGameData.bosses || [];
     
     const totalPokemon = pokemon.length;
     const teamPokemon = pokemon.filter(p => p.status === "Team").length;
     const deadPokemon = pokemon.filter(p => p.status === "Dead").length;
     const boxedPokemon = pokemon.filter(p => p.status === "Boxed").length;
+
+    const handleAddPokemon = React.useCallback(
+        ({ species, status, met, level, metLevel }: {
+            species: string;
+            status: string;
+            met: string;
+            routeId: string;
+            level?: number;
+            metLevel?: number;
+        }) => {
+            const newPokemon = generateEmptyPokemon();
+            newPokemon.species = species;
+            newPokemon.nickname = species;
+            newPokemon.status = status;
+            newPokemon.met = met;
+            if (level !== undefined) newPokemon.level = level;
+            if (metLevel !== undefined) newPokemon.metLevel = metLevel;
+            dispatch(addPokemon(newPokemon));
+        },
+        [dispatch]
+    );
 
     if (isCollapsed) {
         return (
@@ -264,120 +228,14 @@ export const EditorRightSidebar: React.FC<EditorRightSidebarProps> = ({
                         </div>
                     )}
 
-                    {/* Routes Section */}
-                    {routes.length > 0 && (
-                        <CollapsibleSection title="Routes" count={routes.length} defaultOpen>
-                            <div className="space-y-2 max-h-64 overflow-y-auto">
-                                {routes.map((route) => {
-                                    const isCompleted = completedRoutes.has(route.id);
-                                    const isSkipped = skippedRoutes.has(route.id);
-                                    const hasEncounters = route.pokemonMap.length > 0;
-                                    
-                                    return (
-                                        <div 
-                                            key={route.id}
-                                            className={cx(
-                                                "p-2 rounded border text-xs transition-colors",
-                                                isSkipped && "border-border-muted bg-bg-overlay opacity-60",
-                                                isCompleted && "border-success-500 bg-success-50",
-                                                !isSkipped && !isCompleted && "border-border bg-bg-primary"
-                                            )}
-                                        >
-                                            <div className="flex items-center justify-between mb-1">
-                                                <span className="font-medium">{route.routeName}</span>
-                                                <div className="flex items-center gap-1">
-                                                    {isCompleted && <span className="text-success-600">✓</span>}
-                                                    {!isCompleted && (
-                                                        <button
-                                                            onClick={() => handleSkipRoute(route.id)}
-                                                            className={cx(
-                                                                "px-1.5 py-0.5 rounded text-[10px] transition-colors",
-                                                                isSkipped 
-                                                                    ? "bg-bg-tertiary text-fg-secondary"
-                                                                    : "bg-bg-secondary text-fg-tertiary hover:bg-bg-tertiary"
-                                                            )}
-                                                        >
-                                                            {isSkipped ? "Skipped" : "Skip"}
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            {hasEncounters && !isCompleted && !isSkipped && (
-                                                <div className="flex flex-wrap gap-1 mt-1">
-                                                    {route.pokemonMap.slice(0, 6).map((enc) => (
-                                                        <div
-                                                            key={enc.id}
-                                                            className="relative group cursor-pointer"
-                                                            title={`Add ${enc.species}`}
-                                                        >
-                                                            <div className="w-8 h-8 bg-bg-secondary rounded flex items-center justify-center hover:ring-2 hover:ring-primary-400 transition-all">
-                                                                <SimplePokemonIcon species={enc.species} size={24} />
-                                                            </div>
-                                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:flex flex-col bg-bg-primary border border-border rounded shadow-lg z-popover min-w-[80px]">
-                                                                {STATUS_OPTIONS.map((status) => (
-                                                                    <button
-                                                                        key={status}
-                                                                        onClick={() => handleAddPokemon(enc.species, status, route.routeName, route.id)}
-                                                                        className="px-2 py-1 text-[10px] text-left hover:bg-primary-500 hover:text-fg-inverse first:rounded-t last:rounded-b transition-colors"
-                                                                    >
-                                                                        {status}
-                                                                    </button>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                    {route.pokemonMap.length > 6 && (
-                                                        <span className="text-[10px] text-fg-secondary self-center">
-                                                            +{route.pokemonMap.length - 6}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </CollapsibleSection>
-                    )}
-
-                    {/* Bosses Section */}
-                    {bosses.length > 0 && (
-                        <CollapsibleSection title="Bosses" count={bosses.length}>
-                            <div className="space-y-2 max-h-64 overflow-y-auto">
-                                {bosses.map((boss) => (
-                                    <div 
-                                        key={boss.id}
-                                        className="p-2 rounded border border-border bg-bg-primary text-xs"
-                                    >
-                                        <div className="flex items-center justify-between mb-1">
-                                            <span className="font-medium">{boss.name}</span>
-                                            {boss.badge && (
-                                                <span className="text-[10px] text-fg-secondary">
-                                                    {boss.badge.name}
-                                                </span>
-                                            )}
-                                        </div>
-                                        {boss.pokemon.length > 0 && (
-                                            <div className="flex flex-wrap gap-1 mt-1">
-                                                {boss.pokemon.map((poke, idx) => (
-                                                    <div 
-                                                        key={idx}
-                                                        className="relative w-8 h-8 bg-bg-secondary rounded flex items-center justify-center"
-                                                        title={`${poke.species ?? 'Unknown'} Lv.${poke.level ?? '?'}`}
-                                                    >
-                                                        <SimplePokemonIcon species={poke.species ?? "Unknown"} size={24} />
-                                                        <span className="absolute -bottom-0.5 -right-0.5 text-[8px] px-0.5 rounded bg-primary-500 text-fg-inverse">
-                                                            {poke.level ?? '?'}
-                                                        </span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </CollapsibleSection>
-                    )}
+                    {/* Game Data (Routes & Bosses) */}
+                    <ErrorBoundary errorMessage="Failed to load game data">
+                        <FullGameDataView 
+                            data={fullGameData} 
+                            onAddPokemon={handleAddPokemon}
+                            teamCount={teamPokemon}
+                        />
+                    </ErrorBoundary>
 
                     {/* Cloud Runs Section */}
                     {isAuthenticated && runs.length > 0 && (

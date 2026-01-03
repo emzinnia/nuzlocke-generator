@@ -43,10 +43,6 @@ vi.mock("components/Common/Shared", () => ({
     ErrorBoundary: ({ children }: any) => <>{children}</>,
 }));
 
-vi.mock("components/Editors/PokemonEditor", () => ({
-    TypeMatchupDialog: () => <div data-testid="type-matchup-dialog" />,
-}));
-
 vi.mock("components/Common/Shared/PokemonImage", () => ({
     PokemonImage: ({ children }: any) => <>{children("https://img.test")}</>,
 }));

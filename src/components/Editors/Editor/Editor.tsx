@@ -70,6 +70,11 @@ const Result = React.lazy(() =>
         default: res.Result,
     }))
 );
+const TypeMatchupDialog = React.lazy(() =>
+    import("components/Editors/PokemonEditor/TypeMatchupDialog").then((res) => ({
+        default: res.TypeMatchupDialog,
+    }))
+);
 
 const MIN_WIDTH = 320; // px
 const MAX_WIDTH = 800; // px
@@ -292,6 +297,10 @@ export function Editor() {
             {isResizing && (
                 <div className="fixed inset-0 z-[9999] cursor-ew-resize" />
             )}
+
+            <React.Suspense fallback={null}>
+                <TypeMatchupDialog />
+            </React.Suspense>
         </div>
     );
 }
