@@ -18,9 +18,10 @@ const COLLAPSED_KEY = "sidebar-collapsed";
 
 interface SidebarProps {
     onRunsChange: () => void;
+    isLocalMode?: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onRunsChange }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onRunsChange, isLocalMode }) => {
     const { id: runId } = useParams<{ id: string }>();
     const [isCollapsed, setIsCollapsed] = React.useState(() => {
         return localStorage.getItem(COLLAPSED_KEY) === "true";

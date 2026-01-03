@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
     Popover,
     Button,
@@ -28,6 +29,7 @@ import { DeleteAlert } from "components/Editors/DataEditor/DeleteAlert";
 import { HallOfFameDialog } from "./HallOfFameDialog";
 import { showToast } from "components/Common/Shared/appToaster";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
+import type { RunSummary } from "api/runs";
 
 interface NuzlockeSaveData {
     id: string;
@@ -68,6 +70,8 @@ interface NuzlockeSaveItemProps {
     saves: NuzlockeSaveData[];
     onDelete: (deletionFn: () => void) => void;
     onToggleHof: () => void;
+    onNavigate: (id: string) => void;
+    slug?: string;
 }
 
 function NuzlockeSaveItem({
@@ -78,6 +82,8 @@ function NuzlockeSaveItem({
     saves,
     onDelete,
     onToggleHof,
+    onNavigate,
+    slug,
 }: NuzlockeSaveItemProps) {
     const dispatch = useDispatch();
 
@@ -109,6 +115,7 @@ function NuzlockeSaveItem({
         try {
             dispatch(updateSwitchNuzlocke(currentId, id, stateString));
             dispatch(replaceState(parsedData));
+            onNavigate(id);
         } catch (e) {
             showToast({
                 message: `Failed to switch nuzlockes. ${e}`,
@@ -122,7 +129,9 @@ function NuzlockeSaveItem({
             if (typeof data !== "string") {
                 throw new Error("Data is not in correct format.");
             }
-            dispatch(newNuzlocke(data, { isCopy: true }));
+            const newId = crypto.randomUUID();
+            dispatch(newNuzlocke(data, { isCopy: true, id: newId }));
+            onNavigate(newId);
         } catch (e) {
             showToast({
                 message: `Failed to copy nuzlocke. ${e}`,
@@ -178,6 +187,13 @@ function NuzlockeSaveItem({
                 </div>
 
                 <ButtonGroup>
+                    {slug && (
+                        <Link to={`/run/${slug}`}>
+                            <Button icon="eye-open" small intent={Intent.PRIMARY}>
+                                View
+                            </Button>
+                        </Link>
+                    )}
                     <Button
                         disabled={isCurrent}
                         icon="arrow-left-right"
@@ -210,6 +226,7 @@ function NuzlockeSaveItem({
 
 export function NuzlockeSave() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const nuzlockes = useSelector((state: State) => state.nuzlockes);
     const stateString = useSelector((state: State) =>
@@ -226,6 +243,10 @@ export function NuzlockeSave() {
     const [sortOption, setSortOption] = useState("last-edited");
 
     const { currentId } = nuzlockes;
+
+    const handleNavigateToRun = useCallback((id: string) => {
+        navigate(`/run/${id}`);
+    }, [navigate]);
 
     const saves = useMemo(() => {
         const rawSaves = [...nuzlockes.saves] as NuzlockeSaveData[];
@@ -284,8 +305,10 @@ export function NuzlockeSave() {
         const preparedData = stripEditorDarkModeFromState(
             data as unknown as State
         );
-        dispatch(newNuzlocke(JSON.stringify(preparedData), { isCopy: false }));
+        const newId = crypto.randomUUID();
+        dispatch(newNuzlocke(JSON.stringify(preparedData), { isCopy: false, id: newId }));
         dispatch(replaceState(data));
+        navigate(`/run/${newId}`);
     };
 
     const handleDelete = (deletionFn: () => void) => {
@@ -335,6 +358,7 @@ export function NuzlockeSave() {
                         saves={saves}
                         onDelete={handleDelete}
                         onToggleHof={toggleIsHofOpen}
+                        onNavigate={handleNavigateToRun}
                     />
                 ))}
             </div>

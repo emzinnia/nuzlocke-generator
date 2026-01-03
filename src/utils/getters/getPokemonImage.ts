@@ -147,6 +147,7 @@ export async function getPokemonImage({
     shiny,
     gender,
     egg,
+    editor,
 }: GetPokemonImage): Promise<string> {
     const regularNumber = speciesToNumber((species as Species) || "Ditto");
     const leadingZerosNumber = (

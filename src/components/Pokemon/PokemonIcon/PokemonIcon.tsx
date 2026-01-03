@@ -107,6 +107,15 @@ export function PokemonIconPlain(
 
     if (props.hidden) return null;
 
+    const iconSrc = props.customIcon ||
+        getIconURL({
+            species: props.species,
+            forme: props.forme,
+            shiny: props.shiny,
+            gender: props.gender as Pokemon["gender"],
+            egg: props.egg,
+        });
+
     return (
         <div
             ref={dragRef}
@@ -118,25 +127,22 @@ export function PokemonIconPlain(
             }}
             onClick={props.onClick}
         >
-            <ResizedImage
+            <img
                 style={{
                     filter: isSelected
                         ? "drop-shadow(0px 0px 4px cyan)"
                         : undefined,
+                    width: 40,
+                    height: 30,
+                    imageRendering: "pixelated",
                     ...props.imageStyle,
                 }}
                 title={props.includeTitle ? props.species : undefined}
                 alt={props.species}
-                src={
-                    props.customIcon ||
-                    getIconURL({
-                        species: props.species,
-                        forme: props.forme,
-                        shiny: props.shiny,
-                        gender: props.gender as Pokemon["gender"],
-                        egg: props.egg,
-                    })
-                }
+                src={iconSrc}
+                onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/icons/pokemon/unknown.png";
+                }}
             />
         </div>
     );

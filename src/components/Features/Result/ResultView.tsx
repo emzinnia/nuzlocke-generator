@@ -4,18 +4,28 @@ import { isMobile } from "is-mobile";
 
 import { TypeMatchupDialog } from "components/Editors/PokemonEditor";
 import { Result, ResultBase } from "./Result";
+import { EmptyStateView } from "./EmptyStateView";
 import { State } from "state";
+
+function useIsEmptyState(): boolean {
+    const game = useSelector<State, State["game"]>((state) => state.game);
+    const pokemon = useSelector<State, State["pokemon"]>((state) => state.pokemon);
+
+    const isGameEmpty = game.name === "None";
+    const isPokemonEmpty = pokemon.length === 0 || 
+        (pokemon.length === 1 && !pokemon[0].species);
+
+    return isGameEmpty && isPokemonEmpty;
+}
 
 export function ResultView() {
     const editor = useSelector<State, State["editor"]>((state) => state.editor);
     const resultRef = React.useRef<ReturnType<typeof ResultBase>>(null);
     const prevDownloadRequested = React.useRef<number | null>(null);
+    const isEmpty = useIsEmptyState();
 
-    // Listen for download triggers from Redux
     React.useEffect(() => {
         const downloadRequested = editor.downloadRequested ?? 0;
-        // On first run, store the initial value without triggering download
-        // This prevents downloads from firing on page reload due to persisted state
         if (prevDownloadRequested.current === null) {
             prevDownloadRequested.current = downloadRequested;
             return;
@@ -26,15 +36,22 @@ export function ResultView() {
         }
     }, [editor.downloadRequested]);
 
-    // Listen for zoom level changes from Redux
     React.useEffect(() => {
         const zoomLevel = editor.zoomLevel ?? 1;
         resultRef.current?.setZoomLevel(zoomLevel);
     }, [editor.zoomLevel]);
 
-    // On mobile, the Result is shown in the Editor tabs, not here
     if (isMobile()) {
         return <TypeMatchupDialog />;
+    }
+
+    if (isEmpty) {
+        return (
+            <>
+                <TypeMatchupDialog />
+                <EmptyStateView />
+            </>
+        );
     }
 
     return (

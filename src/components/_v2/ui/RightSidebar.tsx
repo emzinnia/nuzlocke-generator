@@ -18,9 +18,10 @@ const COLLAPSED_KEY = "right-sidebar-collapsed";
 interface RightSidebarProps {
     onRunsChange?: () => void;
     isAuthenticated: boolean;
+    isLocalMode?: boolean;
 }
 
-export const RightSidebar: React.FC<RightSidebarProps> = ({ onRunsChange, isAuthenticated }) => {
+export const RightSidebar: React.FC<RightSidebarProps> = ({ onRunsChange, isAuthenticated, isLocalMode }) => {
     const { id: runId } = useParams<{ id: string }>();
     const [isCollapsed, setIsCollapsed] = React.useState(() => {
         return localStorage.getItem(COLLAPSED_KEY) === "true";

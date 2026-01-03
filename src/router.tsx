@@ -1,62 +1,75 @@
 import * as React from "react";
 import {
     createBrowserRouter,
-    redirect,
     type LoaderFunctionArgs,
 } from "react-router-dom";
 import { getAuthToken } from "api/client";
-import { getRun, listRuns } from "api/runs";
+import { listRuns, getRunBySlug, type RunSummary, type Run } from "api/runs";
+import { ensureAuthenticated, type User } from "api/auth";
 
 // Lazy load route components
-const RootLayout = React.lazy(() =>
-    import("./components/Layout/App/RootLayout").then((m) => ({ default: m.RootLayout }))
+const MainLayout = React.lazy(() =>
+    import("./components/Layout/App/MainLayout").then((m) => ({ default: m.MainLayout }))
 );
-const HomePage = React.lazy(() =>
-    import("./components/Layout/App/HomePage").then((m) => ({ default: m.HomePage }))
-);
-const ApiExplorerPage = React.lazy(() =>
-    import("./components/Layout/App/ApiExplorerPage").then((m) => ({ default: m.ApiExplorerPage }))
-);
-const RunPage = React.lazy(() =>
-    import("./components/Layout/App/RunPage").then((m) => ({ default: m.RunPage }))
+const EditorPage = React.lazy(() =>
+    import("./components/Layout/App/EditorPage").then((m) => ({ default: m.EditorPage }))
 );
 const DataPage = React.lazy(() =>
     import("./components/Layout/App/DataPage").then((m) => ({ default: m.DataPage }))
 );
+const RunPage = React.lazy(() =>
+    import("./components/Layout/App/RunPage").then((m) => ({ default: m.RunPage }))
+);
 const RoadmapPage = React.lazy(() =>
-    import("./components/Layout/App/RoadmapPage").then((m) => ({ default: m.RoadmapPage }))
+    import("./components/_v2/Layout/RoadmapPage").then((m) => ({ default: m.RoadmapPage }))
 );
 
-// Auth check helper
-function requireAuth() {
-    const token = getAuthToken();
-    if (!token) {
-        throw redirect("/");
-    }
-    return token;
+export interface RootLoaderData {
+    runs: RunSummary[];
+    isAuthenticated: boolean;
+    user: User | null;
 }
 
-// Loaders
-async function rootLoader() {
+// Root loader - ensures user is authenticated (creates anonymous session if needed)
+async function rootLoader(): Promise<RootLoaderData> {
+    try {
+        const user = await ensureAuthenticated();
+        const runs = await listRuns();
+        return { runs, isAuthenticated: true, user };
+    } catch {
+        // Backend unavailable - fall back to local-only mode
+        return { runs: [], isAuthenticated: false, user: null };
+    }
+}
+
+// Run page loader - fetches a specific run by slug (for backend runs)
+// For local runs, the RunPage component handles loading from Redux
+export interface RunLoaderData {
+    run: Run | null;
+    isBackendRun: boolean;
+    runId: string;
+}
+
+async function runLoader({ params }: LoaderFunctionArgs): Promise<RunLoaderData> {
+    const { slug } = params;
+    if (!slug) {
+        throw new Response("Run not found", { status: 404 });
+    }
+    
     const token = getAuthToken();
+    
+    // If authenticated, try to fetch from backend
     if (token) {
         try {
-            const runs = await listRuns();
-            return { runs, isAuthenticated: true };
+            const run = await getRunBySlug(slug);
+            return { run, isBackendRun: true, runId: slug };
         } catch {
-            return { runs: [], isAuthenticated: false };
+            // Backend run not found - fall through to local mode
         }
     }
-    return { runs: [], isAuthenticated: false };
-}
-
-async function runLoader({ params }: LoaderFunctionArgs) {
-    requireAuth();
-    if (!params.id) {
-        throw new Response("Run ID required", { status: 400 });
-    }
-    const run = await getRun(params.id);
-    return { run };
+    
+    // Return null run - RunPage will try to load from local Redux state
+    return { run: null, isBackendRun: false, runId: slug };
 }
 
 // Error boundary component
@@ -99,14 +112,14 @@ function RouteLoading() {
     );
 }
 
-// Create the router with data APIs
+// Create the router - local editor is the core experience
 export const router = createBrowserRouter([
     {
         id: "root",
         path: "/",
         element: (
             <React.Suspense fallback={<RouteLoading />}>
-                <RootLayout />
+                <MainLayout />
             </React.Suspense>
         ),
         loader: rootLoader,
@@ -116,21 +129,9 @@ export const router = createBrowserRouter([
                 index: true,
                 element: (
                     <React.Suspense fallback={<RouteLoading />}>
-                        <HomePage />
+                        <EditorPage />
                     </React.Suspense>
                 ),
-            },
-            {
-                path: "api-explorer",
-                element: (
-                    <React.Suspense fallback={<RouteLoading />}>
-                        <ApiExplorerPage />
-                    </React.Suspense>
-                ),
-                loader: () => {
-                    requireAuth();
-                    return null;
-                },
             },
             {
                 path: "data",
@@ -141,19 +142,7 @@ export const router = createBrowserRouter([
                 ),
             },
             {
-                path: "roadmap",
-                element: (
-                    <React.Suspense fallback={<RouteLoading />}>
-                        <RoadmapPage />
-                    </React.Suspense>
-                ),
-                loader: () => {
-                    requireAuth();
-                    return null;
-                },
-            },
-            {
-                path: "runs/:id",
+                path: "run/:slug",
                 element: (
                     <React.Suspense fallback={<RouteLoading />}>
                         <RunPage />
@@ -162,7 +151,14 @@ export const router = createBrowserRouter([
                 loader: runLoader,
                 errorElement: <RouteErrorBoundary />,
             },
+            {
+                path: "roadmap",
+                element: (
+                    <React.Suspense fallback={<RouteLoading />}>
+                        <RoadmapPage />
+                    </React.Suspense>
+                ),
+            },
         ],
     },
 ]);
-

@@ -491,7 +491,7 @@ export class DataEditorBase extends React.Component<
                             ? "Exported Nuzlocke Save"
                             : "Import Nuzlocke Save"
                     }
-                    className={classNames({
+                    className={cx({
                         "dark": this.props.state.style.editorDarkMode,
                     })}
                     icon={<Save size={18} />}

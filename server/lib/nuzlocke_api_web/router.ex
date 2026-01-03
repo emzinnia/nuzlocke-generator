@@ -19,7 +19,15 @@ defmodule NuzlockeApiWeb.Router do
 
     post "/register", AuthController, :register
     post "/login", AuthController, :login
+    post "/anonymous", AuthController, :anonymous
     get "/me", AuthController, :me
+  end
+
+  # Protected auth routes (authentication required)
+  scope "/api/auth", NuzlockeApiWeb do
+    pipe_through [:api, :auth, :ensure_auth]
+
+    post "/upgrade", AuthController, :upgrade
   end
 
   # Protected API routes (authentication required)

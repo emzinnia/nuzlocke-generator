@@ -2,7 +2,9 @@ import { css } from "emotion";
 
 export const editorStyles = {
     base: css`
-        min-height: 100vh;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     `,
     historyControls: css`
         left: 0;

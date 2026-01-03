@@ -23,6 +23,7 @@ import {
 import { ErrorBoundary } from "components";
 import { TypesEditor } from "./TypesEditor";
 import { cx } from "emotion";
+import { classNames } from "components/Common/ui/classNames";
 import { Trash, Search, Edit } from "lucide-react";
 
 export interface MoveEditorProps {

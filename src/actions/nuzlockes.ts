@@ -1,14 +1,17 @@
 import { Action } from "actions";
+import { v4 as uuid } from "uuid";
 
 export type NEW_NUZLOCKE = "NEW_NUZLOCKE";
 export const NEW_NUZLOCKE: NEW_NUZLOCKE = "NEW_NUZLOCKE";
 
-export type newNuzlocke = (data, { isCopy }) => Action<NEW_NUZLOCKE>;
-export function newNuzlocke(data, { isCopy }): Action<NEW_NUZLOCKE> {
+export type newNuzlocke = (data: string, options?: { isCopy?: boolean; id?: string }) => Action<NEW_NUZLOCKE>;
+export function newNuzlocke(data: string, options?: { isCopy?: boolean; id?: string }): Action<NEW_NUZLOCKE> {
+    const id = options?.id || uuid();
     return {
         type: NEW_NUZLOCKE,
         data,
-        isCopy,
+        isCopy: options?.isCopy || false,
+        id,
     };
 }
 

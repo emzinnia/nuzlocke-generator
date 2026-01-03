@@ -6,7 +6,8 @@ import { api, setAuthToken, clearAuthToken, getAuthToken } from './client';
 
 export interface User {
   id: string;
-  email: string;
+  email: string | null;
+  is_anonymous: boolean;
 }
 
 export interface AuthResponse {
@@ -44,6 +45,25 @@ export function logout(): void {
 }
 
 /**
+ * Create an anonymous user session.
+ * This allows users to use the app without signing up.
+ */
+export async function loginAnonymously(): Promise<AuthResponse> {
+  const response = await api.post<AuthResponse>('/api/auth/anonymous');
+  setAuthToken(response.token);
+  return response;
+}
+
+/**
+ * Upgrade an anonymous account to a full account with email and password.
+ */
+export async function upgradeAccount(email: string, password: string): Promise<AuthResponse> {
+  const response = await api.post<AuthResponse>('/api/auth/upgrade', { email, password });
+  setAuthToken(response.token);
+  return response;
+}
+
+/**
  * Get the current authenticated user.
  */
 export async function getCurrentUser(): Promise<User | null> {
@@ -66,5 +86,25 @@ export async function getCurrentUser(): Promise<User | null> {
  */
 export function isAuthenticated(): boolean {
   return !!getAuthToken();
+}
+
+/**
+ * Ensure the user is authenticated.
+ * If not authenticated, automatically create an anonymous session.
+ */
+export async function ensureAuthenticated(): Promise<User> {
+  const token = getAuthToken();
+  
+  if (token) {
+    try {
+      const response = await api.get<MeResponse>('/api/auth/me');
+      return response.user;
+    } catch {
+      clearAuthToken();
+    }
+  }
+  
+  const response = await loginAnonymously();
+  return response.user;
 }
 

@@ -6,7 +6,7 @@
  */
 
 // Core primitives
-export { Button, type ButtonProps } from "./Button";
+export { Button, type ButtonProps, type ButtonVariant } from "./Button";
 export { ButtonGroup, type ButtonGroupProps } from "./ButtonGroup";
 export { Dialog, DialogBody, DialogFooter, type DialogProps } from "./Dialog";
 export { Popover, type PopoverProps, type PopoverPosition } from "./Popover";

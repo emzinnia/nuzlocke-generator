@@ -3,7 +3,8 @@ import { State } from "state";
 import { getListOfTypes, typeToColor, Types, getContrastColor } from "utils";
 import { createCustomType, deleteCustomType, editCustomType } from "actions";
 import { ColorEdit, rgbaOrHex } from "components/Common/Shared";
-import { Classes, Button, ColorInput } from "components/ui/shims";
+import { Classes, Button } from "components/ui/shims";
+import { ColorInput } from "components/Common/ui";
 import { Icon } from "components/ui";
 
 export interface TypesEditorProps {
@@ -17,14 +18,6 @@ export interface TypesEditorState {
     type: string;
     color: string;
 }
-
-const rgbaOrHex = (color: any) => {
-    if (color?.rgb?.a !== 1) {
-        const { r, g, b, a } = color.rgb;
-        return `rgba(${r}, ${g}, ${b}, ${a})`;
-    }
-    return color.hex;
-};
 
 export class TypesEditor extends React.Component<
     TypesEditorProps,

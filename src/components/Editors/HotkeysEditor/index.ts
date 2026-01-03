@@ -1,0 +1,2 @@
+export { HotkeysEditor } from "./HotkeysEditor";
+

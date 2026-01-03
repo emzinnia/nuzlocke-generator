@@ -1,8 +1,16 @@
 import * as React from "react";
 import { Icon, type IconName } from "./Icon";
-import { Intent, intentToBgClass, intentToOutlineClass } from "./intent";
+import {
+    Intent,
+    intentToBgClass,
+    intentToOutlineClass,
+    intentToGhostClass,
+    intentToLinkClass,
+} from "./intent";
 import { Spinner } from "./Spinner";
 import { HotkeyIndicator } from "components/Common/Shared";
+
+export type ButtonVariant = "solid" | "outline" | "ghost" | "link";
 
 export interface ButtonHotkeyProps {
     /** The key to display (e.g., "Z", "Y", "S") */
@@ -16,13 +24,15 @@ export interface ButtonHotkeyProps {
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     /** Button intent/color scheme */
     intent?: Intent;
+    /** Button variant style */
+    variant?: ButtonVariant;
     /** Icon to show on the left */
     icon?: IconName | string;
     /** Icon to show on the right */
     rightIcon?: IconName | string;
-    /** Minimal style (no background, just text) */
+    /** @deprecated Use variant="ghost" instead. Minimal style (no background, just text) */
     minimal?: boolean;
-    /** Outlined style (border, no fill) */
+    /** @deprecated Use variant="outline" instead. Outlined style (border, no fill) */
     outlined?: boolean;
     /** Large size variant */
     large?: boolean;
@@ -45,12 +55,19 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 /**
  * Button component with Blueprint-compatible API.
  * Built with Tailwind CSS, no Blueprint dependencies.
+ *
+ * Variants:
+ * - solid: Filled background (default for primary actions)
+ * - outline: Border with transparent background
+ * - ghost: No border, subtle hover background
+ * - link: Looks like a link, underline on hover
  */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     (
         {
             children,
             intent = Intent.NONE,
+            variant,
             icon,
             rightIcon,
             minimal = false,
@@ -70,33 +87,74 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         },
         ref,
     ) => {
+        // Determine effective variant (support legacy minimal/outlined props)
+        let effectiveVariant: ButtonVariant = variant ?? "solid";
+        if (!variant) {
+            if (minimal) effectiveVariant = "ghost";
+            else if (outlined) effectiveVariant = "outline";
+        }
+
         // Base classes
         const baseClasses = [
-            "inline-flex items-center justify-center gap-2",
-            "font-medium rounded transition-colors duration-fast",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+            "inline-flex items-center justify-center gap-1.5",
+            "font-medium rounded-md transition-all duration-150",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
             "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
         ];
 
-        // Size classes
-        const sizeClasses = small
-            ? "h-7 px-2 text-xs"
-            : large
-              ? "h-11 px-5 text-base"
-              : "h-9 px-3 text-sm";
+        // Focus ring color based on intent
+        const focusRingClass =
+            intent === Intent.DANGER
+                ? "focus-visible:ring-danger-500"
+                : intent === Intent.SUCCESS
+                  ? "focus-visible:ring-success-500"
+                  : intent === Intent.WARNING
+                    ? "focus-visible:ring-warning-500"
+                    : "focus-visible:ring-primary-500";
 
-        // Intent/variant classes
+        // Size classes
+        const sizeClasses =
+            effectiveVariant === "link"
+                ? small
+                    ? "text-xs"
+                    : large
+                      ? "text-base"
+                      : "text-sm"
+                : small
+                  ? "h-7 px-2.5 text-xs"
+                  : large
+                    ? "h-11 px-5 text-base"
+                    : "h-9 px-3.5 text-sm";
+
+        // Variant classes based on effective variant
         let variantClasses: string;
-        if (minimal) {
-            variantClasses = `bg-transparent ${intentToOutlineClass[intent]} border-0`;
-        } else if (outlined) {
-            variantClasses = `bg-transparent border ${intentToOutlineClass[intent]}`;
-        } else {
-            variantClasses = intentToBgClass[intent];
+        switch (effectiveVariant) {
+            case "outline":
+                variantClasses = intentToOutlineClass[intent];
+                break;
+            case "ghost":
+                variantClasses = intentToGhostClass[intent];
+                break;
+            case "link":
+                variantClasses = intentToLinkClass[intent];
+                break;
+            case "solid":
+            default:
+                variantClasses = intentToBgClass[intent];
+                break;
         }
 
         // Active state
-        const activeClasses = active ? "ring-2 ring-primary-500 ring-offset-1" : "";
+        const activeClasses = active
+            ? "ring-2 ring-offset-1 " +
+              (intent === Intent.DANGER
+                  ? "ring-danger-500"
+                  : intent === Intent.SUCCESS
+                    ? "ring-success-500"
+                    : intent === Intent.WARNING
+                      ? "ring-warning-500"
+                      : "ring-primary-500")
+            : "";
 
         // Width
         const widthClasses = fill ? "w-full" : "";
@@ -111,6 +169,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
         const allClasses = [
             ...baseClasses,
+            focusRingClass,
             sizeClasses,
             variantClasses,
             activeClasses,

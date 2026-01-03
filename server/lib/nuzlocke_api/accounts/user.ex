@@ -8,6 +8,7 @@ defmodule NuzlockeApi.Accounts.User do
     field :email, :string
     field :password_hash, :string
     field :password, :string, virtual: true
+    field :is_anonymous, :boolean, default: false
 
     has_many :runs, NuzlockeApi.Runs.Run
 
@@ -23,6 +24,29 @@ defmodule NuzlockeApi.Accounts.User do
     |> validate_length(:password, min: 6, max: 100)
     |> unique_constraint(:email)
     |> put_password_hash()
+  end
+
+  @doc """
+  Changeset for creating anonymous users.
+  Anonymous users don't require email or password.
+  """
+  def anonymous_changeset(user) do
+    user
+    |> change(%{is_anonymous: true})
+  end
+
+  @doc """
+  Changeset for upgrading an anonymous user to a full account.
+  """
+  def upgrade_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :password])
+    |> validate_required([:email, :password])
+    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must be a valid email")
+    |> validate_length(:password, min: 6, max: 100)
+    |> unique_constraint(:email)
+    |> put_password_hash()
+    |> put_change(:is_anonymous, false)
   end
 
   defp put_password_hash(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
@@ -47,4 +71,3 @@ defmodule NuzlockeApi.Accounts.User do
     false
   end
 end
-

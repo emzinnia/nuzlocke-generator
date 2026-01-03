@@ -29,26 +29,26 @@
 
 /* Theme color variables - AMOLED dark mode */
 .dark {
-  --theme-background: oklch(0 0 0);
-  --theme-foreground: oklch(1 0 0);
-  --theme-card: oklch(0.11 0 0);
-  --theme-card-foreground: oklch(1 0 0);
-  --theme-border: oklch(0.20 0 0);
-  --theme-input: oklch(0.15 0 0);
-  --theme-primary: oklch(0.55 0.22 260.36);
+  --theme-background: oklch(0.02 0 0);
+  --theme-foreground: oklch(0.98 0 0);
+  --theme-card: oklch(0.07 0 0);
+  --theme-card-foreground: oklch(0.98 0 0);
+  --theme-border: oklch(0.16 0 0);
+  --theme-input: oklch(0.07 0 0);
+  --theme-primary: oklch(0.58 0.22 265);
   --theme-primary-foreground: oklch(0 0 0);
-  --theme-ring: oklch(0.75 0.25 265);
-  --theme-sidebar: oklch(0.05 0 0);
-  --theme-sidebar-foreground: oklch(1 0 0);
-  --theme-sidebar-border: oklch(0.20 0 0);
-  --theme-muted: oklch(0.18 0 0);
-  --theme-muted-foreground: oklch(0.70 0 0);
-  --theme-accent: oklch(0.15 0 0);
-  --theme-accent-foreground: oklch(1 0 0);
-  --theme-popover: oklch(0.05 0 0);
-  --theme-popover-foreground: oklch(1 0 0);
-  --theme-secondary: oklch(0.15 0 0);
-  --theme-secondary-foreground: oklch(1 0 0);
+  --theme-ring: oklch(0.67 0.20 265);
+  --theme-sidebar: oklch(0.04 0 0);
+  --theme-sidebar-foreground: oklch(0.98 0 0);
+  --theme-sidebar-border: oklch(0.14 0 0);
+  --theme-muted: oklch(0.12 0 0);
+  --theme-muted-foreground: oklch(0.78 0 0);
+  --theme-accent: oklch(0.08 0 0);
+  --theme-accent-foreground: oklch(0.98 0 0);
+  --theme-popover: oklch(0.04 0 0);
+  --theme-popover-foreground: oklch(0.98 0 0);
+  --theme-secondary: oklch(0.10 0 0);
+  --theme-secondary-foreground: oklch(0.98 0 0);
 }
 
 /* Register theme colors with Tailwind v4 - these use CSS variables that change based on dark mode */

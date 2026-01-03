@@ -1,215 +1,277 @@
 import * as React from "react";
-import { useLoaderData, useRevalidator } from "react-router-dom";
-import deepmerge from "deepmerge";
+import { useLoaderData, useNavigate, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import type { Run } from "api/runs";
-import { updateRun } from "api/runs";
-import { useRunChannel } from "api/useRunChannel";
-import { RunInfographic } from "./RunInfographic";
-import { Button } from "components/Common/ui/Button";
-import { Pencil, Check, X } from "lucide-react";
+import type { State } from "state";
+import { ErrorBoundary, Skeleton } from "components/Common/Shared";
+import { Button, Icon } from "components/ui";
+import { Intent } from "components/ui/intent";
+import { replaceState, switchNuzlocke } from "actions";
 
-interface RunLoaderData {
-    run: Run;
+const ResultView = React.lazy(() =>
+    import("components/Features/Result/ResultView").then((res) => ({
+        default: res.ResultView,
+    }))
+);
+
+export interface RunLoaderData {
+    run: Run | null;
+    isBackendRun: boolean;
+    runId: string;
 }
 
-// Custom merge strategy: replace arrays instead of concatenating
-const overwriteArrays: deepmerge.Options = {
-    arrayMerge: (_target, source) => source,
+interface LocalRunData {
+    id: string;
+    name: string;
+    game: string | null;
+    data: Partial<State>;
+    lastEdited?: number;
+}
+
+interface GameBadgeProps {
+    game: string | null;
+}
+
+const GameBadge: React.FC<GameBadgeProps> = ({ game }) => {
+    if (!game) return null;
+
+    const gameColors: Record<string, { bg: string; text: string }> = {
+        Red: { bg: "bg-red-500", text: "text-white" },
+        Blue: { bg: "bg-blue-500", text: "text-white" },
+        Yellow: { bg: "bg-yellow-400", text: "text-yellow-900" },
+        Gold: { bg: "bg-amber-500", text: "text-white" },
+        Silver: { bg: "bg-slate-400", text: "text-white" },
+        Crystal: { bg: "bg-cyan-400", text: "text-cyan-900" },
+        Ruby: { bg: "bg-red-600", text: "text-white" },
+        Sapphire: { bg: "bg-blue-600", text: "text-white" },
+        Emerald: { bg: "bg-emerald-500", text: "text-white" },
+        FireRed: { bg: "bg-orange-500", text: "text-white" },
+        LeafGreen: { bg: "bg-green-500", text: "text-white" },
+        Diamond: { bg: "bg-indigo-300", text: "text-indigo-900" },
+        Pearl: { bg: "bg-pink-300", text: "text-pink-900" },
+        Platinum: { bg: "bg-slate-500", text: "text-white" },
+        HeartGold: { bg: "bg-amber-400", text: "text-amber-900" },
+        SoulSilver: { bg: "bg-slate-300", text: "text-slate-800" },
+        Black: { bg: "bg-slate-800", text: "text-white" },
+        White: { bg: "bg-slate-100", text: "text-slate-800" },
+        "Black 2": { bg: "bg-slate-700", text: "text-white" },
+        "White 2": { bg: "bg-slate-200", text: "text-slate-800" },
+        X: { bg: "bg-blue-400", text: "text-white" },
+        Y: { bg: "bg-red-400", text: "text-white" },
+        "Omega Ruby": { bg: "bg-red-700", text: "text-white" },
+        "Alpha Sapphire": { bg: "bg-blue-700", text: "text-white" },
+        Sun: { bg: "bg-orange-400", text: "text-white" },
+        Moon: { bg: "bg-purple-500", text: "text-white" },
+        "Ultra Sun": { bg: "bg-orange-500", text: "text-white" },
+        "Ultra Moon": { bg: "bg-purple-600", text: "text-white" },
+        "Let's Go Pikachu": { bg: "bg-yellow-400", text: "text-yellow-900" },
+        "Let's Go Eevee": { bg: "bg-amber-300", text: "text-amber-900" },
+        Sword: { bg: "bg-cyan-500", text: "text-white" },
+        Shield: { bg: "bg-rose-500", text: "text-white" },
+        "Brilliant Diamond": { bg: "bg-indigo-400", text: "text-white" },
+        "Shining Pearl": { bg: "bg-pink-400", text: "text-white" },
+        "Legends Arceus": { bg: "bg-slate-600", text: "text-white" },
+        Scarlet: { bg: "bg-rose-600", text: "text-white" },
+        Violet: { bg: "bg-violet-600", text: "text-white" },
+    };
+
+    const colors = gameColors[game] || { bg: "bg-slate-500", text: "text-white" };
+
+    return (
+        <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${colors.bg} ${colors.text}`}>
+            {game}
+        </span>
+    );
 };
 
 export const RunPage: React.FC = () => {
-    const { run } = useLoaderData() as RunLoaderData;
-    const revalidator = useRevalidator();
+    const loaderData = useLoaderData() as RunLoaderData;
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     
-    // Local state for real-time updates
-    const [runData, setRunData] = React.useState(run);
+    // Get local nuzlockes from Redux state
+    const nuzlockes = useSelector((state: State) => state.nuzlockes);
+    const currentReduxState = useSelector((state: State) => state);
     
-    // Editable title state
-    const [isEditingName, setIsEditingName] = React.useState(false);
-    const [editedName, setEditedName] = React.useState(run.name);
-    const [isSaving, setIsSaving] = React.useState(false);
-    const inputRef = React.useRef<HTMLInputElement>(null);
-    
-    // Reset local state when navigating to a different run OR when loader brings newer data
-    React.useEffect(() => {
-        setRunData(prev => {
-            // Always reset when switching to a different run
-            if (prev.id !== run.id) {
-                return run;
-            }
-            // Only update from loader if it has equal or newer revision
-            if (run.revision >= prev.revision) {
-                return run;
-            }
-            // Keep local state if it has newer data from real-time updates
-            return prev;
-        });
-        // Also reset edited name when run changes
-        setEditedName(run.name);
-        setIsEditingName(false);
-    }, [run]);
-    
-    // Focus input when entering edit mode
-    React.useEffect(() => {
-        if (isEditingName && inputRef.current) {
-            inputRef.current.focus();
-            inputRef.current.select();
-        }
-    }, [isEditingName]);
-    
-    const handleStartEditing = () => {
-        setEditedName(runData.name);
-        setIsEditingName(true);
-    };
-    
-    const handleCancelEditing = () => {
-        setEditedName(runData.name);
-        setIsEditingName(false);
-    };
-    
-    const handleSaveName = async () => {
-        const trimmedName = editedName.trim();
-        if (!trimmedName || trimmedName === runData.name) {
-            handleCancelEditing();
-            return;
+    // Find local run if not a backend run
+    const localRun = React.useMemo((): LocalRunData | null => {
+        if (loaderData.isBackendRun && loaderData.run) {
+            return null;
         }
         
-        setIsSaving(true);
+        const save = nuzlockes.saves.find((s) => s.id === loaderData.runId);
+        if (!save) return null;
+        
         try {
-            const updatedRun = await updateRun(run.id, { name: trimmedName });
-            setRunData(prev => ({ ...prev, name: updatedRun.name }));
-            setIsEditingName(false);
-            revalidator.revalidate();
-        } catch (err) {
-            console.error('Failed to rename run:', err);
-        } finally {
-            setIsSaving(false);
+            const parsedData = JSON.parse(save.data);
+            return {
+                id: save.id,
+                name: parsedData?.game?.name || "Untitled Run",
+                game: parsedData?.game?.name || null,
+                data: parsedData,
+                lastEdited: save.lastEdited,
+            };
+        } catch {
+            return null;
         }
-    };
+    }, [loaderData, nuzlockes.saves]);
     
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            handleSaveName();
-        } else if (e.key === 'Escape') {
-            handleCancelEditing();
+    // Determine which run to display (backend or local)
+    const isBackendRun = loaderData.isBackendRun && loaderData.run;
+    const backendRun = loaderData.run;
+    
+    // Get run data from either source
+    const runData = isBackendRun ? backendRun?.data : localRun?.data;
+    const runName = isBackendRun 
+        ? backendRun?.name 
+        : (localRun?.data?.game?.name || "Untitled Run");
+    const runGame = isBackendRun 
+        ? (backendRun?.game_name || backendRun?.game) 
+        : localRun?.game;
+    const runId = loaderData.runId;
+    
+    // Check if this is the currently active nuzlocke
+    const isCurrentNuzlocke = nuzlockes.currentId === runId;
+
+    const handleLoadRun = React.useCallback(() => {
+        if (isBackendRun && backendRun?.data) {
+            dispatch(replaceState(backendRun.data));
+            navigate("/");
+        } else if (localRun) {
+            dispatch(switchNuzlocke(localRun.id));
+            dispatch(replaceState(localRun.data));
+            navigate("/");
         }
+    }, [dispatch, navigate, isBackendRun, backendRun, localRun]);
+
+    const formatDate = (dateString: string | number | undefined) => {
+        if (!dateString) return "Unknown";
+        const date = typeof dateString === "number" 
+            ? new Date(dateString) 
+            : new Date(dateString);
+        return date.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
     };
-    
-    // Subscribe to real-time updates via Phoenix Channel
-    const { isConnected } = useRunChannel(run.id, {
-        // Handle initial state when channel connects
-        onJoin: React.useCallback((state) => {
-            setRunData(prev => {
-                // Only update if channel has newer data
-                if (state.revision > prev.revision) {
-                    return {
-                        ...prev,
-                        revision: state.revision,
-                        data: state.data as Run["data"],
-                    };
-                }
-                return prev;
-            });
-        }, []),
-        // Handle real-time patch updates
-        onUpdate: React.useCallback((update) => {
-            setRunData(prev => ({
-                ...prev,
-                revision: update.revision,
-                data: deepmerge(prev.data || {}, update.data || {}, overwriteArrays) as Run["data"],
-            }));
-        }, []),
-    });
+
+    // Handle run not found
+    if (!isBackendRun && !localRun) {
+        return (
+            <div className="flex-1 flex flex-col items-center justify-center bg-bg-primary p-8">
+                <Icon icon="warning-sign" size={48} className="text-warning-500 mb-4" />
+                <h2 className="text-xl font-semibold text-fg-primary mb-2">Run Not Found</h2>
+                <p className="text-fg-secondary mb-4">
+                    This run could not be found in your local saves or on the server.
+                </p>
+                <Link to="/">
+                    <Button intent={Intent.PRIMARY}>Go to Editor</Button>
+                </Link>
+            </div>
+        );
+    }
+
+    const pokemonList = runData?.pokemon || [];
+    const pokemonCount = pokemonList.length;
+    const teamPokemon = pokemonList.filter((p) => p.status === "Team");
+    const deadPokemon = pokemonList.filter((p) => p.status === "Dead");
+    const boxedPokemon = pokemonList.filter((p) => p.status === "Boxed");
 
     return (
-        <div className="p-6 px-14">
-            <div className="flex items-center gap-3 mb-4">
-                {isEditingName ? (
-                    <div className="flex items-center gap-2">
-                        <input
-                            ref={inputRef}
-                            type="text"
-                            value={editedName}
-                            onChange={(e) => setEditedName(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            disabled={isSaving}
-                            className="text-3xl font-bold text-gray-900 dark:text-white bg-transparent border-b-2 border-primary focus:outline-none focus:border-primary/80 disabled:opacity-50 px-1"
-                        />
-                        <Button
-                            onClick={handleSaveName}
-                            disabled={isSaving}
-                            variant="ghost"
-                            className="p-1.5 h-auto w-auto text-green-600 hover:text-green-700 hover:bg-green-100 dark:hover:bg-green-900/30 rounded transition-colors"
-                            title="Save"
-                        >
-                            <Check size={20} />
-                        </Button>
-                        <Button
-                            onClick={handleCancelEditing}
-                            disabled={isSaving}
-                            variant="ghost"
-                            className="p-1.5 h-auto w-auto text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                            title="Cancel"
-                        >
-                            <X size={20} />
-                        </Button>
+        <div className="flex-1 flex flex-col min-h-0 overflow-auto bg-bg-primary">
+            {/* Header */}
+            <div className="border-b border-border bg-bg-secondary px-6 py-4">
+                <div className="flex items-center gap-3 mb-3">
+                    <Link
+                        to="/"
+                        className="text-fg-secondary hover:text-fg-primary transition-colors"
+                    >
+                        <Icon icon="arrow-left" size={20} />
+                    </Link>
+                    <h1 className="text-2xl font-bold text-fg-primary">{runName}</h1>
+                    <GameBadge game={runGame || null} />
+                    {isCurrentNuzlocke && (
+                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-success-100 text-success-700">
+                            Current
+                        </span>
+                    )}
+                    {!isBackendRun && (
+                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-bg-tertiary text-fg-secondary">
+                            Local
+                        </span>
+                    )}
+                </div>
+
+                <div className="flex items-center gap-4 text-sm text-fg-secondary">
+                    {isBackendRun && backendRun ? (
+                        <>
+                            <span>Created: {formatDate(backendRun.inserted_at)}</span>
+                            <span>•</span>
+                            <span>Updated: {formatDate(backendRun.updated_at)}</span>
+                            <span>•</span>
+                            <span>Revision: {backendRun.revision}</span>
+                        </>
+                    ) : (
+                        <span>Last edited: {formatDate(localRun?.lastEdited)}</span>
+                    )}
+                </div>
+            </div>
+
+            {/* Stats */}
+            <div className="px-6 py-4 border-b border-border bg-bg-secondary/50">
+                <div className="grid grid-cols-4 gap-4 max-w-2xl">
+                    <div className="bg-bg-tertiary rounded-lg p-3 text-center">
+                        <div className="text-2xl font-bold text-fg-primary">{pokemonCount}</div>
+                        <div className="text-xs text-fg-secondary">Total</div>
                     </div>
-                ) : (
-                    <div className="flex items-center gap-2 group">
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{runData.name}</h1>
-                        <Button
-                            onClick={handleStartEditing}
-                            variant="ghost"
-                            className="p-1.5 h-auto w-auto opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all"
-                            title="Rename run"
-                        >
-                            <Pencil size={18} />
-                        </Button>
+                    <div className="bg-bg-tertiary rounded-lg p-3 text-center">
+                        <div className="text-2xl font-bold text-success-600">{teamPokemon.length}</div>
+                        <div className="text-xs text-fg-secondary">Team</div>
                     </div>
-                )}
-                {/* Real-time connection indicator */}
-                <span
-                    className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${
-                        isConnected
-                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                            : "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
-                    }`}
-                    title={isConnected ? "Connected to real-time sync" : "Connecting..."}
-                >
-                    <span
-                        className={`w-1.5 h-1.5 rounded-full ${
-                            isConnected ? "bg-green-500" : "bg-gray-400"
-                        }`}
-                    />
-                    {isConnected ? "Live" : "..."}
-                </span>
-                <Button
-                    variant="secondary"
-                    className="ml-auto inline-flex items-center gap-2 px-3 py-2 text-sm font-medium"
-                    title="Download run"
-                >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Download
+                    <div className="bg-bg-tertiary rounded-lg p-3 text-center">
+                        <div className="text-2xl font-bold text-primary-600">{boxedPokemon.length}</div>
+                        <div className="text-xs text-fg-secondary">Boxed</div>
+                    </div>
+                    <div className="bg-bg-tertiary rounded-lg p-3 text-center">
+                        <div className="text-2xl font-bold text-danger-600">{deadPokemon.length}</div>
+                        <div className="text-xs text-fg-secondary">Dead</div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Actions */}
+            <div className="px-6 py-4 border-b border-border flex items-center gap-3">
+                <Button intent={Intent.PRIMARY} icon="edit" onClick={handleLoadRun}>
+                    Open in Editor
+                </Button>
+                <Button variant="outline" icon="download">
+                    Export
+                </Button>
+                <Button variant="outline" icon="duplicate">
+                    Duplicate
+                </Button>
+                <Button variant="ghost" intent={Intent.DANGER} icon="trash">
+                    Delete
                 </Button>
             </div>
-            <RunInfographic data={runData.data} />
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-gray-900/50 p-4">
-                <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
-                    <span>Revision: {runData.revision}</span>
-                    <span>Updated: {new Date(runData.updated_at).toLocaleString()}</span>
+
+            {/* Preview */}
+            <div className="flex-1 p-6 overflow-auto">
+                <h2 className="text-lg font-semibold text-fg-primary mb-4">Preview</h2>
+                <div className="bg-bg-tertiary rounded-lg p-4 overflow-auto">
+                    <ErrorBoundary key="result-preview">
+                        <React.Suspense fallback={<Skeleton />}>
+                            <ResultView />
+                        </React.Suspense>
+                    </ErrorBoundary>
                 </div>
-                <details className="mt-4">
-                    <summary className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">
-                        View Raw Data
-                    </summary>
-                    <pre className="mt-2 p-4 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-300 rounded-md overflow-auto text-xs">
-                        {JSON.stringify(runData.data, null, 2)}
-                    </pre>
-                </details>
             </div>
         </div>
     );
 };
+
+export default RunPage;
+

@@ -130,7 +130,7 @@ export function Editor() {
                 "editor",
                 editorStyles.base,
                 editorDarkMode ? "dark" : "",
-                "h-full p-1 relative overflow-y-auto overflow-x-hidden",
+                "h-full p-1 relative overflow-hidden",
                 "border border-[var(--color-border-default)] border-r-0 border-t-0",
                 "bg-[var(--color-bg-primary)]",
                 "hover:shadow-[0_0_4px_var(--color-border-default)]"
@@ -150,7 +150,7 @@ export function Editor() {
                 id="editor-tabs"
                 defaultSelectedTabId="nuzlocke"
                 fill
-                className="mt-1 [&_[role=tablist]]:px-1 [&_[role=tablist]]:gap-1 [&_[role=tablist]]:border-b-gray-200 dark:[&_[role=tablist]]:border-b-gray-700 [&_[role=tab]]:px-3 [&_[role=tab]]:py-2 [&_[role=tab]]:text-[0.8125rem] [&_[role=tab]]:rounded-t [&_[role=tab]]:bg-transparent [&_[role=tab]]:transition-colors [&_[role=tab]:hover]:bg-black/5 dark:[&_[role=tab]:hover]:bg-white/5 [&_[role=tab][aria-selected=true]]:bg-blue-500/10 dark:[&_[role=tab][aria-selected=true]]:bg-blue-500/15"
+                className="flex-1 flex flex-col min-h-0 [&_[role=tablist]]:px-1 [&_[role=tablist]]:gap-1 [&_[role=tablist]]:flex-shrink-0 [&_[role=tablist]]:bg-[var(--color-bg-primary)] dark:[&_[role=tablist]]:border-b-gray-700 [&_[role=tab]]:px-3 [&_[role=tab]]:py-2 [&_[role=tab]]:text-[0.8125rem] [&_[role=tab]]:rounded-t [&_[role=tab]]:bg-transparent [&_[role=tab]]:transition-colors [&_[role=tab]:hover]:bg-black/5 dark:[&_[role=tab]:hover]:bg-white/5 [&_[role=tab][aria-selected=true]]:bg-blue-500/10 dark:[&_[role=tab][aria-selected=true]]:bg-blue-500/15"
             >
                 <Tab
                     id="data"

@@ -6,7 +6,6 @@ import {
     UPDATE_NUZLOCKE,
     UPDATE_SWITCH_NUZLOCKE,
 } from "actions";
-import { v4 as uuid } from "uuid";
 
 export interface Nuzlockes {
     currentId: string;
@@ -28,7 +27,7 @@ export function nuzlockes(
 ) {
     switch (action.type) {
         case NEW_NUZLOCKE: {
-            const id = uuid();
+            const id = action.id;
             return {
                 ...state,
                 currentId: id,

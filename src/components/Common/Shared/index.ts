@@ -7,3 +7,4 @@ export * from "./ThemeSelect";
 export * from "./ReleaseDialog";
 export * from "./Skeletons";
 export * from "./appToaster";
+export * from "./ColorEdit";

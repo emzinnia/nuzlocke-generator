@@ -3,6 +3,15 @@ import * as React from "react";
 
 const STORAGE_KEY = "dark-mode";
 
+function getStoredPreference(): string | null {
+    if (typeof window === "undefined") return null;
+    try {
+        return window.localStorage.getItem(STORAGE_KEY);
+    } catch {
+        return null;
+    }
+}
+
 interface DarkModeContextType {
     isDark: boolean;
     toggle: () => void;
@@ -12,13 +21,9 @@ interface DarkModeContextType {
 const DarkModeContext = createContext<DarkModeContextType | null>(null);
 
 function getInitialDarkMode(): boolean {
-    // Check localStorage first
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved !== null) {
-        return saved === "true";
-    }
-    // Fall back to system preference
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const saved = getStoredPreference();
+    if (saved !== null) return saved === "true";
+    return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ?? false;
 }
 
 export function DarkModeProvider({ children }: { children: React.ReactNode }) {
@@ -26,22 +31,30 @@ export function DarkModeProvider({ children }: { children: React.ReactNode }) {
 
     // Apply dark class to document
     useEffect(() => {
+        if (typeof document === "undefined") return;
         const root = document.documentElement;
         if (isDark) {
             root.classList.add("dark");
         } else {
             root.classList.remove("dark");
         }
-        localStorage.setItem(STORAGE_KEY, String(isDark));
+        try {
+            window.localStorage.setItem(STORAGE_KEY, String(isDark));
+        } catch {
+            // Ignore storage access errors
+        }
     }, [isDark]);
 
     // Listen for system preference changes
     useEffect(() => {
+        if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+            return;
+        }
+
         const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
         const handleChange = (e: MediaQueryListEvent) => {
             // Only auto-switch if user hasn't explicitly set a preference
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved === null) {
+            if (getStoredPreference() === null) {
                 setIsDark(e.matches);
             }
         };

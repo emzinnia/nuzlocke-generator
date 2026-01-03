@@ -4,6 +4,7 @@ import { login, register } from "api/auth";
 import { useAuthStore } from "./auth";
 import type { RootLoaderData } from "./RootLayout";
 import { Button } from "components/Common/ui/Button";
+import { feature } from "utils";
 
 export const HomePage: React.FC = () => {
     const [email, setEmail] = React.useState("");
@@ -11,7 +12,8 @@ export const HomePage: React.FC = () => {
     const [error, setError] = React.useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-    const { isAuthenticated, runs } = useRouteLoaderData("root") as RootLoaderData || { isAuthenticated: false, runs: [] };
+    const loaderData = useRouteLoaderData("root") as RootLoaderData | undefined;
+    const { isAuthenticated, runs, isLocalMode } = loaderData ?? { isAuthenticated: false, runs: [], isLocalMode: false };
     const revalidator = useRevalidator();
     const navigate = useNavigate();
 
@@ -50,13 +52,19 @@ export const HomePage: React.FC = () => {
     };
 
     React.useEffect(() => {
+        // Auto-redirect to local mode if enabled
+        if (isLocalMode) {
+            navigate("/local", { replace: true });
+            return;
+        }
+        
         if (isAuthenticated && runs.length > 0) {
             const mostRecentRun = [...runs].sort(
                 (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
             )[0];
             navigate(`/runs/${mostRecentRun.id}`, { replace: true });
         }
-    }, [isAuthenticated, runs, navigate]);
+    }, [isAuthenticated, runs, isLocalMode, navigate]);
 
     if (isAuthenticated) {
         return (
@@ -114,6 +122,18 @@ export const HomePage: React.FC = () => {
                         className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white py-2 px-4 rounded-md font-medium transition-colors"
                     >
                         {isSubmitting ? "..." : "Register"}
+                    </Button>
+                </div>
+
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                        Or continue without an account (data saved locally)
+                    </p>
+                    <Button
+                        onClick={() => navigate("/local")}
+                        className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md font-medium transition-colors"
+                    >
+                        Continue Locally
                     </Button>
                 </div>
             </div>

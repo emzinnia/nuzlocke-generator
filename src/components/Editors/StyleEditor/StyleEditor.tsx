@@ -26,7 +26,7 @@ import {
 import { Icon } from "components/ui";
 import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
-import { ColorInput } from "components/Common/ui";
+import { ColorInput, rgbaOrHex } from "components/Common/ui";
 import { cx } from "emotion";
 import * as Styles from "./styles";
 import { ThemeEditor } from "components/Editors/ThemeEditor/ThemeEditor";

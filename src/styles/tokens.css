@@ -199,33 +199,33 @@
 
 .dark,
 html.dark {
-  /* Background layers - warm burnt umber palette */
-  --color-bg-primary: #0E0601;
-  --color-bg-secondary: #090806;
-  --color-bg-tertiary: #191a26;
-  --color-bg-overlay: rgba(14, 6, 1, 0.85);
+  /* Background layers - neutral deep black palette */
+  --color-bg-primary: #050505;
+  --color-bg-secondary: #0b0b10;
+  --color-bg-tertiary: #13131c;
+  --color-bg-overlay: rgba(0, 0, 0, 0.72);
 
-  /* Foreground / text - warm cream and tan tones */
-  --color-text-primary: #f5ede4;
-  --color-text-secondary: #c9b9a6;
-  --color-text-tertiary: #8a7560;
-  --color-text-inverse: #1a120a;
-  --color-text-disabled: #5c4d3d;
+  /* Foreground / text - cool grays for contrast */
+  --color-text-primary: #f5f7fb;
+  --color-text-secondary: #cdd1dc;
+  --color-text-tertiary: #8d92a3;
+  --color-text-inverse: #050505;
+  --color-text-disabled: #4d5361;
 
-  /* Borders - warm brown tones */
-  --color-border-default: #101116;
-  --color-border-muted: #251a10;
-  --color-border-focus: #d97706;
+  /* Borders - neutral grays */
+  --color-border-default: #1c1f29;
+  --color-border-muted: #10131b;
+  --color-border-focus: #60a5fa;
 
-  /* Shadows for dark mode - warm tinted */
-  --shadow-sm: 0 1px 2px 0 rgba(14, 6, 1, 0.4);
-  --shadow-md: 0 4px 6px -1px rgba(14, 6, 1, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px -3px rgba(14, 6, 1, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 20px 25px -5px rgba(14, 6, 1, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  /* Shadows tuned for deep blacks */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.45);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.55), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
 
-  /* Focus ring - amber to match warm theme */
-  --focus-ring-color: #f59e0b;
+  /* Focus ring remains bright for visibility */
+  --focus-ring-color: #60a5fa;
 
   /* Component-specific dark overrides */
   --input-bg: var(--color-bg-secondary);
@@ -261,14 +261,14 @@ html.dark {
 /* Dark mode support for ui-input */
 .dark .ui-input,
 html.dark .ui-input {
-  background-color: #1a1a1a;
-  border-color: #333;
-  color: #f5ede4;
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border-default);
+  color: var(--color-text-primary);
 }
 
 .dark .ui-input::placeholder,
 html.dark .ui-input::placeholder {
-  color: #8a7560;
+  color: var(--color-text-tertiary);
 }
 
 .ui-input-group {
@@ -298,6 +298,194 @@ html.dark .ui-input::placeholder {
 .focus-ring:focus-visible {
   box-shadow: 0 0 0 var(--focus-ring-offset) var(--color-bg-primary),
               0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--focus-ring-color);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MARKDOWN / PROSE STYLING
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.markdown-content {
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.markdown-content > * + * {
+  margin-top: 1em;
+}
+
+.markdown-content h1 {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border-default);
+  padding-bottom: 0.25em;
+}
+
+.markdown-content h2 {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  color: var(--color-text-primary);
+}
+
+.markdown-content h3 {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+  color: var(--color-text-primary);
+}
+
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  color: var(--color-text-primary);
+}
+
+.markdown-content p {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.markdown-content a {
+  color: var(--color-primary-500);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.markdown-content a:hover {
+  color: var(--color-primary-600);
+}
+
+.markdown-content strong {
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.markdown-content em {
+  font-style: italic;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  padding-left: 1.5em;
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.markdown-content ul {
+  list-style-type: disc;
+}
+
+.markdown-content ol {
+  list-style-type: decimal;
+}
+
+.markdown-content li {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.markdown-content li > ul,
+.markdown-content li > ol {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.markdown-content li::marker {
+  color: var(--color-text-tertiary);
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid var(--color-primary-400);
+  padding-left: 1em;
+  margin-left: 0;
+  margin-right: 0;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.markdown-content code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background-color: var(--color-bg-tertiary);
+  padding: 0.2em 0.4em;
+  border-radius: var(--radius-sm);
+  color: var(--color-danger-600);
+}
+
+.markdown-content pre {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  background-color: var(--color-bg-tertiary);
+  padding: 1em;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.markdown-content pre code {
+  background: none;
+  padding: 0;
+  color: var(--color-text-primary);
+}
+
+.markdown-content hr {
+  border: none;
+  border-top: 1px solid var(--color-border-default);
+  margin: 1.5em 0;
+}
+
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+}
+
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  font-size: var(--text-sm);
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid var(--color-border-default);
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+
+.markdown-content th {
+  background-color: var(--color-bg-tertiary);
+  font-weight: var(--weight-semibold);
+}
+
+.markdown-content tr:nth-child(even) {
+  background-color: var(--color-bg-secondary);
+}
+
+/* Dark mode adjustments for markdown */
+.dark .markdown-content code {
+  color: var(--color-danger-400);
+}
+
+.dark .markdown-content a {
+  color: var(--color-primary-400);
+}
+
+.dark .markdown-content a:hover {
+  color: var(--color-primary-300);
 }
 
 /* Reduce motion for users who prefer it */

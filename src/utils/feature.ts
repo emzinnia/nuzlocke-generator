@@ -12,6 +12,7 @@ const featuresFromEnv = {
     emmaMode: import.meta.env.VITE_EMMA_MODE,
     tcgImages: import.meta.env.VITE_TCG_IMAGES,
     rulesetSubmission: import.meta.env.VITE_RULESET_SUBMISSION,
+    localMode: import.meta.env.VITE_LOCAL_MODE ?? import.meta.env.DEV,
 };
 
 type FeatureObject = {

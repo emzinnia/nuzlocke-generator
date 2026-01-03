@@ -37,5 +37,27 @@ defmodule NuzlockeApi.Accounts do
     |> User.changeset(attrs)
     |> Repo.insert()
   end
-end
 
+  @doc """
+  Creates an anonymous user.
+  Anonymous users have no email or password and can use the app without signing up.
+  """
+  def create_anonymous_user do
+    %User{}
+    |> User.anonymous_changeset()
+    |> Repo.insert()
+  end
+
+  @doc """
+  Upgrades an anonymous user to a full account by setting email and password.
+  """
+  def upgrade_anonymous_user(%User{is_anonymous: true} = user, email, password) do
+    user
+    |> User.upgrade_changeset(%{email: email, password: password})
+    |> Repo.update()
+  end
+
+  def upgrade_anonymous_user(%User{is_anonymous: false}, _email, _password) do
+    {:error, :not_anonymous}
+  end
+end

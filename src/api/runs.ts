@@ -9,6 +9,10 @@ import { useUndoRedoStore } from '../hooks/useUndoRedo';
 export interface RunSummary {
   id: string;
   name: string;
+  slug: string;
+  game: string | null;
+  game_name: string | null;
+  pokemon_count: number;
   revision: number;
   updated_at: string;
   inserted_at: string;
@@ -16,6 +20,14 @@ export interface RunSummary {
 
 export interface Run extends RunSummary {
   data: Partial<State>;
+}
+
+/**
+ * Get a run by its slug.
+ */
+export async function getRunBySlug(slug: string): Promise<Run> {
+  const response = await api.get<RunResponse>(`/api/runs/by-slug/${slug}`);
+  return response.run;
 }
 
 export interface RunsListResponse {

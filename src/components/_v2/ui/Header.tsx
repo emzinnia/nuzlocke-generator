@@ -13,6 +13,7 @@ import { DeleteRunDialog } from "./DeleteRunDialog";
 interface HeaderProps {
     runs: RunSummary[];
     isAuthenticated: boolean;
+    isLocalMode?: boolean;
     onRunsChange: () => void;
 }
 
@@ -53,7 +54,7 @@ const NavItem: React.FC<NavItemProps> = ({ to, icon, label, requiresAuth, isAuth
     );
 };
 
-export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, onRunsChange }) => {
+export const Header: React.FC<HeaderProps> = ({ runs, isAuthenticated, isLocalMode, onRunsChange }) => {
     const { isDark, toggle } = useDarkMode();
     const navigate = useNavigate();
     const { id: runId } = useParams<{ id: string }>();

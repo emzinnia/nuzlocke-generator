@@ -83,11 +83,11 @@ export const Tabs: React.FC<TabsProps> = ({
             <div
                 role="tablist"
                 aria-orientation={vertical ? "vertical" : "horizontal"}
-                className={`${
+                className={`flex-shrink-0 ${
                     vertical
                         ? "flex flex-col border-r border-gray-200 dark:border-gray-700"
                         : "flex border-b border-gray-200 dark:border-gray-700"
-                } ${fill ? "flex-1" : ""}`}
+                }`}
             >
                 {tabs.map((tab) => (
                     <button
@@ -124,7 +124,7 @@ export const Tabs: React.FC<TabsProps> = ({
                 ))}
             </div>
 
-            <div className={`${vertical ? "flex-1 pl-4" : " "}`}>
+            <div className={`${vertical ? "flex-1 pl-4" : "flex-1 min-h-0 overflow-y-auto overflow-x-hidden"}`}>
                 {renderActiveTabPanelOnly ? (
                     selectedTab?.props.panel && (
                         <div

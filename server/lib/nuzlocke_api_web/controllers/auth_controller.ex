@@ -52,6 +52,29 @@ defmodule NuzlockeApiWeb.AuthController do
   end
 
   @doc """
+  POST /api/auth/anonymous
+  Create an anonymous user session without requiring signup.
+  """
+  def anonymous(conn, _params) do
+    case Accounts.create_anonymous_user() do
+      {:ok, user} ->
+        {:ok, token, _claims} = Guardian.encode_and_sign(user)
+
+        conn
+        |> put_status(:created)
+        |> json(%{
+          user: %{id: user.id, email: nil, is_anonymous: true},
+          token: token
+        })
+
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{errors: format_changeset_errors(changeset)})
+    end
+  end
+
+  @doc """
   GET /api/auth/me
   Get the current authenticated user.
   """
@@ -66,7 +89,42 @@ defmodule NuzlockeApiWeb.AuthController do
 
       user ->
         conn
-        |> json(%{user: %{id: user.id, email: user.email}})
+        |> json(%{
+          user: %{
+            id: user.id,
+            email: user.email,
+            is_anonymous: user.is_anonymous
+          }
+        })
+    end
+  end
+
+  @doc """
+  POST /api/auth/upgrade
+  Upgrade an anonymous account to a full account with email and password.
+  """
+  def upgrade(conn, %{"email" => email, "password" => password}) do
+    user = Guardian.Plug.current_resource(conn)
+
+    case Accounts.upgrade_anonymous_user(user, email, password) do
+      {:ok, upgraded_user} ->
+        {:ok, token, _claims} = Guardian.encode_and_sign(upgraded_user)
+
+        conn
+        |> json(%{
+          user: %{id: upgraded_user.id, email: upgraded_user.email, is_anonymous: false},
+          token: token
+        })
+
+      {:error, :not_anonymous} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{error: "Account is not anonymous"})
+
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{errors: format_changeset_errors(changeset)})
     end
   end
 
@@ -78,4 +136,3 @@ defmodule NuzlockeApiWeb.AuthController do
     end)
   end
 end
-
