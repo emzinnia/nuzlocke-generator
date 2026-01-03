@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 
 export type PopoverInteractionKind = "click" | "hover" | "click-target-only";
 
@@ -22,25 +23,96 @@ export const Popover: React.FC<PopoverProps> = ({
     onClose,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
+    const triggerRef = useRef<HTMLDivElement>(null);
+    const popoverRef = useRef<HTMLDivElement>(null);
+
+    const updatePosition = useCallback(() => {
+        if (!triggerRef.current || !isOpen) return;
+        
+        const triggerRect = triggerRef.current.getBoundingClientRect();
+        const popoverEl = popoverRef.current;
+        const popoverWidth = popoverEl?.offsetWidth || 160;
+        const popoverHeight = popoverEl?.offsetHeight || 100;
+        const gap = 8;
+        
+        let top = 0;
+        let left = 0;
+
+        switch (position) {
+            case "top":
+                top = triggerRect.top - popoverHeight - gap;
+                left = triggerRect.left + triggerRect.width / 2 - popoverWidth / 2;
+                break;
+            case "bottom":
+                top = triggerRect.bottom + gap;
+                left = triggerRect.left + triggerRect.width / 2 - popoverWidth / 2;
+                break;
+            case "left":
+                top = triggerRect.top + triggerRect.height / 2 - popoverHeight / 2;
+                left = triggerRect.left - popoverWidth - gap;
+                break;
+            case "right":
+                top = triggerRect.top + triggerRect.height / 2 - popoverHeight / 2;
+                left = triggerRect.right + gap;
+                break;
+            case "auto":
+            default:
+                top = triggerRect.bottom + gap;
+                left = triggerRect.left;
+                break;
+        }
+
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        if (left < 8) {
+            left = 8;
+        } else if (left + popoverWidth > viewportWidth - 8) {
+            left = viewportWidth - popoverWidth - 8;
+        }
+        
+        if (top < 8) {
+            top = triggerRect.bottom + gap;
+        } else if (top + popoverHeight > viewportHeight - 8) {
+            top = triggerRect.top - popoverHeight - gap;
+        }
+
+        setPopoverPosition({ top, left });
+    }, [isOpen, position]);
 
     useEffect(() => {
+        if (!isOpen) return;
+        
+        updatePosition();
+        window.addEventListener("scroll", updatePosition, true);
+        window.addEventListener("resize", updatePosition);
+        return () => {
+            window.removeEventListener("scroll", updatePosition, true);
+            window.removeEventListener("resize", updatePosition);
+        };
+    }, [isOpen, updatePosition]);
+
+    useEffect(() => {
+        if (!isOpen || interactionKind !== "click") return;
+
         const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as Node;
             if (
-                containerRef.current &&
-                !containerRef.current.contains(event.target as Node)
+                triggerRef.current &&
+                !triggerRef.current.contains(target) &&
+                popoverRef.current &&
+                !popoverRef.current.contains(target)
             ) {
                 setIsOpen(false);
                 onClose?.();
             }
         };
 
-        if (isOpen && interactionKind === "click") {
-            document.addEventListener("mousedown", handleClickOutside);
-            return () => {
-                document.removeEventListener("mousedown", handleClickOutside);
-            };
-        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
     }, [isOpen, interactionKind, onClose]);
 
     const handleToggle = () => {
@@ -61,17 +133,27 @@ export const Popover: React.FC<PopoverProps> = ({
         }
     };
 
-    const positionClasses = {
-        top: "bottom-full left-1/2 -translate-x-1/2 mb-2",
-        bottom: "top-full left-1/2 -translate-x-1/2 mt-2",
-        left: "right-full top-1/2 -translate-y-1/2 mr-2",
-        right: "left-full top-1/2 -translate-y-1/2 ml-2",
-        auto: "top-full left-0 mt-2",
-    };
+    const popoverContent = isOpen ? (
+        <div
+            ref={popoverRef}
+            className={`fixed z-[9999] ${
+                minimal ? "p-0" : "p-3"
+            } bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 ${popoverClassName}`}
+            style={{
+                top: popoverPosition.top,
+                left: popoverPosition.left,
+            }}
+            onClick={(e) => {
+                e.stopPropagation();
+            }}
+        >
+            {content}
+        </div>
+    ) : null;
 
     return (
         <div
-            ref={containerRef}
+            ref={triggerRef}
             className="relative inline-block"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -85,21 +167,7 @@ export const Popover: React.FC<PopoverProps> = ({
             >
                 {children}
             </div>
-            {isOpen && (
-                <div
-                    className={`absolute z-50 ${
-                        minimal ? "p-0" : "p-3"
-                    } bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 ${
-                        positionClasses[position]
-                    } ${popoverClassName}`}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                    }}
-                >
-                    {content}
-                </div>
-            )}
+            {isOpen && createPortal(popoverContent, document.body)}
         </div>
     );
 };
-

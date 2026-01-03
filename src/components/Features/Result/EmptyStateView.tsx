@@ -6,7 +6,7 @@ import { gameOfOriginToColor, Game } from "utils";
 import { showToast } from "components/Common/Shared/appToaster";
 import { Intent } from "components/ui";
 import { GameSelector } from "components/Common/ui/GameSelector";
-import pokeballImage from "assets/pokeball.png";
+import nuzlockeGeneratorBall from "assets/nuzlocke-generator-ball.png";
 
 function isValidJSON(str: string): boolean {
     try {
@@ -109,7 +109,7 @@ export function EmptyStateView() {
                     <div className="relative inline-block mb-6">
                         <div className="absolute inset-0 bg-gradient-to-br from-red-500/20 to-transparent rounded-full blur-2xl scale-150" />
                         <img 
-                            src={pokeballImage} 
+                            src={nuzlockeGeneratorBall} 
                             alt="" 
                             className="relative w-20 h-20 opacity-80 animate-[pulse_3s_ease-in-out_infinite]" 
                         />

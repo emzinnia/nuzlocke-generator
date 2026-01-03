@@ -194,40 +194,6 @@ export const EditorRightSidebar: React.FC<EditorRightSidebarProps> = ({
             
             <div className="overflow-x-hidden overflow-y-auto flex-1 pt-12 pb-4 pr-4 pl-6">
                 <div className="space-y-3">
-                    {/* Run Stats */}
-                    <div className="bg-bg-tertiary rounded-lg p-3">
-                        <h3 className="text-sm font-semibold text-fg-primary mb-2">
-                            Run Stats
-                        </h3>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                            <div className="flex justify-between">
-                                <span className="text-fg-secondary">Total:</span>
-                                <span className="font-medium">{totalPokemon}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-fg-secondary">Team:</span>
-                                <span className="font-medium text-success-600">{teamPokemon}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-fg-secondary">Boxed:</span>
-                                <span className="font-medium text-primary-600">{boxedPokemon}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-fg-secondary">Dead:</span>
-                                <span className="font-medium text-danger-600">{deadPokemon}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Current Game Info */}
-                    {game.name && (
-                        <div className="bg-bg-tertiary rounded-lg p-3">
-                            <h3 className="text-sm font-semibold text-fg-primary">
-                                Game: {game.name}
-                            </h3>
-                        </div>
-                    )}
-
                     {/* Game Data (Routes & Bosses) */}
                     <ErrorBoundary errorMessage="Failed to load game data">
                         <FullGameDataView 
@@ -283,6 +249,40 @@ export const EditorRightSidebar: React.FC<EditorRightSidebarProps> = ({
                             <li>• Click Pokémon icons to add from routes</li>
                         </ul>
                     </CollapsibleSection>
+
+                    {/* Current Game Info */}
+                    {game.name && (
+                        <div className="bg-bg-tertiary rounded-lg p-3">
+                            <h3 className="text-sm font-semibold text-fg-primary">
+                                Game: {game.name}
+                            </h3>
+                        </div>
+                    )}
+
+                    {/* Run Stats */}
+                    <div className="bg-bg-tertiary rounded-lg p-3">
+                        <h3 className="text-sm font-semibold text-fg-primary mb-2">
+                            Run Stats
+                        </h3>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="flex justify-between">
+                                <span className="text-fg-secondary">Total:</span>
+                                <span className="font-medium">{totalPokemon}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-fg-secondary">Team:</span>
+                                <span className="font-medium text-success-600">{teamPokemon}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-fg-secondary">Boxed:</span>
+                                <span className="font-medium text-primary-600">{boxedPokemon}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-fg-secondary">Dead:</span>
+                                <span className="font-medium text-danger-600">{deadPokemon}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
