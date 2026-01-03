@@ -23,7 +23,7 @@ import {
     Input,
     Label,
 } from "components/ui/shims";
-import { Icon } from "components/ui";
+import { Icon, Intent } from "components/ui";
 import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { ColorInput, rgbaOrHex } from "components/Common/ui";
@@ -233,7 +233,7 @@ export class StyleEditorBase extends React.Component<
                         <Button
                             onClick={this.toggleThemeEditor}
                             style={{ marginLeft: ".25rem" }}
-                            intent="primary"
+                            intent={Intent.PRIMARY}
                             minimal
                         >
                             Edit Theme
@@ -938,7 +938,7 @@ export class StyleEditorBase extends React.Component<
                         {feature.themeEditing && (
                             <Button
                                 minimal
-                                intent="primary"
+                                intent={Intent.PRIMARY}
                                 onClick={this.toggleCSSGuide}
                             >
                                 Check out the CSS Guide!

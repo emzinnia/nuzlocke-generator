@@ -11,7 +11,7 @@ import {
     Input,
     Label,
 } from "components/ui/shims";
-import { Icon } from "components/ui";
+import { Icon, Intent } from "components/ui";
 import { Move } from "components/Pokemon/TeamPokemon/Moves";
 import {
     editCustomMoveMap,
@@ -246,7 +246,7 @@ export class MoveEditorBase extends React.Component<
                                         moveName,
                                     );
                                 }}
-                                intent="primary"
+                                intent={Intent.PRIMARY}
                                 disabled={!(moveType && moveName)}
                             >
                                 Add Move

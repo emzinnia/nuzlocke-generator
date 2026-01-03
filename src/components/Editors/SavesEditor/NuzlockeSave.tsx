@@ -308,7 +308,7 @@ export function NuzlockeSave() {
         const newId = crypto.randomUUID();
         dispatch(newNuzlocke(JSON.stringify(preparedData), { isCopy: false, id: newId }));
         dispatch(replaceState(data));
-        navigate(`/run/${newId}`);
+        navigate("/");
     };
 
     const handleDelete = (deletionFn: () => void) => {
@@ -324,7 +324,7 @@ export function NuzlockeSave() {
         <div className="p-2">
             <div className="flex justify-between items-end gap-1 pb-2">
                 <Button
-                    intent="success"
+                    intent={Intent.SUCCESS}
                     icon="add"
                     onClick={handleNewNuzlocke}
                     hotkey={{ key: "shift+n", showModifier: false }}

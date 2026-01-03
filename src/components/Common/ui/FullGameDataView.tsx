@@ -1,6 +1,6 @@
 import * as React from "react";
 import type { FullGame } from "models/FullGame";
-import { PokemonIconPlain } from "components/Pokemon/PokemonIcon";
+import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { Popover } from "./Popover";
 import { Button } from "./Button";
 import { Collapsible } from "./Collapsible";
@@ -132,7 +132,7 @@ function RoutesSection({
 
     return (
         <Collapsible title={`Routes (${routes.length})`} defaultOpen>
-            <div className="space-y-3">
+            <div className="max-h-[400px] overflow-y-auto space-y-3 pr-1 routes-scrollbar">
                 {routes.map((route) => (
                     <RouteCard
                         key={route.id}
@@ -230,42 +230,72 @@ function EncounterList({
     onAddPokemon: AddPokemonHandler;
     routeId: string;
 }) {
+    const isStarterRoute = routeName === "Starter";
+
+    const getStarterRingColor = (species: string) => {
+        if (!isStarterRoute) return undefined;
+        
+        switch (species) {
+            case "Bulbasaur":
+                return "ring-green-500";
+            case "Charmander":
+                return "ring-red-500";
+            case "Squirtle":
+                return "ring-blue-500";
+            default:
+                return undefined;
+        }
+    };
+
     return (
         <div className="mt-2">
             <ul className="flex flex-wrap gap-1">
-                {encounters.map((encounter) => (
-                    <li key={encounter.id}>
-                        <Popover
-                            position="bottom"
-                            minimal
-                            content={
-                                <div className="flex flex-col min-w-[100px]">
-                                    {STATUS_OPTIONS.map((status) => (
-                                        <Button
-                                            key={status}
-                                            variant="ghost"
-                                            onClick={() =>
-                                                onAddPokemon({
-                                                    species: encounter.species,
-                                                    status,
-                                                    met: routeName,
-                                                    routeId,
-                                                })
-                                            }
-                                            className="w-full px-3 py-2 justify-start text-left text-sm bg-primary-foreground hover:bg-primary/90 first:rounded-t last:rounded-b"
-                                        >
-                                            {status}
-                                        </Button>
-                                    ))}
+                {encounters.map((encounter) => {
+                    const ringColor = getStarterRingColor(encounter.species);
+                    
+                    return (
+                        <li key={encounter.id}>
+                            <Popover
+                                position="bottom"
+                                minimal
+                                content={
+                                    <div className="flex flex-col min-w-[100px]">
+                                        {STATUS_OPTIONS.map((status) => (
+                                            <Button
+                                                key={status}
+                                                variant="ghost"
+                                                onClick={() =>
+                                                    onAddPokemon({
+                                                        species: encounter.species,
+                                                        status,
+                                                        met: routeName,
+                                                        routeId,
+                                                    })
+                                                }
+                                                className="w-full px-3 py-2 justify-start text-left text-sm bg-primary-foreground hover:bg-primary/90 first:rounded-t last:rounded-b"
+                                            >
+                                                {status}
+                                            </Button>
+                                        ))}
+                                    </div>
+                                }
+                            >
+                                <div 
+                                    className={`bg-card text-primary rounded-sm p-1 flex items-center justify-center cursor-pointer transition-all ${
+                                        isStarterRoute 
+                                            ? `h-16 hover:ring-4 ${ringColor ? `ring-4 ${ringColor}` : ''}` 
+                                            : 'h-12 hover:ring-2 hover:ring-blue-400'
+                                    }`}
+                                >
+                                    <PokemonIcon 
+                                        species={encounter.species}
+                                        imageStyle={isStarterRoute ? { width: 60, height: 45 } : undefined}
+                                    />
                                 </div>
-                            }
-                        >
-                            <div className="bg-card h-12 text-primary rounded-sm p-1 flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all">
-                                <PokemonIconPlain species={encounter.species} />
-                            </div>
-                        </Popover>
-                    </li>
-                ))}
+                            </Popover>
+                        </li>
+                    );
+                })}
             </ul>
         </div>
     );
@@ -338,7 +368,7 @@ function TrainerPokemonList({
                 {pokemon.map((entry, idx) => (
                     <li key={idx}>
                         <div className="relative bg-card h-12 w-12 text-primary rounded-sm p-1 flex items-center justify-center border border-border">
-                            <PokemonIconPlain species={entry.species ?? "Unknown"} />
+                            <PokemonIcon species={entry.species ?? "Unknown"} />
                             <span className="absolute -bottom-1 -right-1 text-[10px] px-1 py-0.5 rounded-sm bg-primary text-white">
                                 {entry.level != null ? `Lv. ${entry.level}` : "Lv. ?"}
                             </span>

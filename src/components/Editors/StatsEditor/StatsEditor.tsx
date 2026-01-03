@@ -166,7 +166,7 @@ export class StatsEditorBase extends React.Component<StatsEditorProps> {
                                 />
                                 <Button
                                     icon="trash"
-                                    intent="danger"
+                                    intent={Intent.DANGER}
                                     style={{ margin: "6px", fontSize: "80%" }}
                                     minimal
                                     onClick={() =>
@@ -181,7 +181,7 @@ export class StatsEditorBase extends React.Component<StatsEditorProps> {
                                 icon="plus"
                                 style={{ margin: "4px", fontSize: "80%" }}
                                 onClick={() => addStat({ key: "", value: "" })}
-                                intent="success"
+                                intent={Intent.SUCCESS}
                             >
                                 Add Custom Stat
                             </Button>

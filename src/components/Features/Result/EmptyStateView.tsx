@@ -1,10 +1,11 @@
 import * as React from "react";
 import { useDispatch } from "react-redux";
-import { FileUp, FolderOpen, Play, ChevronDown, Gamepad2 } from "lucide-react";
+import { FileUp, FolderOpen } from "lucide-react";
 import { editGame, editStyle, resetCheckpoints, replaceState, newNuzlocke } from "actions";
 import { gameOfOriginToColor, Game } from "utils";
 import { showToast } from "components/Common/Shared/appToaster";
 import { Intent } from "components/ui";
+import { GameSelector } from "components/Common/ui/GameSelector";
 import pokeballImage from "assets/pokeball.png";
 
 function isValidJSON(str: string): boolean {
@@ -18,7 +19,6 @@ function isValidJSON(str: string): boolean {
 
 export function EmptyStateView() {
     const dispatch = useDispatch();
-    const [isGameSelectOpen, setIsGameSelectOpen] = React.useState(false);
     const [selectedGame, setSelectedGame] = React.useState<Game | null>(null);
     const jsonInputRef = React.useRef<HTMLInputElement>(null);
     const saveInputRef = React.useRef<HTMLInputElement>(null);
@@ -89,22 +89,6 @@ export function EmptyStateView() {
         });
     };
 
-    const gamesByGeneration = React.useMemo(() => {
-        const generations: { name: string; games: Game[] }[] = [
-            { name: "Gen I", games: ["Red", "Blue", "Green", "Yellow"] },
-            { name: "Gen II", games: ["Gold", "Silver", "Crystal"] },
-            { name: "Gen III", games: ["Ruby", "Sapphire", "Emerald", "FireRed", "LeafGreen", "Colosseum", "XD Gale of Darkness"] },
-            { name: "Gen IV", games: ["Diamond", "Pearl", "Platinum", "HeartGold", "SoulSilver"] },
-            { name: "Gen V", games: ["Black", "White", "Black 2", "White 2"] },
-            { name: "Gen VI", games: ["X", "Y", "OmegaRuby", "AlphaSapphire"] },
-            { name: "Gen VII", games: ["Sun", "Moon", "Ultra Sun", "Ultra Moon", "Let's Go Pikachu", "Let's Go Eevee"] },
-            { name: "Gen VIII", games: ["Sword", "Shield", "Brilliant Diamond", "Shining Pearl", "Legends: Arceus"] },
-            { name: "Gen IX", games: ["Scarlet", "Violet", "Legends: Z-A"] },
-            { name: "Other", games: ["Custom"] },
-        ];
-        return generations;
-    }, []);
-
     return (
         <div className="flex-1 flex items-center justify-center p-8 min-h-0 overflow-auto">
             <input
@@ -154,7 +138,7 @@ export function EmptyStateView() {
                         onClick={handleSaveFileClick}
                     />
 
-                    <div className="group">
+                    <div className="group cursor-pointer">
                         <button
                             onClick={() => setIsGameSelectOpen(!isGameSelectOpen)}
                             className="w-full flex items-center gap-4 p-4 rounded-lg bg-bg-secondary border border-border hover:border-primary-400/50 hover:bg-bg-tertiary transition-all duration-200 text-left"
@@ -207,7 +191,7 @@ export function EmptyStateView() {
                                     <div className="mt-4 pt-4 border-t border-border">
                                         <button
                                             onClick={handleStartGame}
-                                            className="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium rounded-lg transition-all duration-200 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 flex items-center justify-center gap-2"
+                                            className="w-full py-2.5 px-4 bg-gradient-to-r cursor-pointer from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium rounded-lg transition-all duration-200 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 flex items-center justify-center gap-2"
                                         >
                                             <Gamepad2 className="w-4 h-4" />
                                             Start {selectedGame}
@@ -240,7 +224,7 @@ function ActionCard({ icon, title, description, onClick }: ActionCardProps) {
     return (
         <button
             onClick={onClick}
-            className="w-full flex items-center gap-4 p-4 rounded-lg bg-bg-secondary border border-border hover:border-primary-400/50 hover:bg-bg-tertiary pointer-cursor transition-all duration-200 text-left group"
+            className="w-full flex items-center gap-4 p-4 rounded-lg bg-bg-secondary border border-border hover:border-primary-400/50 hover:bg-[var(--color-bg-tertiary)] cursor-pointer transition-all duration-200 text-left group"
         >
             <div className="shrink-0 w-10 h-10 rounded-lg bg-linear-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white shadow-lg shadow-primary-500/20 group-hover:shadow-primary-500/30 transition-shadow">
                 {icon}

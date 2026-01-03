@@ -39,7 +39,14 @@ export { Alert, type AlertProps } from "./Alert";
 export { Icon, type IconProps, type IconName } from "./Icon";
 
 // Intents (Blueprint compatibility)
-export { Intent, intentToBgClass, intentToOutlineClass, intentToTextClass } from "./intent";
+export {
+    Intent,
+    intentToBgClass,
+    intentToOutlineClass,
+    intentToGhostClass,
+    intentToLinkClass,
+    intentToTextClass,
+} from "./intent";
 
 // Table components
 export {

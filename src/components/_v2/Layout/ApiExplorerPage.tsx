@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ApiExplorer } from "./ApiExplorer";
+import { ApiExplorer } from "components/Layout/App/ApiExplorer";
 
 export const ApiExplorerPage: React.FC = () => {
     return (

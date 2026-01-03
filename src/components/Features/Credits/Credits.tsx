@@ -118,7 +118,7 @@ export function Credits() {
             </Dialog>
             <Button
                 style={{ margin: "0.5rem auto", display: "block" }}
-                intent="primary"
+                intent={Intent.PRIMARY}
                 minimal
                 onClick={() => setCreditsModal(true)}
             >

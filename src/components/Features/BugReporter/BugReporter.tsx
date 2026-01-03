@@ -96,7 +96,7 @@ export class BugReporterBase extends React.Component<
                             disabled={!userReportTitle || isSending}
                             onClick={this.sendBugReport}
                             minimal
-                            intent="danger"
+                            intent={Intent.DANGER}
                         >
                             Submit{" "}
                             {isSending ? (

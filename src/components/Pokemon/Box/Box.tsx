@@ -251,7 +251,7 @@ export const Box: React.FC<BoxProps> = (props) => {
                 onConfirm={handleDeleteBox}
                 confirmButtonText="Delete Box"
                 cancelButtonText="Cancel"
-                intent="danger"
+                intent={Intent.DANGER}
             >
                 <p>
                     This will delete the currently selected Box and all Pokémon

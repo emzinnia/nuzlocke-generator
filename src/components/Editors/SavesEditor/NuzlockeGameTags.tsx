@@ -22,7 +22,7 @@ export function NuzlockeGameTags({
     const secondaryTagClasses = `mx-0.5 bg-black/20 dark:text-white text-black`;
 
     return (
-            <div className="flex gap-0.5 flex-col justify-center min-w-1/2">
+            <div className="flex gap-0.5 flex-col justify-center w-24">
                 <Tag
                     round
                     className="mx-0.5"

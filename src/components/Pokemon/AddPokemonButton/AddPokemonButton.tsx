@@ -16,7 +16,7 @@ export function AddPokemonButton({ pokemon }: { pokemon: Pokemon }) {
     return (
         <Button
             icon="add"
-            intent="success"
+            intent={Intent.SUCCESS}
             className="add-new-pokemon"
             data-testid="add-pokemon-button"
             onClick={onClick}

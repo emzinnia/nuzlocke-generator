@@ -527,7 +527,7 @@ export class DataEditorBase extends React.Component<
                                 >
                                     <Button
                                         icon={<Download size={16} />}
-                                        intent="primary"
+                                        intent={Intent.PRIMARY}
                                     >
                                         Download
                                     </Button>

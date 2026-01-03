@@ -23,6 +23,9 @@ const RunPage = React.lazy(() =>
 const RoadmapPage = React.lazy(() =>
     import("./components/_v2/Layout/RoadmapPage").then((m) => ({ default: m.RoadmapPage }))
 );
+const ApiExplorerPage = React.lazy(() =>
+    import("./components/_v2/Layout/ApiExplorerPage").then((m) => ({ default: m.ApiExplorerPage }))
+);
 
 export interface RootLoaderData {
     runs: RunSummary[];
@@ -156,6 +159,14 @@ export const router = createBrowserRouter([
                 element: (
                     <React.Suspense fallback={<RouteLoading />}>
                         <RoadmapPage />
+                    </React.Suspense>
+                ),
+            },
+            {
+                path: "api-explorer",
+                element: (
+                    <React.Suspense fallback={<RouteLoading />}>
+                        <ApiExplorerPage />
                     </React.Suspense>
                 ),
             },

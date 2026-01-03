@@ -101,7 +101,7 @@ export function EvolutionSelection({ currentPokemon, onEvolve }) {
             <Button
                 onClick={onEvolve(species)}
                 minimal
-                intent="primary"
+                intent={Intent.PRIMARY}
             >
                 Evolve
             </Button>
@@ -130,7 +130,7 @@ export function EvolutionSelection({ currentPokemon, onEvolve }) {
                     </>
                 }
             >
-                <Button minimal intent="primary">
+                <Button minimal intent={Intent.PRIMARY}>
                     Evolve
                 </Button>
             </Popover>

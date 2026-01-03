@@ -106,7 +106,7 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                         transition: "200ms",
                         transform: isBoxFormOpen ? "rotate(135deg)" : undefined,
                     }}
-                    intent="success"
+                    intent={Intent.SUCCESS}
                 />
                 <div style={{ clear: "both" }} />
                 {isBoxFormOpen && (
@@ -190,7 +190,7 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                         >
                             <Button
                                 onClick={this.toggleBoxForm}
-                                intent="danger"
+                                intent={Intent.DANGER}
                                 style={{ margin: "0 .5rem" }}
                                 minimal
                             >
@@ -199,7 +199,7 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                             <Button
                                 style={{ margin: "0 .5rem" }}
                                 onClick={this.confirmNewBox}
-                                intent="success"
+                                intent={Intent.SUCCESS}
                                 disabled={!this.state.newBox.name}
                             >
                                 Confirm

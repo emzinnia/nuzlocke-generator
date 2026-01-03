@@ -6,6 +6,11 @@ module.exports = {
         "./src/**/*.{js,ts,jsx,tsx}",
     ],
     darkMode: "class",
+    safelist: [
+        "ring-green-500",
+        "ring-red-500",
+        "ring-blue-500",
+    ],
     theme: {
         extend: {
             colors: {
@@ -38,6 +43,7 @@ module.exports = {
                     700: "var(--color-primary-700)",
                     800: "var(--color-primary-800)",
                     900: "var(--color-primary-900)",
+                    950: "var(--color-primary-950)",
                 },
                 success: {
                     50: "var(--color-success-50)",
@@ -50,6 +56,7 @@ module.exports = {
                     700: "var(--color-success-700)",
                     800: "var(--color-success-800)",
                     900: "var(--color-success-900)",
+                    950: "var(--color-success-950)",
                 },
                 warning: {
                     50: "var(--color-warning-50)",
@@ -62,6 +69,7 @@ module.exports = {
                     700: "var(--color-warning-700)",
                     800: "var(--color-warning-800)",
                     900: "var(--color-warning-900)",
+                    950: "var(--color-warning-950)",
                 },
                 danger: {
                     50: "var(--color-danger-50)",
@@ -74,6 +82,7 @@ module.exports = {
                     700: "var(--color-danger-700)",
                     800: "var(--color-danger-800)",
                     900: "var(--color-danger-900)",
+                    950: "var(--color-danger-950)",
                 },
                 input: "var(--input-bg)",
                 dialog: "var(--dialog-bg)",

@@ -10,6 +10,12 @@ export const fullGameData: FullGame = {
             routeName: "Starter",
             pokemonMap: [
                 {
+                    id: "3",
+                    species: "Bulbasaur",
+                    levelRange: [5, 5],
+                    method: EncounterMethod.Starter,
+                },
+                {
                     id: "1",
                     species: "Charmander",
                     levelRange: [5, 5],
@@ -21,12 +27,7 @@ export const fullGameData: FullGame = {
                     levelRange: [5, 5],
                     method: EncounterMethod.Starter,
                 },
-                {
-                    id: "3",
-                    species: "Bulbasaur",
-                    levelRange: [5, 5],
-                    method: EncounterMethod.Starter,
-                },
+                
             ],
         },
         {
@@ -165,5 +166,7 @@ export const fullGameData: FullGame = {
             ],
         },
     ],
-    trainerRoutesOrders: [],
+    trainerRoutesOrders: [
+        "Starter",
+    ],
 };
