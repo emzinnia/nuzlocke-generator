@@ -8,6 +8,7 @@ import { sortPokes } from "utils";
 import { Trainer } from "./Trainer";
 import { TeamPokemon } from "./TeamPokemon";
 
+import "./themes/base.css";
 import "./themes/default.css";
 
 async function loadDomToImage() {
@@ -61,7 +62,7 @@ export const Resultv2 = React.forwardRef<Resultv2Handle, object>((_, ref) => {
             <div className="w-full h-full flex justify-center items-center">
                 <div
                     ref={resultRef}
-                    className="bg-bg-primary w-[600px] min-h-[400px] result"
+                    className="bg-bg-primary w-[800px] min-h-[400px] result"
                     style={{
                         backgroundColor: bgColor,
                     }}

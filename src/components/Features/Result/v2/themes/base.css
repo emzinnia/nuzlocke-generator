@@ -1,0 +1,215 @@
+/**
+* base contains css and theme primitives for the css themes
+*/
+.result {
+    --trainer-background-color: #04030f;
+    --trainer-text-color: #e5e5e5;
+    --trainer-name-color: #ffffff;
+    --trainer-title-color: #a3a3a3;
+    --trainer-stat-label-color: #737373;
+    --trainer-stat-value-color: #e5e5e5;
+    --trainer-badge-background-color: #3b82f6;
+    --trainer-badge-text-color: #ffffff;
+    --trainer-notes-color: #a3a3a3;
+
+    --team-pokemon-background-color: #141414;
+    --team-pokemon-text-color: #e5e5e5;
+    --team-pokemon-text-secondary-color: #a3a3a3;
+    --team-pokemon-text-muted-color: #737373;
+    --team-pokemon-accent-color: #3b82f6;
+    --team-pokemon-nature-color: #f59e0b;
+    --team-pokemon-ability-color: #10b981;
+    --team-pokemon-move-background-color: #262626;
+    --team-pokemon-move-text-color: #d4d4d4;
+    --team-pokemon-shiny-color: #fbbf24;
+    --team-pokemon-mvp-background-color: #fef3c7;
+    --team-pokemon-mvp-text-color: #92400e;
+}
+
+.result-content {
+}
+
+.trainer {
+}
+
+.trainer-content {
+    background-color: var(--trainer-background-color);
+    color: var(--trainer-text-color);
+}
+
+.trainer-image-wrapper {
+}
+
+.trainer-image {
+    border-radius: 0.25rem;
+}
+
+.trainer-info {
+}
+
+.trainer-header {
+}
+
+.trainer-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--trainer-name-color);
+}
+
+.trainer-title {
+    font-size: 0.875rem;
+    color: var(--trainer-title-color);
+    font-style: italic;
+}
+
+.trainer-stats {
+}
+
+.trainer-stat {
+}
+
+.trainer-stat-label {
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--trainer-stat-label-color);
+}
+
+.trainer-stat-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--trainer-stat-value-color);
+}
+
+.trainer-badges {
+}
+
+.trainer-badge {
+    font-size: 0.625rem;
+    background-color: var(--trainer-badge-background-color);
+    color: var(--trainer-badge-text-color);
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+}
+
+.trainer-badge-image {
+    display: block;
+}
+
+.trainer-badge-name {
+}
+
+.trainer-notes {
+    font-size: 0.75rem;
+    color: var(--trainer-notes-color);
+    font-style: italic;
+}
+
+.team-pokemon {
+    background-color: var(--team-pokemon-background-color);
+    color: var(--team-pokemon-text-color);
+}
+
+.team-pokemon-image-wrapper {
+}
+
+.team-pokemon-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.team-pokemon-shiny-indicator {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    background-color: var(--team-pokemon-shiny-color);
+    border-radius: 50%;
+    box-shadow: 0 0 4px var(--team-pokemon-shiny-color);
+}
+
+.team-pokemon-item-wrapper {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 0.25rem;
+    padding: 0.125rem;
+}
+
+.team-pokemon-item-icon {
+    display: block;
+}
+
+.team-pokemon-info {
+}
+
+.team-pokemon-header {
+}
+
+.team-pokemon-mvp {
+    background-color: var(--team-pokemon-mvp-background-color);
+    color: var(--team-pokemon-mvp-text-color);
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+}
+
+.team-pokemon-nickname {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--team-pokemon-text-color);
+}
+
+.team-pokemon-species {
+    font-size: 0.75rem;
+    color: var(--team-pokemon-text-secondary-color);
+}
+
+.team-pokemon-level {
+    font-size: 0.75rem;
+    color: var(--team-pokemon-text-muted-color);
+}
+
+.team-pokemon-traits {
+    font-size: 0.75rem;
+}
+
+.team-pokemon-nature {
+    color: var(--team-pokemon-nature-color);
+    font-weight: 500;
+}
+
+.team-pokemon-ability {
+    color: var(--team-pokemon-ability-color);
+    font-style: italic;
+}
+
+.team-pokemon-met {
+    font-size: 0.6875rem;
+    color: var(--team-pokemon-text-muted-color);
+}
+
+.team-pokemon-moves {
+}
+
+.team-pokemon-move {
+    font-size: 0.625rem;
+    background-color: var(--team-pokemon-move-background-color);
+    color: var(--team-pokemon-move-text-color);
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.125rem;
+}
+
+.team-pokemon-notes {
+    font-size: 0.6875rem;
+    color: var(--team-pokemon-text-secondary-color);
+    font-style: italic;
+}
