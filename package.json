@@ -196,6 +196,6 @@
         "typescript": "^5.4.3",
         "typescript-eslint": "^8.31.1",
         "url-loader": "^4.1.1",
-        "uuid": "^3.4.0"
+        "uuid": "^14.0.0"
     }
 }
