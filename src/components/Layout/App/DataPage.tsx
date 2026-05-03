@@ -162,7 +162,7 @@ export const DataPage: React.FC = () => {
     }, [search, typeFilter]);
 
     return (
-        <div className="p-6">
+        <div className="p-6 w-full overflow-auto">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Pokemon Data</h1>
 
             {/* Filters */}

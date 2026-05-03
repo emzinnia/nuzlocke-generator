@@ -24,20 +24,21 @@ describe("<GameSelector />", () => {
     it("renders the trigger button with correct text", () => {
         render(<GameSelector {...defaultProps} />);
 
-        expect(screen.getByText("Start New Run")).toBeTruthy();
+        expect(screen.getByText("Start Nuzlocke!")).toBeTruthy();
         expect(screen.getByText("Choose a game to begin tracking")).toBeTruthy();
     });
 
     it("is collapsed by default", () => {
         render(<GameSelector {...defaultProps} />);
 
-        expect(screen.queryByText("All")).toBeNull();
+        const chevron = document.querySelector('[class*="rotate-180"]');
+        expect(chevron).toBeNull();
     });
 
     it("expands when clicking the trigger button", () => {
         render(<GameSelector {...defaultProps} />);
 
-        const trigger = screen.getByRole("button", { name: /Start New Run/i });
+        const trigger = screen.getByRole("button", { name: /Start Nuzlocke!/i });
         fireEvent.click(trigger);
 
         expect(screen.getByText("All")).toBeTruthy();
@@ -48,7 +49,7 @@ describe("<GameSelector />", () => {
     it("shows all generation filter tabs when expanded", () => {
         render(<GameSelector {...defaultProps} />);
 
-        fireEvent.click(screen.getByRole("button", { name: /Start New Run/i }));
+        fireEvent.click(screen.getByRole("button", { name: /Start Nuzlocke!/i }));
 
         const expectedTabs = ["All", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "Other"];
         expectedTabs.forEach((tab) => {
@@ -59,7 +60,7 @@ describe("<GameSelector />", () => {
     it("shows game buttons when expanded", () => {
         render(<GameSelector {...defaultProps} />);
 
-        fireEvent.click(screen.getByRole("button", { name: /Start New Run/i }));
+        fireEvent.click(screen.getByRole("button", { name: /Start Nuzlocke!/i }));
 
         expect(screen.getByRole("button", { name: "Red" })).toBeTruthy();
         expect(screen.getByRole("button", { name: "Blue" })).toBeTruthy();
@@ -69,7 +70,7 @@ describe("<GameSelector />", () => {
     it("calls onGameSelect when clicking a game", () => {
         render(<GameSelector {...defaultProps} />);
 
-        fireEvent.click(screen.getByRole("button", { name: /Start New Run/i }));
+        fireEvent.click(screen.getByRole("button", { name: /Start Nuzlocke!/i }));
         fireEvent.click(screen.getByRole("button", { name: "Red" }));
 
         expect(defaultProps.onGameSelect).toHaveBeenCalledWith("Red");
@@ -79,7 +80,7 @@ describe("<GameSelector />", () => {
     it("filters games when clicking a generation tab", () => {
         render(<GameSelector {...defaultProps} />);
 
-        fireEvent.click(screen.getByRole("button", { name: /Start New Run/i }));
+        fireEvent.click(screen.getByRole("button", { name: /Start Nuzlocke!/i }));
         fireEvent.click(screen.getByRole("button", { name: "I" }));
 
         expect(screen.getByRole("button", { name: "Red" })).toBeTruthy();
@@ -91,7 +92,7 @@ describe("<GameSelector />", () => {
     it("shows Gen III games when filtering by Gen III", () => {
         render(<GameSelector {...defaultProps} />);
 
-        fireEvent.click(screen.getByRole("button", { name: /Start New Run/i }));
+        fireEvent.click(screen.getByRole("button", { name: /Start Nuzlocke!/i }));
         fireEvent.click(screen.getByRole("button", { name: "III" }));
 
         expect(screen.getByRole("button", { name: "Ruby" })).toBeTruthy();
@@ -105,24 +106,24 @@ describe("<GameSelector />", () => {
     it("does not show start button when no game is selected", () => {
         render(<GameSelector {...defaultProps} />);
 
-        fireEvent.click(screen.getByRole("button", { name: /Start New Run/i }));
+        fireEvent.click(screen.getByRole("button", { name: /Start Nuzlocke!/i }));
 
-        expect(screen.queryByRole("button", { name: /^Start / })).toBeNull();
+        expect(screen.queryByTestId("start-nuzlocke-confirm")).toBeNull();
     });
 
-    it("shows start button with game name when a game is selected", () => {
+    it("shows start button when a game is selected", () => {
         render(<GameSelector {...defaultProps} selectedGame="Emerald" />);
 
-        fireEvent.click(screen.getByRole("button", { name: /Start New Run/i }));
+        fireEvent.click(screen.getByTestId("start-nuzlocke-trigger"));
 
-        expect(screen.getByRole("button", { name: /Start Emerald/ })).toBeTruthy();
+        expect(screen.getByTestId("start-nuzlocke-confirm")).toBeTruthy();
     });
 
     it("calls onStartGame when clicking the start button", () => {
         render(<GameSelector {...defaultProps} selectedGame="Emerald" />);
 
-        fireEvent.click(screen.getByRole("button", { name: /Start New Run/i }));
-        fireEvent.click(screen.getByRole("button", { name: /Start Emerald/ }));
+        fireEvent.click(screen.getByTestId("start-nuzlocke-trigger"));
+        fireEvent.click(screen.getByTestId("start-nuzlocke-confirm"));
 
         expect(defaultProps.onStartGame).toHaveBeenCalledTimes(1);
     });
@@ -130,24 +131,28 @@ describe("<GameSelector />", () => {
     it("shows the selected game badge in the trigger when a game is selected", () => {
         render(<GameSelector {...defaultProps} selectedGame="FireRed" />);
 
-        expect(screen.getByText("FireRed")).toBeTruthy();
+        const badges = screen.getAllByText("FireRed");
+        expect(badges.length).toBeGreaterThanOrEqual(1);
     });
 
     it("collapses when clicking the trigger button again", () => {
         render(<GameSelector {...defaultProps} />);
 
-        const trigger = screen.getByRole("button", { name: /Start New Run/i });
+        const trigger = screen.getByRole("button", { name: /Start Nuzlocke!/i });
         fireEvent.click(trigger);
-        expect(screen.getByText("All")).toBeTruthy();
+
+        let chevron = document.querySelector('[class*="rotate-180"]');
+        expect(chevron).toBeTruthy();
 
         fireEvent.click(trigger);
-        expect(screen.queryByRole("button", { name: "All" })).toBeNull();
+        chevron = document.querySelector('[class*="rotate-180"]');
+        expect(chevron).toBeNull();
     });
 
     it("shows Other category with Custom game", () => {
         render(<GameSelector {...defaultProps} />);
 
-        fireEvent.click(screen.getByRole("button", { name: /Start New Run/i }));
+        fireEvent.click(screen.getByRole("button", { name: /Start Nuzlocke!/i }));
         fireEvent.click(screen.getByRole("button", { name: "Other" }));
 
         expect(screen.getByRole("button", { name: "Custom" })).toBeTruthy();
@@ -156,7 +161,7 @@ describe("<GameSelector />", () => {
     it("shows Gen IX games", () => {
         render(<GameSelector {...defaultProps} />);
 
-        fireEvent.click(screen.getByRole("button", { name: /Start New Run/i }));
+        fireEvent.click(screen.getByRole("button", { name: /Start Nuzlocke!/i }));
         fireEvent.click(screen.getByRole("button", { name: "IX" }));
 
         expect(screen.getByRole("button", { name: "Scarlet" })).toBeTruthy();

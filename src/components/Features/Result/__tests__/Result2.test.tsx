@@ -11,11 +11,20 @@ let editorState = {
     showResultInMobile: false,
 };
 
-const useSelectorMock = vi.fn((selector: any) => selector({ editor: editorState }));
+const mockState = {
+    editor: editorState,
+    game: { name: "Red", customName: "" },
+    pokemon: [{ species: "Pikachu", id: "1" }],
+    style: { customCSS: "", editorDarkMode: false },
+};
+
+const useSelectorMock = vi.fn((selector: any) => selector(mockState));
 const isMobileMock = isMobile as unknown as vi.Mock;
 
 vi.mock("react-redux", () => ({
     useSelector: (selector: any) => useSelectorMock(selector),
+    connect: () => (c: any) => c,
+    Provider: ({ children }: any) => children,
 }));
 
 vi.mock("is-mobile", () => ({
@@ -40,10 +49,11 @@ describe("<ResultView />", () => {
             zoomLevel: 1,
             showResultInMobile: false,
         };
+        mockState.editor = editorState;
         toImageMock.mockClear();
         setZoomLevelMock.mockClear();
         useSelectorMock.mockImplementation((selector: any) =>
-            selector({ editor: editorState }),
+            selector(mockState),
         );
         isMobileMock.mockReturnValue(false);
     });
@@ -59,6 +69,7 @@ describe("<ResultView />", () => {
         expect(toImageMock).not.toHaveBeenCalled();
 
         editorState = { ...editorState, downloadRequested: 1 };
+        mockState.editor = editorState;
         rerender(<ResultView />);
 
         await waitFor(() => expect(toImageMock).toHaveBeenCalledTimes(1));
@@ -69,6 +80,7 @@ describe("<ResultView />", () => {
         expect(setZoomLevelMock).toHaveBeenCalledWith(1);
 
         editorState = { ...editorState, zoomLevel: 2 };
+        mockState.editor = editorState;
         rerender(<ResultView />);
 
         await waitFor(() => expect(setZoomLevelMock).toHaveBeenLastCalledWith(2));

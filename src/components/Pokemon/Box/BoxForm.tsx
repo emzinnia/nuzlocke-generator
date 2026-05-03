@@ -25,6 +25,8 @@ export interface BoxFormProps {
     boxes: State["box"];
     addBox: addBox;
     style: State["style"];
+    isOpen?: boolean;
+    onToggle?: () => void;
 }
 
 export interface BoxFormState {
@@ -52,6 +54,9 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
         try {
             this.props.addBox(this.state.newBox as AddBoxArgs);
             this.setState({ newBox: baseBox });
+            if (this.props.onToggle) {
+                this.props.onToggle();
+            }
         } catch (e) {
             showToast({
                 message: "Cannot name a box the same as a current one.",
@@ -72,8 +77,10 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
     };
 
     public render() {
-        const { boxes } = this.props;
-        const { isBoxFormOpen } = this.state;
+        const { boxes, isOpen, onToggle } = this.props;
+        const isControlled = isOpen !== undefined;
+        const isBoxFormOpen = isControlled ? isOpen : this.state.isBoxFormOpen;
+        const handleToggle = isControlled ? onToggle : this.toggleBoxForm;
 
         const inputStyle = {
             margin: "0 auto",
@@ -92,22 +99,24 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
 
         return (
             <>
-                <Button
-                    onClick={this.toggleBoxForm}
-                    icon="plus"
-                    small
-                    style={{
-                        margin: ".25rem",
-                        height: "2rem",
-                        width: "2rem",
-                        float: "right",
-                        marginTop: "-.75rem",
-                        borderRadius: "50%",
-                        transition: "200ms",
-                        transform: isBoxFormOpen ? "rotate(135deg)" : undefined,
-                    }}
-                    intent={Intent.SUCCESS}
-                />
+                {!isControlled && (
+                    <Button
+                        onClick={this.toggleBoxForm}
+                        icon="plus"
+                        small
+                        style={{
+                            margin: ".25rem",
+                            height: "2rem",
+                            width: "2rem",
+                            float: "right",
+                            marginTop: "-.75rem",
+                            borderRadius: "50%",
+                            transition: "200ms",
+                            transform: isBoxFormOpen ? "rotate(135deg)" : undefined,
+                        }}
+                        intent={Intent.SUCCESS}
+                    />
+                )}
                 <div style={{ clear: "both" }} />
                 {isBoxFormOpen && (
                     <div
@@ -189,7 +198,7 @@ export class BoxFormBase extends React.Component<BoxFormProps, BoxFormState> {
                             }}
                         >
                             <Button
-                                onClick={this.toggleBoxForm}
+                                onClick={handleToggle}
                                 intent={Intent.DANGER}
                                 style={{ margin: "0 .5rem" }}
                                 minimal

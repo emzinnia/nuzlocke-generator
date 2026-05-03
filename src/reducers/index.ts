@@ -18,6 +18,7 @@ import { stats } from "./stats";
 import { customTypes } from "./customTypes";
 import { editorHistory } from "./editorHistory";
 import { excludedAreas, customAreas } from "./areas";
+import { completedRoutes, skippedRoutes } from "./routeProgress";
 import { view } from "./view";
 import { hotkeys } from "./hotkeys";
 import { saveUploadSettings } from "./saveUploadSettings";
@@ -25,6 +26,7 @@ import { saveUploadSettings } from "./saveUploadSettings";
 export const reducers = {
     box,
     checkpoints,
+    completedRoutes,
     confirmation,
     customAreas,
     customMoveMap,
@@ -39,6 +41,7 @@ export const reducers = {
     saveUploadSettings,
     selectedId,
     sawRelease,
+    skippedRoutes,
     trainer,
     history,
     rules,

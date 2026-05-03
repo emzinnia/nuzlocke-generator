@@ -9,10 +9,6 @@ import type { Pokemon } from "models";
 
 const styles = {
     container: css`
-        margin-left: auto;
-        width: 100%;
-        padding-left: 2rem;
-        padding-right: 1rem;
         display: flex;
         align-items: center;
     `,
@@ -21,9 +17,22 @@ const styles = {
         flex: 1;
     `,
     input: css`
-        margin: 0.25rem;
         width: 100%;
         padding-right: 2rem;
+        background: var(--input-bg);
+        border: 1px solid var(--color-border-default);
+        border-radius: var(--radius-md);
+        transition: border-color var(--duration-fast) var(--ease-in-out),
+                    box-shadow var(--duration-fast) var(--ease-in-out);
+        
+        &:focus {
+            border-color: var(--color-primary-500);
+            box-shadow: 0 0 0 2px var(--color-primary-100);
+        }
+        
+        .dark &:focus {
+            box-shadow: 0 0 0 2px var(--color-primary-900);
+        }
     `,
     hotkeyIndicator: css`
         position: absolute;
@@ -33,50 +42,71 @@ const styles = {
     `,
     helpPopover: css`
         margin-left: 0.5rem;
+        opacity: 0.7;
+        transition: opacity var(--duration-fast) var(--ease-in-out);
+        
+        &:hover {
+            opacity: 1;
+        }
     `,
     error: css`
-        color: #c23030;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--color-danger-600);
         font-size: 0.85rem;
-        padding: 0.25rem 0.5rem;
-        margin-bottom: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        margin: 0.5rem 0;
+        background: var(--color-danger-50);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--color-danger-200);
 
         .dark & {
-            color: #ff6b6b;
+            color: var(--color-danger-400);
+            background: var(--color-danger-950);
+            border-color: var(--color-danger-900);
         }
     `,
     warning: css`
-        color: #bf7326;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--color-warning-700);
         font-size: 0.85rem;
-        padding: 0.25rem 0.5rem;
-        margin-bottom: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        margin: 0.5rem 0;
+        background: var(--color-warning-50);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--color-warning-200);
 
         .dark & {
-            color: #ffc107;
+            color: var(--color-warning-400);
+            background: var(--color-warning-950);
+            border-color: var(--color-warning-900);
         }
 
         code {
-            background: rgba(92, 112, 128, 0.15);
-            padding: 0.1rem 0.3rem;
-            border-radius: 3px;
-            font-family: "SF Mono", "Consolas", "Monaco", monospace;
+            background: var(--color-warning-100);
+            padding: 0.1rem 0.4rem;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
             font-size: 0.8rem;
+            font-weight: 500;
         }
 
         .dark & code {
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffc107;
+            background: var(--color-warning-900);
         }
     `,
     noResults: css`
-        color: #5c7080;
+        color: var(--color-text-tertiary);
         font-size: 0.9rem;
-        padding: 0.5rem;
+        padding: 0.75rem;
         text-align: center;
         font-style: italic;
-
-        .dark & {
-            color: #a7b6c2;
-        }
+        background: var(--color-bg-secondary);
+        border-radius: var(--radius-md);
+        margin: 0.5rem 0;
     `,
 };
 

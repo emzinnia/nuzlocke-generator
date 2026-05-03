@@ -96,19 +96,6 @@ export type PokemonInputProps = CurrentPokemonInputProps &
     InputTypesFromState &
     InputTypesFromInternalState;
 
-export const renderItems = (visibleItems, setSelectedItem, selectedItem) =>
-    visibleItems.map((v, i) => {
-        return (
-            <li
-                key={i}
-                onClick={(_e) => setSelectedItem(v)}
-                style={v === selectedItem ? { color: "lightblue" } : {}}
-            >
-                {v}
-            </li>
-        );
-    });
-
 export function PokemonAutocompleteInput({
     className,
     placeholder,
@@ -117,40 +104,135 @@ export function PokemonAutocompleteInput({
     disabled,
     setEdit,
     items,
+    onChange,
 }: PokemonInputProps) {
     const [isOpen, setIsOpen] = React.useState(false);
-    const [visibleItems, setVisibleItems] = React.useState(items);
-    const [selectedItem, setSelectedItem] = React.useState();
-    const handleKeyDown = () => {};
-    const closeList = () => setIsOpen(false);
-    const openList = () => setIsOpen(true);
+    const [visibleItems, setVisibleItems] = React.useState<string[]>(items ?? []);
+    const [selectedIndex, setSelectedIndex] = React.useState(-1);
+    const listRef = React.useRef<HTMLUListElement>(null);
+    const closeTimeoutRef = React.useRef<number | undefined>(undefined);
+
+    const currentValue = edit[inputName] ?? "";
+
+    React.useEffect(() => {
+        setVisibleItems(
+            items?.filter((item) =>
+                item.toLowerCase().includes(currentValue.toLowerCase())
+            ) ?? []
+        );
+    }, [items, currentValue]);
+
+    const selectItem = (value: string) => {
+        if (closeTimeoutRef.current) {
+            window.clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = undefined;
+        }
+        setEdit({ [inputName]: value });
+        onChange?.({} as React.ChangeEvent<HTMLElement>);
+        setIsOpen(false);
+        setSelectedIndex(-1);
+    };
+
+    const openList = () => {
+        if (closeTimeoutRef.current) {
+            window.clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = undefined;
+        }
+        setIsOpen(true);
+        setSelectedIndex(-1);
+    };
+
+    const closeList = () => {
+        if (closeTimeoutRef.current) {
+            window.clearTimeout(closeTimeoutRef.current);
+        }
+        closeTimeoutRef.current = window.setTimeout(() => {
+            setIsOpen(false);
+            setSelectedIndex(-1);
+            closeTimeoutRef.current = undefined;
+        }, 200);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (!visibleItems.length) return;
+
+        switch (e.key) {
+            case "ArrowDown":
+                e.preventDefault();
+                setSelectedIndex((prev) =>
+                    prev < visibleItems.length - 1 ? prev + 1 : prev
+                );
+                setIsOpen(true);
+                break;
+            case "ArrowUp":
+                e.preventDefault();
+                setSelectedIndex((prev) => (prev > 0 ? prev - 1 : 0));
+                setIsOpen(true);
+                break;
+            case "Enter":
+                e.preventDefault();
+                if (selectedIndex >= 0 && visibleItems[selectedIndex]) {
+                    selectItem(visibleItems[selectedIndex]);
+                }
+                break;
+            case "Escape":
+            case "Tab":
+                setIsOpen(false);
+                setSelectedIndex(-1);
+                break;
+        }
+    };
+
+    React.useEffect(() => {
+        if (selectedIndex < 0 || !listRef.current) return;
+        const selectedNode = listRef.current.children[selectedIndex] as HTMLElement | undefined;
+        selectedNode?.scrollIntoView({ block: "nearest" });
+    }, [selectedIndex]);
 
     return (
-        <>
+        <div className="autocomplete relative flex-1">
             <input
                 autoComplete="off"
-                className={cx(className)}
+                className={cx(className, "w-full")}
                 onKeyDown={handleKeyDown}
                 onFocus={openList}
-                onChange={closeList}
+                onBlur={closeList}
                 placeholder={placeholder}
                 name={inputName}
                 type="text"
-                value={edit[inputName]}
+                value={currentValue}
                 disabled={disabled}
-                onInput={(e) => {
+                onChange={(e) => {
                     setEdit({ [inputName]: e.currentTarget.value });
-                    setVisibleItems(items?.filter(item => 
-                        item.toLowerCase().includes(e.currentTarget.value.toLowerCase())
-                    ));
+                    setVisibleItems(
+                        items?.filter((item) =>
+                            item.toLowerCase().includes(e.currentTarget.value.toLowerCase())
+                        ) ?? []
+                    );
+                    setSelectedIndex(-1);
+                    setIsOpen(true);
                 }}
             />
-            {isOpen ? (
-                <ul className="autocomplete-items has-nice-scrollbars">
-                    {renderItems(visibleItems, setSelectedItem, selectedItem)}
+            {isOpen && visibleItems.length > 0 && (
+                <ul
+                    ref={listRef}
+                    className="autocomplete-items has-nice-scrollbars"
+                >
+                    {visibleItems.map((item, i) => (
+                        <li
+                            key={i}
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                selectItem(item);
+                            }}
+                            className={i === selectedIndex ? "autocomplete-selected" : ""}
+                        >
+                            {item}
+                        </li>
+                    ))}
                 </ul>
-            ) : null}
-        </>
+            )}
+        </div>
     );
 }
 

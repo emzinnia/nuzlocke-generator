@@ -98,7 +98,7 @@ describe("styleDefaults", () => {
         expect(objectPropertiesWhere(styleDefaults, (p) => p === "round")).toBe(
             1,
         );
-        expect(objectPropertiesWhere(styleDefaults, (p) => p)).toBe(28);
+        expect(objectPropertiesWhere(styleDefaults, (p) => p)).toBe(30);
     });
 });
 

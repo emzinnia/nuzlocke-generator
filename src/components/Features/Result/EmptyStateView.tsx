@@ -90,7 +90,7 @@ export function EmptyStateView() {
     };
 
     return (
-        <div className="flex-1 flex items-center justify-center p-8 min-h-0 overflow-auto">
+        <div className="flex-1 flex items-center justify-center p-8 min-h-0 overflow-auto scrollbar-gutter-stable content-scroll">
             <input
                 ref={jsonInputRef}
                 type="file"

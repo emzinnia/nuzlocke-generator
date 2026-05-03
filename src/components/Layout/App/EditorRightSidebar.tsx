@@ -9,7 +9,7 @@ import { cx } from "emotion";
 import type { RunSummary } from "api/runs";
 import { FullGameDataView } from "components/Common/ui/FullGameDataView";
 import { ErrorBoundary } from "components/Common/Shared/ErrorBoundary";
-import { addPokemon } from "actions";
+import { addPokemon, updateCompletedRoutes, updateSkippedRoutes } from "actions";
 import { generateEmptyPokemon } from "utils";
 
 const MIN_WIDTH = 0;
@@ -65,6 +65,8 @@ export const EditorRightSidebar: React.FC<EditorRightSidebarProps> = ({
     const dispatch = useDispatch();
     const game = useSelector((state: State) => state.game);
     const pokemon = useSelector((state: State) => state.pokemon);
+    const completedRoutes = useSelector((state: State) => state.completedRoutes);
+    const skippedRoutes = useSelector((state: State) => state.skippedRoutes);
     
     const [isCollapsed, setIsCollapsed] = React.useState(() => {
         return localStorage.getItem(COLLAPSED_KEY) === "true";
@@ -163,6 +165,20 @@ export const EditorRightSidebar: React.FC<EditorRightSidebarProps> = ({
         [dispatch]
     );
 
+    const handleCompletedRoutesChange = React.useCallback(
+        (routes: string[]) => {
+            dispatch(updateCompletedRoutes(routes));
+        },
+        [dispatch]
+    );
+
+    const handleSkippedRoutesChange = React.useCallback(
+        (routes: string[]) => {
+            dispatch(updateSkippedRoutes(routes));
+        },
+        [dispatch]
+    );
+
     if (isCollapsed) {
         return (
             <Button
@@ -178,7 +194,7 @@ export const EditorRightSidebar: React.FC<EditorRightSidebarProps> = ({
 
     return (
         <aside
-            className="h-full relative flex-shrink-0 flex flex-col overflow-hidden bg-bg-secondary text-fg-primary border-l border-border duration-normal transition-colors"
+            className="group/sidebar h-full relative flex-shrink-0 flex flex-col overflow-hidden bg-bg-secondary text-fg-primary border-l border-border duration-normal transition-colors"
             style={{ width }}
         >
             <div className="absolute top-4 left-0 z-20">
@@ -192,7 +208,7 @@ export const EditorRightSidebar: React.FC<EditorRightSidebarProps> = ({
                 </Button>
             </div>
             
-            <div className="overflow-x-hidden overflow-y-auto flex-1 pt-12 pb-4 pr-4 pl-6">
+            <div className="overflow-x-hidden overflow-y-auto flex-1 pt-12 pb-4 pr-4 pl-6 scrollbar-gutter-stable sidebar-scroll">
                 <div className="space-y-3">
                     {/* Game Data (Routes & Bosses) */}
                     <ErrorBoundary errorMessage="Failed to load game data">
@@ -200,6 +216,10 @@ export const EditorRightSidebar: React.FC<EditorRightSidebarProps> = ({
                             data={fullGameData} 
                             onAddPokemon={handleAddPokemon}
                             teamCount={teamPokemon}
+                            completedRoutes={completedRoutes}
+                            skippedRoutes={skippedRoutes}
+                            onCompletedRoutesChange={handleCompletedRoutesChange}
+                            onSkippedRoutesChange={handleSkippedRoutesChange}
                         />
                     </ErrorBoundary>
 

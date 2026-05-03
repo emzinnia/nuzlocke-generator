@@ -4,6 +4,7 @@ export * from "./ButtonGroup";
 export * from "./Checkbox";
 export * from "./Collapsible";
 export * from "./ColorInput";
+export * from "./ModernColorPicker";
 export * from "./ContextMenu";
 export * from "./DeleteRunDialog";
 export * from "./Dialog";

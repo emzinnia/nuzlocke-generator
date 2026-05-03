@@ -22,6 +22,10 @@ interface FullGameDataViewProps {
     runId?: string;
     onAddPokemon?: AddPokemonHandler;
     teamCount?: number;
+    completedRoutes?: string[];
+    skippedRoutes?: string[];
+    onCompletedRoutesChange?: (routes: string[]) => void;
+    onSkippedRoutesChange?: (routes: string[]) => void;
 }
 
 export const FullGameDataView: React.FC<FullGameDataViewProps> = ({
@@ -29,14 +33,21 @@ export const FullGameDataView: React.FC<FullGameDataViewProps> = ({
     runId,
     onAddPokemon: externalAddPokemon,
     teamCount: externalTeamCount,
+    completedRoutes: externalCompletedRoutes,
+    skippedRoutes: externalSkippedRoutes,
+    onCompletedRoutesChange,
+    onSkippedRoutesChange,
 }) => {
-    const [completedRoutes, setCompletedRoutes] = React.useState<Set<string>>(
-        () => new Set()
-    );
-    const [skippedRoutes, setSkippedRoutes] = React.useState<Set<string>>(
-        () => new Set()
-    );
     const [internalTeamCount, setInternalTeamCount] = React.useState(0);
+
+    const completedRoutesSet = React.useMemo(
+        () => new Set(externalCompletedRoutes ?? []),
+        [externalCompletedRoutes]
+    );
+    const skippedRoutesSet = React.useMemo(
+        () => new Set(externalSkippedRoutes ?? []),
+        [externalSkippedRoutes]
+    );
 
     const teamCount = externalTeamCount ?? internalTeamCount;
 
@@ -48,6 +59,22 @@ export const FullGameDataView: React.FC<FullGameDataViewProps> = ({
             setInternalTeamCount(count);
         });
     }, [runId]);
+
+    const addRouteToCompleted = React.useCallback((routeId: string) => {
+        if (onCompletedRoutesChange) {
+            const next = new Set(completedRoutesSet);
+            next.add(routeId);
+            onCompletedRoutesChange(Array.from(next));
+        }
+    }, [completedRoutesSet, onCompletedRoutesChange]);
+
+    const removeRouteFromSkipped = React.useCallback((routeId: string) => {
+        if (onSkippedRoutesChange && skippedRoutesSet.has(routeId)) {
+            const next = new Set(skippedRoutesSet);
+            next.delete(routeId);
+            onSkippedRoutesChange(Array.from(next));
+        }
+    }, [skippedRoutesSet, onSkippedRoutesChange]);
 
     const internalAddPokemon = React.useCallback<AddPokemonHandler>(
         async ({ species, status, met, routeId, level, metLevel }) => {
@@ -63,60 +90,41 @@ export const FullGameDataView: React.FC<FullGameDataViewProps> = ({
             if (status === "Team") {
                 setInternalTeamCount((prev) => prev + 1);
             }
-            setCompletedRoutes((prev) => {
-                const next = new Set(prev);
-                next.add(routeId);
-                return next;
-            });
-            setSkippedRoutes((prev) => {
-                if (!prev.has(routeId)) return prev;
-                const next = new Set(prev);
-                next.delete(routeId);
-                return next;
-            });
+            addRouteToCompleted(routeId);
+            removeRouteFromSkipped(routeId);
         },
-        [runId]
+        [runId, addRouteToCompleted, removeRouteFromSkipped]
     );
 
     const handleAddPokemon = React.useCallback<AddPokemonHandler>(
         async (input) => {
             if (externalAddPokemon) {
                 await externalAddPokemon(input);
-                setCompletedRoutes((prev) => {
-                    const next = new Set(prev);
-                    next.add(input.routeId);
-                    return next;
-                });
-                setSkippedRoutes((prev) => {
-                    if (!prev.has(input.routeId)) return prev;
-                    const next = new Set(prev);
-                    next.delete(input.routeId);
-                    return next;
-                });
+                addRouteToCompleted(input.routeId);
+                removeRouteFromSkipped(input.routeId);
             } else {
                 await internalAddPokemon(input);
             }
         },
-        [externalAddPokemon, internalAddPokemon]
+        [externalAddPokemon, internalAddPokemon, addRouteToCompleted, removeRouteFromSkipped]
     );
 
     const handleSkipRoute = React.useCallback((routeId: string) => {
-        setSkippedRoutes((prev) => {
-            const next = new Set(prev);
+        if (onSkippedRoutesChange) {
+            const next = new Set(skippedRoutesSet);
             if (next.has(routeId)) {
                 next.delete(routeId);
             } else {
                 next.add(routeId);
             }
-            return next;
-        });
-        setCompletedRoutes((prev) => {
-            if (!prev.has(routeId)) return prev;
-            const next = new Set(prev);
+            onSkippedRoutesChange(Array.from(next));
+        }
+        if (onCompletedRoutesChange && completedRoutesSet.has(routeId)) {
+            const next = new Set(completedRoutesSet);
             next.delete(routeId);
-            return next;
-        });
-    }, []);
+            onCompletedRoutesChange(Array.from(next));
+        }
+    }, [completedRoutesSet, skippedRoutesSet, onCompletedRoutesChange, onSkippedRoutesChange]);
 
     return (
         <div className="space-y-6">
@@ -124,8 +132,8 @@ export const FullGameDataView: React.FC<FullGameDataViewProps> = ({
             <RoutesSection
                 routes={data.routes}
                 onAddPokemon={handleAddPokemon}
-                completedRoutes={completedRoutes}
-                skippedRoutes={skippedRoutes}
+                completedRoutes={completedRoutesSet}
+                skippedRoutes={skippedRoutesSet}
                 onSkipRoute={handleSkipRoute}
                 teamCount={teamCount}
             />
@@ -320,6 +328,16 @@ function EncounterList({
     );
 }
 
+const STATUS_OPTIONS: StatusOption[] = ["Team", "Boxed", "Dead", "Champs", "Missed"];
+
+const STATUS_COLORS: Record<StatusOption, string> = {
+    Team: "bg-green-500/20 text-green-700 dark:text-green-300 border-green-500/40",
+    Boxed: "bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/40",
+    Dead: "bg-red-500/20 text-red-700 dark:text-red-300 border-red-500/40",
+    Champs: "bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/40",
+    Missed: "bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-500/40",
+};
+
 function EncounterPokemonCard({
     encounter,
     routeName,
@@ -337,27 +355,16 @@ function EncounterPokemonCard({
     isStarterRoute: boolean;
     starterStyle?: { ringClass: string; glowColor: string };
 }) {
+    const defaultStatus: StatusOption = teamCount < 6 ? "Team" : "Boxed";
     const [selectedLevel, setSelectedLevel] = React.useState<number>(encounter.levelRange[0]);
+    const [selectedStatus, setSelectedStatus] = React.useState<StatusOption>(defaultStatus);
     
     const hasVariableLevelRange = encounter.levelRange[0] !== encounter.levelRange[1];
-    const targetStatus: StatusOption = teamCount < 6 ? "Team" : "Boxed";
 
-    const handleDirectAdd = () => {
-        const level = encounter.levelRange[0];
+    const handleAdd = () => {
         onAddPokemon({
             species: encounter.species,
-            status: targetStatus,
-            met: routeName,
-            routeId,
-            level,
-            metLevel: level,
-        });
-    };
-
-    const handleAddWithLevel = () => {
-        onAddPokemon({
-            species: encounter.species,
-            status: targetStatus,
+            status: selectedStatus,
             met: routeName,
             routeId,
             level: selectedLevel,
@@ -390,17 +397,18 @@ function EncounterPokemonCard({
         </div>
     );
 
-    if (hasVariableLevelRange) {
-        return (
-            <li>
-                <Popover
-                    position="bottom"
-                    minimal
-                    content={
-                        <div className="p-3 min-w-[160px]">
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
-                                {encounter.species}
-                            </p>
+    return (
+        <li>
+            <Popover
+                position="bottom"
+                minimal
+                content={
+                    <div className="p-3 min-w-[180px]">
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">
+                            {encounter.species}
+                        </p>
+                        
+                        {hasVariableLevelRange && (
                             <div className="mb-3">
                                 <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">
                                     Level ({encounter.levelRange[0]}–{encounter.levelRange[1]})
@@ -417,27 +425,42 @@ function EncounterPokemonCard({
                                     ))}
                                 </select>
                             </div>
-                            <Button
-                                variant="primary"
-                                onClick={handleAddWithLevel}
-                                className="w-full text-sm"
-                            >
-                                Add to {targetStatus}
-                            </Button>
-                        </div>
-                    }
-                >
-                    {cardContent}
-                </Popover>
-            </li>
-        );
-    }
+                        )}
 
-    return (
-        <li>
-            <div onClick={handleDirectAdd}>
+                        <div className="mb-4">
+                            <label className="text-xs text-gray-600 dark:text-gray-400 block mb-2">
+                                Status
+                            </label>
+                            <div className="flex flex-wrap gap-2">
+                                {STATUS_OPTIONS.map((status) => (
+                                    <button
+                                        key={status}
+                                        type="button"
+                                        onClick={() => setSelectedStatus(status)}
+                                        className={`px-2.5 py-1.5 text-xs font-medium rounded border transition-all ${
+                                            selectedStatus === status
+                                                ? `${STATUS_COLORS[status]} ring-1 ring-offset-1 ring-current`
+                                                : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                        }`}
+                                    >
+                                        {status}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <Button
+                            variant="primary"
+                            onClick={handleAdd}
+                            className="w-full text-sm"
+                        >
+                            Add to {selectedStatus}
+                        </Button>
+                    </div>
+                }
+            >
                 {cardContent}
-            </div>
+            </Popover>
         </li>
     );
 }

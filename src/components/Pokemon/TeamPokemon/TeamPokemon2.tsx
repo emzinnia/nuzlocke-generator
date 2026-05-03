@@ -12,7 +12,7 @@ import {
 } from "utils";
 import { css } from "emotion";
 import Mustache from "mustache";
-import { ErrorBoundary, PokemonIconPlain } from "components";
+import { ErrorBoundary, PokemonIconPlain, PokemonIconStatic } from "components";
 import { uniq } from "ramda";
 import { MovesBase } from "./Moves";
 import { GenderElementReact } from "components/Common/Shared";
@@ -47,7 +47,7 @@ const LinkedPokemon = ({ linkedPokemon, style }) => {
             <div className="pokemon-linked">
                 {style.linkedPokemonText}{" "}
                 {linkedPokemon.nickname || linkedPokemon.species}
-                <PokemonIconPlain {...linkedPokemon} />
+                <PokemonIconStatic {...linkedPokemon} />
             </div>
         </ErrorBoundary>
     ) : null;
@@ -127,10 +127,7 @@ export function TeamPokemon({
     const pokemonImage = stripURLCSS(image);
 
     const pokemonIcon = (
-        <PokemonIconPlain
-            selectedId={""}
-            onClick={() => {}}
-            imageStyle={{}}
+        <PokemonIconStatic
             species={pokemon?.species}
             id={pokemon?.id}
             style={{ cursor: "pointer" }}

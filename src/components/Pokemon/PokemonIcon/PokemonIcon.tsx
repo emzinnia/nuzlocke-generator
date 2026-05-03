@@ -90,7 +90,7 @@ export const getIconURL = ({
         return `${baseURL}${isShiny}/egg.png`;
     }
     const normalizedName = normalizeSpeciesName(species);
-    const formeSuffix = getIconFormeSuffix(species, forme);
+    const formeSuffix = getIconFormeSuffix(forme as keyof typeof Forme);
     return `${baseURL}${isShiny}/${isFemaleSpecific}${normalizedName}${formeSuffix}.png`;
 };
 
@@ -169,5 +169,40 @@ export function PokemonIcon(props: PokemonIconProps) {
             selectedId={selectedId}
             onClick={handleClick}
         />
+    );
+}
+
+export function PokemonIconStatic(props: BasePokemonIconProps) {
+    if (props.hidden) return null;
+
+    const iconSrc = props.customIcon ||
+        getIconURL({
+            species: props.species,
+            forme: props.forme,
+            shiny: props.shiny,
+            gender: props.gender as Pokemon["gender"],
+            egg: props.egg,
+        });
+
+    return (
+        <div
+            className={props.className}
+            style={{
+                cursor: "default",
+                display: "inline-block",
+                ...props.style,
+            }}
+        >
+            <img
+                style={{
+                    width: 40,
+                    height: 30,
+                    imageRendering: "pixelated",
+                }}
+                title={props.includeTitle ? props.species : undefined}
+                alt={props.species}
+                src={iconSrc}
+            />
+        </div>
     );
 }

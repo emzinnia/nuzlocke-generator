@@ -73,10 +73,11 @@ export function GameSelector({ selectedGame, onGameSelect, onStartGame }: GameSe
     };
 
     return (
-        <div className="group">
+        <div className="group flex flex-col items-center">
             <button
+                data-testid="start-nuzlocke-trigger"
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full flex items-center gap-4 p-4 rounded-lg bg-bg-secondary border border-border hover:border-emerald-400/50 hover:bg-bg-tertiary transition-all duration-200 text-left cursor-pointer"
+                className="w-1/2 min-w-[16rem] flex items-center gap-4 py-5 px-4 rounded-lg bg-bg-secondary border border-border hover:border-emerald-400/50 hover:bg-bg-tertiary transition-all duration-200 text-left cursor-pointer"
             >
                 <div className="shrink-0 w-10 h-10 rounded-lg bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
                     <Play className="w-5 h-5" />
@@ -85,7 +86,7 @@ export function GameSelector({ selectedGame, onGameSelect, onStartGame }: GameSe
                     <div className="font-medium text-fg-primary text-sm">
                         {selectedGame && selectedGame !== "None" ? (
                             <span className="flex items-center gap-2">
-                                Start New Run
+                                Start Nuzlocke!
                                 <span 
                                     className="px-2 py-0.5 rounded-full text-xs font-medium"
                                     style={{ 
@@ -97,7 +98,7 @@ export function GameSelector({ selectedGame, onGameSelect, onStartGame }: GameSe
                                 </span>
                             </span>
                         ) : (
-                            "Start New Run"
+                            "Start Nuzlocke!"
                         )}
                     </div>
                     <div className="text-xs text-fg-tertiary mt-0.5">Choose a game to begin tracking</div>
@@ -178,13 +179,14 @@ export function GameSelector({ selectedGame, onGameSelect, onStartGame }: GameSe
                     </div>
 
                     {selectedGame && selectedGame !== "None" && (
-                        <div className="p-3 border-t border-border bg-bg-tertiary/30">
+                        <div className="p-3 border-t border-border bg-bg-tertiary/30 flex justify-center">
                             <button
+                                data-testid="start-nuzlocke-confirm"
                                 onClick={onStartGame}
-                                className="w-full py-2.5 px-4 bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium rounded-lg transition-all duration-200 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+                                className="w-1/2 min-w-[12rem] py-3 px-4 bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium rounded-lg transition-all duration-200 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
                             >
                                 <Gamepad2 className="w-4 h-4" />
-                                Start {selectedGame}
+                                Start Nuzlocke!
                             </button>
                         </div>
                     )}

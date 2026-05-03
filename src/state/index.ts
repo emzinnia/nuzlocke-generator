@@ -8,6 +8,7 @@ import { SaveUploadSettingsState } from "reducers/saveUploadSettings";
 
 export interface State {
     box: Boxes;
+    completedRoutes: string[];
     confirmation: boolean;
     checkpoints: Checkpoints;
     customAreas: string[];
@@ -20,6 +21,7 @@ export interface State {
     sawRelease: { [v: string]: boolean };
     saveUploadSettings: SaveUploadSettingsState;
     selectedId: string;
+    skippedRoutes: string[];
     style: Styles;
     theme: any;
     trainer: Trainer;

@@ -1,18 +1,11 @@
 import * as React from "react";
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent } from "utils/testUtils";
 import {
     PokemonIconPlain,
     getIconURL,
 } from "../PokemonIcon";
 import { Gender } from "components/Common/Shared";
 
-vi.mock("components/Common/Shared/PokemonImage", () => ({
-    PokemonImage: ({ children }: any) => <>{children("custom-icon.png")}</>,
-}));
-
-vi.mock("components/Common/Shared/ResizedImage", () => ({
-    ResizedImage: (props: any) => <img data-testid="resized" {...props} />,
-}));
 
 describe("getIconURL", () => {
     it("builds shiny female forme url", () => {
@@ -40,14 +33,14 @@ describe("getIconURL", () => {
             egg: true,
         });
 
-        expect(url).toBe("icons/pokemon/egg.png");
+        expect(url).toBe("/icons/pokemon/regular/egg.png");
     });
 });
 
 describe("<PokemonIconPlain />", () => {
-    it("renders custom icon via ResizedImage", () => {
+    it("renders custom icon and handles click", () => {
         const onClick = vi.fn();
-        const { getByTestId } = render(
+        const { getByAltText } = render(
             <PokemonIconPlain
                 id="p1"
                 species="Mew"
@@ -56,7 +49,7 @@ describe("<PokemonIconPlain />", () => {
                 shiny={false}
                 egg={false}
                 className="custom"
-                customIcon="data:image/png;base64"
+                customIcon="data:image/png;base64,ABC123"
                 imageStyle={{ height: "32px" }}
                 onClick={onClick}
                 selectedId={null}
@@ -65,7 +58,9 @@ describe("<PokemonIconPlain />", () => {
             />,
         );
 
-        fireEvent.click(getByTestId("resized"));
+        const img = getByAltText("Mew");
+        expect(img.getAttribute("src")).toBe("data:image/png;base64,ABC123");
+        fireEvent.click(img);
 
         expect(onClick).toHaveBeenCalled();
     });

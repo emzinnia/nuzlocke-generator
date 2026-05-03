@@ -25,7 +25,15 @@ export const TeamPokemon = ({ teamPokemon }: TeamPokemonProps) => {
         <>
             <h3 className="team-pokemon-label">Team</h3>
 
-            <div className="team-pokemon-list flex flex-wrap gap-0.5 w-full">
+            <div
+                className="team-pokemon-list w-full"
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(var(--team-layout-cols, 3), 1fr)",
+                    gridTemplateRows: "repeat(var(--team-layout-rows, 2), auto)",
+                    gap: "0.125rem",
+                }}
+            >
                 {teamPokemon.map((poke) => (
                     <div
                         key={poke.id}

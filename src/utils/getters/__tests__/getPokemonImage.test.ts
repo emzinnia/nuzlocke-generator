@@ -137,7 +137,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             species: "Pikachu",
         });
 
-        expect(result).toBe("url(img/egg.jpg)");
+        expect(result).toBe("url(/img/egg.jpg)");
     });
 
     describe("spritesMode (remote sprite URLs)", () => {
@@ -280,7 +280,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 style: { teamImages: "sugimori" } as any,
             });
 
-            expect(result).toBe("url(img/sugimori/female/521-galarian.png)");
+            expect(result).toBe("url(/img/sugimori/female/521-galarian.png)");
         });
 
         it("returns sugimori base folder for other species", async () => {
@@ -290,7 +290,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 style: { teamImages: "sugimori" } as any,
             });
 
-            expect(result).toBe("url(img/sugimori/25-galarian.png)");
+            expect(result).toBe("url(/img/sugimori/25-galarian.png)");
         });
 
         it("returns dream world SVGs (falls back to 1 when no number)", async () => {
@@ -299,7 +299,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 style: { teamImages: "dream world" } as any,
             });
 
-            expect(result).toBe("url(img/dw/1.svg)");
+            expect(result).toBe("url(/img/dw/1.svg)");
         });
 
         it("returns shuffle assets with Mime Jr. special-cased", async () => {
@@ -308,7 +308,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 style: { teamImages: "shuffle" } as any,
             });
 
-            expect(result).toBe("url(img/shuffle/mime-jr.png)");
+            expect(result).toBe("url(/img/shuffle/mime-jr.png)");
         });
 
         it("returns tcg assets, adding -f for significant gender differences", async () => {
@@ -318,7 +318,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 style: { teamImages: "tcg" } as any,
             });
 
-            expect(result).toBe("url(img/tcg/pikachu-f.jpg)");
+            expect(result).toBe("url(/img/tcg/pikachu-f.jpg)");
         });
     });
 
@@ -329,7 +329,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 forme: "Alolan" as any,
                 shiny: true,
             });
-            expect(result).toBe("url(img/alolan-dugtrio-shiny.jpg)");
+            expect(result).toBe("url(/img/alolan-dugtrio-shiny.jpg)");
         });
 
         it("uses explicit stopgap for shiny Gyarados", async () => {
@@ -337,7 +337,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 species: "Gyarados",
                 shiny: true,
             });
-            expect(result).toBe("url(img/gyarados-shiny.jpg)");
+            expect(result).toBe("url(/img/gyarados-shiny.jpg)");
         });
 
         it("uses explicit stopgap for Indeedee male", async () => {
@@ -345,7 +345,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 species: "Indeedee",
                 gender: "Male" as any,
             });
-            expect(result).toBe("url(img/indeedee-m.jpg)");
+            expect(result).toBe("url(/img/indeedee-m.jpg)");
         });
 
         it("uses explicit stopgap for Basculegion female", async () => {
@@ -353,14 +353,14 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 species: "Basculegion",
                 gender: "Female" as any,
             });
-            expect(result).toBe("url(img/basculegion-f.jpg)");
+            expect(result).toBe("url(/img/basculegion-f.jpg)");
         });
     });
 
     describe("default local jpg fallback", () => {
         it("uses missingno when species is empty/undefined", async () => {
             const result = await getPokemonImage({});
-            expect(result).toBe("url(img/missingno.jpg)");
+            expect(result).toBe("url(/img/missingno.jpg)");
         });
 
         it("normalizes species into img/<name>.jpg with forme applied via addForme", async () => {
@@ -374,7 +374,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 "Mr.-Mime",
                 "Galarian",
             );
-            expect(result).toBe("url(img/mr.-mime-galarian.jpg)");
+            expect(result).toBe("url(/img/mr.-mime-galarian.jpg)");
         });
     });
 

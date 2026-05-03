@@ -492,6 +492,68 @@ html.dark .ui-input::placeholder {
   color: var(--color-primary-300);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   AUTOCOMPLETE STYLES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.autocomplete {
+  position: relative;
+}
+
+.current-pokemon-input-wrapper.autocomplete {
+  position: relative;
+}
+
+.autocomplete-items {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: var(--z-dropdown);
+  max-height: 12rem;
+  overflow-y: auto;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  margin-top: 0.25rem;
+  padding: 0.25rem 0;
+  list-style: none;
+}
+
+.dark .autocomplete-items {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border-default);
+}
+
+.autocomplete-items li {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  transition: background-color var(--duration-fast) var(--ease-in-out);
+}
+
+.autocomplete-items li:hover {
+  background: var(--color-bg-tertiary);
+}
+
+.dark .autocomplete-items li:hover {
+  background: var(--color-bg-tertiary);
+}
+
+.autocomplete-items li.autocomplete-selected,
+.autocomplete-items li:focus {
+  background: var(--color-primary-100);
+  color: var(--color-primary-700);
+}
+
+.dark .autocomplete-items li.autocomplete-selected,
+.dark .autocomplete-items li:focus {
+  background: var(--color-primary-900);
+  color: var(--color-primary-200);
+}
+
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   *,

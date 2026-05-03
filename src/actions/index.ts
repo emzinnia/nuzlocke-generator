@@ -39,3 +39,4 @@ export * from "./editHotkey";
 export * from "./saveUploadSettings";
 export * from "./setZoomLevel";
 export * from "./setBaseEditorState";
+export * from "./updateRouteProgress";

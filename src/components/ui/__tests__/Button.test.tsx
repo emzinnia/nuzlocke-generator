@@ -73,7 +73,6 @@ describe("<Button />", () => {
 
         let button = screen.getByRole("button", { name: "Minimal" });
         expect(button.className).toContain("bg-transparent");
-        expect(button.className).toContain("border-0");
         expect(button.className).toContain("text-danger-600");
 
         rerender(

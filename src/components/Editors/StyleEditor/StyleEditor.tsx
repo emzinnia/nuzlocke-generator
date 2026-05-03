@@ -10,6 +10,12 @@ import {
     OrientationType,
     Styles as StylesType,
     feature,
+    ResultV2Theme,
+    resultV2ThemeDefaults,
+    TeamLayoutType,
+    teamLayoutOptions,
+    ThemePalette,
+    themePalettes,
 } from "utils";
 import {
     RadioGroup,
@@ -26,14 +32,14 @@ import {
 import { Icon, Intent } from "components/ui";
 import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
-import { ColorInput, rgbaOrHex } from "components/Common/ui";
+import { ColorInput, rgbaOrHex, ModernColorPicker } from "components/Common/ui";
 import { cx } from "emotion";
 import * as Styles from "./styles";
 import { ThemeEditor } from "components/Editors/ThemeEditor/ThemeEditor";
 import { customCSSGuide as text } from "utils/customCSSGuide";
 import ReactMarkdown from "react-markdown";
 import { debounce } from "utils/debounce";
-import { Palette, X as XIcon } from "lucide-react";
+import { Palette, X as XIcon, Sparkles, Settings } from "lucide-react";
 
 const editEvent = (
     e: any,
@@ -146,6 +152,286 @@ export const TextAreaDebounced = ({
     );
 };
 
+interface V2ThemeColorPickerProps {
+    label: string;
+    themeKey: keyof ResultV2Theme;
+    value: string;
+    onChange: (key: keyof ResultV2Theme, value: string) => void;
+}
+
+const V2ThemeColorPicker = ({
+    label,
+    themeKey,
+    value,
+    onChange,
+}: V2ThemeColorPickerProps) => (
+    <div className="flex items-center gap-2 py-1">
+        <Label className="inline text-xs min-w-28 text-gray-600 dark:text-gray-400">{label}</Label>
+        <ModernColorPicker
+            name={themeKey}
+            value={value}
+            onChange={(color) => onChange(themeKey, color)}
+            defaultFormat="rgba"
+        />
+    </div>
+);
+
+interface V2ThemeEditorProps {
+    theme: ResultV2Theme;
+    editStyle: editStyle;
+}
+
+const v2ThemeLabels: Record<keyof ResultV2Theme, string> = {
+    trainerBackgroundColor: "Trainer Background",
+    trainerTextColor: "Trainer Text",
+    trainerNameColor: "Trainer Name",
+    trainerTitleColor: "Trainer Title",
+    trainerStatLabelColor: "Trainer Stat Label",
+    trainerStatValueColor: "Trainer Stat Value",
+    trainerBadgeBackgroundColor: "Badge Background",
+    trainerBadgeTextColor: "Badge Text",
+    trainerNotesColor: "Trainer Notes",
+    teamPokemonBackgroundColor: "Pokémon Background",
+    teamPokemonTextColor: "Pokémon Text",
+    teamPokemonTextSecondaryColor: "Pokémon Secondary Text",
+    teamPokemonTextMutedColor: "Pokémon Muted Text",
+    teamPokemonAccentColor: "Pokémon Accent",
+    teamPokemonNatureColor: "Nature Color",
+    teamPokemonAbilityColor: "Ability Color",
+    teamPokemonMoveBackgroundColor: "Move Background",
+    teamPokemonMoveTextColor: "Move Text",
+    teamPokemonShinyColor: "Shiny Indicator",
+    teamPokemonMvpBackgroundColor: "MVP Background",
+    teamPokemonMvpTextColor: "MVP Text",
+};
+
+const V2ThemeEditor = ({ theme, editStyle }: V2ThemeEditorProps) => {
+    const currentTheme = theme ?? resultV2ThemeDefaults;
+
+    const handleColorChange = (key: keyof ResultV2Theme, value: string) => {
+        editStyle({
+            resultV2Theme: {
+                ...currentTheme,
+                [key]: value,
+            },
+        });
+    };
+
+    const handleReset = () => {
+        editStyle({ resultV2Theme: resultV2ThemeDefaults });
+    };
+
+    const trainerKeys: (keyof ResultV2Theme)[] = [
+        "trainerBackgroundColor",
+        "trainerTextColor",
+        "trainerNameColor",
+        "trainerTitleColor",
+        "trainerStatLabelColor",
+        "trainerStatValueColor",
+        "trainerBadgeBackgroundColor",
+        "trainerBadgeTextColor",
+        "trainerNotesColor",
+    ];
+
+    const pokemonKeys: (keyof ResultV2Theme)[] = [
+        "teamPokemonBackgroundColor",
+        "teamPokemonTextColor",
+        "teamPokemonTextSecondaryColor",
+        "teamPokemonTextMutedColor",
+        "teamPokemonAccentColor",
+        "teamPokemonNatureColor",
+        "teamPokemonAbilityColor",
+        "teamPokemonMoveBackgroundColor",
+        "teamPokemonMoveTextColor",
+        "teamPokemonShinyColor",
+        "teamPokemonMvpBackgroundColor",
+        "teamPokemonMvpTextColor",
+    ];
+
+    return (
+        <div className="mt-4 space-y-4">
+            <div className="flex items-center justify-between">
+                <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Theme Colors
+                </h5>
+                <Button
+                    minimal
+                    intent={Intent.WARNING}
+                    onClick={handleReset}
+                    icon="reset"
+                >
+                    Reset to Defaults
+                </Button>
+            </div>
+
+            <div className="space-y-3">
+                <h6 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                    Trainer Section
+                </h6>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {trainerKeys.map((key) => (
+                        <V2ThemeColorPicker
+                            key={key}
+                            label={v2ThemeLabels[key]}
+                            themeKey={key}
+                            value={currentTheme[key]}
+                            onChange={handleColorChange}
+                        />
+                    ))}
+                </div>
+            </div>
+
+            <div className="space-y-3">
+                <h6 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                    Team Pokémon
+                </h6>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {pokemonKeys.map((key) => (
+                        <V2ThemeColorPicker
+                            key={key}
+                            label={v2ThemeLabels[key]}
+                            themeKey={key}
+                            value={currentTheme[key]}
+                            onChange={handleColorChange}
+                        />
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+interface TeamLayoutSelectorProps {
+    value: TeamLayoutType;
+    onChange: (layout: TeamLayoutType) => void;
+}
+
+const TeamLayoutSelector = ({ value, onChange }: TeamLayoutSelectorProps) => {
+    return (
+        <div className="mt-4 space-y-3">
+            <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Team Layout
+            </h5>
+            <div className="flex flex-wrap gap-3">
+                {teamLayoutOptions.map((layout) => {
+                    const isSelected = value === layout.id;
+                    const blocks = Array.from({ length: 6 });
+                    
+                    return (
+                        <button
+                            key={layout.id}
+                            type="button"
+                            onClick={() => onChange(layout.id)}
+                            className={`flex flex-col items-center gap-1.5 p-2 rounded-lg border-2 transition-all ${
+                                isSelected
+                                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
+                                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-800"
+                            }`}
+                            title={layout.label}
+                        >
+                            <div
+                                className="grid gap-0.5"
+                                style={{
+                                    gridTemplateColumns: `repeat(${layout.cols}, 1fr)`,
+                                    gridTemplateRows: `repeat(${layout.rows}, 1fr)`,
+                                }}
+                            >
+                                {blocks.map((_, idx) => (
+                                    <div
+                                        key={idx}
+                                        className={`w-3 h-3 rounded-sm ${
+                                            isSelected
+                                                ? "bg-blue-500"
+                                                : "bg-gray-300 dark:bg-gray-600"
+                                        }`}
+                                    />
+                                ))}
+                            </div>
+                            <span className={`text-xs font-medium ${
+                                isSelected
+                                    ? "text-blue-600 dark:text-blue-400"
+                                    : "text-gray-500 dark:text-gray-400"
+                            }`}>
+                                {layout.label}
+                            </span>
+                        </button>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
+interface PaletteSelectorProps {
+    onSelect: (palette: ThemePalette) => void;
+}
+
+const PaletteSelector = ({ onSelect }: PaletteSelectorProps) => {
+    const gamePalettes = themePalettes.filter((p) => p.category === "game");
+    const customPalettes = themePalettes.filter((p) => p.category === "custom");
+
+    const PaletteButton = ({ palette }: { palette: ThemePalette }) => (
+        <button
+            type="button"
+            onClick={() => onSelect(palette)}
+            className="group flex flex-col items-center gap-1 p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all"
+            title={palette.name}
+        >
+            <div className="flex gap-0.5 rounded overflow-hidden">
+                <div
+                    className="w-4 h-6 rounded-l-sm"
+                    style={{ backgroundColor: palette.preview.primary }}
+                />
+                <div
+                    className="w-4 h-6"
+                    style={{ backgroundColor: palette.preview.secondary }}
+                />
+                <div
+                    className="w-4 h-6 rounded-r-sm"
+                    style={{ backgroundColor: palette.preview.accent }}
+                />
+            </div>
+            <span className="text-xs text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate max-w-16 text-center leading-tight">
+                {palette.name}
+            </span>
+        </button>
+    );
+
+    return (
+        <div className="space-y-4">
+            <div className="flex items-center justify-between">
+                <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Color Palettes
+                </h5>
+            </div>
+
+            {customPalettes.length > 0 && (
+                <div className="space-y-2">
+                    <h6 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        Presets
+                    </h6>
+                    <div className="flex flex-wrap gap-2">
+                        {customPalettes.map((palette) => (
+                            <PaletteButton key={palette.id} palette={palette} />
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <div className="space-y-2">
+                <h6 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                    Game-Inspired
+                </h6>
+                <div className="flex flex-wrap gap-2">
+                    {gamePalettes.map((palette) => (
+                        <PaletteButton key={palette.id} palette={palette} />
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export class StyleEditorBase extends React.Component<
     StyleEditorProps,
     StyleEditorState
@@ -211,6 +497,89 @@ export class StyleEditorBase extends React.Component<
                 >
                     <ReactMarkdown>{text}</ReactMarkdown>
                 </Drawer>
+
+                {feature.resultv2 && (
+                    <BaseEditor
+                        icon={<Sparkles size={14} />}
+                        name="Modern Styles"
+                        id="style-modern"
+                        defaultOpen={true}
+                    >
+                        <div className="mb-3 p-2 rounded bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-sm text-blue-700 dark:text-blue-300">
+                            These styles apply to the new Result v2 renderer.
+                        </div>
+
+                        <PaletteSelector
+                            onSelect={(palette) => props.editStyle({ resultV2Theme: palette.colors })}
+                        />
+
+                        <div className={styleEdit}>
+                            <Label className="inline text-xs mr-2">
+                                Background color
+                            </Label>
+                            <ColorInput
+                                onChange={(e) => editEvent(e, props)}
+                                name={"bgColor"}
+                                value={rgbaOrHex(props.style.bgColor)}
+                                onColorChange={(color) =>
+                                    editEvent(
+                                        { target: { value: rgbaOrHex(color) } },
+                                        props,
+                                        "bgColor",
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <V2ThemeEditor
+                            theme={props.style.resultV2Theme}
+                            editStyle={props.editStyle}
+                        />
+
+                        <TeamLayoutSelector
+                            value={props.style.teamLayout ?? "2x3"}
+                            onChange={(layout) => props.editStyle({ teamLayout: layout })}
+                        />
+
+                        <div className="custom-css-input-wrapper mt-4">
+                            <Label className="flex justify-between">
+                                <span>Custom CSS</span>
+                                {feature.themeEditing && (
+                                    <Button
+                                        minimal
+                                        intent={Intent.PRIMARY}
+                                        onClick={this.toggleCSSGuide}
+                                    >
+                                        Check out the CSS Guide!
+                                    </Button>
+                                )}
+                            </Label>
+                            <TextAreaDebounced
+                                name="customCSS"
+                                props={props}
+                                edit={editEvent}
+                            />
+                        </div>
+
+                        <div className="custom-css-input-wrapper">
+                            <Label style={{ padding: ".5rem", marginBottom: 0 }}>
+                                Custom Team HTML
+                            </Label>
+                            <TextAreaDebounced
+                                name="customTeamHTML"
+                                props={props}
+                                edit={editEvent}
+                            />
+                        </div>
+                    </BaseEditor>
+                )}
+
+                <BaseEditor
+                    icon={<Settings size={14} />}
+                    name="Classic Styles"
+                    id="style-classic"
+                    defaultOpen={!feature.resultv2}
+                >
                 <div className={styleEdit}>
                     <Label
                         htmlFor="template"
@@ -930,43 +1299,30 @@ export class StyleEditorBase extends React.Component<
                     />
                 </div>
 
-                <div className="custom-css-input-wrapper">
-                    <Label
-                        className="flex justify-between"
-                    >
-                        <span>Custom CSS</span>
-                        {feature.themeEditing && (
-                            <Button
-                                minimal
-                                intent={Intent.PRIMARY}
-                                onClick={this.toggleCSSGuide}
-                            >
-                                Check out the CSS Guide!
-                            </Button>
-                        )}
-                    </Label>
-                    <TextAreaDebounced
-                        name="customCSS"
-                        props={props}
-                        edit={editEvent}
-                    />
-                </div>
-
-                {feature.resultv2 && (
+                {!feature.resultv2 && (
                     <div className="custom-css-input-wrapper">
                         <Label
-                            style={{ padding: ".5rem", marginBottom: 0 }}
+                            className="flex justify-between"
                         >
-                            Custom Team HTML{" "}
-                            {/*<a href=''>Check out Layout Guide</a>*/}
+                            <span>Custom CSS</span>
+                            {feature.themeEditing && (
+                                <Button
+                                    minimal
+                                    intent={Intent.PRIMARY}
+                                    onClick={this.toggleCSSGuide}
+                                >
+                                    Check out the CSS Guide!
+                                </Button>
+                            )}
                         </Label>
                         <TextAreaDebounced
-                            name="customTeamHTML"
+                            name="customCSS"
                             props={props}
                             edit={editEvent}
                         />
                     </div>
                 )}
+                </BaseEditor>
             </BaseEditor>
         );
     }
