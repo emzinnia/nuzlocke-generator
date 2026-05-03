@@ -1,5 +1,5 @@
-import head from "lodash/head";
-import tail from "lodash/tail";
+import head from "lodash/head.js";
+import tail from "lodash/tail.js";
 import express from "express";
 import path, { dirname } from "node:path";
 import * as dotenv from "dotenv";
