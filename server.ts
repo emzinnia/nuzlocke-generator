@@ -14,7 +14,7 @@ const __dirname = dirname(__filename);
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 const logger = pino({});
 
 const isLocal = process.env.NODE_ENV === "local";
@@ -42,11 +42,9 @@ interface ReportArgs {
 }
 
 const PORT = process.env.PORT || 8080;
+const distPath = path.join(__dirname, "dist");
 
-app.get("/", async (req, res, next) => {
-    app.use(express.static(path.join(__dirname, "dist")));
-    next();
-});
+app.use(express.static(distPath));
 
 const GITHUB_BODY_LIMIT = 65535;
 const RESERVED_OVERHEAD = 500;
@@ -302,7 +300,7 @@ ${processedData}
     }
 });
 
-app.get("/release/:type", async (req, res, next) => {
+app.get("/release/:type", async (req, res) => {
     const type = req.params.type;
 
     const releases = await fetch(`${GH_URL}/releases`, {
@@ -339,20 +337,34 @@ app.get("/release/:type", async (req, res, next) => {
 
         res.send({ status: 400, error: `Invalid release type param` });
     }
-    next();
 });
 
-app.get("/nuzlocke/:id", async (req, res, next) => {
+app.get("/nuzlocke/:id", async (req, res) => {
     logger.info("Retrieving nuzlocke ", req.params.id);
     res.send({ status: 200 });
-    next();
 });
 
-app.post("/nuzlocke", async (req, res, next) => {});
-
-app.get("/nuzlockes", async (req, res, next) => {});
-
-app.listen(PORT, () => {
-    logger.info(`Current environment: ${process.env.NODE_ENV}`);
-    logger.info(`Running server on http://localhost:${PORT} 🚀`);
+app.post("/nuzlocke", async (_req, res) => {
+    res.status(501).send({ status: 501, error: "Not implemented" });
 });
+
+app.get("/nuzlockes", async (_req, res) => {
+    res.status(501).send({ status: 501, error: "Not implemented" });
+});
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
+});
+
+export function startServer(port = PORT) {
+    return app.listen(port, () => {
+        logger.info(`Current environment: ${process.env.NODE_ENV}`);
+        logger.info(`Running server on http://localhost:${port} 🚀`);
+    });
+}
+
+export default app;
+
+if (process.env.VERCEL !== "1") {
+    startServer();
+}
