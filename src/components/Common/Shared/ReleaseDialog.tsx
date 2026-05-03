@@ -104,6 +104,7 @@ export interface ReleaseNote {
     id: number;
     version: string;
     note: string;
+    timestamp: string;
 }
 
 export function ReleaseDialog(props: DialogProps & ReleaseDialogProps) {
@@ -120,10 +121,13 @@ export function ReleaseDialog(props: DialogProps & ReleaseDialogProps) {
     if (error || allNotesError) return null;
     if (!data || !allNotesData) return null;
 
-    const note = data.payload.notes[0];
-    const version = note?.version;
+    const note = data.payload?.notes?.[0];
+    const allNotes = allNotesData.payload?.notes ?? [];
 
-    const allNotes = allNotesData.payload.notes;
+    if (!note) return null;
+
+    const version = note.version;
+    const patchlessVersion = getPatchlessVersion(version);
 
     return (
         <Dialog
@@ -148,7 +152,7 @@ export function ReleaseDialog(props: DialogProps & ReleaseDialogProps) {
                         <img
                             className={mascot}
                             alt="mascot"
-                            src={getMascot(getPatchlessVersion(version))}
+                            src={getMascot(patchlessVersion)}
                         />
                     </h3>
                     {data && (
@@ -170,7 +174,7 @@ export function ReleaseDialog(props: DialogProps & ReleaseDialogProps) {
                         Previous Release Notes
                     </Button>
                     {seePrevious &&
-                        allNotes.map((note) => {
+                        allNotes.map((note: ReleaseNote) => {
                             const source = `#### ![${mascot}](${getMascot(getPatchlessVersion(note.version))}) ${note.version}\n${note.note}\n\n_Uploaded on ${new Date(note.timestamp).toLocaleString()}_`;
                             return (
                                 <ReactMarkdown

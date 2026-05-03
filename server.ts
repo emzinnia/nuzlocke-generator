@@ -302,14 +302,18 @@ ${processedData}
 
 app.get("/release/:type", async (req, res) => {
     const type = req.params.type;
+    const headers: Record<string, string> = {
+        Accept: "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+    };
+
+    if (GH_ACCESS_TOKEN) {
+        headers.Authorization = `Token ${GH_ACCESS_TOKEN}`;
+    }
 
     const releases = await fetch(`${GH_URL}/releases`, {
         method: "GET",
-        headers: {
-            Accept: "application/vnd.github.v3+json",
-            Authorization: `Token ${process.env.GH_ACCESS_TOKEN}`,
-            "Content-Type": "application/json",
-        },
+        headers,
     })
         .then((res) => res.json())
         .then((res) => {
@@ -328,7 +332,7 @@ app.get("/release/:type", async (req, res) => {
 
     if (type === "latest") {
         const notes = head(releases);
-        res.send({ status: 200, payload: { notes: [notes] } });
+        res.send({ status: 200, payload: { notes: notes ? [notes] : [] } });
     } else if (type === "all") {
         const notes = tail(releases);
         res.send({ status: 200, payload: { notes } });
