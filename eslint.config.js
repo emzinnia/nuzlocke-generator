@@ -6,9 +6,38 @@ import { defineConfig } from "eslint/config";
 
 export default defineConfig([
     {
+        ignores: [
+            "**/node_modules/**",
+            "**/dist/**",
+            "**/build/**",
+            "**/coverage/**",
+            "**/lighthouse/**",
+            "**/webpack.config.ts",
+            "**/.eslintrc.js",
+            "**/.babelrc",
+            "**/jest-config.json",
+            "**/server.ts",
+            "**/setupTests.ts",
+            "**/stylus.config.ts",
+            "**/babel.config.js",
+            "**/imageCheck.ts",
+            "**/massRename.ts",
+            "**/scraper.js",
+            "**/__tests__/*.ts",
+            "**/vite.config.js",
+        ],
+    },
+    {
         files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
         plugins: { js },
         extends: ["js/recommended"],
+    },
+    {
+        settings: {
+            react: {
+                version: "detect",
+            },
+        },
     },
     {
         files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
@@ -16,15 +45,6 @@ export default defineConfig([
     },
     tseslint.configs.recommended,
     pluginReact.configs.flat.recommended,
-    {
-        ignores: [
-            "**/node_modules/**",
-            "**/dist/**",
-            "**/build/**",
-            "**/coverage/**",
-            "**/lighthouse/**",
-        ],
-    },
     {
         rules: {
             "react/prop-types": "off",
