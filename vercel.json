@@ -1,0 +1,30 @@
+{
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist",
+    "rewrites": [
+        {
+            "source": "/report",
+            "destination": "/api/server"
+        },
+        {
+            "source": "/release/:type",
+            "destination": "/api/server"
+        },
+        {
+            "source": "/nuzlocke",
+            "destination": "/api/server"
+        },
+        {
+            "source": "/nuzlocke/:path*",
+            "destination": "/api/server"
+        },
+        {
+            "source": "/nuzlockes",
+            "destination": "/api/server"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
+}
