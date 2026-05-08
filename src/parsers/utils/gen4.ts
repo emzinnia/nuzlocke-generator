@@ -724,7 +724,7 @@ export const GEN4_ITEM_MAP: Record<number, string | undefined> = {
     213: "BrightPowder",
     214: "White Herb",
     215: "Macho Brace",
-    216: "Exp. Share",
+    216: "Exp Share",
     217: "Quick Claw",
     218: "Soothe Bell",
     219: "Mental Herb",

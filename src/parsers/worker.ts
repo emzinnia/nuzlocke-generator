@@ -65,7 +65,7 @@ const detectGen3SaveFormatFromString = (text: string): GameSaveFormat | undefine
 
 type Gen4Variant = "DP" | "Platinum" | "HGSS";
 
-const detectGen4GameNameFromString = (text: string): Gen4Variant | undefined => {
+const detectGen4SaveFormatFromString = (text: string): Gen4Variant | undefined => {
     const s = normalizeForTokenSearch(text);
 
     // HeartGold / SoulSilver
@@ -83,6 +83,18 @@ const detectGen4GameNameFromString = (text: string): Gen4Variant | undefined => 
     return undefined;
 };
 
+const detectGen4GameNameFromString = (text: string): GameName | undefined => {
+    const s = normalizeForTokenSearch(text);
+
+    if (s.includes("HEARTGOLD") || s.includes("HG")) return "HeartGold";
+    if (s.includes("SOULSILVER") || s.includes("SS")) return "SoulSilver";
+    if (s.includes("PLATINUM") || s.includes("PT")) return "Platinum";
+    if (s.includes("DIAMOND")) return "Diamond";
+    if (s.includes("PEARL")) return "Pearl";
+
+    return undefined;
+};
+
 /**
  * Gen 4 save file detection heuristics.
  *
@@ -94,9 +106,12 @@ const detectGen4GameNameFromString = (text: string): Gen4Variant | undefined => 
  * The blocks have different sizes per game variant:
  *   - D/P:      General ~0xC100,  Storage ~0x121E0
  *   - Platinum: General ~0xCF2C,  Storage ~0x121E4
- *   - HGSS:     General ~0xF628,  Storage ~0x12310
+ *   - HGSS:     General 0xF628,   Storage 0x12310 at 0xF700
  *
- * Each block ends with a 20-byte footer containing:
+ * Each block has footer counters at size - 0x14. D/P/Pt checksums exclude
+ * 0x14 bytes, while HGSS checksums exclude 0x10 bytes, matching PKHeX.Core.
+ *
+ * Footer fields at size - 0x14 include:
  *   - Offset +0x08: Block size (u32 little-endian)
  *   - Offset +0x12: CRC-16-CCITT checksum
  *
@@ -131,8 +146,11 @@ const GEN4_SIZE_RANGES = {
 } as const;
 
 // Known Gen 4 block sizes (from various save files and documentation)
-const GEN4_KNOWN_GENERAL_SIZES = [0x0c100, 0x0cf2c, 0x0f628, 0x0f700];
-const GEN4_KNOWN_STORAGE_SIZES = [0x121e0, 0x121e4, 0x12310, 0x12311];
+const GEN4_KNOWN_GENERAL_SIZES = [0x0c100, 0x0cf2c, 0x0f628];
+const GEN4_KNOWN_STORAGE_SIZES = [0x121e0, 0x121e4, 0x12310];
+
+const getGen4ChecksumFooterSize = (blockSize: number) =>
+    blockSize === 0x0f628 || blockSize === 0x12310 ? 0x10 : 0x14;
 
 /**
  * CRC-16-CCITT with 0xFFFF initial value (used by Gen 4 saves for D/P/Pt)
@@ -174,7 +192,7 @@ const findGen4Block = (
         if (saveCount === 0xffffffff) continue;
 
         if (requireCrcValidation) {
-            const dataEnd = footerOffset;
+            const dataEnd = blockStart + size - getGen4ChecksumFooterSize(size);
             const blockData = buf.subarray(blockStart, dataEnd);
             const stored = buf.readUInt16LE(footerOffset + 0x12);
             const computed = crc16CcittGen4(blockData);
@@ -273,7 +291,7 @@ const detectGen4VariantFromBuffer = (buf: Buffer): Gen4Variant | undefined => {
 const detectGen4SaveFormat = (buf: Buffer, fileName?: string): GameSaveFormat => {
     // First try filename hints
     if (fileName) {
-        const hint = detectGen4GameNameFromString(fileName);
+        const hint = detectGen4SaveFormatFromString(fileName);
         if (hint) return hint;
     }
 
@@ -497,12 +515,8 @@ self.onmessage = async ({
     } else if (gameChoice === "DP" || gameChoice === "Platinum" || gameChoice === "HGSS") {
         // Gen 4: use filename hints or default based on detected format
         const gen4Hint = fileName ? detectGen4GameNameFromString(fileName) : undefined;
-        if (gen4Hint === "HGSS") {
-            detectedGame = makeGame("HeartGold");
-        } else if (gen4Hint === "Platinum") {
-            detectedGame = makeGame("Platinum");
-        } else if (gen4Hint === "DP") {
-            detectedGame = makeGame("Diamond");
+        if (gen4Hint) {
+            detectedGame = makeGame(gen4Hint);
         } else if (gameChoice === "HGSS") {
             detectedGame = makeGame("HeartGold");
         } else if (gameChoice === "Platinum") {

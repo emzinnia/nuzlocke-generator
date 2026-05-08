@@ -3,11 +3,10 @@ import { Pokemon } from "models";
 import { matchSpeciesToTypes } from "utils/formatters/matchSpeciesToTypes";
 import { Forme } from "utils/Forme";
 import { Types } from "utils/Types";
-import { listOfPokemon, Species } from "utils/data/listOfPokemon";
+import { Species } from "utils/data/listOfPokemon";
 import { MOVES_ARRAY } from "./utils";
 import { ParserOptions } from "./utils/parserOptions";
-import { ABILITY_MAP } from "./utils/gen3";
-import { GEN4_ITEM_MAP, GEN4_SPECIES_MAP } from "./utils/gen4";
+import { GEN4_ITEM_MAP, GEN4_LOCATION_MAP, GEN4_SPECIES_MAP } from "./utils/gen4";
 
 type Gen4Game = "DP" | "Platinum" | "HGSS";
 
@@ -19,10 +18,20 @@ type Layout = {
     storageSize: number;
     pairStride: number;
     storageKind: "dppt" | "hgss";
+    checksumFooterSize: number;
+    trainerNameOffset: number;
+    trainerIdOffset: number;
+    moneyOffset: number;
+    timeOffset: number;
+    badgesOffset: number;
+    partyCountOffset: number;
+    partyOffset: number;
 };
 
 type ValidatedBlock = {
     ok: boolean;
+    checksumValid: boolean;
+    storedSize: number;
     saveCount: number;
     linkValue: number;
     checksumStored: number;
@@ -37,6 +46,7 @@ type ActiveBlocks = {
 };
 
 type PokemonContext = {
+    game: Gen4Game;
     status: string;
     position: number;
     isParty: boolean;
@@ -46,15 +56,34 @@ type PokemonContext = {
 };
 
 const FOOTER_SIZE = 0x14;
+const FOOTER_CHECKSUM_SIZE_SINNOH = 0x14;
+const FOOTER_CHECKSUM_SIZE_HGSS = 0x10;
 const PARTY_POKEMON_SIZE = 236;
 const PC_POKEMON_SIZE = 136;
 const BOX_COUNT = 18;
 const BOX_CAPACITY = 30;
 const STORAGE_HEADER_DPPT = 0x04;
 const BOX_STRIDE_HGSS = 0x1000;
-const BOX_PADDING_HGSS = 0x10;
-const PARTY_OFFSET = 0x98;
-const PARTY_COUNT_OFFSET = 0x94;
+
+const DP_HGSS_GENERAL_OFFSETS = {
+    trainerNameOffset: 0x64,
+    trainerIdOffset: 0x74,
+    moneyOffset: 0x78,
+    timeOffset: 0x86,
+    badgesOffset: 0x7e,
+    partyCountOffset: 0x94,
+    partyOffset: 0x98,
+};
+
+const PLATINUM_GENERAL_OFFSETS = {
+    trainerNameOffset: 0x68,
+    trainerIdOffset: 0x78,
+    moneyOffset: 0x7c,
+    timeOffset: 0x8a,
+    badgesOffset: 0x82,
+    partyCountOffset: 0x9c,
+    partyOffset: 0xa0,
+};
 
 const GEN4_LAYOUTS: Layout[] = [
     {
@@ -65,6 +94,8 @@ const GEN4_LAYOUTS: Layout[] = [
         storageSize: 0x121e0,
         pairStride: 0x40000,
         storageKind: "dppt",
+        checksumFooterSize: FOOTER_CHECKSUM_SIZE_SINNOH,
+        ...DP_HGSS_GENERAL_OFFSETS,
     },
     {
         name: "Platinum",
@@ -74,17 +105,37 @@ const GEN4_LAYOUTS: Layout[] = [
         storageSize: 0x121e4,
         pairStride: 0x40000,
         storageKind: "dppt",
+        checksumFooterSize: FOOTER_CHECKSUM_SIZE_SINNOH,
+        ...PLATINUM_GENERAL_OFFSETS,
     },
     {
         name: "HGSS",
         generalStart: 0x00000,
-        generalSize: 0x0f700,
+        generalSize: 0x0f628,
         storageStart: 0x0f700,
-        storageSize: 0x12311,
+        storageSize: 0x12310,
         pairStride: 0x40000,
         storageKind: "hgss",
+        checksumFooterSize: FOOTER_CHECKSUM_SIZE_HGSS,
+        ...DP_HGSS_GENERAL_OFFSETS,
     },
 ];
+
+const compareFooterCounters = (a: number, b: number) => {
+    if (a === 0xffffffff && b !== 0xfffffffe) return -1;
+    if (b === 0xffffffff && a !== 0xfffffffe) return 1;
+    if (a > b) return 1;
+    if (a < b) return -1;
+    return 0;
+};
+
+const compareBlocks = (a: ValidatedBlock, b: ValidatedBlock) => {
+    const major = compareFooterCounters(a.linkValue, b.linkValue);
+    if (major !== 0) return major;
+
+    const minor = compareFooterCounters(a.saveCount, b.saveCount);
+    return minor;
+};
 
 // 24-entry shuffle table (Bulbapedia) for Gen 4 PKM block order.
 const BLOCK_PERMUTATIONS = [
@@ -134,6 +185,192 @@ const BALL_MAP: Record<number, string> = {
     16: "Cherish Ball",
 };
 
+const GEN4_NATURES = [
+    "Hardy",
+    "Lonely",
+    "Brave",
+    "Adamant",
+    "Naughty",
+    "Bold",
+    "Docile",
+    "Relaxed",
+    "Impish",
+    "Lax",
+    "Timid",
+    "Hasty",
+    "Serious",
+    "Jolly",
+    "Naive",
+    "Modest",
+    "Mild",
+    "Quiet",
+    "Bashful",
+    "Rash",
+    "Calm",
+    "Gentle",
+    "Sassy",
+    "Careful",
+    "Quirky",
+] as const;
+
+const GEN4_ABILITY_MAP = [
+    undefined,
+    "Stench",
+    "Drizzle",
+    "Speed Boost",
+    "Battle Armor",
+    "Sturdy",
+    "Damp",
+    "Limber",
+    "Sand Veil",
+    "Static",
+    "Volt Absorb",
+    "Water Absorb",
+    "Oblivious",
+    "Cloud Nine",
+    "Compound Eyes",
+    "Insomnia",
+    "Color Change",
+    "Immunity",
+    "Flash Fire",
+    "Shield Dust",
+    "Own Tempo",
+    "Suction Cups",
+    "Intimidate",
+    "Shadow Tag",
+    "Rough Skin",
+    "Wonder Guard",
+    "Levitate",
+    "Effect Spore",
+    "Synchronize",
+    "Clear Body",
+    "Natural Cure",
+    "Lightning Rod",
+    "Serene Grace",
+    "Swift Swim",
+    "Chlorophyll",
+    "Illuminate",
+    "Trace",
+    "Huge Power",
+    "Poison Point",
+    "Inner Focus",
+    "Magma Armor",
+    "Water Veil",
+    "Magnet Pull",
+    "Soundproof",
+    "Rain Dish",
+    "Sand Stream",
+    "Pressure",
+    "Thick Fat",
+    "Early Bird",
+    "Flame Body",
+    "Run Away",
+    "Keen Eye",
+    "Hyper Cutter",
+    "Pickup",
+    "Truant",
+    "Hustle",
+    "Cute Charm",
+    "Plus",
+    "Minus",
+    "Forecast",
+    "Sticky Hold",
+    "Shed Skin",
+    "Guts",
+    "Marvel Scale",
+    "Liquid Ooze",
+    "Overgrow",
+    "Blaze",
+    "Torrent",
+    "Swarm",
+    "Rock Head",
+    "Drought",
+    "Arena Trap",
+    "Vital Spirit",
+    "White Smoke",
+    "Pure Power",
+    "Shell Armor",
+    "Air Lock",
+    "Tangled Feet",
+    "Motor Drive",
+    "Rivalry",
+    "Steadfast",
+    "Snow Cloak",
+    "Gluttony",
+    "Anger Point",
+    "Unburden",
+    "Heatproof",
+    "Simple",
+    "Dry Skin",
+    "Download",
+    "Iron Fist",
+    "Poison Heal",
+    "Adaptability",
+    "Skill Link",
+    "Hydration",
+    "Solar Power",
+    "Quick Feet",
+    "Normalize",
+    "Sniper",
+    "Magic Guard",
+    "No Guard",
+    "Stall",
+    "Technician",
+    "Leaf Guard",
+    "Klutz",
+    "Mold Breaker",
+    "Super Luck",
+    "Aftermath",
+    "Anticipation",
+    "Forewarn",
+    "Unaware",
+    "Tinted Lens",
+    "Filter",
+    "Slow Start",
+    "Scrappy",
+    "Storm Drain",
+    "Ice Body",
+    "Solid Rock",
+    "Snow Warning",
+    "Honey Gather",
+    "Frisk",
+    "Reckless",
+    "Multitype",
+    "Flower Gift",
+    "Bad Dreams",
+] as const;
+
+const UNOWN_FORMES: Forme[] = [
+    Forme.A,
+    Forme.B,
+    Forme.C,
+    Forme.D,
+    Forme.E,
+    Forme.F,
+    Forme.G,
+    Forme.H,
+    Forme.I,
+    Forme.J,
+    Forme.K,
+    Forme.L,
+    Forme.M,
+    Forme.N,
+    Forme.O,
+    Forme.P,
+    Forme.Q,
+    Forme.R,
+    Forme.S,
+    Forme.T,
+    Forme.U,
+    Forme.V,
+    Forme.W,
+    Forme.X,
+    Forme.Y,
+    Forme.Z,
+    Forme["!"],
+    Forme["?"],
+];
+
 const getSpeciesName = (id: number): Species | undefined => {
     const hexKey = `0x${id.toString(16).toUpperCase().padStart(3, "0")}`;
     const species = GEN4_SPECIES_MAP[hexKey];
@@ -143,51 +380,47 @@ const getSpeciesName = (id: number): Species | undefined => {
     return species as Species | undefined;
 };
 
-const getAbilityForSpecies = (species: Species | undefined, abilitySlot: number) => {
-    if (!species) return undefined;
-    const dex = listOfPokemon.indexOf(species) + 1;
-    const abilities = ABILITY_MAP[dex] ?? [];
-    const index = abilitySlot === 1 ? 1 : 0;
-    return abilities[index] || abilities[0];
+const getGen4AbilityName = (abilityId: number) => {
+    if (!abilityId) return undefined;
+    return GEN4_ABILITY_MAP[abilityId] ?? `Ability #${abilityId}`;
 };
 
-const determineUnownForme = (personality: number): Forme => {
-    const value =
-        ((personality & 0x3000000) >> 18) |
-        ((personality & 0x30000) >> 12) |
-        ((personality & 0x300) >> 6) |
-        (personality & 0x3);
-    const formes: Forme[] = [
-        Forme.A,
-        Forme.B,
-        Forme.C,
-        Forme.D,
-        Forme.E,
-        Forme.F,
-        Forme.G,
-        Forme.H,
-        Forme.I,
-        Forme.J,
-        Forme.K,
-        Forme.L,
-        Forme.M,
-        Forme.N,
-        Forme.O,
-        Forme.P,
-        Forme.Q,
-        Forme.R,
-        Forme.S,
-        Forme.T,
-        Forme.U,
-        Forme.V,
-        Forme.W,
-        Forme.X,
-        Forme.Y,
-        Forme.Z,
-        Forme["!"],
-        Forme["?"],
-    ];
-    return formes[value % formes.length];
+const getGen4Nature = (pid: number) => GEN4_NATURES[pid % GEN4_NATURES.length];
+
+const getGen4Gender = (genderValue: number) => {
+    if (genderValue === 0) return "m";
+    if (genderValue === 1) return "f";
+    if (genderValue === 2) return "genderless";
+    return undefined;
+};
+
+const getGen4LocationName = (locationId: number) => {
+    if (locationId === 0xffff) return undefined;
+    return GEN4_LOCATION_MAP[locationId] ?? `Location #${locationId}`;
+};
+
+const getGen4Forme = (species: Species | undefined, formId: number): Forme | undefined => {
+    if (!species) return undefined;
+    if (species === "Unown") return UNOWN_FORMES[formId] ?? undefined;
+    if (species === "Deoxys") {
+        return [undefined, Forme.Attack, Forme.Defense, Forme.Speed][formId];
+    }
+    if (species === "Burmy" || species === "Wormadam") {
+        return [Forme.Plant, Forme.Sandy, Forme.Trash][formId];
+    }
+    if (species === "Shellos" || species === "Gastrodon") {
+        return [Forme["West Sea"], Forme["East Sea"]][formId];
+    }
+    if (species === "Rotom") {
+        return [undefined, Forme.Heat, Forme.Wash, Forme.Frost, Forme.Fan, Forme.Mow][formId];
+    }
+    if (species === "Giratina") {
+        return [undefined, Forme.Origin][formId];
+    }
+    if (species === "Shaymin") {
+        return [undefined, Forme.Sky][formId];
+    }
+    return undefined;
 };
 
 const crc16Ccitt = (buffer: Buffer) => {
@@ -213,9 +446,9 @@ const sumPk4Checksum = (buffer: Buffer) => {
 
 const decryptPk4Payload = (encrypted: Buffer, checksum: number) => {
     const out = Buffer.alloc(encrypted.length);
-    let seed = checksum & 0xffff;
+    let seed = checksum >>> 0;
     for (let i = 0; i < encrypted.length; i += 2) {
-        seed = (seed * 0x41c64e6d + 0x6073) >>> 0;
+        seed = (Math.imul(seed, 0x41c64e6d) + 0x6073) >>> 0;
         const key = (seed >>> 16) & 0xffff;
         const value = encrypted.readUInt16LE(i) ^ key;
         out.writeUInt16LE(value & 0xffff, i);
@@ -243,13 +476,13 @@ const unshufflePk4Blocks = (decrypted: Buffer, personality: number) => {
 
 const parseIvs = (value: number) => ({
     hp: value & 0x1f,
-    attack: (value >> 5) & 0x1f,
-    defense: (value >> 10) & 0x1f,
-    speed: (value >> 15) & 0x1f,
-    specialAttack: (value >> 20) & 0x1f,
-    specialDefense: (value >> 25) & 0x1f,
-    isEgg: Boolean((value >> 30) & 0x1),
-    abilitySlot: (value >> 31) & 0x1,
+    attack: (value >>> 5) & 0x1f,
+    defense: (value >>> 10) & 0x1f,
+    speed: (value >>> 15) & 0x1f,
+    specialAttack: (value >>> 20) & 0x1f,
+    specialDefense: (value >>> 25) & 0x1f,
+    isEgg: Boolean((value >>> 30) & 0x1),
+    isNicknamed: Boolean((value >>> 31) & 0x1),
 });
 
 const shinyCheck = (pid: number, otId: number) => {
@@ -260,24 +493,88 @@ const shinyCheck = (pid: number, otId: number) => {
     return value < 8;
 };
 
-const GEN4_CHAR_UPPER_START = 0x012b;
-const GEN4_CHAR_LOWER_START = 0x0145;
-const GEN4_CHAR_DIGIT_START = 0x0121;
+const GEN4_INT_CHAR_TABLE = [
+    "", "　", "ぁ", "あ", "ぃ", "い", "ぅ", "う", "ぇ", "え", "ぉ", "お", "か", "が", "き", "ぎ",
+    "く", "ぐ", "け", "げ", "こ", "ご", "さ", "ざ", "し", "じ", "す", "ず", "せ", "ぜ", "そ", "ぞ",
+    "た", "だ", "ち", "ぢ", "っ", "つ", "づ", "て", "で", "と", "ど", "な", "に", "ぬ", "ね", "の",
+    "は", "ば", "ぱ", "ひ", "び", "ぴ", "ふ", "ぶ", "ぷ", "へ", "べ", "ぺ", "ほ", "ぼ", "ぽ", "ま",
+    "み", "む", "め", "も", "ゃ", "や", "ゅ", "ゆ", "ょ", "よ", "ら", "り", "る", "れ", "ろ", "わ",
+    "を", "ん", "ァ", "ア", "ィ", "イ", "ゥ", "ウ", "ェ", "エ", "ォ", "オ", "カ", "ガ", "キ", "ギ",
+    "ク", "グ", "ケ", "ゲ", "コ", "ゴ", "サ", "ザ", "シ", "ジ", "ス", "ズ", "セ", "ゼ", "ソ", "ゾ",
+    "タ", "ダ", "チ", "ヂ", "ッ", "ツ", "ヅ", "テ", "デ", "ト", "ド", "ナ", "ニ", "ヌ", "ネ", "ノ",
+    "ハ", "バ", "パ", "ヒ", "ビ", "ピ", "フ", "ブ", "プ", "ヘ", "ベ", "ペ", "ホ", "ボ", "ポ", "マ",
+    "ミ", "ム", "メ", "モ", "ャ", "ヤ", "ュ", "ユ", "ョ", "ヨ", "ラ", "リ", "ル", "レ", "ロ", "ワ",
+    "ヲ", "ン", "０", "１", "２", "３", "４", "５", "６", "７", "８", "９", "Ａ", "Ｂ", "Ｃ", "Ｄ",
+    "Ｅ", "Ｆ", "Ｇ", "Ｈ", "Ｉ", "Ｊ", "Ｋ", "Ｌ", "Ｍ", "Ｎ", "Ｏ", "Ｐ", "Ｑ", "Ｒ", "Ｓ", "Ｔ",
+    "Ｕ", "Ｖ", "Ｗ", "Ｘ", "Ｙ", "Ｚ", "ａ", "ｂ", "ｃ", "ｄ", "ｅ", "ｆ", "ｇ", "ｈ", "ｉ", "ｊ",
+    "ｋ", "ｌ", "ｍ", "ｎ", "ｏ", "ｐ", "ｑ", "ｒ", "ｓ", "ｔ", "ｕ", "ｖ", "ｗ", "ｘ", "ｙ", "ｚ",
+    "", "！", "？", "、", "。", "…", "・", "／", "「", "」", "『", "』", "（", "）", "♂", "♀",
+    "＋", "ー", "×", "÷", "＝", "～", "：", "；", "．", "，", "♠", "♣", "♥", "♦", "★", "◎",
+    "○", "□", "△", "◇", "＠", "♪", "％", "☀", "☁", "☂", "☃", "①", "②", "③", "④", "⑤",
+    "⑥", "⑦", "円", "♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "←", "↑", "↓", "→", "►",
+    "＆", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E",
+    "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
+    "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k",
+    "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "À",
+    "Á", "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï", "Ð",
+    "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "⑧", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "Þ", "ß", "à",
+    "á", "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï", "ð",
+    "ñ", "ò", "ó", "ô", "õ", "ö", "⑨", "ø", "ù", "ú", "û", "ü", "ý", "þ", "ÿ", "Œ",
+    "œ", "Ş", "ş", "ª", "º", "⑩", "⑪", "⑫", "$", "¡", "¿", "!", "?", ",", ".", "⑬",
+    "･", "/", "‘", "'", "“", "”", "„", "«", "»", "(", ")", "♂", "♀", "+", "-", "*",
+    "#", "=", "&", "~", ":", ";", "⑯", "⑰", "⑱", "⑲", "⑳", "⑴", "⑵", "⑶", "⑷", "⑸",
+    "@", "⑹", "%", "⑺", "⑻", "⑼", "⑽", "⑾", "⑿", "⒀", "⒁", "⒂", "⒃", "⒄", " ", "⒅",
+    "⒆", "⒇", "⒈", "⒉", "⒊", "⒋", "⒌", "⒍", "°", "_", "＿", "⒎", "⒏",
+] as const;
+
+const GEN4_KOREAN_START = 0x0400;
+const GEN4_KOREAN_HANGUL_COUNT = 2350;
+const GEN4_KOREAN_JAMO_START = 0x0d30;
+const GEN4_KOREAN_JAMO_TABLE = [
+    "", "ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ",
+    "ㅋ", "ㅌ", "ㅍ", "ㅎ", "ㅏ", "ㅐ", "ㅑ", "ㅒ", "ㅓ", "ㅔ", "ㅕ", "ㅖ", "ㅗ", "ㅛ", "ㅜ", "ㅠ",
+    "ㅡ", "ㅣ",
+] as const;
+const GEN4_KOREAN_EXTRA: Record<number, string> = {
+    0x0d61: "뢔",
+    0x0d62: "쌰",
+    0x0d63: "쎼",
+    0x0d64: "쓔",
+    0x0d65: "쬬",
+};
+const eucKrDecoder =
+    typeof TextDecoder !== "undefined" ? new TextDecoder("euc-kr") : undefined;
+
+const decodeGen4KoreanChar = (code: number) => {
+    const koreanOffset = code - GEN4_KOREAN_START;
+    if (
+        eucKrDecoder &&
+        koreanOffset >= 1 &&
+        koreanOffset <= GEN4_KOREAN_HANGUL_COUNT
+    ) {
+        const tableOffset = koreanOffset - 1;
+        const lead = 0xb0 + Math.floor(tableOffset / 94);
+        const trail = 0xa1 + (tableOffset % 94);
+        return eucKrDecoder.decode(Uint8Array.from([lead, trail]));
+    }
+
+    if (
+        code >= GEN4_KOREAN_JAMO_START &&
+        code < GEN4_KOREAN_JAMO_START + GEN4_KOREAN_JAMO_TABLE.length
+    ) {
+        return GEN4_KOREAN_JAMO_TABLE[code - GEN4_KOREAN_JAMO_START] || null;
+    }
+
+    return GEN4_KOREAN_EXTRA[code] || null;
+};
 
 const decodeGen4Char = (code: number): string | null => {
-    if (code === 0xffff || code === 0x0000) return null;
-    if (code >= GEN4_CHAR_UPPER_START && code < GEN4_CHAR_UPPER_START + 26) {
-        return String.fromCharCode("A".charCodeAt(0) + (code - GEN4_CHAR_UPPER_START));
+    if (code === 0xffff) return null;
+    if (code < GEN4_INT_CHAR_TABLE.length) {
+        return GEN4_INT_CHAR_TABLE[code] || null;
     }
-    if (code >= GEN4_CHAR_LOWER_START && code < GEN4_CHAR_LOWER_START + 26) {
-        return String.fromCharCode("a".charCodeAt(0) + (code - GEN4_CHAR_LOWER_START));
-    }
-    if (code >= GEN4_CHAR_DIGIT_START && code < GEN4_CHAR_DIGIT_START + 10) {
-        return String.fromCharCode("0".charCodeAt(0) + (code - GEN4_CHAR_DIGIT_START));
-    }
-    if (code === 0x0000) return " ";
-    if (code >= 0x20 && code <= 0x7e) {
-        return String.fromCharCode(code);
+    if (code >= GEN4_KOREAN_START && code <= 0x0d65) {
+        return decodeGen4KoreanChar(code);
     }
     return null;
 };
@@ -294,14 +591,15 @@ const decodeGen4String = (buffer: Buffer, maxChars: number) => {
 };
 
 const parsePartyStats = (buffer: Buffer) => {
+    if (buffer.length < 0x14) return undefined;
     const level = buffer.readUInt8(0x04);
-    const currentHp = buffer.readUInt16LE(0x08);
-    const maxHp = buffer.readUInt16LE(0x0a);
-    const attack = buffer.readUInt16LE(0x0c);
-    const defense = buffer.readUInt16LE(0x0e);
-    const speed = buffer.readUInt16LE(0x10);
-    const specialAttack = buffer.readUInt16LE(0x12);
-    const specialDefense = buffer.readUInt16LE(0x14);
+    const currentHp = buffer.readUInt16LE(0x06);
+    const maxHp = buffer.readUInt16LE(0x08);
+    const attack = buffer.readUInt16LE(0x0a);
+    const defense = buffer.readUInt16LE(0x0c);
+    const speed = buffer.readUInt16LE(0x0e);
+    const specialAttack = buffer.readUInt16LE(0x10);
+    const specialDefense = buffer.readUInt16LE(0x12);
     return {
         level,
         stats: {
@@ -327,6 +625,8 @@ const decodePokemon = (buffer: Buffer, context: PokemonContext): Pokemon | null 
 
     // Decrypt using stored checksum
     const decrypted = decryptPk4Payload(encrypted, checksumStored);
+    if (sumPk4Checksum(decrypted) !== checksumStored) return null;
+
     const blocks = unshufflePk4Blocks(decrypted, pid);
     const speciesId = blocks.A.readUInt16LE(0x00);
 
@@ -345,9 +645,10 @@ const decodePokemon = (buffer: Buffer, context: PokemonContext): Pokemon | null 
     const itemId = growth.readUInt16LE(0x02);
     const otId = growth.readUInt32LE(0x04); // TID/SID combined
     const exp = growth.readUInt32LE(0x08);
-    const ppBonuses = growth.readUInt8(0x0c);
-    const friendship = growth.readUInt8(0x0d);
-    const language = growth.readUInt8(0x17);
+    const friendship = growth.readUInt8(0x0c);
+    const abilityId = growth.readUInt8(0x0d);
+    const markings = growth.readUInt8(0x0e);
+    const language = growth.readUInt8(0x0f);
 
     const moveIds = [
         attacks.readUInt16LE(0x00),
@@ -361,75 +662,98 @@ const decodePokemon = (buffer: Buffer, context: PokemonContext): Pokemon | null 
         attacks.readUInt8(0x0a),
         attacks.readUInt8(0x0b),
     ];
+    const ppBonuses = [
+        attacks.readUInt8(0x0c),
+        attacks.readUInt8(0x0d),
+        attacks.readUInt8(0x0e),
+        attacks.readUInt8(0x0f),
+    ];
 
     const evs = {
-        hp: evsBlock.readUInt8(0x00),
-        attack: evsBlock.readUInt8(0x01),
-        defense: evsBlock.readUInt8(0x02),
-        speed: evsBlock.readUInt8(0x03),
-        specialAttack: evsBlock.readUInt8(0x04),
-        specialDefense: evsBlock.readUInt8(0x05),
+        hp: growth.readUInt8(0x10),
+        attack: growth.readUInt8(0x11),
+        defense: growth.readUInt8(0x12),
+        speed: growth.readUInt8(0x13),
+        specialAttack: growth.readUInt8(0x14),
+        specialDefense: growth.readUInt8(0x15),
     };
 
     const contest = {
-        cool: evsBlock.readUInt8(0x06),
-        beauty: evsBlock.readUInt8(0x07),
-        cute: evsBlock.readUInt8(0x08),
-        smart: evsBlock.readUInt8(0x09),
-        tough: evsBlock.readUInt8(0x0a),
-        sheen: evsBlock.readUInt8(0x0b),
+        cool: growth.readUInt8(0x16),
+        beauty: growth.readUInt8(0x17),
+        cute: growth.readUInt8(0x18),
+        smart: growth.readUInt8(0x19),
+        tough: growth.readUInt8(0x1a),
+        sheen: growth.readUInt8(0x1b),
     };
 
-    const pokerus = misc.readUInt8(0x00);
-    const metLocation = misc.readUInt8(0x01);
-    const originInfo = misc.readUInt16LE(0x02);
-    const ivData = misc.readUInt32LE(0x04);
-    const ribbons = misc.readUInt32LE(0x08);
+    const nickname = decodeGen4String(evsBlock.slice(0x00, 0x16), 11);
+    const originGame = evsBlock.readUInt8(0x17);
+    const ribbons = growth.readUInt32LE(0x1c);
+    const ivData = attacks.readUInt32LE(0x10);
+    const formGenderData = attacks.readUInt8(0x18);
+    const eggLocationExtended = attacks.readUInt16LE(0x1c);
+    const platinumMetLocation = attacks.readUInt16LE(0x1e);
+    const dpMetLocation = misc.readUInt16LE(0x18);
+    const pokerus = misc.readUInt8(0x1a);
+    const dpBallId = misc.readUInt8(0x1b);
+    const metLevelGender = misc.readUInt8(0x1c);
+    const hgssBallId = misc.readUInt8(0x1e);
 
     const ivs = parseIvs(ivData);
-    const metLevel = originInfo & 0x7f;
-    const originGame = (originInfo >> 7) & 0xf;
-    const ballId = (originInfo >> 11) & 0xf;
-    const otGender = (originInfo >> 15) & 0x1 ? "F" : "M";
+    const fatefulEncounter = (formGenderData & 0x01) === 1;
+    const genderValue = (formGenderData >>> 1) & 0x03;
+    const formId = formGenderData >>> 3;
+    const metLevel = metLevelGender & 0x7f;
+    const otGender = (metLevelGender >>> 7) & 0x1 ? "F" : "M";
+    const metLocation =
+        context.game === "DP"
+            ? dpMetLocation
+            : platinumMetLocation || dpMetLocation;
+    const ballId = context.game === "HGSS" ? hgssBallId : dpBallId;
 
     const statsSection =
         context.isParty && buffer.length >= PARTY_POKEMON_SIZE
-            ? parsePartyStats(buffer.slice(PC_POKEMON_SIZE))
+            ? parsePartyStats(
+                  decryptPk4Payload(buffer.slice(PC_POKEMON_SIZE), pid),
+              )
             : undefined;
 
     const level = statsSection?.level || undefined;
 
     const moves = moveIds.map((id) => MOVES_ARRAY?.[id]).filter(Boolean);
     const pokeball = BALL_MAP[ballId] || `Ball #${ballId}`;
-    const ability = getAbilityForSpecies(
-        speciesName,
-        ivs.abilitySlot === 1 ? 1 : 0,
-    );
+    const ability = getGen4AbilityName(abilityId);
     const types = speciesName
         ? (Array.from(new Set(matchSpeciesToTypes(speciesName))) as [Types, Types])
         : undefined;
     const shiny = shinyCheck(pid, otId);
-    const forme =
-        speciesName === "Unown" ? determineUnownForme(pid) : undefined;
+    const gender = getGen4Gender(genderValue);
+    const nature = getGen4Nature(pid);
+    const forme = getGen4Forme(speciesName, formId);
 
     const basePid = pid.toString(16);
     const currentCount = context.pidTracker.get(basePid) || 0;
     context.pidTracker.set(basePid, currentCount + 1);
     const id = currentCount > 0 ? `${basePid}-${currentCount}` : basePid;
+    const species = speciesName || `Species ${speciesId}`;
+    const displayNickname = ivs.isNicknamed && nickname ? nickname : species;
 
     const pokemon: Pokemon = {
-        species: speciesName || `Species ${speciesId}`,
-        nickname: undefined,
+        species,
+        nickname: displayNickname,
         status: context.status,
         id,
         level,
         moves,
         shiny,
         forme,
+        gender,
+        nature,
         item: itemId
             ? GEN4_ITEM_MAP[itemId] ?? `Item #${itemId}`
             : undefined,
-        met: metLocation ? `Location #${metLocation}` : undefined,
+        met: getGen4LocationName(metLocation),
         metLevel: metLevel || undefined,
         position: context.position,
         egg: ivs.isEgg,
@@ -439,12 +763,19 @@ const decodePokemon = (buffer: Buffer, context: PokemonContext): Pokemon | null 
         extraData: {
             language,
             friendship,
+            abilityId,
+            markings,
+            fatefulEncounter,
             ppBonuses,
             movePP,
             evs,
             contest,
+            genderValue,
+            formId,
             pokerus,
             originGame,
+            eggLocationExtended,
+            metLocation,
             otGender,
             ribbons,
             ivs,
@@ -459,10 +790,16 @@ const decodePokemon = (buffer: Buffer, context: PokemonContext): Pokemon | null 
     return pokemon;
 };
 
-const validateBlock = (buffer: Buffer): ValidatedBlock => {
+const validateBlock = (
+    buffer: Buffer,
+    expectedSize: number,
+    checksumFooterSize: number,
+): ValidatedBlock => {
     if (buffer.length < FOOTER_SIZE)
         return {
             ok: false,
+            checksumValid: false,
+            storedSize: 0,
             buffer,
             saveCount: 0,
             linkValue: 0,
@@ -472,10 +809,20 @@ const validateBlock = (buffer: Buffer): ValidatedBlock => {
     const footerStart = buffer.length - FOOTER_SIZE;
     const linkValue = buffer.readUInt32LE(footerStart + 0x00);
     const saveCount = buffer.readUInt32LE(footerStart + 0x04);
+    const storedSize = buffer.readUInt32LE(footerStart + 0x08);
     const checksumStored = buffer.readUInt16LE(footerStart + 0x12);
-    const checksumComputed = crc16Ccitt(buffer.slice(0, footerStart));
+    const checksumComputed = crc16Ccitt(
+        buffer.slice(0, buffer.length - checksumFooterSize),
+    );
+    const checksumValid = checksumStored === checksumComputed;
+    const structuralValid =
+        storedSize === expectedSize &&
+        saveCount !== 0xffffffff &&
+        linkValue !== 0xffffffff;
     return {
-        ok: checksumStored === checksumComputed,
+        ok: structuralValid,
+        checksumValid,
+        storedSize,
         buffer,
         saveCount,
         linkValue,
@@ -485,9 +832,10 @@ const validateBlock = (buffer: Buffer): ValidatedBlock => {
 };
 
 const selectLayoutAndBlocks = (file: Buffer, preferred?: Gen4Game): ActiveBlocks => {
-    const layouts = preferred
+    const preferredLayouts = preferred
         ? GEN4_LAYOUTS.filter((l) => l.name === preferred)
-        : GEN4_LAYOUTS;
+        : [];
+    const layouts = preferredLayouts.length ? preferredLayouts : GEN4_LAYOUTS;
 
     let best: ActiveBlocks | undefined;
 
@@ -516,27 +864,30 @@ const selectLayoutAndBlocks = (file: Buffer, preferred?: Gen4Game): ActiveBlocks
                 storageStart,
                 storageStart + layout.storageSize,
             );
-            const general = validateBlock(generalBuf);
-            const storage = validateBlock(storageBuf);
+            const general = validateBlock(
+                generalBuf,
+                layout.generalSize,
+                layout.checksumFooterSize,
+            );
+            const storage = validateBlock(
+                storageBuf,
+                layout.storageSize,
+                layout.checksumFooterSize,
+            );
             validated.push({ base, general, storage });
         }
 
         const validGenerals = validated.filter((v) => v.general.ok);
         if (!validGenerals.length) continue;
         const selectedGeneral = validGenerals.reduce((a, b) =>
-            b.general.saveCount > a.general.saveCount ? b : a,
+            compareBlocks(a.general, b.general) < 0 ? b : a,
         );
 
         const candidateStorage = validated
             .filter((v) => v.storage.ok)
-            .sort((a, b) => b.storage.saveCount - a.storage.saveCount);
+            .sort((a, b) => -compareBlocks(a.storage, b.storage));
 
-        let chosenStorage = candidateStorage.find(
-            (v) => v.storage.linkValue === selectedGeneral.general.saveCount,
-        );
-        if (!chosenStorage && candidateStorage.length) {
-            chosenStorage = candidateStorage[0];
-        }
+        const chosenStorage = candidateStorage[0];
         if (!chosenStorage) continue;
 
         best = {
@@ -559,12 +910,16 @@ const selectLayoutAndBlocks = (file: Buffer, preferred?: Gen4Game): ActiveBlocks
                 fallbackLayout.generalStart,
                 fallbackLayout.generalStart + fallbackLayout.generalSize,
             ),
+            fallbackLayout.generalSize,
+            fallbackLayout.checksumFooterSize,
         );
         const storage = validateBlock(
             file.slice(
                 fallbackLayout.storageStart,
                 fallbackLayout.storageStart + fallbackLayout.storageSize,
             ),
+            fallbackLayout.storageSize,
+            fallbackLayout.checksumFooterSize,
         );
         best = { layout: fallbackLayout, general, storage };
     }
@@ -580,16 +935,18 @@ const getBoxStatus = (boxIndex: number, options: ParserOptions) => {
 
 const parseParty = (
     general: Buffer,
+    layout: Layout,
     options: ParserOptions,
     pidTracker: Map<string, number>,
 ) => {
-    const count = general.readUInt8(PARTY_COUNT_OFFSET) || 0;
+    const count = general.readUInt8(layout.partyCountOffset) || 0;
     const party: Pokemon[] = [];
     const capped = Math.min(count, 6);
     for (let i = 0; i < capped; i++) {
-        const start = PARTY_OFFSET + i * PARTY_POKEMON_SIZE;
+        const start = layout.partyOffset + i * PARTY_POKEMON_SIZE;
         const slice = general.slice(start, start + PARTY_POKEMON_SIZE);
         const context: PokemonContext = {
+            game: layout.name,
             status: "Team",
             position: i + 1,
             isParty: true,
@@ -622,8 +979,9 @@ const parseBoxes = (
                     slotIndex * PC_POKEMON_SIZE;
                 const slice = boxArea.slice(offset, offset + PC_POKEMON_SIZE);
                 const context: PokemonContext = {
+                    game: layout.name,
                     status: getBoxStatus(boxIndex, options),
-                    position: (slotIndex + 1) * (boxIndex + 1),
+                    position: boxIndex * BOX_CAPACITY + slotIndex + 1,
                     isParty: false,
                     boxIndex,
                     slotIndex,
@@ -642,8 +1000,9 @@ const parseBoxes = (
                 const offset = slotIndex * PC_POKEMON_SIZE;
                 const slice = boxArea.slice(offset, offset + PC_POKEMON_SIZE);
                 const context: PokemonContext = {
+                    game: layout.name,
                     status: getBoxStatus(boxIndex, options),
-                    position: (slotIndex + 1) * (boxIndex + 1),
+                    position: boxIndex * BOX_CAPACITY + slotIndex + 1,
                     isParty: false,
                     boxIndex,
                     slotIndex,
@@ -662,22 +1021,24 @@ const titleCase = (str: string): string => {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
-const parseTrainer = (general: Buffer) => {
-    // Trainer name at 0x64 (8 characters max, 16 bytes)
-    // Apply title case as DS games store names in uppercase
-    const rawName = decodeGen4String(general.slice(0x64, 0x64 + 16), 8);
-    const name = titleCase(rawName);
-    // TID at 0x74, SID at 0x76
-    const tid = general.readUInt16LE(0x74);
-    // Money at 0x78
-    const money = general.readUInt32LE(0x78);
-    // Play time at 0x86: hours (u16), minutes (u8), seconds (u8)
-    const hours = general.readUInt16LE(0x86);
-    const minutes = general.readUInt8(0x88);
-    const seconds = general.readUInt8(0x89);
+const normalizeTrainerName = (str: string): string => {
+    if (/^[A-Z]+$/.test(str)) return titleCase(str);
+    return str;
+};
+
+const parseTrainer = (general: Buffer, layout: Layout) => {
+    const rawName = decodeGen4String(
+        general.slice(layout.trainerNameOffset, layout.trainerNameOffset + 16),
+        8,
+    );
+    const name = normalizeTrainerName(rawName);
+    const tid = general.readUInt16LE(layout.trainerIdOffset);
+    const money = general.readUInt32LE(layout.moneyOffset);
+    const hours = general.readUInt16LE(layout.timeOffset);
+    const minutes = general.readUInt8(layout.timeOffset + 2);
+    const seconds = general.readUInt8(layout.timeOffset + 3);
     const time = `${hours}:${minutes}:${seconds}`;
-    // Badges at 0x7E (1 byte bitfield, each bit = 1 badge)
-    const badgeByte = general.readUInt8(0x7e);
+    const badgeByte = general.readUInt8(layout.badgesOffset);
     const badgeCount = countBits(badgeByte);
     const badges = Array.from({ length: badgeCount }, (_, i) => `Badge ${i + 1}`);
 
@@ -709,8 +1070,13 @@ export const parseGen4Save = async (
     const active = selectLayoutAndBlocks(buffer, preferred);
     const pidTracker = new Map<string, number>();
 
-    const trainer = parseTrainer(active.general.buffer);
-    const party = parseParty(active.general.buffer, options, pidTracker);
+    const trainer = parseTrainer(active.general.buffer, active.layout);
+    const party = parseParty(
+        active.general.buffer,
+        active.layout,
+        options,
+        pidTracker,
+    );
     const boxed = parseBoxes(
         active.storage.buffer,
         active.layout,
@@ -728,6 +1094,8 @@ export const parseGen4Save = async (
                   storageSave: active.storage.saveCount,
                   generalChecksum: `0x${active.general.checksumStored.toString(16)}`,
                   storageChecksum: `0x${active.storage.checksumStored.toString(16)}`,
+                  generalChecksumValid: active.general.checksumValid,
+                  storageChecksumValid: active.storage.checksumValid,
               }
             : undefined,
     };
