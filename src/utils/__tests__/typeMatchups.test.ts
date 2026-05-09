@@ -193,7 +193,7 @@ describe("typeMatchups utilities", () => {
 
         it("handles Pokemon with undefined types", () => {
             const team: Pokemon[] = [
-                createMockPokemon({ types: undefined as any }),
+                createMockPokemon({ types: undefined }),
             ];
 
             const result = buildTeamMatchups(team, Generation.Gen9);
@@ -204,7 +204,7 @@ describe("typeMatchups utilities", () => {
 
         it("handles Pokemon with empty types array", () => {
             const team: Pokemon[] = [
-                createMockPokemon({ types: [] as any }),
+                createMockPokemon({ types: [] as unknown as Pokemon["types"] }),
             ];
 
             const result = buildTeamMatchups(team, Generation.Gen9);
@@ -240,4 +240,3 @@ describe("typeMatchups utilities", () => {
         });
     });
 });
-

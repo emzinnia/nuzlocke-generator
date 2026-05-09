@@ -162,7 +162,10 @@ export function PokemonIconPlain({
     includeTitle,
     imageStyle,
     editorDarkMode,
-}: PokemonIconProps & { imageStyle: any; editorDarkMode?: boolean }) {
+}: PokemonIconProps & {
+    imageStyle?: React.CSSProperties;
+    editorDarkMode?: boolean;
+}) {
     const isUnknown = normalizeSpeciesName(
         species as Species,
     ) === "unknown";

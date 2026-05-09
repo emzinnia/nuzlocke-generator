@@ -128,7 +128,7 @@ const getGameNameSerebii = (name: Game) => {
 
 export interface GetPokemonImage {
     customImage?: string;
-    forme?: keyof typeof Forme;
+    forme?: Pokemon["forme"] | keyof typeof Forme;
     species?: string;
     name?: Game;
     style?: State["style"];
@@ -311,7 +311,7 @@ export async function getPokemonImage({
             handleTcgTransforms(
                 addForme(
                     (species || "").replace(/\s/g, "").replace(/'/g, ""),
-                    forme,
+                    forme as keyof typeof Forme,
                 ),
                 gender,
             ) || "missingno"
@@ -338,7 +338,7 @@ export async function getPokemonImage({
                 .replace(/\s/g, "-")
                 .replace(/'/g, "")
                 .replace(/:/g, "-"),
-            forme,
+            forme as keyof typeof Forme,
         ) || "missingno"
     ).toLowerCase()}.jpg)`;
 }

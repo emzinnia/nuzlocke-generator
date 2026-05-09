@@ -39,8 +39,6 @@ export interface CreditsData {
     art: { name: string; link?: string; role?: string }[];
 }
 
-export interface CreditsProps {}
-
 export function Credits() {
     const [creditsModal, setCreditsModal] = React.useState(false);
     const style = useSelector<State, State["style"]>((state) => state.style);

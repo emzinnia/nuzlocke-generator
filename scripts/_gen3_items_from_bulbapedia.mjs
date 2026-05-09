@@ -113,7 +113,6 @@ $("table").each((_i, table) => {
 
         if (existing !== name) {
             // Keep the first but surface a warning for manual review.
-            // eslint-disable-next-line no-console
             console.warn(
                 `Duplicate id ${id}: existing="${existing}", new="${name}" (keeping existing)`,
             );
@@ -138,5 +137,4 @@ for (const id of ids) {
 }
 
 console.log("};");
-
 

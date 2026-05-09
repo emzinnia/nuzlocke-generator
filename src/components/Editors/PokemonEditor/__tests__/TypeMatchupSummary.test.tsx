@@ -2,7 +2,7 @@ import * as React from "react";
 import { render, screen, fireEvent } from "utils/testUtils";
 import { describe, it, expect } from "vitest";
 import { TypeMatchupSummary } from "../TypeMatchupSummary";
-import { Types } from "utils";
+import { styleDefaults, Types } from "utils";
 import { Pokemon } from "models";
 
 const createMockPokemon = (overrides: Partial<Pokemon> = {}): Pokemon => ({
@@ -17,7 +17,7 @@ const defaultProps = {
     pokemon: [],
     game: { name: "Red" as const, customName: "" },
     customTypes: [],
-    style: { editorDarkMode: false } as any,
+    style: { ...styleDefaults, editorDarkMode: false },
 };
 
 describe("<TypeMatchupSummary />", () => {
@@ -238,7 +238,7 @@ describe("<TypeMatchupSummary />", () => {
     describe("text contrast", () => {
         it("uses light text in dark mode", () => {
             const { container } = render(
-                <TypeMatchupSummary {...defaultProps} style={{ editorDarkMode: true } as any} />,
+                <TypeMatchupSummary {...defaultProps} style={{ ...styleDefaults, editorDarkMode: true }} />,
             );
 
             const heading = container.querySelector("h3");
@@ -247,7 +247,7 @@ describe("<TypeMatchupSummary />", () => {
 
         it("uses dark text in light mode", () => {
             const { container } = render(
-                <TypeMatchupSummary {...defaultProps} style={{ editorDarkMode: false } as any} />,
+                <TypeMatchupSummary {...defaultProps} style={{ ...styleDefaults, editorDarkMode: false }} />,
             );
 
             const heading = container.querySelector("h3");
@@ -255,4 +255,3 @@ describe("<TypeMatchupSummary />", () => {
         });
     });
 });
-

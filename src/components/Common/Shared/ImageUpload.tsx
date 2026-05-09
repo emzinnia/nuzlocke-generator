@@ -2,26 +2,32 @@ import * as React from "react";
 import { Button, Intent } from "@blueprintjs/core";
 import { showToast } from "./appToaster";
 
-const toBase64 = (file) =>
-    new Promise((resolve, reject) => {
+const toBase64 = (file: File) =>
+    new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
+        reader.onload = () => {
+            if (typeof reader.result === "string") {
+                resolve(reader.result);
+                return;
+            }
+            reject(new Error("Expected FileReader to return a data URL."));
+        };
         reader.onerror = (error) => reject(error);
     });
 
 export interface ImageUploadProps {
     onSuccess: (data: string, fileName?: string) => void;
-    onError?: (error: any) => void;
+    onError?: (error: unknown) => void;
     multiple?: boolean;
 }
 
 const onUpload =
     ({ onSuccess, onError }: ImageUploadProps) =>
-    async (e: any) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files: File[] = Array.from(
             // Prefer `target` (matches how RTL passes `fireEvent.change(..., { target: { files }})`)
-            e?.target?.files ?? e?.currentTarget?.files ?? [],
+            e.target.files ?? e.currentTarget.files ?? [],
         );
         if (!files.length) {
             if (onError) {
@@ -46,7 +52,7 @@ const onUpload =
             }
             try {
                 const image = await toBase64(file);
-                onSuccess?.(image as string, file?.name);
+                onSuccess?.(image, file?.name);
                 uploaded += 1;
             } catch (err) {
                 failed += 1;
@@ -56,9 +62,9 @@ const onUpload =
 
         // Allow selecting the same files again (browser won't fire change otherwise).
         try {
-            if (e?.target) {
+            if (e.target) {
                 e.target.value = "";
-            } else if (e?.currentTarget) {
+            } else if (e.currentTarget) {
                 e.currentTarget.value = "";
             }
         } catch {

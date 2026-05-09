@@ -17,21 +17,31 @@ import {
     JUMP_TO_HISTORY_STATE,
 } from "actions";
 
+type TestState = {
+    count?: number;
+    pokemon?: Array<{ name?: string; level?: number }> | string[];
+    trainer?: { name: string; badges: number };
+    [key: string]: unknown;
+};
+
 // Helper to create forward and backward diffs
-function createDiffs(oldState: any, newState: any): { forwardDiff: DiffEntry; backwardDiff: DiffEntry } {
+function createDiffs(
+    oldState: TestState,
+    newState: TestState,
+): { forwardDiff: DiffEntry; backwardDiff: DiffEntry } {
     const forwardDiff = diff(oldState, newState) as DiffEntry;
     const backwardDiff = diff(newState, oldState) as DiffEntry;
     return { forwardDiff, backwardDiff };
 }
 
 // Helper to create a history entry from two states
-function createHistoryEntry(oldState: any, newState: any): HistoryEntry {
+function createHistoryEntry(oldState: TestState, newState: TestState): HistoryEntry {
     const { forwardDiff, backwardDiff } = createDiffs(oldState, newState);
     return { forwardDiff, backwardDiff };
 }
 
 describe("editorHistory reducer", () => {
-    const initialState: History<any> = {
+    const initialState: History<TestState> = {
         past: [],
         present: undefined,
         future: [],
@@ -75,7 +85,7 @@ describe("editorHistory reducer", () => {
             const newState = { pokemon: [{ name: "Pikachu" }, { name: "Charmander" }] };
             const { forwardDiff, backwardDiff } = createDiffs(oldState, newState);
 
-            const stateWithPresent: History<any> = {
+            const stateWithPresent: History<TestState> = {
                 past: [],
                 present: oldState,
                 future: [],
@@ -98,7 +108,7 @@ describe("editorHistory reducer", () => {
 
         it("does not create entry when diff is empty", () => {
             const state = { pokemon: [{ name: "Pikachu" }] };
-            const stateWithPresent: History<any> = {
+            const stateWithPresent: History<TestState> = {
                 past: [],
                 present: state,
                 future: [],
@@ -121,7 +131,7 @@ describe("editorHistory reducer", () => {
             const state3 = { pokemon: [{ name: "Squirtle" }] };
             const futureEntry = createHistoryEntry(state1, state2);
 
-            const stateWithFuture: History<any> = {
+            const stateWithFuture: History<TestState> = {
                 past: [],
                 present: state1,
                 future: [futureEntry],
@@ -147,7 +157,7 @@ describe("editorHistory reducer", () => {
                 entries.push(createHistoryEntry({ count: i }, { count: i + 1 }));
             }
 
-            const fullHistory: History<any> = {
+            const fullHistory: History<TestState> = {
                 past: entries,
                 present: { count: 50 },
                 future: [],
@@ -171,7 +181,7 @@ describe("editorHistory reducer", () => {
 
     describe("UNDO_EDITOR_HISTORY", () => {
         it("does nothing when past is empty", () => {
-            const state: History<any> = {
+            const state: History<TestState> = {
                 past: [],
                 present: { count: 1 },
                 future: [],
@@ -192,7 +202,7 @@ describe("editorHistory reducer", () => {
             const state2 = { pokemon: [{ name: "Pikachu" }, { name: "Charmander" }] };
             const entry = createHistoryEntry(state1, state2);
 
-            const state: History<any> = {
+            const state: History<TestState> = {
                 past: [entry],
                 present: state2,
                 future: [],
@@ -215,7 +225,7 @@ describe("editorHistory reducer", () => {
             const entry1 = createHistoryEntry(state1, state2);
             const entry2 = createHistoryEntry(state2, state3);
 
-            let state: History<any> = {
+            let state: History<TestState> = {
                 past: [entry1, entry2],
                 present: state3,
                 future: [],
@@ -238,7 +248,7 @@ describe("editorHistory reducer", () => {
 
     describe("REDO_EDITOR_HISTORY", () => {
         it("does nothing when future is empty", () => {
-            const state: History<any> = {
+            const state: History<TestState> = {
                 past: [],
                 present: { count: 1 },
                 future: [],
@@ -254,7 +264,7 @@ describe("editorHistory reducer", () => {
             const state2 = { pokemon: [{ name: "Pikachu" }, { name: "Charmander" }] };
             const entry = createHistoryEntry(state1, state2);
 
-            const state: History<any> = {
+            const state: History<TestState> = {
                 past: [],
                 present: state1,
                 future: [entry],
@@ -277,7 +287,7 @@ describe("editorHistory reducer", () => {
             const entry1 = createHistoryEntry(state1, state2);
             const entry2 = createHistoryEntry(state2, state3);
 
-            let state: History<any> = {
+            let state: History<TestState> = {
                 past: [],
                 present: state1,
                 future: [entry1, entry2],
@@ -304,7 +314,7 @@ describe("editorHistory reducer", () => {
             const state2 = { count: 2 };
             const entry = createHistoryEntry(state1, state2);
 
-            const state: History<any> = {
+            const state: History<TestState> = {
                 past: [entry],
                 present: state2,
                 future: [],
@@ -322,7 +332,7 @@ describe("editorHistory reducer", () => {
             const entry1 = createHistoryEntry(state1, state2);
             const entry2 = createHistoryEntry(state2, state3);
 
-            const state: History<any> = {
+            const state: History<TestState> = {
                 past: [entry1, entry2],
                 present: state3,
                 future: [],
@@ -345,7 +355,7 @@ describe("editorHistory reducer", () => {
             const entry1 = createHistoryEntry(state1, state2);
             const entry2 = createHistoryEntry(state2, state3);
 
-            const state: History<any> = {
+            const state: History<TestState> = {
                 past: [],
                 present: state1,
                 future: [entry1, entry2],
@@ -368,7 +378,7 @@ describe("editorHistory reducer", () => {
             const state2 = { count: 2 };
             const entry = createHistoryEntry(state1, state2);
 
-            const state: History<any> = {
+            const state: History<TestState> = {
                 past: [entry],
                 present: state2,
                 future: [],
@@ -412,7 +422,7 @@ describe("editorHistory reducer", () => {
                 const state2 = { count: 2 };
                 const entry = createHistoryEntry(state1, state2);
 
-                const history: History<any> = {
+                const history: History<TestState> = {
                     past: [entry],
                     present: state2,
                     future: [],
@@ -430,7 +440,7 @@ describe("editorHistory reducer", () => {
                 const entry1 = createHistoryEntry(state1, state2);
                 const entry2 = createHistoryEntry(state2, state3);
 
-                const history: History<any> = {
+                const history: History<TestState> = {
                     past: [entry1, entry2],
                     present: state3,
                     future: [],
@@ -453,7 +463,7 @@ describe("editorHistory reducer", () => {
                 const entry1 = createHistoryEntry(state1, state2);
                 const entry2 = createHistoryEntry(state2, state3);
 
-                const history: History<any> = {
+                const history: History<TestState> = {
                     past: [],
                     present: state1,
                     future: [entry1, entry2],
@@ -470,7 +480,7 @@ describe("editorHistory reducer", () => {
             });
 
             it("returns undefined when present is null", () => {
-                const history: History<any> = {
+                const history: History<TestState> = {
                     past: [],
                     present: undefined,
                     future: [],
@@ -490,7 +500,7 @@ describe("editorHistory reducer", () => {
             const state3 = { count: 3 };
             const entry1 = createHistoryEntry(state1, state2);
 
-            let history: History<any> = {
+            let history: History<TestState> = {
                 past: [entry1],
                 present: state2,
                 future: [],
@@ -528,7 +538,7 @@ describe("editorHistory reducer", () => {
 
             const entry = createHistoryEntry(state1, state2);
 
-            let history: History<any> = {
+            let history: History<TestState> = {
                 past: [entry],
                 present: state2,
                 future: [],
@@ -538,14 +548,16 @@ describe("editorHistory reducer", () => {
             // Undo
             history = editorHistory(history, { type: UNDO_EDITOR_HISTORY });
             expect(history.present).toEqual(state1);
-            expect(history.present.trainer.badges).toBe(0);
-            expect(history.present.pokemon[0].level).toBe(5);
+            const undoPresent = history.present as typeof state1;
+            expect(undoPresent.trainer.badges).toBe(0);
+            expect(undoPresent.pokemon[0].level).toBe(5);
 
             // Redo
             history = editorHistory(history, { type: REDO_EDITOR_HISTORY });
             expect(history.present).toEqual(state2);
-            expect(history.present.trainer.badges).toBe(1);
-            expect(history.present.pokemon[0].level).toBe(10);
+            const redoPresent = history.present as typeof state2;
+            expect(redoPresent.trainer.badges).toBe(1);
+            expect(redoPresent.pokemon[0].level).toBe(10);
         });
 
         it("handles array element removal and addition", () => {
@@ -556,7 +568,7 @@ describe("editorHistory reducer", () => {
             const entry1 = createHistoryEntry(state1, state2);
             const entry2 = createHistoryEntry(state2, state3);
 
-            let history: History<any> = {
+            let history: History<TestState> = {
                 past: [entry1, entry2],
                 present: state3,
                 future: [],
@@ -569,16 +581,14 @@ describe("editorHistory reducer", () => {
 
             history = editorHistory(history, { type: UNDO_EDITOR_HISTORY });
             expect(history.present).toEqual(state1);
-            expect(history.present.pokemon).toContain("Charmander");
+            expect(history.present?.pokemon).toContain("Charmander");
 
             // Redo twice to get back to state3
             history = editorHistory(history, { type: REDO_EDITOR_HISTORY });
             history = editorHistory(history, { type: REDO_EDITOR_HISTORY });
             expect(history.present).toEqual(state3);
-            expect(history.present.pokemon).toContain("Bulbasaur");
-            expect(history.present.pokemon).not.toContain("Charmander");
+            expect(history.present?.pokemon).toContain("Bulbasaur");
+            expect(history.present?.pokemon).not.toContain("Charmander");
         });
     });
 });
-
-

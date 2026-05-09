@@ -10,16 +10,23 @@ export type PokemonExtraDataStatsProps = {
     renderStat: StatRenderer;
 };
 
+type ExtraDataRecord = Record<string, unknown> & {
+    stats?: Record<string, unknown>;
+};
+
+const isExtraDataRecord = (value: unknown): value is ExtraDataRecord =>
+    typeof value === "object" && value !== null;
+
 export const PokemonExtraDataStats = ({
     effectiveGeneration,
     extraData,
     renderStat,
 }: PokemonExtraDataStatsProps) => {
-    const ed = (extraData ?? {}) as any;
+    const ed = isExtraDataRecord(extraData) ? extraData : {};
 
     // Gen 3 stats live under extraData.stats for party Pokémon (see `src/parsers/gen3.ts`).
     // We fall back to the root `extraData` to avoid breaking older data shapes.
-    const gen3Stats = ed?.stats ?? ed;
+    const gen3Stats = isExtraDataRecord(ed.stats) ? ed.stats : ed;
 
     if (effectiveGeneration === Generation.Gen1) {
         return (
@@ -71,5 +78,4 @@ export const PokemonExtraDataStats = ({
         </>
     );
 };
-
 

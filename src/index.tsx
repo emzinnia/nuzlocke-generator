@@ -15,7 +15,7 @@ import { isLocal } from "utils";
 import { ErrorBoundary } from "components";
 import { AppToasterHost } from "components/Common/Shared/appToaster";
 
-(window as any).global = window;
+(window as unknown as Window & { global: Window }).global = window;
 
 // @TODO: add back Buffer/Path
 // // @ts-ignore
@@ -44,7 +44,7 @@ async function getRollbar() {
         enabled: isLocal() ? false : true,
     });
 
-    Rollbar.init(rollbarConfig as any);
+    Rollbar.init(rollbarConfig as unknown as Parameters<typeof Rollbar.init>[0]);
 }
 
 getRollbar().then((res) => res);
@@ -106,7 +106,7 @@ async function createRender() {
         import("components/Layout/App").then((res) => ({ default: res.App })),
     );
 
-    const ReduxProvider = Provider as any;
+    const ReduxProvider = Provider;
 
     if (!mountNode) {
         throw new Error("Failed to locate app mount node");

@@ -96,7 +96,7 @@ export function TeamPokemon({
         (async () => {
             const newImage = await getPokemonImage({
                 customImage: pokemon.customImage,
-                forme: pokemon.forme as any,
+                forme: pokemon.forme,
                 species: pokemon.species,
                 shiny: pokemon.shiny,
                 style: style,

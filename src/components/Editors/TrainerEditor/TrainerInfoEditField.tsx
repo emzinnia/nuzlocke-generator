@@ -1,15 +1,16 @@
 import * as React from "react";
-import { Omit } from "ramda";
 import { debounce } from "utils/debounce";
 
 export interface TrainerInfoEditFieldProps {
-    label: React.ReactElement<any> | string;
+    label: React.ReactNode;
     name: string;
     placeholder: string;
-    onEdit?: any;
-    onInput?: any;
+    onEdit?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onInput?: (e: React.FormEvent<HTMLInputElement>) => void;
     value?: string;
-    element?: (inputProps: Omit<TrainerInfoEditFieldProps, "element">) => any;
+    element?: (
+        inputProps: Omit<TrainerInfoEditFieldProps, "element">,
+    ) => React.ReactNode;
 }
 
 export function TrainerInfoEditField({
@@ -24,7 +25,7 @@ export function TrainerInfoEditField({
     const [innerValue, setValue] = React.useState<string | undefined>("");
 
     const delayedValue = React.useCallback(
-        debounce((e) => onEdit(e), 300),
+        debounce((e: React.ChangeEvent<HTMLInputElement>) => onEdit?.(e), 300),
         [value],
     );
 
@@ -32,7 +33,7 @@ export function TrainerInfoEditField({
         setValue(value);
     }, [value]);
 
-    const onChange = (e) => {
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.persist();
         setValue(e.target.value);
         delayedValue(e);

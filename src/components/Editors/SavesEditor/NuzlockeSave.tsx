@@ -51,12 +51,10 @@ export interface NuzlockeSaveControlsState {
     deletionFunction?: () => void;
 }
 
-interface ContainsId {
-    id: number;
-    [prop: string]: any;
-}
-
-const sort = (a: ContainsId, b: ContainsId) => a.id - b.id;
+const sort = (
+    a: State["nuzlockes"]["saves"][number],
+    b: State["nuzlockes"]["saves"][number],
+) => a.id.localeCompare(b.id);
 
 const stripEditorDarkModeFromState = (state: State) => {
     const baseState = omit(["nuzlockes", "editorHistory"], state) as {
@@ -127,9 +125,9 @@ export class NuzlockeSaveBase extends React.Component<
                     style={{ marginBottom: "0.25rem" }}
                     onClick={() => {
                         updateNuzlocke(currentId, state);
-                        const data = createStore(appReducers)?.getState();
+                        const data = createStore(appReducers)?.getState() as unknown as State;
                         const preparedData = stripEditorDarkModeFromState(
-                            data as unknown as State,
+                            data,
                         );
                         newNuzlocke(JSON.stringify(preparedData), {
                             isCopy: false,
@@ -196,7 +194,7 @@ export class NuzlockeSaveBase extends React.Component<
                                 color={color}
                                 data={parsedData}
                                 isCurrent={isCurrent}
-                                isCopy={isCopy}
+                                isCopy={Boolean(isCopy)}
                                 size={((data.length * 2) / 1024).toFixed(2)}
                             />
                             <DeleteAlert
@@ -343,4 +341,4 @@ export const NuzlockeSave = connect(
         replaceState,
         updateSwitchNuzlocke,
     },
-)(NuzlockeSaveBase as any);
+)(NuzlockeSaveBase);

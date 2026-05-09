@@ -44,7 +44,7 @@ export class DeepSet<T> {
         return this.set;
     }
 
-    public static cheapCompare(o: any, i: any) {
+    public static cheapCompare(o: unknown, i: unknown) {
         return JSON.stringify(o) === JSON.stringify(i);
     }
 }

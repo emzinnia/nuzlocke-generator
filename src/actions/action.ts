@@ -3,10 +3,12 @@
  * @param T type
  * @param P payload
  */
-export interface Action<T, P = any> {
+type LegacyActionPayload = ReturnType<typeof JSON.parse>;
+
+export interface Action<T, P = LegacyActionPayload> {
     type: T;
     [payload: string]: P | T;
-    readonly meta?: any;
+    readonly meta?: LegacyActionPayload;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -16,7 +18,7 @@ export namespace Action {
     export type Payload<P> = { [K in Index]?: P };
     export interface Data<T extends Type> {
         readonly type: T & Type;
-        readonly meta?: any;
+        readonly meta?: LegacyActionPayload;
     }
 }
 

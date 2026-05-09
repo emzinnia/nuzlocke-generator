@@ -8,9 +8,15 @@ import {
 } from "actions";
 import { v4 as uuid } from "uuid";
 
+export interface NuzlockeSaveEntry {
+    id: string;
+    data: string;
+    isCopy?: boolean;
+}
+
 export interface Nuzlockes {
     currentId: string;
-    saves: any[];
+    saves: NuzlockeSaveEntry[];
 }
 
 export function nuzlockes(

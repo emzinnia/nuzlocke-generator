@@ -1,7 +1,13 @@
 export const classWithDarkTheme = (
-    css: any,
+    css: Record<string, unknown>,
     name: string,
     condition: boolean = true,
 ) => {
-    return { [css[name]]: true, [css[`${name}_dark`]]: condition };
+    const baseClass = css[name];
+    const darkClass = css[`${name}_dark`];
+
+    return {
+        ...(typeof baseClass === "string" ? { [baseClass]: true } : {}),
+        ...(typeof darkClass === "string" ? { [darkClass]: condition } : {}),
+    };
 };

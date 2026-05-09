@@ -96,9 +96,8 @@ function parseArgs(argv: string[]) {
             if (v !== "regular" && v !== "shiny" && v !== "both") {
                 throw new Error(`--variant must be regular, shiny, or both (got ${v})`);
             }
-            args.variant = v as any;
+            args.variant = v;
         } else if (a === "--help" || a === "-h") {
-            // eslint-disable-next-line no-console
             console.log(`Download PokéSprite box icons (Gen 8)
 
 Flags:
@@ -290,7 +289,6 @@ async function runPool<T, R>(
     const results: R[] = [];
 
     async function runOne() {
-        // eslint-disable-next-line no-constant-condition
         while (true) {
             const current = index;
             index += 1;
@@ -323,7 +321,6 @@ async function main() {
         ),
     );
 
-    // eslint-disable-next-line no-console
     console.log(
         `Fetched ${filtered.length} sprite references from dex-gen8.html (${args.variant}) -> ${path.relative(
             repoRoot,
@@ -333,7 +330,6 @@ async function main() {
         })`,
     );
     if (genderNote.length) {
-        // eslint-disable-next-line no-console
         console.log(
             `Female variants detected for: ${genderNote.join(", ")}` +
                 (genderNote.some((slug) => !genderedSpecies.has(slug))
@@ -342,7 +338,6 @@ async function main() {
         );
     }
     if (unknownSlugs.size) {
-        // eslint-disable-next-line no-console
         console.warn(
             `Note: ${unknownSlugs.size} slugs were not matched to the known species list: ${Array.from(
                 unknownSlugs,
@@ -365,16 +360,13 @@ async function main() {
         { total: 0, downloaded: 0, skipped: 0, dryRun: 0 },
     );
 
-    // eslint-disable-next-line no-console
     console.log(
         `Done. downloaded=${summary.downloaded} skipped_exists=${summary.skipped} dry_run=${summary.dryRun} total=${summary.total}`,
     );
 }
 
 main().catch((err) => {
-    // eslint-disable-next-line no-console
     console.error(err);
     process.exit(1);
 });
-
 

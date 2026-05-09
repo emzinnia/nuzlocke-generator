@@ -108,7 +108,7 @@ export class RulesEditor extends React.Component<RulesEditorProps, RulesEditorSt
                 <TextArea
                     value={rule}
                     className={Classes.FILL}
-                    onChange={(e: any) =>
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                         this.props.editRule(index, e.target.value)
                     }
                     dir="auto"
@@ -323,7 +323,11 @@ export class RulesEditor extends React.Component<RulesEditorProps, RulesEditorSt
 }
 
 export const RulesEditorDialogBase = (
-    props: RulesEditorProps & { onClose: any; isOpen: boolean; style: any },
+    props: RulesEditorProps & {
+        onClose: () => void;
+        isOpen: boolean;
+        style: State["style"];
+    },
 ) => {
     return (
         <Dialog
@@ -353,4 +357,4 @@ export const RulesEditorDialog = connect(
         style: state.style,
     }),
     { editRule, addRule, deleteRule, resetRules, setRules },
-)(RulesEditorDialogBase as any);
+)(RulesEditorDialogBase);

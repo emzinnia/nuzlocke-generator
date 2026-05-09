@@ -327,7 +327,7 @@ const parsePokemon = (
 };
 
 const getSpeciesList = (buf: Buffer) => {
-    const str: any[] = [];
+    const str: string[] = [];
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < buf.length; i++) {
         if (buf[i] === 0xff) {
@@ -398,7 +398,7 @@ const transformPokemon = (
 };
 
 const convertWithCharMap = (buf: Buffer, nickname = false) => {
-    const str: any[] = [];
+    const str: string[] = [];
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < buf.length; i++) {
         // tslint:disable-next-line:triple-equals

@@ -1,4 +1,5 @@
 import { Action } from "./action";
+import { State } from "state";
 
 /**
  * Similar to REPLACE_STATE but specifically for undo/redo operations.
@@ -7,11 +8,19 @@ import { Action } from "./action";
 export type SYNC_STATE_FROM_HISTORY = "SYNC_STATE_FROM_HISTORY";
 export const SYNC_STATE_FROM_HISTORY: SYNC_STATE_FROM_HISTORY = "SYNC_STATE_FROM_HISTORY";
 
-export type syncStateFromHistory = (syncWith: any) => Action<SYNC_STATE_FROM_HISTORY>;
-export function syncStateFromHistory(syncWith: any): Action<SYNC_STATE_FROM_HISTORY> {
+export interface SyncStateFromHistoryAction
+    extends Action<SYNC_STATE_FROM_HISTORY, Partial<State>> {
+    syncWith: Partial<State>;
+}
+
+export type syncStateFromHistory = (
+    syncWith: Partial<State>,
+) => SyncStateFromHistoryAction;
+export function syncStateFromHistory(
+    syncWith: Partial<State>,
+): SyncStateFromHistoryAction {
     return {
         type: SYNC_STATE_FROM_HISTORY,
         syncWith,
     };
 }
-
