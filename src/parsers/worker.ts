@@ -22,6 +22,48 @@ interface MessageData {
     };
 }
 
+type NonAutoGameSaveFormat = Exclude<GameSaveFormat, "Auto">;
+type Gen3SaveFormat = "RS" | "FRLG" | "Emerald";
+
+type ParsedMonForInference = {
+    species?: string;
+    status?: string;
+    extraData?: {
+        originGame?: string;
+    };
+};
+
+type SaveParseResult = {
+    pokemon: ParsedMonForInference[];
+    isYellow?: boolean;
+    game?: GameName;
+    [key: string]: unknown;
+};
+
+type ParseContext = {
+    buf: Buffer;
+    gen1Gen2Buf: Buffer;
+    selectedGame?: GameSaveFormat;
+    boxMappings: BoxMappings;
+    fileName?: string;
+    gen3SaveFormatHint?: Gen3SaveFormat;
+    gen4SaveFormatHint?: Gen4Variant;
+    gen5SaveFormatHint?: Gen5Game;
+};
+
+type ParserHandler = {
+    isFormat: (gameChoice: NonAutoGameSaveFormat) => boolean;
+    parse: (
+        context: ParseContext,
+        gameChoice: NonAutoGameSaveFormat,
+    ) => Promise<SaveParseResult>;
+    detectGame: (
+        context: ParseContext,
+        gameChoice: NonAutoGameSaveFormat,
+        result: SaveParseResult,
+    ) => GameModel | undefined;
+};
+
 self.onmessageerror = (err) => {
     console.error("save worker message error", err);
 };
@@ -56,6 +98,46 @@ const getHintTokens = (s: string) =>
 const hasHintToken = (tokens: string[], ...values: string[]) =>
     tokens.some((token) => values.includes(token));
 
+const asSaveParseResult = (result: unknown) => result as SaveParseResult;
+
+const isExplicitGameChoice = (
+    selectedGame?: GameSaveFormat,
+): selectedGame is NonAutoGameSaveFormat =>
+    Boolean(selectedGame && selectedGame !== "Auto");
+
+const isAutoSelected = (context: ParseContext) =>
+    !isExplicitGameChoice(context.selectedGame);
+
+const isGen3SizedSave = (buf: Buffer) =>
+    buf.length === SAVE_SIZE_GEN3 || buf.length === SAVE_SIZE_GEN3_TRIMMED;
+
+const isGen1Gen2SizedSave = (buf: Buffer) =>
+    buf.length >= SAVE_SIZE_GEN1_GEN2 &&
+    buf.length <= SAVE_SIZE_GEN1_GEN2_MAX_WITH_PADDING;
+
+const isGen1SaveFormat = (
+    gameChoice: NonAutoGameSaveFormat,
+): gameChoice is "RBY" => gameChoice === "RBY";
+
+const isGen2SaveFormat = (
+    gameChoice: NonAutoGameSaveFormat,
+): gameChoice is "GS" | "Crystal" =>
+    gameChoice === "GS" || gameChoice === "Crystal";
+
+const isGen3SaveFormat = (
+    gameChoice: NonAutoGameSaveFormat,
+): gameChoice is Gen3SaveFormat =>
+    gameChoice === "RS" || gameChoice === "FRLG" || gameChoice === "Emerald";
+
+const isGen4SaveFormat = (
+    gameChoice: NonAutoGameSaveFormat,
+): gameChoice is Gen4Variant =>
+    gameChoice === "DP" || gameChoice === "Platinum" || gameChoice === "HGSS";
+
+const isGen5SaveFormat = (
+    gameChoice: NonAutoGameSaveFormat,
+): gameChoice is Gen5Game => gameChoice === "BW" || gameChoice === "B2W2";
+
 const detectGen3GameNameFromString = (text: string): GameName | undefined => {
     const s = normalizeForTokenSearch(text);
 
@@ -71,7 +153,7 @@ const detectGen3GameNameFromString = (text: string): GameName | undefined => {
     return undefined;
 };
 
-const detectGen3SaveFormatFromString = (text: string): GameSaveFormat | undefined => {
+const detectGen3SaveFormatFromString = (text: string): Gen3SaveFormat | undefined => {
     const name = detectGen3GameNameFromString(text);
     if (!name) return undefined;
     if (name === "FireRed" || name === "LeafGreen") return "FRLG";
@@ -311,7 +393,7 @@ const detectGen4VariantFromBuffer = (buf: Buffer): Gen4Variant | undefined => {
  * Detect the Gen 4 save format (DP, Platinum, or HGSS) from buffer and/or filename.
  * Falls back to "DP" if no specific variant can be determined.
  */
-const detectGen4SaveFormat = (buf: Buffer, fileName?: string): GameSaveFormat => {
+const detectGen4SaveFormat = (buf: Buffer, fileName?: string): Gen4Variant => {
     const detected = detectGen4VariantFromBuffer(buf);
     if (detected) return detected;
 
@@ -441,13 +523,6 @@ const detectGen2IsCrystal = (buf: Buffer) => {
     return crScore > gsScore;
 };
 
-type ParsedMonForInference = {
-    status?: string;
-    extraData?: {
-        originGame?: string;
-    };
-};
-
 const inferGen3GameFromPokemon = (
     pokemon: ParsedMonForInference[],
 ): GameName | undefined => {
@@ -503,11 +578,17 @@ const parseGen3WithBestVariant = async (
     return frlgTeamCount > emeraldTeamCount ? asFrlg : asEmerald;
 };
 
-self.onmessage = async ({
-    data: { save, selectedGame, boxMappings, fileName },
-}: MessageData) => {
-    let result;
+const detectGen1Gen2GameChoice = (buf: Buffer): "RBY" | "Crystal" | "GS" => {
+    if (isLikelyGen1Save(buf)) return "RBY";
+    return detectGen2IsCrystal(buf) ? "Crystal" : "GS";
+};
 
+const createParseContext = ({
+    save,
+    selectedGame,
+    boxMappings,
+    fileName,
+}: MessageData["data"]): ParseContext => {
     if (!save) {
         throw new Error("No save file detected.");
     }
@@ -515,155 +596,257 @@ self.onmessage = async ({
     const buf = toBuffer(save);
     const gen1Gen2Buf = normalizeGen1Gen2Buffer(buf);
     const gen3SaveFormatHint =
-        buf.length === SAVE_SIZE_GEN3 || buf.length === SAVE_SIZE_GEN3_TRIMMED
+        isGen3SizedSave(buf)
             ? (fileName ? detectGen3SaveFormatFromString(fileName) : undefined)
             : undefined;
     const gen5SaveFormatHint = detectGen5SaveFormat(buf, fileName);
-
-    // Auto-detect Gen 4 variant based on file structure and filename
     const gen4SaveFormatHint =
         buf.length >= SAVE_SIZE_GEN4 && !gen5SaveFormatHint
             ? detectGen4SaveFormat(buf, fileName)
             : undefined;
 
-    const gameChoice: GameSaveFormat =
-        selectedGame && selectedGame !== "Auto"
-            ? selectedGame
-            : gen5SaveFormatHint
-              ? gen5SaveFormatHint
-              : buf.length >= SAVE_SIZE_GEN4
-              ? gen4SaveFormatHint ?? "DP"
-              : buf.length === SAVE_SIZE_GEN3 || buf.length === SAVE_SIZE_GEN3_TRIMMED
-                ? gen3SaveFormatHint ?? "Emerald"
-                : buf.length >= SAVE_SIZE_GEN1_GEN2 &&
-                    buf.length <= SAVE_SIZE_GEN1_GEN2_MAX_WITH_PADDING
-                  ? isLikelyGen1Save(gen1Gen2Buf)
-                      ? "RBY"
-                      : detectGen2IsCrystal(gen1Gen2Buf)
-                        ? "Crystal"
-                        : "GS"
-                  : // fallback: try gen3 if it's "large-ish", else assume gen2
-                    buf.length > SAVE_SIZE_GEN1_GEN2
-                    ? "Emerald"
-                    : "GS";
+    return {
+        buf,
+        gen1Gen2Buf,
+        selectedGame,
+        boxMappings,
+        fileName,
+        gen3SaveFormatHint,
+        gen4SaveFormatHint,
+        gen5SaveFormatHint,
+    };
+};
 
-    if (gameChoice === "RBY") {
-        result = await parseGen1Save(gen1Gen2Buf, { boxMappings });
-    } else if (gameChoice === "GS") {
-        result = await parseGen2Save(gen1Gen2Buf, { isCrystal: false, boxMappings });
-    } else if (gameChoice === "Crystal") {
-        result = await parseGen2Save(gen1Gen2Buf, { isCrystal: true, boxMappings });
-    } else if (gameChoice === "RS" || gameChoice === "FRLG" || gameChoice === "Emerald") {
-        // If the user picked "Auto", we still need the correct gen3 variant (FRLG vs RSE) for party offsets.
-        if (!selectedGame || selectedGame === "Auto") {
-            try {
-                // If the save itself contains a strong hint, trust it.
-                if (gen3SaveFormatHint) {
-                    result = await parseGen3Save(buf, {
-                        boxMappings,
-                        selectedGame: gen3SaveFormatHint,
-                    });
-                } else {
-                    result = await parseGen3WithBestVariant(buf, boxMappings);
-                }
-            } catch (err) {
-                // Some Gen1/2 saves come with tiny padding (e.g. 0x802c) which can trick Auto into Gen3.
-                // If Gen3 rejects the size, fall back to Gen1/2 parsing on the normalized 32KiB buffer.
-                const msg =
-                    err instanceof Error ? err.message : typeof err === "string" ? err : "";
-                if (typeof msg === "string" && msg.includes("Unexpected Gen 3 save size")) {
-                    const fallbackChoice = isLikelyGen1Save(gen1Gen2Buf)
-                        ? ("RBY" as const)
-                        : detectGen2IsCrystal(gen1Gen2Buf)
-                          ? ("Crystal" as const)
-                          : ("GS" as const);
-                    result =
-                        fallbackChoice === "RBY"
-                            ? await parseGen1Save(gen1Gen2Buf, { boxMappings })
-                            : await parseGen2Save(gen1Gen2Buf, {
-                                  isCrystal: fallbackChoice === "Crystal",
-                                  boxMappings,
-                              });
-                } else {
-                    throw err;
-                }
-            }
-        } else {
-            result = await parseGen3Save(buf, { boxMappings, selectedGame: gameChoice });
+const detectAutoGameChoice = (context: ParseContext): NonAutoGameSaveFormat => {
+    if (context.gen5SaveFormatHint) return context.gen5SaveFormatHint;
+    if (context.buf.length >= SAVE_SIZE_GEN4) {
+        return context.gen4SaveFormatHint ?? "DP";
+    }
+    if (isGen3SizedSave(context.buf)) {
+        return context.gen3SaveFormatHint ?? "Emerald";
+    }
+    if (isGen1Gen2SizedSave(context.buf)) {
+        return detectGen1Gen2GameChoice(context.gen1Gen2Buf);
+    }
+
+    // Fallback: try Gen 3 if it's "large-ish", else assume Gen 2.
+    return context.buf.length > SAVE_SIZE_GEN1_GEN2 ? "Emerald" : "GS";
+};
+
+const selectGameChoice = (context: ParseContext): NonAutoGameSaveFormat =>
+    isExplicitGameChoice(context.selectedGame)
+        ? context.selectedGame
+        : detectAutoGameChoice(context);
+
+const parseGen1Choice = async (context: ParseContext) =>
+    asSaveParseResult(
+        await parseGen1Save(context.gen1Gen2Buf, {
+            boxMappings: context.boxMappings,
+        }),
+    );
+
+const parseGen2Choice = async (
+    context: ParseContext,
+    gameChoice: NonAutoGameSaveFormat,
+) =>
+    asSaveParseResult(
+        await parseGen2Save(context.gen1Gen2Buf, {
+            isCrystal: gameChoice === "Crystal",
+            boxMappings: context.boxMappings,
+        }),
+    );
+
+const isUnexpectedGen3SizeError = (err: unknown) => {
+    const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "";
+    return msg.includes("Unexpected Gen 3 save size");
+};
+
+const parsePaddedGen1Gen2Fallback = async (context: ParseContext) => {
+    const fallbackChoice = detectGen1Gen2GameChoice(context.gen1Gen2Buf);
+    return fallbackChoice === "RBY"
+        ? parseGen1Choice(context)
+        : parseGen2Choice(context, fallbackChoice);
+};
+
+const parseAutoGen3Choice = async (context: ParseContext) => {
+    try {
+        if (context.gen3SaveFormatHint) {
+            return asSaveParseResult(
+                await parseGen3Save(context.buf, {
+                    boxMappings: context.boxMappings,
+                    selectedGame: context.gen3SaveFormatHint,
+                }),
+            );
         }
-    } else if (gameChoice === "DP" || gameChoice === "Platinum" || gameChoice === "HGSS") {
-        const preferredGen4 =
-            selectedGame === "DP" ||
-            selectedGame === "Platinum" ||
-            selectedGame === "HGSS"
-                ? selectedGame
-                : undefined;
-        result = await parseGen4Save(buf, {
-            boxMappings,
+
+        return asSaveParseResult(
+            await parseGen3WithBestVariant(context.buf, context.boxMappings),
+        );
+    } catch (err) {
+        // Some Gen1/2 saves come with tiny padding (e.g. 0x802c) which can trick Auto into Gen3.
+        // If Gen3 rejects the size, fall back to Gen1/2 parsing on the normalized 32KiB buffer.
+        if (isUnexpectedGen3SizeError(err)) {
+            return parsePaddedGen1Gen2Fallback(context);
+        }
+        throw err;
+    }
+};
+
+const parseGen3Choice = async (
+    context: ParseContext,
+    gameChoice: NonAutoGameSaveFormat,
+) => {
+    if (isAutoSelected(context)) {
+        return parseAutoGen3Choice(context);
+    }
+
+    return asSaveParseResult(
+        await parseGen3Save(context.buf, {
+            boxMappings: context.boxMappings,
+            selectedGame: gameChoice,
+        }),
+    );
+};
+
+const parseGen4Choice = async (context: ParseContext) => {
+    const preferredGen4 =
+        isExplicitGameChoice(context.selectedGame) &&
+        isGen4SaveFormat(context.selectedGame)
+            ? context.selectedGame
+            : undefined;
+
+    return asSaveParseResult(
+        await parseGen4Save(context.buf, {
+            boxMappings: context.boxMappings,
             selectedGame: preferredGen4,
-        });
-    } else if (gameChoice === "BW" || gameChoice === "B2W2") {
-        const preferredGen5 =
-            selectedGame === "BW" || selectedGame === "B2W2"
-                ? selectedGame
-                : gen5SaveFormatHint;
-        result = await parseGen5Save(buf, {
-            boxMappings,
+        }),
+    );
+};
+
+const parseGen5Choice = async (context: ParseContext) => {
+    const preferredGen5 =
+        isExplicitGameChoice(context.selectedGame) &&
+        isGen5SaveFormat(context.selectedGame)
+            ? context.selectedGame
+            : context.gen5SaveFormatHint;
+
+    return asSaveParseResult(
+        await parseGen5Save(context.buf, {
+            boxMappings: context.boxMappings,
             selectedGame: preferredGen5,
-        });
-    } else {
-        throw new Error(`Unsupported game type: ${gameChoice}`);
-    }
+        }),
+    );
+};
 
-    // strip out invalid species
-    result.pokemon = result.pokemon.filter((poke) => poke.species);
+const detectGen1Game = (
+    context: ParseContext,
+    gameChoice: NonAutoGameSaveFormat,
+    result: SaveParseResult,
+) => makeGame(result.isYellow ? "Yellow" : "Red");
 
-    let detectedGame: GameModel | undefined;
-    if (gameChoice === "RBY") {
-        detectedGame = makeGame(result.isYellow ? "Yellow" : "Red");
-    } else if (gameChoice === "Crystal") {
-        detectedGame = makeGame("Crystal");
-    } else if (gameChoice === "GS") {
-        detectedGame = makeGame("Gold");
-    } else if (gameChoice === "DP" || gameChoice === "Platinum" || gameChoice === "HGSS") {
-        // Gen 4: use filename hints or default based on detected format
-        const gen4Hint = fileName ? detectGen4GameNameFromString(fileName) : undefined;
-        if (gen4Hint && gen4GameMatchesSaveFormat(gen4Hint, gameChoice)) {
-            detectedGame = makeGame(gen4Hint);
-        } else if (gameChoice === "HGSS") {
-            detectedGame = makeGame("HeartGold");
-        } else if (gameChoice === "Platinum") {
-            detectedGame = makeGame("Platinum");
-        } else {
-            detectedGame = makeGame("Diamond");
-        }
-    } else if (gameChoice === "BW" || gameChoice === "B2W2") {
-        const gen5Hint = fileName ? detectGen5GameNameFromString(fileName) : undefined;
-        if (result.game) {
-            detectedGame = makeGame(result.game);
-        } else if (gen5Hint && gen5GameMatchesSaveFormat(gen5Hint, gameChoice)) {
-            detectedGame = makeGame(gen5Hint);
-        } else if (gameChoice === "B2W2") {
-            detectedGame = makeGame("Black 2");
-        } else {
-            detectedGame = makeGame("Black");
-        }
-    } else {
-        const hinted = fileName ? detectGen3GameNameFromString(fileName) : undefined;
-        if (hinted) {
-            detectedGame = makeGame(hinted);
-        } else {
-        // Gen 3: infer exact title (Ruby vs Sapphire, FireRed vs LeafGreen, etc.) from origin-game majority.
-            const inferred = inferGen3GameFromPokemon(result.pokemon);
-            if (inferred) detectedGame = makeGame(inferred);
-            else if (gameChoice === "FRLG") detectedGame = makeGame("FireRed");
-            else if (gameChoice === "Emerald") detectedGame = makeGame("Emerald");
-            else detectedGame = makeGame("Ruby");
-        }
+const detectGen2Game = (
+    context: ParseContext,
+    gameChoice: NonAutoGameSaveFormat,
+) => makeGame(gameChoice === "Crystal" ? "Crystal" : "Gold");
+
+const detectGen3Game = (
+    context: ParseContext,
+    gameChoice: NonAutoGameSaveFormat,
+    result: SaveParseResult,
+) => {
+    const hinted = context.fileName
+        ? detectGen3GameNameFromString(context.fileName)
+        : undefined;
+    if (hinted) return makeGame(hinted);
+
+    // Infer exact title (Ruby vs Sapphire, FireRed vs LeafGreen, etc.) from origin-game majority.
+    const inferred = inferGen3GameFromPokemon(result.pokemon);
+    if (inferred) return makeGame(inferred);
+    if (gameChoice === "FRLG") return makeGame("FireRed");
+    if (gameChoice === "Emerald") return makeGame("Emerald");
+    return makeGame("Ruby");
+};
+
+const detectGen4Game = (
+    context: ParseContext,
+    gameChoice: NonAutoGameSaveFormat,
+) => {
+    const gen4Hint = context.fileName
+        ? detectGen4GameNameFromString(context.fileName)
+        : undefined;
+    if (gen4Hint && gen4GameMatchesSaveFormat(gen4Hint, gameChoice)) {
+        return makeGame(gen4Hint);
     }
+    if (gameChoice === "HGSS") return makeGame("HeartGold");
+    if (gameChoice === "Platinum") return makeGame("Platinum");
+    return makeGame("Diamond");
+};
+
+const detectGen5Game = (
+    context: ParseContext,
+    gameChoice: NonAutoGameSaveFormat,
+    result: SaveParseResult,
+) => {
+    const gen5Hint = context.fileName
+        ? detectGen5GameNameFromString(context.fileName)
+        : undefined;
+    if (result.game) return makeGame(result.game);
+    if (gen5Hint && gen5GameMatchesSaveFormat(gen5Hint, gameChoice)) {
+        return makeGame(gen5Hint);
+    }
+    return gameChoice === "B2W2" ? makeGame("Black 2") : makeGame("Black");
+};
+
+// Future Gen 6-9 support should add one handler per generation here instead of
+// adding more branching to the worker message handler.
+const parserHandlers: ParserHandler[] = [
+    {
+        isFormat: isGen1SaveFormat,
+        parse: parseGen1Choice,
+        detectGame: detectGen1Game,
+    },
+    {
+        isFormat: isGen2SaveFormat,
+        parse: parseGen2Choice,
+        detectGame: detectGen2Game,
+    },
+    {
+        isFormat: isGen3SaveFormat,
+        parse: parseGen3Choice,
+        detectGame: detectGen3Game,
+    },
+    {
+        isFormat: isGen4SaveFormat,
+        parse: parseGen4Choice,
+        detectGame: detectGen4Game,
+    },
+    {
+        isFormat: isGen5SaveFormat,
+        parse: parseGen5Choice,
+        detectGame: detectGen5Game,
+    },
+];
+
+const getParserHandler = (gameChoice: NonAutoGameSaveFormat) => {
+    const handler = parserHandlers.find((candidate) => candidate.isFormat(gameChoice));
+    if (!handler) throw new Error(`Unsupported game type: ${gameChoice}`);
+    return handler;
+};
+
+self.onmessage = async ({ data }: MessageData) => {
+    const context = createParseContext(data);
+    const gameChoice = selectGameChoice(context);
+    const handler = getParserHandler(gameChoice);
+    const result = await handler.parse(context, gameChoice);
+    const pokemon = result.pokemon.filter((poke) => poke.species);
+    const detectedGame = handler.detectGame(context, gameChoice, {
+        ...result,
+        pokemon,
+    });
 
     self.postMessage({
         ...result,
+        pokemon,
         detectedGame,
         detectedSaveFormat: gameChoice,
     });
