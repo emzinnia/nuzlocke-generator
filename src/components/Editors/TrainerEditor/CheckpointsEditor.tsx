@@ -128,7 +128,7 @@ export class CheckpointsEditorBase extends React.Component<
 > {
     public state = { badgeNumber: 0 };
 
-    private addCheckpoint = (e: any) => {
+    private addCheckpoint = () => {
         this.setState(
             {
                 badgeNumber: this.state.badgeNumber + 1,

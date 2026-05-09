@@ -30,27 +30,11 @@ import { Nature } from "utils/Nature";
 import { getAdditionalFormes } from "utils/getters/getAdditionalFormes";
 import { getEvolutionLine } from "utils";
 
-const objectPropertiesWhere = (obj: object, filter: any) =>
+const objectPropertiesWhere = (
+    obj: object,
+    filter: (value: unknown) => boolean,
+) =>
     Array.from(Object.values(obj)).filter(filter).length;
-
-expect.extend({
-    toBeOneOf(received, argument) {
-        const validValues = Array.isArray(argument) ? argument : [argument];
-        const pass = validValues.includes(received);
-        if (pass) {
-            return {
-                message: () =>
-                    `expected ${received} not to be one of [${validValues.join(", ")}]`,
-                pass: true,
-            };
-        }
-        return {
-            message: () =>
-                `expected ${received} to be one of [${validValues.join(", ")}]`,
-            pass: false,
-        };
-    },
-});
 
 describe("addForme", () => {
     it("returns an alolan species", () => {
@@ -68,7 +52,7 @@ describe("choose", () => {
         const dice = [1, 2, 3, 4, 5, 6];
         const chosenDice = choose<number>(dice);
         for (let i = 0; i < 10; i++) {
-            (expect as any)(chosenDice).toBeOneOf(dice);
+            expect(dice).toContain(chosenDice);
         }
     });
 });
@@ -98,7 +82,7 @@ describe("styleDefaults", () => {
         expect(objectPropertiesWhere(styleDefaults, (p) => p === "round")).toBe(
             1,
         );
-        expect(objectPropertiesWhere(styleDefaults, (p) => p)).toBe(28);
+        expect(objectPropertiesWhere(styleDefaults, (p) => Boolean(p))).toBe(28);
     });
 });
 
@@ -260,7 +244,11 @@ describe(getGameGeneration.name, () => {
         expect(getGameGeneration("Sword")).toBe(Generation.Gen8);
         expect(getGameGeneration("Platinum")).toBe(Generation.Gen4);
         // Assumes latest gen
-        expect(getGameGeneration("Fake Game" as any)).toBe(Generation.Gen8);
+        expect(
+            getGameGeneration(
+                "Fake Game" as unknown as Parameters<typeof getGameGeneration>[0],
+            ),
+        ).toBe(Generation.Gen8);
     });
 });
 

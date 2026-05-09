@@ -115,9 +115,12 @@ const team: Pokemon[] = [
 ];
 
 type ComponentNode = TreeNodeInfo & {
-    component: any;
+    component: unknown;
     import?: string;
-    options?: { props: any; baseProps?: any };
+    options?: {
+        props: Record<string, unknown>;
+        baseProps?: Record<string, unknown>;
+    };
     childNodes?: ComponentNode[];
 };
 
@@ -391,7 +394,7 @@ export class ThemeEditorBase extends React.Component<
                     <CSSUnitInput
                         key={propKey}
                         name={propKey}
-                        value={value}
+                        value={String(value)}
                         onChange={(e) => {
                             modify(propKey, e.target.value);
                             this.setState(this.state);
@@ -404,8 +407,8 @@ export class ThemeEditorBase extends React.Component<
                 return (
                     <WrapWithLabel key={propKey} name={propKey}>
                         <Switch
-                            onChange={(e: any) => {
-                                modify(propKey, e.target.checked);
+                            onChange={(e: React.FormEvent<HTMLInputElement>) => {
+                                modify(propKey, e.currentTarget.checked);
                                 this.setState(this.state);
                             }}
                             checked={value}

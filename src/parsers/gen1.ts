@@ -10,27 +10,6 @@ import { parseTime } from "./utils/parseTime";
 import { ParserOptions } from "./utils/parserOptions";
 import { v4 as uuid } from "uuid";
 
-// tslint:disable-next-line:class-name
-interface GEN_1_SAVE {
-    yellow: boolean;
-    pokemonParty: any;
-    currentPokemonBoxNum: any;
-    currentPokemonBox: any;
-    pokemonBoxes: any[];
-    pokedexSeen: any;
-    pokedexOwned: any;
-    itemBag: any;
-    itemPC: any;
-    timePlayed: any;
-    money: any;
-    casinoCoins: any;
-    trainerID: any;
-    trainerName: any;
-    rivalName: any;
-    badges: any;
-    pikachuFriendship: any;
-}
-
 const OFFSETS = {
     PLAYER_NAME: 0x2598,
     POKEDEX_OWNED: 0x25a3,
@@ -85,6 +64,16 @@ const TYPE = {
     0x1a: "Dragon",
 };
 
+interface ParsedGen1Pokemon {
+    species: string;
+    level: number;
+    type1: string;
+    type2: string;
+    moves: string[];
+    id: string;
+    extraData?: object;
+}
+
 interface PartyPokemon {
     count: number;
     species: number[];
@@ -92,7 +81,7 @@ interface PartyPokemon {
 }
 
 const convertWithCharMap = (buf: Buffer, nickname = false) => {
-    const str: any[] = [];
+    const str: string[] = [];
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < buf.length; i++) {
         // tslint:disable-next-line:triple-equals
@@ -103,7 +92,7 @@ const convertWithCharMap = (buf: Buffer, nickname = false) => {
 };
 
 const getSpeciesList = (buf: Buffer) => {
-    const str: any[] = [];
+    const str: string[] = [];
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < buf.length; i++) {
         if (buf[i] === 0xff) {
@@ -189,19 +178,11 @@ const getPokemonNames = (buf: Buffer, entries: number = 6) => {
 export interface Gen1PokemonObject {
     entriesUsed: number;
     speciesList: string[];
-    pokemonList: {
-        species: string;
-        level: number;
-        type1: string;
-        type2: string;
-        moves: string[];
-        id: string;
-        extraData: object;
-    }[];
+    pokemonList: ParsedGen1Pokemon[];
     pokemonNames: string[];
 }
 
-const removeLastEntries = (entries, arr) => {
+const removeLastEntries = (entries: number, arr: unknown[]) => {
     // tslint:disable
     const a = arr;
     const l = arr.length;
@@ -237,7 +218,7 @@ const parseBoxedPokemon = (buf: Buffer): Gen1PokemonObject => {
     const entriesUsed = box[0x0000];
     const rawSpeciesList = box.slice(0x0001, 0x0001 + 21);
     const speciesList = getSpeciesList(rawSpeciesList);
-    const pokemonList: any = getPokemonListForBox(
+    const pokemonList = getPokemonListForBox(
         box.slice(0x0016, 0x0016 + 660),
         entriesUsed,
     );
@@ -358,7 +339,6 @@ export const parseGen1Save = async (file: Buffer, options: ParserOptions) => {
             badges: badges,
         },
         pokemon: [
-            // @ts-expect-error - Pokemon type conversion handled by transformPokemon
             ...transformPokemon(pokemonParty, "Team"),
             ...pokemonFromBoxes,
         ],

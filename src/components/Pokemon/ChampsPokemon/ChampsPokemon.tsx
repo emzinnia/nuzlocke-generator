@@ -10,13 +10,24 @@ import {
     getGameGeneration,
     getContrastColor,
     gameOfOriginToColor,
+    styleDefaults,
 } from "utils";
 import { Pokemon } from "models";
 import { GenderElement } from "components/Common/Shared";
 import { css, cx } from "emotion";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 
-export const champsPokemon = (options: any) => css`
+type ChampsPokemonStyleOptions = {
+    height: string;
+    width: string;
+    margin?: string;
+    background: string;
+    color: string;
+    padding?: string;
+    minimal: boolean;
+};
+
+export const champsPokemon = (options: ChampsPokemonStyleOptions) => css`
     height: ${options.height};
     width: ${options.width};
     margin: ${options.margin};
@@ -30,7 +41,7 @@ export const champsPokemon = (options: any) => css`
     /* flex-grow: 4; */
 `;
 
-export type ChampsPokemonProps = { [P in keyof Pokemon]?: any } & {
+export type ChampsPokemonProps = Partial<Pokemon> & {
     showNickname?: boolean;
     showGender?: boolean;
     showLevel?: boolean;
@@ -79,9 +90,10 @@ export class ChampsPokemon extends React.Component<ChampsPokemonProps> {
                 forme={forme}
                 style={
                     {
+                        ...styleDefaults,
                         spritesMode: true,
                         useSpritesForChampsPokemon: true,
-                    } as any
+                    }
                 }
             >
                 {(backgroundImage) => (
@@ -104,7 +116,7 @@ export class ChampsPokemon extends React.Component<ChampsPokemonProps> {
 
     public render() {
         const { margin, padding, customCSS } = this.props;
-        const color = gameOfOriginToColor(this.props.gameOfOrigin);
+        const color = gameOfOriginToColor(this.props.gameOfOrigin ?? "Red");
         const minimal = !(
             this.props.showNickname ||
             this.props.showGender ||
@@ -128,7 +140,16 @@ export class ChampsPokemon extends React.Component<ChampsPokemonProps> {
                     ) : (
                         <PokemonIcon
                             className="champs-pokemon-image"
-                            {...(this.props as any)}
+                            id={this.props.id}
+                            species={this.props.species ?? "Unknown"}
+                            forme={this.props.forme}
+                            gender={this.props.gender}
+                            customIcon={this.props.customIcon}
+                            hidden={this.props.hidden}
+                            egg={this.props.egg}
+                            position={this.props.position}
+                            shiny={this.props.shiny}
+                            status={this.props.status}
                         />
                     )}
                     <span

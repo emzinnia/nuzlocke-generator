@@ -4,6 +4,7 @@ import { compileQuery } from "../compile";
 import { normalizePokemon } from "../normalize";
 import { searchPokemon } from "../index";
 import type { Pokemon } from "models";
+import { Types } from "utils";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Test Pokémon data
@@ -16,7 +17,7 @@ const createPokemon = (overrides: Partial<Pokemon> = {}): Pokemon => ({
     status: "Team",
     level: 25,
     gender: "m",
-    types: ["Electric", "Electric"] as any,
+    types: [Types.Electric, Types.Electric],
     moves: [],
     shiny: false,
     egg: false,
@@ -28,13 +29,13 @@ const createPokemon = (overrides: Partial<Pokemon> = {}): Pokemon => ({
 });
 
 const testTeam: Pokemon[] = [
-    createPokemon({ id: "1", species: "Bruxish", nickname: "Breem", gender: "f", types: ["Water", "Psychic"] as any, level: 30 }),
-    createPokemon({ id: "2", species: "Breloom", nickname: "", gender: "m", types: ["Grass", "Fighting"] as any, level: 45, shiny: true }),
-    createPokemon({ id: "3", species: "Bulbasaur", nickname: "Planty", gender: "m", types: ["Grass", "Poison"] as any, level: 5 }),
-    createPokemon({ id: "4", species: "Feebas", nickname: "", gender: "f", types: ["Water", "Water"] as any, level: 10 }),
-    createPokemon({ id: "5", species: "Umbreon", nickname: "Shadow", gender: "m", types: ["Dark", "Dark"] as any, level: 50, status: "Dead" }),
-    createPokemon({ id: "6", species: "Gengar", nickname: "Spooky", gender: "f", types: ["Ghost", "Poison"] as any, level: 55 }),
-    createPokemon({ id: "7", species: "Spiritomb", nickname: "", gender: "f", types: ["Ghost", "Dark"] as any, level: 40, moves: ["Ice Beam", "Shadow Ball"] }),
+    createPokemon({ id: "1", species: "Bruxish", nickname: "Breem", gender: "f", types: [Types.Water, Types.Psychic], level: 30 }),
+    createPokemon({ id: "2", species: "Breloom", nickname: "", gender: "m", types: [Types.Grass, Types.Fighting], level: 45, shiny: true }),
+    createPokemon({ id: "3", species: "Bulbasaur", nickname: "Planty", gender: "m", types: [Types.Grass, Types.Poison], level: 5 }),
+    createPokemon({ id: "4", species: "Feebas", nickname: "", gender: "f", types: [Types.Water, Types.Water], level: 10 }),
+    createPokemon({ id: "5", species: "Umbreon", nickname: "Shadow", gender: "m", types: [Types.Dark, Types.Dark], level: 50, status: "Dead" }),
+    createPokemon({ id: "6", species: "Gengar", nickname: "Spooky", gender: "f", types: [Types.Ghost, Types.Poison], level: 55 }),
+    createPokemon({ id: "7", species: "Spiritomb", nickname: "", gender: "f", types: [Types.Ghost, Types.Dark], level: 40, moves: ["Ice Beam", "Shadow Ball"] }),
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -375,4 +376,3 @@ describe("searchPokemon", () => {
         expect(fallbackIds.size).toBe(0); // No matches expected
     });
 });
-

@@ -10,10 +10,10 @@ export function generateEmptyPokemon(
     let position: number = 0;
     if (pokemon && pokemon.length > 0) {
         try {
-            position =
-                parseInt(
-                    pokemon.sort(sortPokes)[pokemon.length - 1].position as any,
-                ) + 1;
+            const nextPosition =
+                Number(pokemon.sort(sortPokes)[pokemon.length - 1].position) +
+                1;
+            position = Number.isFinite(nextPosition) ? nextPosition : 0;
         } catch (e) {
             console.error("Attempted to generate position, but failed.", e);
         }

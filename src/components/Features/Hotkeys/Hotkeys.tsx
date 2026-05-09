@@ -39,13 +39,18 @@ export interface HotkeysProps {
     editStyle: editStyle;
 }
 
+interface GlobalHotkeysEvents {
+    handleKeyDown: (event: KeyboardEvent) => void;
+    handleKeyUp: (event: KeyboardEvent) => void;
+}
+
 export class HotkeysBase extends React.PureComponent<HotkeysProps> {
-    public globalHotkeysEvents: any;
+    public globalHotkeysEvents: GlobalHotkeysEvents;
     private keyUpActions: Map<string, Array<() => void>> = new Map();
     private firstPokemonId: string | null = null;
     private lastPokemonId: string | null = null;
 
-    public constructor(props) {
+    public constructor(props: HotkeysProps) {
         super(props);
         this.globalHotkeysEvents = {
             handleKeyDown: this.handleKeyDown,
@@ -86,7 +91,6 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         );
     }
 
-     
     private handleKeyDown = (event: KeyboardEvent) => {
         return;
     };
@@ -112,12 +116,14 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
         for (const hotkey of listOfHotkeys) {
             if (!hotkey?.onKeyUp) continue;
             const effectiveKey = this.getEffectiveKey(hotkey);
-            const candidate = (this as any)[hotkey.onKeyUp];
+            const candidate = (this as unknown as Record<string, unknown>)[
+                hotkey.onKeyUp
+            ];
             if (typeof candidate !== "function") continue;
 
             const arr = next.get(effectiveKey) ?? [];
             // Bind once up front so keyup is O(1) dispatch.
-            arr.push(candidate.bind(this));
+            arr.push(() => candidate.call(this));
             next.set(effectiveKey, arr);
         }
 

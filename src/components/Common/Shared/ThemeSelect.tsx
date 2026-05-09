@@ -7,13 +7,13 @@ import { editStyle } from "actions";
 
 export interface ThemeSelectProps {
     theme: string;
-    onChange?: Function;
+    onChange?: (style: { template: string }) => void;
 }
 
-export const ThemeSelectBase = ({ theme, onChange }) => (
+export const ThemeSelectBase = ({ theme, onChange }: ThemeSelectProps) => (
     <HTMLSelect
         value={theme}
-        onChange={(e) => onChange({ template: e.target.value })}
+        onChange={(e) => onChange?.({ template: e.target.value })}
     >
         {listOfThemes.map((o) => (
             <option key={o} value={o}>

@@ -25,7 +25,7 @@ const styles = {
     hallOfFameText: css``,
 };
 
-export type HallOfFameDialogProps = DialogProps & {};
+export type HallOfFameDialogProps = DialogProps;
 
 export function HallOfFameDialog(props: HallOfFameDialogProps) {
     return (

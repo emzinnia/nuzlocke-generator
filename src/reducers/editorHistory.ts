@@ -11,7 +11,7 @@ import { Diff, applyChange, revertChange } from "deep-diff";
 import { take } from "ramda";
 
 // A single diff entry represents the changes between two states
-export type DiffEntry = Diff<any, any>[];
+export type DiffEntry = Diff<unknown, unknown>[];
 
 // A history entry now stores diffs instead of full state snapshots
 // This dramatically reduces memory usage for large state trees
@@ -33,7 +33,7 @@ export interface History<T> {
     lastRevisionType: "undo" | "redo" | "update" | "load";
 }
 
-const initial: History<any> = {
+const initial: History<unknown> = {
     past: [],
     present: undefined,
     future: [],
@@ -136,8 +136,8 @@ export function reconstructStateAtIndex<T>(
     return state;
 }
 
-export function editorHistory(
-    state: History<any> = initial,
+export function editorHistory<T = unknown>(
+    state: History<T> = initial as History<T>,
     action: Action<
         | UNDO_EDITOR_HISTORY
         | UPDATE_EDITOR_HISTORY
@@ -146,13 +146,13 @@ export function editorHistory(
         | INIT_EDITOR_HISTORY
         | JUMP_TO_HISTORY_STATE
     >,
-): History<any> {
+): History<T> {
     switch (action.type) {
         // Initialize history with the first state snapshot
         case INIT_EDITOR_HISTORY: {
             return {
                 ...state,
-                present: deepClone(action.present),
+                present: deepClone(action.present as T),
                 lastRevisionType: "load",
             };
         }
@@ -164,7 +164,7 @@ export function editorHistory(
             if (present == null) {
                 return {
                     past: [],
-                    present: action.newState,
+                    present: action.newState as T,
                     future: [],
                     lastRevisionType: "update",
                 };
@@ -186,7 +186,7 @@ export function editorHistory(
                 // Store the entry - limit to MAX_HISTORY_LENGTH
                 past: [...take(MAX_HISTORY_LENGTH - 1, past), entry],
                 // Update present to the new state (no deep clone needed - immutable by convention)
-                present: action.newState,
+                present: action.newState as T,
                 // Clear future on new changes (can't redo after new edits)
                 future: [],
                 lastRevisionType: "update",
@@ -263,9 +263,6 @@ export function editorHistory(
             // This is more complex with diffs - we need to recompute diffs for the new timeline
             // For simplicity, we'll reconstruct all intermediate states and recompute diffs
             
-            // First, reconstruct all states in the timeline
-            const allStates: any[] = [];
-            
             // Reconstruct states from index 0 to end
             let tempState = deepClone(present);
             
@@ -273,18 +270,14 @@ export function editorHistory(
             for (let i = currentIndex - 1; i >= 0; i--) {
                 tempState = applyBackwardDiff(tempState, past[i].backwardDiff);
             }
-            allStates.push(tempState);
-            
             // Now go forward through all past entries
             for (let i = 0; i < past.length; i++) {
                 tempState = applyForwardDiff(tempState, past[i].forwardDiff);
-                allStates.push(tempState);
             }
             
             // Add future states
             for (let i = 0; i < future.length; i++) {
                 tempState = applyForwardDiff(tempState, future[i].forwardDiff);
-                allStates.push(tempState);
             }
             
             // Now rebuild past/future with the original diffs, just rearranged
@@ -322,7 +315,7 @@ export function editorHistory(
 
         // Return initial state when entire state tree gets replaced
         case REPLACE_STATE:
-            return initial;
+            return initial as History<T>;
 
         default:
             return state;

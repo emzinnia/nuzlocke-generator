@@ -3,28 +3,33 @@ import { render, screen } from "@testing-library/react";
 
 import { ResultBase, BackspriteMontage } from "../Result";
 import { styleDefaults, generateEmptyPokemon } from "utils";
-import { Editor, Box } from "models";
+import { Editor, Box, Pokemon } from "models";
+
+type ResultBaseProps = React.ComponentProps<typeof ResultBase>;
+type PokemonSpeciesProps = { species: string };
+type PokemonProp = { pokemon: Pokemon };
+type ChildrenProps = { children?: React.ReactNode };
 
 vi.mock("components/Pokemon/TeamPokemon/TeamPokemon", () => ({
-    TeamPokemon: ({ pokemon }: any) => (
+    TeamPokemon: ({ pokemon }: PokemonProp) => (
         <div data-testid={`team-${pokemon.species}`}>{pokemon.species}</div>
     ),
 }));
 
 vi.mock("components/Pokemon/BoxedPokemon/BoxedPokemon", () => ({
-    BoxedPokemon: ({ species }: any) => (
+    BoxedPokemon: ({ species }: PokemonSpeciesProps) => (
         <div data-testid={`boxed-${species}`}>{species}</div>
     ),
 }));
 
 vi.mock("components/Pokemon/DeadPokemon/DeadPokemon", () => ({
-    DeadPokemon: ({ species }: any) => (
+    DeadPokemon: ({ species }: PokemonSpeciesProps) => (
         <div data-testid={`dead-${species}`}>{species}</div>
     ),
 }));
 
 vi.mock("components/Pokemon/ChampsPokemon/ChampsPokemon", () => ({
-    ChampsPokemon: ({ species }: any) => (
+    ChampsPokemon: ({ species }: PokemonSpeciesProps) => (
         <div data-testid={`champs-${species}`}>{species}</div>
     ),
 }));
@@ -40,7 +45,7 @@ vi.mock("components/Layout/TopBar/TopBar", () => ({
 }));
 
 vi.mock("components/Common/Shared", () => ({
-    ErrorBoundary: ({ children }: any) => <>{children}</>,
+    ErrorBoundary: ({ children }: ChildrenProps) => <>{children}</>,
 }));
 
 vi.mock("components/Editors/PokemonEditor", () => ({
@@ -48,12 +53,16 @@ vi.mock("components/Editors/PokemonEditor", () => ({
 }));
 
 vi.mock("components/Common/Shared/PokemonImage", () => ({
-    PokemonImage: ({ children }: any) => <>{children("https://img.test")}</>,
+    PokemonImage: ({
+        children,
+    }: {
+        children: (url: string) => React.ReactNode;
+    }) => <>{children("https://img.test")}</>,
 }));
 
 vi.mock("components/ui/shims", () => ({
-    Select: ({ children }: any) => <div data-testid="zoom-select">{children}</div>,
-    Button: ({ children }: any) => <button>{children}</button>,
+    Select: ({ children }: ChildrenProps) => <div data-testid="zoom-select">{children}</div>,
+    Button: ({ children }: ChildrenProps) => <button>{children}</button>,
     Classes: {},
     MenuItem: () => null,
 }));
@@ -90,17 +99,19 @@ describe("<ResultBase />", () => {
             <ResultBase
                 pokemon={createPokemon()}
                 game={{ name: "Red", customName: "" }}
-                trainer={{ notes: "Remember to heal", badges: [] } as any}
+                trainer={{ notes: "Remember to heal", badges: [] }}
                 box={boxes}
                 editor={baseEditor}
-                selectPokemon={vi.fn() as any}
-                toggleMobileResultView={vi.fn() as any}
-                toggleDialog={vi.fn() as any}
+                selectPokemon={vi.fn() as unknown as ResultBaseProps["selectPokemon"]}
+                toggleMobileResultView={
+                    vi.fn() as unknown as ResultBaseProps["toggleMobileResultView"]
+                }
+                toggleDialog={vi.fn() as unknown as ResultBaseProps["toggleDialog"]}
                 style={{
                     ...styleDefaults,
                     displayRules: true,
                     displayRulesLocation: "top",
-                    trainerSectionOrientation: "horizontal" as any,
+                    trainerSectionOrientation: "horizontal",
                 }}
                 rules={["Rule 1", "Rule 2"]}
                 customTypes={[]}

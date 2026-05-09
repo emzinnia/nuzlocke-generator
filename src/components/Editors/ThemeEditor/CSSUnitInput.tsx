@@ -6,8 +6,8 @@ import { head, last } from "ramda";
 
 export interface CSSUnitInputProps {
     name: string;
-    value: any;
-    onChange: (e?: any) => void;
+    value: string;
+    onChange: (e: { target: { value: string } }) => void;
     allowedUnits?: string[];
 }
 

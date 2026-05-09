@@ -4,7 +4,7 @@ import configureStore from "redux-mock-store";
 import { generateEmptyPokemon } from "utils";
 import { State } from "state";
 
-export function TestProvider({ children }: any) {
+export function TestProvider({ children }: { children?: React.ReactNode }) {
     const store = configureStore()({
         pokemon: [generateEmptyPokemon(), generateEmptyPokemon()],
         style: {

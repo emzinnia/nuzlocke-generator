@@ -21,12 +21,12 @@ export interface State {
     saveUploadSettings: SaveUploadSettingsState;
     selectedId: string;
     style: Styles;
-    theme: any;
+    theme: unknown;
     trainer: Trainer;
     customMoveMap: { move: string; type: string; id: string }[];
     customTypes: { type: string; color: string; id: string }[];
     stats: Record<"id" | "value" | "key", string | undefined>[];
     nuzlockes: Nuzlockes;
-    editorHistory: History<any>;
+    editorHistory: History<Omit<State, "editorHistory">>;
     view: View;
 }

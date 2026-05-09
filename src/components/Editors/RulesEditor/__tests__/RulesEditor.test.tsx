@@ -1,7 +1,7 @@
 import * as React from "react";
 import { render, screen, fireEvent, waitFor } from "utils/testUtils";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
-import { feature } from "utils/feature";
+import { feature, styleDefaults } from "utils";
 import { RulesEditor, RulesEditorDialogBase, presetRules } from "../RulesEditor";
 
 const originalFetch = global.fetch;
@@ -259,10 +259,10 @@ describe("RulesEditor", () => {
     });
 
     it("submits suggestions and re-enables the button on success", async () => {
-        const fetchMock = vi.fn().mockResolvedValue({
+        const fetchMock = vi.fn<typeof fetch>(async () => ({
             json: vi.fn().mockResolvedValue({ status: 200 }),
-        } as any);
-        global.fetch = fetchMock as any;
+        }) as unknown as Response);
+        global.fetch = fetchMock as unknown as typeof fetch;
 
         render(<RulesEditor {...defaultProps} />);
         const trigger = getCommunityRulesetButton();
@@ -281,9 +281,9 @@ describe("RulesEditor", () => {
         fireEvent.click(submitButton);
 
         await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
-        const fetchCall = fetchMock.mock.calls[0];
+        const fetchCall = fetchMock.mock.calls[0]!;
         expect(fetchCall[0]).toContain("/suggest-ruleset");
-        const body = JSON.parse((fetchCall[1] as any).body);
+        const body = JSON.parse(String((fetchCall[1] as RequestInit).body));
         expect(body.name).toBe("Ironmon");
         expect(body.rules).toEqual(defaultProps.rules);
 
@@ -292,7 +292,7 @@ describe("RulesEditor", () => {
 
     it("re-enables submit when the suggestion request fails", async () => {
         const fetchMock = vi.fn().mockRejectedValue(new Error("network error"));
-        global.fetch = fetchMock as any;
+        global.fetch = fetchMock as unknown as typeof fetch;
 
         render(<RulesEditor {...defaultProps} />);
         const trigger = getCommunityRulesetButton();
@@ -354,7 +354,7 @@ describe("RulesEditorDialogBase", () => {
         setRules: mockSetRules,
         onClose: mockOnClose,
         isOpen: true,
-        style: { editorDarkMode: false },
+        style: { ...styleDefaults, editorDarkMode: false },
     };
 
     beforeEach(() => {
@@ -378,7 +378,10 @@ describe("RulesEditorDialogBase", () => {
 
     it("applies dark mode class when editorDarkMode is true", () => {
         const { baseElement } = render(
-            <RulesEditorDialogBase {...dialogProps} style={{ editorDarkMode: true }} />
+            <RulesEditorDialogBase
+                {...dialogProps}
+                style={{ ...styleDefaults, editorDarkMode: true }}
+            />
         );
         const dialog = baseElement.querySelector(".rules-editor-dialog");
         expect(dialog).not.toBeNull();
@@ -392,4 +395,3 @@ describe("RulesEditorDialogBase", () => {
         expect(dialog!.className.includes("bp5-dark")).toBe(false);
     });
 });
-

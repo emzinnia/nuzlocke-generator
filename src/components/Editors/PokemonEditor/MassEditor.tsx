@@ -7,7 +7,7 @@ import { MassEditorTable } from "./MassEditorTable";
 
 export interface MassEditorProps {
     isOpen: boolean;
-    toggleDialog?: (e?: any) => void;
+    toggleDialog?: () => void;
     style: State["style"];
 }
 

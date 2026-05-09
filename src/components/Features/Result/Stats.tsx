@@ -33,22 +33,18 @@ export class StatsBase extends React.Component<
     }
 
     private typeMap() {
-        const typesFreq = {};
+        const typesFreq: Partial<Record<string, number>> = {};
 
         this.props.pokemon.forEach((poke) => {
             if (poke && Array.isArray(poke.types)) {
                 const type1 = poke.types[0];
                 const type2 = poke.types[1];
 
-                if (typesFreq.hasOwnProperty(type1)) {
-                    typesFreq[type1]++;
-                } else {
-                    typesFreq[type1] = 1;
-                }
+                typesFreq[type1] = (typesFreq[type1] ?? 0) + 1;
 
-                if (typesFreq.hasOwnProperty(type2)) {
+                if (Object.prototype.hasOwnProperty.call(typesFreq, type2)) {
                     if (type1 !== type2) {
-                        typesFreq[type2]++;
+                        typesFreq[type2] = (typesFreq[type2] ?? 0) + 1;
                     }
                 } else {
                     typesFreq[type2] = 1;
@@ -62,7 +58,7 @@ export class StatsBase extends React.Component<
     private getMostCommonType() {
         const t = this.typeMap();
         const sorted = Object.keys(t)
-            .map((key) => ({ name: key, total: t[key] }))
+            .map((key) => ({ name: key, total: t[key] ?? 0 }))
             .sort((a, b) => b.total - a.total);
         return [0, 1, 2, 3, 4, 5].map((n) => ({
             name: sorted[n]?.name,
@@ -70,15 +66,15 @@ export class StatsBase extends React.Component<
         }));
     }
 
-    private displayMostCommonType(data: { name?: string; total?: string }[]) {
+    private displayMostCommonType(data: { name?: string; total?: number }[]) {
         return data
             .filter((d) => d.name != null)
             .map((d) => `${d.name} (${d.total} Pokémon)`)
             .join(", ");
     }
 
-    private wordMap(arr) {
-        const wm = {};
+    private wordMap(arr: string[]) {
+        const wm: Record<string, number> = {};
         arr.forEach((key) => {
             if (
                 key === "from" ||
@@ -91,7 +87,7 @@ export class StatsBase extends React.Component<
             ) {
                 return;
             }
-            if (wm.hasOwnProperty(key)) {
+            if (Object.prototype.hasOwnProperty.call(wm, key)) {
                 wm[key]++;
             } else {
                 wm[key] = 1;
@@ -115,7 +111,7 @@ export class StatsBase extends React.Component<
         }));
     }
 
-    private displayMostCommonDeath(data: { name?: string; total?: string }[]) {
+    private displayMostCommonDeath(data: { name?: string; total?: number }[]) {
         const numOfDead = this.props.pokemon.filter(
             (s) => s.status === "Dead",
         ).length;

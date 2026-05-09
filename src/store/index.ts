@@ -1,4 +1,9 @@
-import { applyMiddleware, createStore, Middleware } from "redux";
+import {
+    applyMiddleware,
+    createStore,
+    Middleware,
+    ReducersMapObject,
+} from "redux";
 import { createLogger } from "redux-logger";
 // @TODO: figure out this deprecation
 import { createBrowserHistory } from "history";
@@ -99,7 +104,10 @@ const config = {
 
 export const history = createBrowserHistory();
 
-export const persistReducers = persistCombineReducers(config, reducers as any);
+export const persistReducers = persistCombineReducers(
+    config,
+    reducers as unknown as ReducersMapObject,
+);
 
 export const middlewares: Middleware[] = [historyMiddleware];
 
@@ -107,7 +115,7 @@ if (import.meta.env.PROD) {
     // No additional middlewares in production
 } else {
     const loggerMiddleware = createLogger();
-    middlewares.push(loggerMiddleware as any);
+    middlewares.push(loggerMiddleware as Middleware);
 }
 
 export const store = createStore(

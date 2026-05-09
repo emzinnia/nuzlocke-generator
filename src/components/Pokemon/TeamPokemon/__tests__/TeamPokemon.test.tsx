@@ -62,7 +62,7 @@ import { Editor, Game, Pokemon } from "models";
 import { TeamPokemonBase, TeamPokemonInfo } from "../TeamPokemon";
 
 const baseStyle = { ...styleDefaults };
-const baseGame: Game = { name: "Red" as any, customName: "" };
+const baseGame: Game = { name: "Red", customName: "" };
 const baseEditor: Editor = { minimized: false };
 
 const basePokemon: Pokemon = {
@@ -274,4 +274,3 @@ describe("TeamPokemonInfo", () => {
         expect(screen.getByText("SPDEF")).toBeTruthy();
     });
 });
-

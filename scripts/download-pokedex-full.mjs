@@ -52,7 +52,6 @@ function parseArgs(argv) {
         else if (a === "--dry-run") args.dryRun = true;
         else if (a === "--verbose") args.verbose = true;
         else if (a === "--help" || a === "-h") {
-            // eslint-disable-next-line no-console
             console.log(`
 Download official Pokédex images from pokemon.com
 
@@ -134,7 +133,6 @@ async function downloadOne({ dex, outDir, force, retries, timeoutMs, verbose, dr
     }
 
     let attempt = 0;
-    // eslint-disable-next-line no-constant-condition
     while (true) {
         attempt++;
         try {
@@ -156,7 +154,6 @@ async function downloadOne({ dex, outDir, force, retries, timeoutMs, verbose, dr
                 if (retryable && attempt <= retries + 1) {
                     const backoff = Math.min(10_000, 500 * 2 ** (attempt - 1));
                     if (verbose) {
-                        // eslint-disable-next-line no-console
                         console.warn(`[${dex}] ${res.status} retrying in ${backoff}ms (${attempt}/${retries + 1})`);
                     }
                     await sleep(backoff);
@@ -183,7 +180,6 @@ async function downloadOne({ dex, outDir, force, retries, timeoutMs, verbose, dr
             if (canRetry) {
                 const backoff = Math.min(10_000, 500 * 2 ** (attempt - 1));
                 if (verbose) {
-                    // eslint-disable-next-line no-console
                     console.warn(
                         `[${dex}] ${isAbort ? "timeout" : "error"} retrying in ${backoff}ms (${attempt}/${retries + 1})`,
                     );
@@ -201,7 +197,6 @@ async function runPool(items, concurrency, worker) {
     const results = [];
 
     async function runOne() {
-        // eslint-disable-next-line no-constant-condition
         while (true) {
             const current = idx;
             idx++;
@@ -222,12 +217,10 @@ async function main() {
     const dexes = [];
     for (let dex = from; dex <= to; dex++) dexes.push(dex);
 
-    // eslint-disable-next-line no-console
     console.log(
         `Downloading Pokédex images: ${from}..${to} -> ${path.relative(repoRoot, out) || "."} (concurrency=${concurrency})`,
     );
     if (dryRun) {
-        // eslint-disable-next-line no-console
         console.log(`(dry run: no files will be written)`);
     }
 
@@ -249,16 +242,13 @@ async function main() {
         { total: 0, downloaded: 0, skipped: 0, dryRun: 0, other: 0 },
     );
 
-    // eslint-disable-next-line no-console
     console.log(
         `Done. downloaded=${summary.downloaded} skipped_exists=${summary.skipped} dry_run=${summary.dryRun} total=${summary.total}`,
     );
 }
 
 main().catch((err) => {
-    // eslint-disable-next-line no-console
     console.error(err);
     process.exit(1);
 });
-
 

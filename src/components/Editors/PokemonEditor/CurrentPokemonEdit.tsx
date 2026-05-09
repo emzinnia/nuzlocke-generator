@@ -79,7 +79,7 @@ export const CopyPokemonButton: React.FunctionComponent<
 
 export interface CurrentPokemonEditProps {
     selectedId: Pokemon["id"];
-    box: any;
+    box: State["box"];
     pokemon: Pokemon[];
     selectPokemon: selectPokemon;
     editPokemon: editPokemon;
@@ -640,7 +640,9 @@ export class CurrentPokemonEditBase extends React.Component<
                                         types: matchSpeciesToTypes(
                                             e.target.value as Species,
                                             // @TODO: tighten type
-                                            currentPokemon.forme as any,
+                                            currentPokemon.forme as Parameters<
+                                                typeof matchSpeciesToTypes
+                                            >[1],
                                             getGameGeneration(
                                                 this.props.game.name as Game,
                                             ),

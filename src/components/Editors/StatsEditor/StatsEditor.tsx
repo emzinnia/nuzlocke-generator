@@ -17,13 +17,29 @@ export interface StatsEditorProps {
     deleteStat: deleteStat;
 }
 
-const sortById = (a, b) => {
-    if (a.id > b.id) return 1;
-    if (b.id > a.id) return -1;
+const sortById = (a: State["stats"][number], b: State["stats"][number]) => {
+    if ((a.id ?? "") > (b.id ?? "")) return 1;
+    if ((b.id ?? "") > (a.id ?? "")) return -1;
     return 0;
 };
 
 export class StatsEditorBase extends React.Component<StatsEditorProps> {
+    private onDisplayStatsChange = (e: React.FormEvent<HTMLInputElement>) => {
+        this.props.editStyle({
+            [e.currentTarget.name]: e.currentTarget.checked,
+        });
+    };
+
+    private onStatsOptionChange = (e: React.FormEvent<HTMLInputElement>) => {
+        const stats = this.props.style?.statsOptions;
+        this.props.editStyle({
+            statsOptions: {
+                ...stats,
+                [e.currentTarget.name]: e.currentTarget.checked,
+            },
+        });
+    };
+
     private onChange =
         (stat: State["stats"][number], use: "key" | "value") =>
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,9 +69,7 @@ export class StatsEditorBase extends React.Component<StatsEditorProps> {
                             checked={style.displayStats}
                             name="displayStats"
                             label="Display Stats"
-                            onChange={(e: any) =>
-                                editStyle({ [e.target.name]: e.target.checked })
-                            }
+                            onChange={this.onDisplayStatsChange}
                         />
                     </div>
                     <ul
@@ -71,14 +85,7 @@ export class StatsEditorBase extends React.Component<StatsEditorProps> {
                                 checked={stats?.averageLevel}
                                 name="averageLevel"
                                 label="Average Level"
-                                onChange={(e: any) =>
-                                    editStyle({
-                                        statsOptions: {
-                                            ...stats,
-                                            [e.target.name]: e.target.checked,
-                                        },
-                                    })
-                                }
+                                onChange={this.onStatsOptionChange}
                             />
                         </li>
 
@@ -88,14 +95,7 @@ export class StatsEditorBase extends React.Component<StatsEditorProps> {
                                 checked={stats?.averageLevelDetailed}
                                 name="averageLevelDetailed"
                                 label="Average Level (Detailed)"
-                                onChange={(e: any) =>
-                                    editStyle({
-                                        statsOptions: {
-                                            ...stats,
-                                            [e.target.name]: e.target.checked,
-                                        },
-                                    })
-                                }
+                                onChange={this.onStatsOptionChange}
                             />
                         </li>
 
@@ -104,14 +104,7 @@ export class StatsEditorBase extends React.Component<StatsEditorProps> {
                                 checked={stats?.mostCommonKillers}
                                 name="mostCommonKillers"
                                 label="Most Common Killers"
-                                onChange={(e: any) =>
-                                    editStyle({
-                                        statsOptions: {
-                                            ...stats,
-                                            [e.target.name]: e.target.checked,
-                                        },
-                                    })
-                                }
+                                onChange={this.onStatsOptionChange}
                             />
                         </li>
 
@@ -120,14 +113,7 @@ export class StatsEditorBase extends React.Component<StatsEditorProps> {
                                 checked={stats?.mostCommonTypes}
                                 name="mostCommonTypes"
                                 label="Most Common Types"
-                                onChange={(e: any) =>
-                                    editStyle({
-                                        statsOptions: {
-                                            ...stats,
-                                            [e.target.name]: e.target.checked,
-                                        },
-                                    })
-                                }
+                                onChange={this.onStatsOptionChange}
                             />
                         </li>
 
@@ -136,14 +122,7 @@ export class StatsEditorBase extends React.Component<StatsEditorProps> {
                                 checked={stats?.shiniesCaught}
                                 name="shiniesCaught"
                                 label="Shinies Caught"
-                                onChange={(e: any) =>
-                                    editStyle({
-                                        statsOptions: {
-                                            ...stats,
-                                            [e.target.name]: e.target.checked,
-                                        },
-                                    })
-                                }
+                                onChange={this.onStatsOptionChange}
                             />
                         </li>
 
@@ -216,4 +195,4 @@ export const StatsEditor = connect(
         deleteStat,
         editStat,
     },
-)(StatsEditorBase as any);
+)(StatsEditorBase);

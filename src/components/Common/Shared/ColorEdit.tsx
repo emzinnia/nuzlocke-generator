@@ -7,18 +7,42 @@ import { State } from "state";
 import { ChromePicker } from "react-color";
 import { Popover, PopoverInteractionKind, Classes } from "@blueprintjs/core";
 
-export const rgbaOrHex = (o) =>
-    (o.rgb && o.rgb.a && o.rgb.a !== 1
-        ? `rgba(${o.rgb.r}, ${o.rgb.g}, ${o.rgb.b}, ${o.rgb.a})`
-        : o.hex) || o;
+type RgbColor = {
+    r: number;
+    g: number;
+    b: number;
+    a?: number;
+};
+
+export type ColorValue =
+    | string
+    | RgbColor
+    | {
+          hex: string;
+          rgb: RgbColor;
+      };
+
+export const rgbaOrHex = (o: ColorValue): string => {
+    if (typeof o === "string") {
+        return o;
+    }
+
+    if ("rgb" in o) {
+        return o.rgb.a && o.rgb.a !== 1
+            ? `rgba(${o.rgb.r}, ${o.rgb.g}, ${o.rgb.b}, ${o.rgb.a})`
+            : o.hex;
+    }
+
+    return `rgba(${o.r}, ${o.g}, ${o.b}, ${o.a ?? 1})`;
+};
 
 export interface ColorEditProps {
-    value?: any;
-    onChange: (e?: React.ChangeEvent<HTMLInputElement>) => void;
+    value?: ColorValue;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     name: string;
     style?: State["style"];
     width?: string;
-    onColorChange: (color) => void;
+    onColorChange: (color: ColorValue) => void;
 }
 
 export class ColorEditBase extends React.Component<
@@ -72,7 +96,7 @@ export class ColorEditBase extends React.Component<
                                 ),
                             )}
                             name={name}
-                            value={rgbaOrHex(value)}
+                            value={rgbaOrHex(value ?? "")}
                             onFocus={(_e) =>
                                 this.setState({ showChromePicker: true })
                             }
@@ -85,7 +109,7 @@ export class ColorEditBase extends React.Component<
                                 height: "1rem",
                                 width: "1rem",
                                 marginLeft: ".5rem",
-                                background: value,
+                                background: rgbaOrHex(value ?? ""),
                                 borderRadius: "50%",
                             }}
                         />
