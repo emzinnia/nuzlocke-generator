@@ -166,6 +166,16 @@ test("imports Black 2 boxed Pokemon with derived levels", async ({ page }) => {
         buffer: readBlack2LivingDexSave(),
     });
 
+    const teamSlots = page.locator(".team-container .pokemon-container");
+    await expect(teamSlots).toHaveCount(6, { timeout: 20_000 });
+    await expect(teamSlots.first().locator(".pokemon-name")).toHaveText("Emboar");
+
+    const extraData = teamSlots.first().locator(".pokemon-extra-data");
+    await expect(extraData).toBeVisible();
+    for (const value of ["331", "344", "154", "143", "312", "165"]) {
+        await expect(extraData).toContainText(value);
+    }
+
     const boxedNames = page.getByTestId("boxed-pokemon-name");
     await expect(boxedNames.first()).toBeVisible({ timeout: 20_000 });
 

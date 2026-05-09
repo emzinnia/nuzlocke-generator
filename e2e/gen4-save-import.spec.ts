@@ -7,6 +7,10 @@ type SaveFixture = {
     party: string[];
     firstBoxed?: string[];
     itemImages?: { partyIndex: number; fileName: string }[];
+    partyStats?: Array<{
+        partyIndex: number;
+        values: string[];
+    }>;
 };
 
 const saves: SaveFixture[] = [
@@ -15,6 +19,12 @@ const saves: SaveFixture[] = [
         detectedGame: "Diamond",
         party: ["Gengar", "Lapras", "Dragonite", "Rayquaza", "Bibarel", "Darkrai"],
         firstBoxed: ["ROCK", "ROCKY", "EYELESS", "JON", "FOOL", "DUCKY"],
+        partyStats: [
+            {
+                partyIndex: 0,
+                values: ["269", "139", "165", "317", "305", "194"],
+            },
+        ],
     },
     {
         fileName: "heartgold.sav",
@@ -70,6 +80,17 @@ for (const save of saves) {
             await expect(
                 teamSlots.nth(itemImage.partyIndex).locator(".pokemon-item img"),
             ).toHaveAttribute("src", new RegExp(`hold-item/${itemImage.fileName}$`));
+        }
+
+        for (const partyStats of save.partyStats ?? []) {
+            const extraData = teamSlots
+                .nth(partyStats.partyIndex)
+                .locator(".pokemon-extra-data");
+            await expect(extraData).toBeVisible();
+
+            for (const value of partyStats.values) {
+                await expect(extraData).toContainText(value);
+            }
         }
 
         await expect(page.locator("select").first()).toHaveValue(save.detectedGame);
