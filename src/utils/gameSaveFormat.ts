@@ -9,4 +9,6 @@ export type GameSaveFormat =
     | "Emerald"
     | "DP"
     | "Platinum"
-    | "HGSS";
+    | "HGSS"
+    | "BW"
+    | "B2W2";

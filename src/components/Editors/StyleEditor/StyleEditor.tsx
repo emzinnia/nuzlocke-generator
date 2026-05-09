@@ -795,7 +795,7 @@ export class StyleEditorBase extends React.Component<
                     <Checkbox
                         checked={props.style.displayGameOriginForBoxedAndDead}
                         name="displayGameOriginForBoxedAndDead"
-                        label="Display Game Origin for Boxed and Dead"
+                        label="Display Game Origin"
                         onChange={(e) => editCheckboxEvent(e, props, "displayGameOriginForBoxedAndDead")}
                     />
                 </div>

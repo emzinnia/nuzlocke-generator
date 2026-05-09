@@ -1,9 +1,17 @@
-import { parseGen1Save, parseGen2Save, parseGen3Save, parseGen4Save } from ".";
+import {
+    detectGen5Layout,
+    parseGen1Save,
+    parseGen2Save,
+    parseGen3Save,
+    parseGen4Save,
+    parseGen5Save,
+} from ".";
 import { BoxMappings } from "./utils/boxMappings";
 import { Buffer } from "buffer";
 import type { GameSaveFormat } from "utils/gameSaveFormat";
 import type { Game as GameName } from "utils";
 import type { Game as GameModel } from "models";
+import type { Gen5Game } from "./gen5";
 
 interface MessageData {
     data: {
@@ -22,6 +30,9 @@ const SAVE_SIZE_GEN1_GEN2 = 0x8000; // 32 KiB
 const SAVE_SIZE_GEN3 = 0x20000; // 128 KiB
 const SAVE_SIZE_GEN3_TRIMMED = 0x1c000; // 114,688 bytes (2 * 0xE000)
 const SAVE_SIZE_GEN4 = 0x80000; // 512 KiB typical DS save
+const SAVE_SIZE_GEN5_BW = 0x24000; // 144 KiB Gen 5 main save
+const SAVE_SIZE_GEN5_B2W2 = 0x26000; // 152 KiB Gen 5 main save
+const SAVE_SIZE_GEN5_RAW = 0x80000; // 512 KiB Gen 5 raw save
 // Some emulators append small headers/footers; treat "slightly > 32KiB" as Gen1/2.
 const SAVE_SIZE_GEN1_GEN2_MAX_WITH_PADDING = 0x9000;
 
@@ -36,7 +47,7 @@ const normalizeGen1Gen2Buffer = (buf: Buffer) =>
 const normalizeForTokenSearch = (s: string) => {
     // "Case and spacing insensitive": remove whitespace and uppercase.
     // For filenames we also strip punctuation to make matching more forgiving.
-    return s.toUpperCase().replace(/\s+/g, "").replace(/[^A-Z]/g, "");
+    return s.toUpperCase().replace(/\s+/g, "").replace(/[^A-Z0-9]/g, "");
 };
 
 const getHintTokens = (s: string) =>
@@ -323,6 +334,76 @@ const gen4GameMatchesSaveFormat = (
     return saveFormat === gameName;
 };
 
+const detectGen5SaveFormatFromString = (text: string): Gen5Game | undefined => {
+    const s = normalizeForTokenSearch(text);
+    const tokens = getHintTokens(text);
+
+    if (
+        s.includes("BLACK2") ||
+        s.includes("WHITE2") ||
+        s.includes("BLACKTWO") ||
+        s.includes("WHITETWO") ||
+        hasHintToken(tokens, "B2", "W2", "BW2", "B2W2")
+    ) {
+        return "B2W2";
+    }
+
+    if (
+        s.includes("BLACK") ||
+        s.includes("WHITE") ||
+        hasHintToken(tokens, "BW")
+    ) {
+        return "BW";
+    }
+
+    return undefined;
+};
+
+const detectGen5GameNameFromString = (text: string): GameName | undefined => {
+    const s = normalizeForTokenSearch(text);
+    const tokens = getHintTokens(text);
+
+    if (s.includes("BLACK2") || s.includes("BLACKTWO") || hasHintToken(tokens, "B2")) {
+        return "Black 2";
+    }
+    if (s.includes("WHITE2") || s.includes("WHITETWO") || hasHintToken(tokens, "W2")) {
+        return "White 2";
+    }
+    if (s.includes("BLACK")) return "Black";
+    if (s.includes("WHITE")) return "White";
+
+    return undefined;
+};
+
+const detectGen5SaveFormat = (
+    buf: Buffer,
+    fileName?: string,
+): Gen5Game | undefined => {
+    if (
+        buf.length !== SAVE_SIZE_GEN5_RAW &&
+        buf.length !== SAVE_SIZE_GEN5_BW &&
+        buf.length !== SAVE_SIZE_GEN5_B2W2
+    ) {
+        return undefined;
+    }
+
+    const detected = detectGen5Layout(buf);
+    if (detected) return detected;
+
+    return fileName ? detectGen5SaveFormatFromString(fileName) : undefined;
+};
+
+const gen5GameMatchesSaveFormat = (
+    gameName: GameName,
+    saveFormat: GameSaveFormat,
+) => {
+    if (saveFormat === "BW") return gameName === "Black" || gameName === "White";
+    if (saveFormat === "B2W2") {
+        return gameName === "Black 2" || gameName === "White 2";
+    }
+    return false;
+};
+
 // Matches the checksum logic used in `src/parsers/gen1.ts`.
 const isLikelyGen1Save = (buf: Buffer) => {
     if (buf.length < SAVE_SIZE_GEN1_GEN2) return false;
@@ -437,17 +518,20 @@ self.onmessage = async ({
         buf.length === SAVE_SIZE_GEN3 || buf.length === SAVE_SIZE_GEN3_TRIMMED
             ? (fileName ? detectGen3SaveFormatFromString(fileName) : undefined)
             : undefined;
+    const gen5SaveFormatHint = detectGen5SaveFormat(buf, fileName);
 
     // Auto-detect Gen 4 variant based on file structure and filename
     const gen4SaveFormatHint =
-        buf.length >= SAVE_SIZE_GEN4
+        buf.length >= SAVE_SIZE_GEN4 && !gen5SaveFormatHint
             ? detectGen4SaveFormat(buf, fileName)
             : undefined;
 
     const gameChoice: GameSaveFormat =
         selectedGame && selectedGame !== "Auto"
             ? selectedGame
-            : buf.length >= SAVE_SIZE_GEN4
+            : gen5SaveFormatHint
+              ? gen5SaveFormatHint
+              : buf.length >= SAVE_SIZE_GEN4
               ? gen4SaveFormatHint ?? "DP"
               : buf.length === SAVE_SIZE_GEN3 || buf.length === SAVE_SIZE_GEN3_TRIMMED
                 ? gen3SaveFormatHint ?? "Emerald"
@@ -518,6 +602,15 @@ self.onmessage = async ({
             boxMappings,
             selectedGame: preferredGen4,
         });
+    } else if (gameChoice === "BW" || gameChoice === "B2W2") {
+        const preferredGen5 =
+            selectedGame === "BW" || selectedGame === "B2W2"
+                ? selectedGame
+                : gen5SaveFormatHint;
+        result = await parseGen5Save(buf, {
+            boxMappings,
+            selectedGame: preferredGen5,
+        });
     } else {
         throw new Error(`Unsupported game type: ${gameChoice}`);
     }
@@ -543,6 +636,17 @@ self.onmessage = async ({
             detectedGame = makeGame("Platinum");
         } else {
             detectedGame = makeGame("Diamond");
+        }
+    } else if (gameChoice === "BW" || gameChoice === "B2W2") {
+        const gen5Hint = fileName ? detectGen5GameNameFromString(fileName) : undefined;
+        if (result.game) {
+            detectedGame = makeGame(result.game);
+        } else if (gen5Hint && gen5GameMatchesSaveFormat(gen5Hint, gameChoice)) {
+            detectedGame = makeGame(gen5Hint);
+        } else if (gameChoice === "B2W2") {
+            detectedGame = makeGame("Black 2");
+        } else {
+            detectedGame = makeGame("Black");
         }
     } else {
         const hinted = fileName ? detectGen3GameNameFromString(fileName) : undefined;

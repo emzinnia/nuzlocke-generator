@@ -162,4 +162,50 @@ describe("parsers worker", () => {
         expect(call.detectedGame?.name).toBe("SoulSilver");
         expect(call.detectedSaveFormat).toBe("HGSS");
     });
+
+    it.each([
+        [
+            "fixtures/gen5/projectpokemon-base-black-boy.sav",
+            "pokemon-black.sav",
+            "Black",
+            "BW",
+            "Black",
+        ],
+        [
+            "fixtures/gen5/projectpokemon-base-white-boy.sav",
+            "pokemon-white.sav",
+            "White",
+            "BW",
+            "White",
+        ],
+        [
+            "fixtures/gen5/projectpokemon-base-black-2-boy.sav",
+            "pokemon-black-2.sav",
+            "Black 2",
+            "B2W2",
+            "Black",
+        ],
+        [
+            "fixtures/gen5/projectpokemon-base-white-2-boy.sav",
+            "pokemon-white-2.sav",
+            "White 2",
+            "B2W2",
+            "White",
+        ],
+    ])(
+        "detects %s as %s",
+        async (fixture, fileName, gameName, saveFormat, trainerName) => {
+            const save = loadSav(fixture);
+            const selfRef = globalThis.self as unknown as WorkerSelf;
+            await selfRef.onmessage?.({
+                data: { save, selectedGame: "Auto", boxMappings: [], fileName },
+            });
+            const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+            expect(call.detectedGame?.name).toBe(gameName);
+            expect(call.detectedSaveFormat).toBe(saveFormat);
+            expect(call.trainer?.name).toBe(trainerName);
+            expect(call.trainer?.money).toBe("3000");
+            expect(call.pokemon).toEqual([]);
+        },
+    );
 });

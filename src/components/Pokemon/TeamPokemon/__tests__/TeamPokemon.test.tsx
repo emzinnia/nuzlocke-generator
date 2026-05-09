@@ -273,4 +273,26 @@ describe("TeamPokemonInfo", () => {
         expect(screen.getByText("SPATK")).toBeTruthy();
         expect(screen.getByText("SPDEF")).toBeTruthy();
     });
+
+    it("shows game of origin when enabled", () => {
+        const styleWithGameOrigin = {
+            ...baseStyle,
+            displayGameOriginForBoxedAndDead: true,
+        };
+
+        render(
+            <TeamPokemonInfo
+                generation={Generation.Gen5}
+                style={styleWithGameOrigin}
+                pokemon={{ ...basePokemon, gameOfOrigin: "White 2" }}
+                customTypes={[]}
+                linkedPokemon={undefined}
+                game={baseGame}
+            />,
+        );
+
+        expect(screen.getByTestId("pokemon-gameoforigin").textContent).toBe(
+            "White 2",
+        );
+    });
 });
