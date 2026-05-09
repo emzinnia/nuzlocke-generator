@@ -6,4 +6,7 @@ export type GameSaveFormat =
     | "Crystal"
     | "RS"
     | "FRLG"
-    | "Emerald";
+    | "Emerald"
+    | "DP"
+    | "Platinum"
+    | "HGSS";

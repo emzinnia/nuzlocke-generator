@@ -26,6 +26,10 @@ const getGameNumberOfBoxes = (game: GameSaveFormat): number => {
         case "RS":
         case "FRLG":
             return 14;
+        case "DP":
+        case "Platinum":
+        case "HGSS":
+            return 18;
         default:
             return 12;
     }
@@ -86,4 +90,3 @@ export function saveUploadSettings(
 
 // Export helper for generating default mappings (used by components)
 export { generateDefaultBoxMappings };
-
