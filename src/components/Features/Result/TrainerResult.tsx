@@ -55,6 +55,9 @@ export const TrainerColumnItem = ({
     ) : null;
 };
 
+const getClearedCheckpointName = (checkpoint: Badge | string) =>
+    typeof checkpoint === "string" ? checkpoint : checkpoint.name;
+
 export interface CheckpointsDisplayProps {
     style: State["style"];
     trainer?: State["trainer"];
@@ -94,7 +97,9 @@ export function CheckpointsDisplay({
     return (
         <>
             {checkpoints.map((badge, index) => {
-                const obtained = cleared.some((b) => b.name === badge.name);
+                const obtained = cleared.some(
+                    (b) => getClearedCheckpointName(b) === badge.name,
+                );
                 return (
                     <React.Fragment key={badge.name}>
                         <img

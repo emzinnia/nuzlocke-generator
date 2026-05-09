@@ -51,15 +51,18 @@ export const AdvancedImportOptions = React.forwardRef<
 
     const gen3Enabled = import.meta.env.VITE_GEN3_SAVES === "true";
     const gen4Enabled = import.meta.env.VITE_GEN4_SAVES === "true";
+    const gen5Enabled = import.meta.env.VITE_GEN5_SAVES !== "false";
     
     const gen1And2Games: GameSaveFormat[] = ["RBY", "GS", "Crystal"];
     const gen3Games: GameSaveFormat[] = ["RS", "FRLG", "Emerald"];
     const gen4Games: GameSaveFormat[] = ["DP", "Platinum", "HGSS"];
+    const gen5Games: GameSaveFormat[] = ["BW", "B2W2"];
     
     const allowedGames: GameSaveFormat[] = [
         ...gen1And2Games,
         ...(gen3Enabled ? gen3Games : []),
         ...(gen4Enabled ? gen4Games : []),
+        ...(gen5Enabled ? gen5Games : []),
     ];
 
     // Expose openFileDialog to parent via ref

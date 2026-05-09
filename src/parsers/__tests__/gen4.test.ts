@@ -240,6 +240,7 @@ describe("Gen 4 Save Parser", () => {
                 ability: "Levitate",
                 nature: "Timid",
                 gender: "f",
+                gameOfOrigin: "LeafGreen",
                 met: "Pal Park",
                 metLevel: 68,
             });
@@ -248,6 +249,7 @@ describe("Gen 4 Save Parser", () => {
                 ability: "Air Lock",
                 nature: "Serious",
                 gender: "genderless",
+                gameOfOrigin: "Emerald",
                 met: "Pal Park",
                 metLevel: 73,
             });
@@ -256,6 +258,7 @@ describe("Gen 4 Save Parser", () => {
                 ability: "Bad Dreams",
                 nature: "Naughty",
                 gender: "genderless",
+                gameOfOrigin: "Diamond",
                 met: "Newmoon Island",
                 metLevel: 40,
             });
@@ -265,6 +268,7 @@ describe("Gen 4 Save Parser", () => {
                 gender: "genderless",
                 nature: "Jolly",
                 ability: "Levitate",
+                gameOfOrigin: "Diamond",
                 met: "Solaceon Ruins",
                 metLevel: 17,
             });
@@ -273,6 +277,7 @@ describe("Gen 4 Save Parser", () => {
                 formId: 17,
                 genderValue: 2,
                 metLocation: 53,
+                originGameName: "Diamond",
             });
         });
 

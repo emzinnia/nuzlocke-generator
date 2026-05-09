@@ -30,6 +30,9 @@ const getGameNumberOfBoxes = (game: GameSaveFormat): number => {
         case "Platinum":
         case "HGSS":
             return 18;
+        case "BW":
+        case "B2W2":
+            return 24;
         default:
             return 12;
     }

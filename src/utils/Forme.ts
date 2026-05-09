@@ -93,6 +93,7 @@ export enum Forme {
 
     White = "white",
     Black = "black",
+    Zen = "zen",
 
     Mow = "mow",
     Wash = "wash",
@@ -106,6 +107,7 @@ export enum Forme {
 
     School = "school",
     Pirouette = "pirouette",
+    Resolute = "resolute",
 
     Therian = "therian",
 

@@ -10,6 +10,7 @@ import {
     Generation,
     getGameGeneration,
     getContrastColor,
+    gameOfOriginToColor,
     TemplateName,
     Types,
     Forme,
@@ -37,6 +38,44 @@ export interface TeamPokemonInfoProps {
     linkedPokemon?: Pokemon;
     game: State["game"];
 }
+
+const GameOfOriginBadge = ({
+    pokemon,
+    style,
+}: {
+    pokemon: Pokemon;
+    style: Styles;
+}) => {
+    if (
+        !style.displayGameOriginForBoxedAndDead ||
+        style.displayBackgroundInsteadOfBadge ||
+        !pokemon.gameOfOrigin ||
+        pokemon.gameOfOrigin === "None"
+    ) {
+        return null;
+    }
+
+    const background = gameOfOriginToColor(pokemon.gameOfOrigin);
+    if (!background) return null;
+
+    return (
+        <span
+            className="pokemon-gameoforigin"
+            data-testid="pokemon-gameoforigin"
+            style={{
+                background,
+                color: getContrastColor(background),
+                borderRadius: ".25rem",
+                display: "inline-block",
+                fontSize: "80%",
+                margin: ".25rem",
+                padding: ".25rem",
+            }}
+        >
+            {pokemon.gameOfOrigin}
+        </span>
+    );
+};
 
 function getSpriteStyle({ spritesMode, scaleSprites, teamImages }) {
     if (spritesMode) {
@@ -77,6 +116,14 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
 
         const accentColor = style ? style.accentColor : "#111111";
         const isCardsTheme = style.template === TemplateName.Cards;
+        const gameOfOriginColor = pokemon.gameOfOrigin
+            ? gameOfOriginToColor(pokemon.gameOfOrigin)
+            : "";
+        const useGameOfOriginBackground = Boolean(
+            style.displayGameOriginForBoxedAndDead &&
+                style.displayBackgroundInsteadOfBadge &&
+                gameOfOriginColor,
+        );
         const isCompactTheme =
             style.template === TemplateName.Compact ||
             style.template === TemplateName.CompactWithIcons;
@@ -111,7 +158,11 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                 <div
                     className="pokemon-info"
                     style={{
-                        backgroundColor: isCardsTheme ? undefined : accentColor,
+                        backgroundColor: isCardsTheme
+                            ? undefined
+                            : useGameOfOriginBackground
+                              ? gameOfOriginColor
+                              : accentColor,
                         // backgroundImage: isCardsTheme ? undefined : `linear-gradient(to right, #2d2d2d 1px, transparent 1px), linear-gradient(to bottom, #2d2d2d 1px, transparent 1px)`,
                         backgroundImage: isCompactTheme
                             ? getBackgroundGradient(
@@ -128,6 +179,8 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                             ? getContrastColor(
                                   typeToColor(getTypeOrNone(), customTypes),
                               )
+                            : useGameOfOriginBackground
+                              ? getContrastColor(gameOfOriginColor)
                             : getContrastColor(accentColor),
                     }}
                 >
@@ -172,19 +225,11 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                                     lv. {pokemon.level}
                                 </span>
                             ) : null}
+                            <GameOfOriginBadge
+                                pokemon={pokemon}
+                                style={style}
+                            />
                         </div>
-                        {/* <span style={{
-                                background: gameOfOriginToColor(pokemon.gameOfOrigin!),
-                                color: getContrastColor(gameOfOriginToColor(pokemon.gameOfOrigin!)),
-                                borderRadius: '.25rem',
-                                display: 'inline-block',
-                                fontSize: '90%',
-                                margin: 0,
-                                padding: '.25rem',
-                                textAlign: 'center',
-                                width: '200px',
-                            }}>{ pokemon.gameOfOrigin }
-                        </span> */}
                         <div className="pokemon-met">
                             {getMetLocationString({
                                 poke: pokemon,
@@ -346,6 +391,7 @@ export function TeamPokemonBaseMinimal(
                             lv. {pokemon.level}
                         </span>
                     ) : null}
+                    <GameOfOriginBadge pokemon={pokemon} style={style} />
                 </div>
             </div>
         </div>

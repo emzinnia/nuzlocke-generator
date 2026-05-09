@@ -3,6 +3,7 @@ import { Pokemon } from "models";
 import { matchSpeciesToTypes } from "utils/formatters/matchSpeciesToTypes";
 import { Forme } from "utils/Forme";
 import { Types } from "utils/Types";
+import { Game as GameName } from "utils";
 import { Species } from "utils/data/listOfPokemon";
 import { MOVES_ARRAY } from "./utils";
 import { ParserOptions } from "./utils/parserOptions";
@@ -399,6 +400,20 @@ const getGen4LocationName = (locationId: number) => {
     return GEN4_LOCATION_MAP[locationId] ?? `Location #${locationId}`;
 };
 
+const getOriginGameName = (gameId: number): GameName | undefined => {
+    if (gameId === 1) return "Sapphire";
+    if (gameId === 2) return "Ruby";
+    if (gameId === 3) return "Emerald";
+    if (gameId === 4) return "FireRed";
+    if (gameId === 5) return "LeafGreen";
+    if (gameId === 7) return "HeartGold";
+    if (gameId === 8) return "SoulSilver";
+    if (gameId === 10) return "Diamond";
+    if (gameId === 11) return "Pearl";
+    if (gameId === 12) return "Platinum";
+    return undefined;
+};
+
 const getGen4Forme = (species: Species | undefined, formId: number): Forme | undefined => {
     if (!species) return undefined;
     if (species === "Unown") return UNOWN_FORMES[formId] ?? undefined;
@@ -731,6 +746,7 @@ const decodePokemon = (buffer: Buffer, context: PokemonContext): Pokemon | null 
     const gender = getGen4Gender(genderValue);
     const nature = getGen4Nature(pid);
     const forme = getGen4Forme(speciesName, formId);
+    const gameOfOrigin = getOriginGameName(originGame);
 
     const basePid = pid.toString(16);
     const currentCount = context.pidTracker.get(basePid) || 0;
@@ -750,6 +766,7 @@ const decodePokemon = (buffer: Buffer, context: PokemonContext): Pokemon | null 
         forme,
         gender,
         nature,
+        gameOfOrigin,
         item: itemId
             ? GEN4_ITEM_MAP[itemId] ?? `Item #${itemId}`
             : undefined,
@@ -774,6 +791,7 @@ const decodePokemon = (buffer: Buffer, context: PokemonContext): Pokemon | null 
             formId,
             pokerus,
             originGame,
+            originGameName: gameOfOrigin,
             eggLocationExtended,
             metLocation,
             otGender,
