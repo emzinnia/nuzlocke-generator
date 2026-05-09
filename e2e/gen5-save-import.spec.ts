@@ -73,7 +73,9 @@ const encryptPk5 = (decryptedPk5: Buffer) => {
     return encrypted;
 };
 
-const buildBlack2HaxorusSave = () => {
+const PARTY_POKEMON_SIZE = 220;
+
+const buildBlack2HaxorusSave = (heldItemIds = [0]) => {
     const savePath = path.join(
         process.cwd(),
         "src",
@@ -91,10 +93,14 @@ const buildBlack2HaxorusSave = () => {
         "pkhex-haxorus.pk5",
     );
     const save = Buffer.from(readFileSync(savePath).subarray(0, 0x26000));
-    const pk5 = encryptPk5(readFileSync(pk5Path));
+    const pk5 = readFileSync(pk5Path);
 
-    save.writeUInt8(1, 0x18e04);
-    pk5.copy(save, 0x18e08);
+    save.writeUInt8(heldItemIds.length, 0x18e04);
+    heldItemIds.forEach((heldItemId, index) => {
+        const pokemon = Buffer.from(pk5);
+        pokemon.writeUInt16LE(heldItemId, 0x0a);
+        encryptPk5(pokemon).copy(save, 0x18e08 + index * PARTY_POKEMON_SIZE);
+    });
     return save;
 };
 
@@ -150,6 +156,32 @@ test("imports a Gen 5 Black 2 save through the save upload UI", async ({ page })
     await expect(
         page.locator('.badge-wrapper img.trainer-checkpoint[data-badge="Wave Badge"]'),
     ).toHaveClass(/not-obtained/);
+});
+
+test("imports Gen 5 held item images", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const fileChooserPromise = page.waitForEvent("filechooser");
+    await page.getByTestId("import-save-file-button").click();
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles({
+        name: "black-2-held-items.sav",
+        mimeType: "application/octet-stream",
+        buffer: buildBlack2HaxorusSave([92, 246]),
+    });
+
+    const teamSlots = page.locator(".team-container .pokemon-container");
+    await expect(teamSlots).toHaveCount(2, { timeout: 20_000 });
+
+    await expect(teamSlots.nth(0).locator(".pokemon-item img")).toHaveAttribute(
+        "src",
+        /hold-item\/nugget\.png$/,
+    );
+    await expect(teamSlots.nth(1).locator(".pokemon-item img")).toHaveAttribute(
+        "src",
+        /hold-item\/never-melt-ice\.png$/,
+    );
 });
 
 test("imports Black 2 boxed Pokemon with derived levels", async ({ page }) => {

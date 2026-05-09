@@ -1,15 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Buffer } from "buffer";
 import { detectGen5Layout, parseGen5Save, type Gen5Game } from "../gen5";
 import type { Game } from "utils";
+import { formatHeldItemIconFileName } from "../../utils/formatters/formatHeldItemIconFileName";
 
 const fixturePath = (...parts: string[]) =>
     join(process.cwd(), "src", "parsers", "fixtures", "gen5", ...parts);
 
 const readFixture = (name: string) => readFileSync(fixturePath(name));
 const readParserFile = (name: string) => readFileSync(join(process.cwd(), "src", "parsers", name));
+const PARTY_POKEMON_SIZE = 220;
 
 const BLOCK_PERMUTATIONS = [
     "ABCD",
@@ -80,6 +82,25 @@ const encryptPk5 = (decryptedPk5: Buffer) => {
     }
 
     return encrypted;
+};
+
+const buildBlack2PartySave = (heldItemIds: number[]) => {
+    const saveData = Buffer.from(
+        readFixture("projectpokemon-base-black-2-boy.sav").subarray(0, 0x26000),
+    );
+    const pk5 = readFixture("pkhex-haxorus.pk5");
+
+    saveData.writeUInt8(heldItemIds.length, 0x18e04);
+    heldItemIds.forEach((heldItemId, index) => {
+        const pokemon = Buffer.from(pk5);
+        pokemon.writeUInt16LE(heldItemId, 0x0a);
+        encryptPk5(pokemon).copy(
+            saveData,
+            0x18e08 + index * PARTY_POKEMON_SIZE,
+        );
+    });
+
+    return saveData;
 };
 
 describe("Gen 5 Save Parser", () => {
@@ -164,12 +185,7 @@ describe("Gen 5 Save Parser", () => {
     });
 
     it("decrypts PK5 party data from a Gen 5 save", async () => {
-        const saveData = Buffer.from(
-            readFixture("projectpokemon-base-black-2-boy.sav").subarray(0, 0x26000),
-        );
-        const encryptedPk5 = encryptPk5(readFixture("pkhex-haxorus.pk5"));
-        saveData.writeUInt8(1, 0x18e04);
-        encryptedPk5.copy(saveData, 0x18e08);
+        const saveData = buildBlack2PartySave([0]);
 
         const result = await parseGen5Save(saveData, {
             boxMappings: [],
@@ -209,6 +225,35 @@ describe("Gen 5 Save Parser", () => {
             metLocationName: "Nature Preserve",
             checksumStored: 41388,
         });
+    });
+
+    it("uses image-backed held item names for Gen 5 imports", async () => {
+        const result = await parseGen5Save(buildBlack2PartySave([92, 246]), {
+            boxMappings: [],
+            selectedGame: "B2W2",
+        });
+
+        expect(result.pokemon.map((pokemon) => pokemon.item)).toEqual([
+            "Nugget",
+            "Never Melt Ice",
+        ]);
+
+        for (const pokemon of result.pokemon) {
+            const fileName = formatHeldItemIconFileName(pokemon.item ?? "");
+
+            expect(
+                existsSync(
+                    join(
+                        process.cwd(),
+                        "src",
+                        "assets",
+                        "icons",
+                        "hold-item",
+                        fileName,
+                    ),
+                ),
+            ).toBe(true);
+        }
     });
 
     it("derives legal boxed Pokemon levels from Black 2 PC data", async () => {

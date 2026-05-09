@@ -1,9 +1,11 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { parseGen4Save } from "../gen4";
-import { readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "node:path";
 import { Buffer } from "buffer";
+import { GEN4_ITEM_MAP } from "../utils/gen4";
+import { formatHeldItemIconFileName } from "../../utils/formatters/formatHeldItemIconFileName";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -79,6 +81,30 @@ const refreshBlockChecksum = (
 };
 
 describe("Gen 4 Save Parser", () => {
+    it("uses image-backed held item names for Gen 4 imports", () => {
+        expect(GEN4_ITEM_MAP[92]).toBe("Nugget");
+        expect(GEN4_ITEM_MAP[246]).toBe("Never Melt Ice");
+        expect(formatHeldItemIconFileName("NeverMeltIce")).toBe(
+            "never-melt-ice.png",
+        );
+
+        for (const itemId of [92, 246]) {
+            const fileName = formatHeldItemIconFileName(
+                GEN4_ITEM_MAP[itemId] ?? "",
+            );
+
+            expect(
+                existsSync(
+                    join(
+                        __dirname,
+                        "../../assets/icons/hold-item",
+                        fileName,
+                    ),
+                ),
+            ).toBe(true);
+        }
+    });
+
     describe("Diamond Save File", () => {
         let saveData: Buffer;
 

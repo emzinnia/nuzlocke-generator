@@ -5,6 +5,7 @@ import { Provider, useSelector, useStore } from "react-redux";
 import { State } from "state";
 import {
     formatBallText,
+    getHeldItemIconPath,
     getGameGeneration,
     getPokemonImage,
     stripURLCSS,
@@ -167,12 +168,7 @@ export function TeamPokemon({
                 customTypes={customTypes}
             />,
         ),
-        item: pokemon.item
-            ? `icons/hold-item/${(pokemon.item || "")
-                  .toLowerCase()
-                  .replace(/'/g, "")
-                  .replace(/\s/g, "-")}.png`
-            : undefined,
+        item: pokemon.item ? getHeldItemIconPath(pokemon.item) : undefined,
         itemComponent: ReactDOMServer.renderToString(
             <PokemonItem
                 pokemon={pokemon}

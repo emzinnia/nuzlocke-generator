@@ -754,7 +754,7 @@ export const GEN4_ITEM_MAP: Record<number, string | undefined> = {
     243: "Mystic Water",
     244: "Sharp Beak",
     245: "Poison Barb",
-    246: "NeverMeltIce",
+    246: "Never Melt Ice",
     247: "Spell Tag",
     248: "TwistedSpoon",
     249: "Charcoal",

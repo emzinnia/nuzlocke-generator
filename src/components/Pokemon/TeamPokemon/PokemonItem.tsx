@@ -4,7 +4,7 @@ import { Pokemon } from "models";
 import { State } from "state";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { ResizedImage } from "components/Common/Shared/ResizedImage";
-import { getBackgroundGradient, typeToColor } from "utils";
+import { getBackgroundGradient, getHeldItemIconPath, typeToColor } from "utils";
 
 const itemLabelStyle = {
     base: css`
@@ -97,10 +97,7 @@ export function PokemonItem({
             ) : (
                 <img
                     alt={pokemon.item}
-                    src={`icons/hold-item/${(pokemon.item || "")
-                        .toLowerCase()
-                        .replace(/'/g, "")
-                        .replace(/\s/g, "-")}.png`}
+                    src={getHeldItemIconPath(pokemon.item || "")}
                 />
             )}
         </div>
