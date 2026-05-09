@@ -1630,8 +1630,9 @@ export const matchSpeciesToTypes = (
             return [Types.Water, Types.Poison];
         case "Skarmory":
         case "Celesteela":
-        case "Corviknight":
             return [Types.Steel, Types.Flying];
+        case "Corviknight":
+            return [Types.Flying, Types.Steel];
 
         case "Larvitar":
         case "Pupitar":
