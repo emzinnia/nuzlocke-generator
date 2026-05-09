@@ -39,6 +39,12 @@ const normalizeForTokenSearch = (s: string) => {
     return s.toUpperCase().replace(/\s+/g, "").replace(/[^A-Z]/g, "");
 };
 
+const getHintTokens = (s: string) =>
+    s.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
+
+const hasHintToken = (tokens: string[], ...values: string[]) =>
+    tokens.some((token) => values.includes(token));
+
 const detectGen3GameNameFromString = (text: string): GameName | undefined => {
     const s = normalizeForTokenSearch(text);
 
@@ -67,16 +73,19 @@ type Gen4Variant = "DP" | "Platinum" | "HGSS";
 
 const detectGen4SaveFormatFromString = (text: string): Gen4Variant | undefined => {
     const s = normalizeForTokenSearch(text);
+    const tokens = getHintTokens(text);
 
     // HeartGold / SoulSilver
-    if (s.includes("HEARTGOLD") || s.includes("HG")) return "HGSS";
-    if (s.includes("SOULSILVER") || s.includes("SS")) return "HGSS";
-    if (s.includes("HGSS")) return "HGSS";
+    if (s.includes("HEARTGOLD") || hasHintToken(tokens, "HG", "HGSS")) {
+        return "HGSS";
+    }
+    if (s.includes("SOULSILVER") || hasHintToken(tokens, "SS")) return "HGSS";
 
     // Platinum
-    if (s.includes("PLATINUM") || s.includes("PT")) return "Platinum";
+    if (s.includes("PLATINUM") || hasHintToken(tokens, "PT")) return "Platinum";
 
     // Diamond / Pearl
+    if (hasHintToken(tokens, "DP")) return "DP";
     if (s.includes("DIAMOND")) return "DP";
     if (s.includes("PEARL")) return "DP";
 
@@ -85,10 +94,13 @@ const detectGen4SaveFormatFromString = (text: string): Gen4Variant | undefined =
 
 const detectGen4GameNameFromString = (text: string): GameName | undefined => {
     const s = normalizeForTokenSearch(text);
+    const tokens = getHintTokens(text);
 
-    if (s.includes("HEARTGOLD") || s.includes("HG")) return "HeartGold";
-    if (s.includes("SOULSILVER") || s.includes("SS")) return "SoulSilver";
-    if (s.includes("PLATINUM") || s.includes("PT")) return "Platinum";
+    if (s.includes("HEARTGOLD") || hasHintToken(tokens, "HG", "HGSS")) {
+        return "HeartGold";
+    }
+    if (s.includes("SOULSILVER") || hasHintToken(tokens, "SS")) return "SoulSilver";
+    if (s.includes("PLATINUM") || hasHintToken(tokens, "PT")) return "Platinum";
     if (s.includes("DIAMOND")) return "Diamond";
     if (s.includes("PEARL")) return "Pearl";
 
@@ -289,18 +301,26 @@ const detectGen4VariantFromBuffer = (buf: Buffer): Gen4Variant | undefined => {
  * Falls back to "DP" if no specific variant can be determined.
  */
 const detectGen4SaveFormat = (buf: Buffer, fileName?: string): GameSaveFormat => {
-    // First try filename hints
+    const detected = detectGen4VariantFromBuffer(buf);
+    if (detected) return detected;
+
+    // Fall back to filename hints if the block layout is not recognizable.
     if (fileName) {
         const hint = detectGen4SaveFormatFromString(fileName);
         if (hint) return hint;
     }
 
-    // Then try structural detection
-    const detected = detectGen4VariantFromBuffer(buf);
-    if (detected) return detected;
-
     // Default to DP as fallback
     return "DP";
+};
+
+const gen4GameMatchesSaveFormat = (
+    gameName: GameName,
+    saveFormat: GameSaveFormat,
+) => {
+    if (saveFormat === "DP") return gameName === "Diamond" || gameName === "Pearl";
+    if (saveFormat === "HGSS") return gameName === "HeartGold" || gameName === "SoulSilver";
+    return saveFormat === gameName;
 };
 
 // Matches the checksum logic used in `src/parsers/gen1.ts`.
@@ -515,7 +535,7 @@ self.onmessage = async ({
     } else if (gameChoice === "DP" || gameChoice === "Platinum" || gameChoice === "HGSS") {
         // Gen 4: use filename hints or default based on detected format
         const gen4Hint = fileName ? detectGen4GameNameFromString(fileName) : undefined;
-        if (gen4Hint) {
+        if (gen4Hint && gen4GameMatchesSaveFormat(gen4Hint, gameChoice)) {
             detectedGame = makeGame(gen4Hint);
         } else if (gameChoice === "HGSS") {
             detectedGame = makeGame("HeartGold");

@@ -89,6 +89,20 @@ describe("parsers worker", () => {
         ]);
     });
 
+    it.each(["attempt.sav", "boss.sav", "DS save.sav"])(
+        "ignores incidental Gen 4 abbreviation substrings in %s",
+        async (fileName) => {
+            const save = loadSav("diamond.sav");
+            const selfRef = globalThis.self as unknown as WorkerSelf;
+            await selfRef.onmessage?.({
+                data: { save, selectedGame: "Auto", boxMappings: [], fileName },
+            });
+            const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+            expect(call.detectedGame?.name).toBe("Diamond");
+            expect(call.detectedSaveFormat).toBe("DP");
+        },
+    );
+
     it("detects HeartGold from heartgold.sav", async () => {
         const save = loadSav("heartgold.sav");
         const selfRef = globalThis.self as unknown as WorkerSelf;

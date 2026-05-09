@@ -33,9 +33,9 @@ vi.mock("components/Features/Result/TrainerResult", () => ({
     TrainerResult: () => <div data-testid="trainer-result" />,
 }));
 
-vi.mock("components/Layout/Header/Header", () => ({
-    Header: () => (
-        <div data-testid="header" />
+vi.mock("components/Layout/TopBar/TopBar", () => ({
+    TopBar: ({ children }: { children?: React.ReactNode }) => (
+        <div data-testid="top-bar">{children}</div>
     ),
 }));
 
@@ -63,7 +63,6 @@ vi.mock("is-mobile", () => ({ default: () => false }));
 const baseEditor: Editor = {
     minimized: false,
     showResultInMobile: false,
-    zoomLevel: 1,
 };
 
 const boxes: Box[] = [
@@ -130,4 +129,3 @@ describe("<BackspriteMontage />", () => {
         expect(sprites[0].getAttribute("data-sprite-species")).toBe("Pikachu");
     });
 });
-
