@@ -63,6 +63,7 @@
         "@emmaramirez/dom-to-image": "^3.0.2",
         "@react-hook/debounce": "^3.0.0",
         "@types/react-dnd-html5-backend": "^3.0.2",
+        "@vercel/analytics": "^2.0.1",
         "@vitejs/plugin-react": "^5.1.0",
         "autoprefixer": "^10.0.1",
         "babel-loader": "^8.2.2",
