@@ -6,9 +6,26 @@ import { defineConfig } from "eslint/config";
 
 export default defineConfig([
     {
+        ignores: [
+            "**/node_modules/**",
+            "**/.venv/**",
+            "**/dist/**",
+            "**/build/**",
+            "**/coverage/**",
+            "**/lighthouse/**",
+        ],
+    },
+    {
         files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
         plugins: { js },
         extends: ["js/recommended"],
+    },
+    {
+        settings: {
+            react: {
+                version: "detect",
+            },
+        },
     },
     {
         files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
@@ -16,15 +33,6 @@ export default defineConfig([
     },
     tseslint.configs.recommended,
     pluginReact.configs.flat.recommended,
-    {
-        ignores: [
-            "**/node_modules/**",
-            "**/dist/**",
-            "**/build/**",
-            "**/coverage/**",
-            "**/lighthouse/**",
-        ],
-    },
     {
         rules: {
             "react/prop-types": "off",
