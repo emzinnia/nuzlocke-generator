@@ -1,5 +1,5 @@
 import * as React from "react";
-import { connect, useDispatch } from "react-redux";
+import { connect, useDispatch } from "store/reactZustand";
 
 import { Pokemon, Game } from "models";
 import { GenderElement } from "components/Common/Shared";

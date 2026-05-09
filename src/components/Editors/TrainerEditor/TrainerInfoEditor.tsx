@@ -10,7 +10,7 @@ import {
 } from "@blueprintjs/core";
 import { listOfTrainers } from "utils";
 import { TrainerInfoEditField } from "./TrainerInfoEditField";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "store/reactZustand";
 import { State } from "state";
 import { editTrainer } from "actions";
 

@@ -9,7 +9,7 @@ import {
     HTMLSelect,
 } from "@blueprintjs/core";
 import { State } from "state";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { addBox, AddBoxArgs } from "actions";
 import { Autocomplete } from "components";
 import { wallpapers } from "./Box";

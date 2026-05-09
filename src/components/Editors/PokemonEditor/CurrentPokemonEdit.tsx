@@ -22,7 +22,7 @@ import { CurrentPokemonInput } from "./CurrentPokemonInput";
 import { DeletePokemonButton } from "components/Pokemon/DeletePokemonButton/DeletePokemonButton";
 import { Autocomplete, ErrorBoundary } from "components/Common/Shared";
 import { selectPokemon, editPokemon } from "actions";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { listOfGames, accentedE } from "utils";
 import { cx } from "emotion";
 import * as Styles from "./styles";

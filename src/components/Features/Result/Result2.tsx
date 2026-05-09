@@ -2,7 +2,7 @@ import * as React from "react";
 import { TeamPokemon } from "components/Pokemon/TeamPokemon/TeamPokemon2";
 import { cx } from "emotion";
 import { Box, Pokemon } from "models";
-import { useSelector } from "react-redux";
+import { useSelector } from "store/reactZustand";
 import { State } from "state";
 import { Menu, MenuItem } from "@blueprintjs/core";
 import {
@@ -330,7 +330,6 @@ export class Result extends React.Component {
         return (
             <div className={cx(Styles.result_wrapper, "hide-scrollbars")}>
                 {/* @TODO fix this */}
-                {/* @ts-expect-error - TopBar ref type mismatch */}
                 <TopBar ref={this.ref} />
                 <ResultInner ref={this.ref} />
             </div>

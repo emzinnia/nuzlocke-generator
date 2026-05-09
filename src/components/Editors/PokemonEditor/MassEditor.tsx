@@ -1,5 +1,5 @@
 import * as React from "react";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { Dialog, Classes } from "@blueprintjs/core";
 import { State } from "state";
 import { ErrorBoundary } from "components";

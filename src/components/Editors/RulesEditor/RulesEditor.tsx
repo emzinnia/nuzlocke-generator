@@ -10,7 +10,7 @@ import {
     Divider,
     Spinner,
 } from "@blueprintjs/core";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { editRule, addRule, deleteRule, resetRules, setRules } from "actions";
 import { showToast } from "components/Common/Shared/appToaster";
 

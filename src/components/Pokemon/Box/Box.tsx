@@ -32,7 +32,7 @@ import {
     Classes,
     Toast,
 } from "@blueprintjs/core";
-import { connect, useDispatch } from "react-redux";
+import { connect, useDispatch } from "store/reactZustand";
 import {
     PokemonIcon,
     PokemonIconProps,

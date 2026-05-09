@@ -8,7 +8,7 @@ import {
     Classes,
     Spinner,
 } from "@blueprintjs/core";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { css } from "emotion";
 import { showToast } from "components/Common/Shared/appToaster";
 import { State } from "state";

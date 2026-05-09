@@ -9,7 +9,7 @@ import {
     isEmpty,
     feature,
 } from "utils";
-import { connect, useSelector } from "react-redux";
+import { connect, useSelector } from "store/reactZustand";
 import { Trainer, Badge } from "models";
 import { State } from "state";
 import { Checkpoints } from "reducers/checkpoints";

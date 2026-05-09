@@ -8,7 +8,7 @@ import {
     Intent,
     Icon,
 } from "@blueprintjs/core";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { State } from "state";
 import {
     updateNuzlocke,
@@ -25,8 +25,7 @@ import {
     Styles,
 } from "utils";
 import { omit } from "ramda";
-import { createStore } from "redux";
-import { appReducers } from "reducers";
+import { createDefaultState } from "store";
 import { NuzlockeGameTags } from "./NuzlockeGameTags";
 import { DeleteAlert } from "components/Editors/DataEditor/DeleteAlert";
 import { HallOfFameDialog } from "./HallOfFameDialog";
@@ -125,7 +124,7 @@ export class NuzlockeSaveBase extends React.Component<
                     style={{ marginBottom: "0.25rem" }}
                     onClick={() => {
                         updateNuzlocke(currentId, state);
-                        const data = createStore(appReducers)?.getState() as unknown as State;
+                        const data = createDefaultState();
                         const preparedData = stripEditorDarkModeFromState(
                             data,
                         );
