@@ -207,7 +207,13 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
         try {
             const domToImage = await load();
             const dataUrl = await domToImage.toPng(resultNode, {
-                corsImage: true,
+                corsImg: {
+                    method: "GET",
+                    url: "https://cors-anywhere-nuzgen.herokuapp.com/#{cors}",
+                    data: {},
+                },
+                imagePlaceholder:
+                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg==",
             });
             console.log(dataUrl, resultNode);
             const link = document.createElement("a");
