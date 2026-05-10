@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => {
                 Unfezant: 521,
                 Gyarados: 130,
                 Dugtrio: 51,
+                Slowpoke: 79,
                 Indeedee: 876,
                 Basculegion: 902,
                 "Mime Jr.": 439,
@@ -281,6 +282,20 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             );
         });
 
+        it("keeps forme suffixes when building shiny Sword/Shield sprite URLs", async () => {
+            const result = await getPokemonImage({
+                species: "Slowpoke",
+                forme: imageForme("Galarian"),
+                name: imageGame("Sword"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: true,
+            });
+
+            expect(result).toBe(
+                "cors(https://www.serebii.net/Shiny/SWSH/079-Galarian.png)",
+            );
+        });
+
         it("uses generic serebii URL builder for other games when spritesMode is true", async () => {
             const result = await getPokemonImage({
                 species: "Pikachu",
@@ -408,4 +423,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-
