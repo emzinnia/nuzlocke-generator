@@ -43,6 +43,7 @@ import { resultSelector } from "selectors";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { normalizeSpeciesName } from "utils/getters/normalizeSpeciesName";
 import { Select } from "@blueprintjs/select";
+import { downloadImageDataUrl } from "utils/downloadImage";
 
 async function load() {
     const resource = await import("@emmaramirez/dom-to-image");
@@ -209,11 +210,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
             const dataUrl = await domToImage.toPng(resultNode, {
                 corsImage: true,
             });
-            console.log(dataUrl, resultNode);
-            const link = document.createElement("a");
-            link.download = `nuzlocke-${uuid()}.png`;
-            link.href = dataUrl;
-            link.click();
+            await downloadImageDataUrl(dataUrl, `nuzlocke-${uuid()}.png`);
             this.setState({ downloadError: null, isDownloading: false });
         } catch (e) {
             console.log(e);
