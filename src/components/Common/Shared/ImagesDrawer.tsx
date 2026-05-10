@@ -201,6 +201,110 @@ export interface Image {
     image: string;
 }
 
+export const MAX_IMAGE_UPLOAD_SIZE_MB = 0.5;
+
+export interface UploadedImageFailure {
+    fileName: string;
+    error: unknown;
+}
+
+export interface ImageUploadSummary {
+    uploaded: Image[];
+    tooLarge: File[];
+    failed: UploadedImageFailure[];
+}
+
+const toBase64 = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            if (typeof reader.result === "string") {
+                resolve(reader.result);
+                return;
+            }
+            reject(new Error("Expected FileReader to return a data URL."));
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+
+const splitFileName = (fileName: string) => {
+    const trimmed = fileName.trim() || "uploaded-image";
+    const extensionStart = trimmed.lastIndexOf(".");
+    if (extensionStart <= 0) {
+        return {
+            baseName: trimmed,
+            extension: "",
+        };
+    }
+
+    return {
+        baseName: trimmed.slice(0, extensionStart),
+        extension: trimmed.slice(extensionStart),
+    };
+};
+
+export const getUniqueImageName = async (fileName: string) => {
+    const { baseName, extension } = splitFileName(fileName);
+    const requestedName = `${baseName}${extension}`;
+    const existing = await db.images.where("name").equals(requestedName).first();
+    if (!existing) {
+        return requestedName;
+    }
+
+    let suffix = 2;
+    while (suffix < 1000) {
+        const candidate = `${baseName} (${suffix})${extension}`;
+        const match = await db.images.where("name").equals(candidate).first();
+        if (!match) {
+            return candidate;
+        }
+        suffix += 1;
+    }
+
+    return `${baseName} (${Date.now()})${extension}`;
+};
+
+export const uploadImageFiles = async (
+    files: File[],
+): Promise<ImageUploadSummary> => {
+    const uploaded: Image[] = [];
+    const tooLarge: File[] = [];
+    const failed: UploadedImageFailure[] = [];
+
+    for (const file of files) {
+        const size = (file.size ?? 0) / 1024 / 1024;
+        if (size > MAX_IMAGE_UPLOAD_SIZE_MB) {
+            tooLarge.push(file);
+            continue;
+        }
+        try {
+            const image = await toBase64(file);
+            const name = await getUniqueImageName(file.name);
+            const id = await db.images.add({
+                image,
+                name,
+            });
+            uploaded.push({
+                id,
+                image,
+                name,
+            });
+        } catch (error) {
+            failed.push({
+                fileName: file.name,
+                error,
+            });
+        }
+    }
+
+    return {
+        uploaded,
+        tooLarge,
+        failed,
+    };
+};
+
 enum ImagesDrawerLayout {
     List = "list",
     Grid = "grid",
@@ -284,36 +388,11 @@ export function ImagesDrawerInner() {
         const files: File[] = Array.from(e?.target?.files ?? []);
         if (!files.length) return;
 
-        const toBase64 = (file: File) =>
-            new Promise<string>((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result as string);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-
-        let uploaded = 0;
-        let tooLarge = 0;
-        let failed = 0;
-        let lastId: number | undefined;
-
-        for (const file of files) {
-            const size = (file.size ?? 0) / 1024 / 1024;
-            if (size > 0.5) {
-                tooLarge += 1;
-                continue;
-            }
-            try {
-                const image = await toBase64(file);
-                lastId = await db.images.put({
-                    image,
-                    name: file.name,
-                });
-                uploaded += 1;
-            } catch {
-                failed += 1;
-            }
-        }
+        const uploadSummary = await uploadImageFiles(files);
+        const uploaded = uploadSummary.uploaded.length;
+        const tooLarge = uploadSummary.tooLarge.length;
+        const failed = uploadSummary.failed.length;
+        const lastImage = uploadSummary.uploaded[uploaded - 1];
 
         // Allow selecting the same files again.
         try {
@@ -322,8 +401,8 @@ export function ImagesDrawerInner() {
             // ignore
         }
 
-        if (lastId != null) {
-            setRefresh(lastId);
+        if (lastImage?.id != null) {
+            setRefresh(lastImage.id);
         }
 
         const skippedText = tooLarge > 0 ? ` Skipped ${tooLarge} too-large.` : "";
