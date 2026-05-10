@@ -8,6 +8,7 @@ import compression from "compression";
 import cors from "cors";
 import pino from "pino";
 import { fileURLToPath } from "node:url";
+import { fetchImageForProxy, ImageProxyError } from "./imageProxy.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -43,6 +44,53 @@ interface ReportArgs {
 
 const PORT = process.env.PORT || 8080;
 const distPath = path.join(__dirname, "dist");
+
+app.all("/image-proxy", async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method === "OPTIONS") {
+        res.status(204).end();
+        return;
+    }
+
+    if (req.method !== "GET" && req.method !== "POST") {
+        res.status(405).send({ error: "Method not allowed." });
+        return;
+    }
+
+    const queryUrl = Array.isArray(req.query.url)
+        ? req.query.url[0]
+        : req.query.url;
+    const bodyUrl =
+        req.body && typeof req.body === "object" ? req.body.url : undefined;
+    const imageUrl =
+        req.method === "POST" && typeof bodyUrl === "string"
+            ? bodyUrl
+            : queryUrl;
+
+    try {
+        const image = await fetchImageForProxy(
+            typeof imageUrl === "string" ? imageUrl : undefined,
+        );
+
+        res.header("Cache-Control", image.cacheControl);
+        res.header("Content-Type", image.contentType);
+        res.send(image.body);
+    } catch (error) {
+        const statusCode =
+            error instanceof ImageProxyError ? error.statusCode : 502;
+        const message =
+            error instanceof Error ? error.message : "Failed to proxy image.";
+
+        logger.warn(
+            { statusCode, imageUrl, error: message },
+            "Image proxy request failed",
+        );
+        res.status(statusCode).send({ error: message });
+    }
+});
 
 app.use(express.static(distPath));
 

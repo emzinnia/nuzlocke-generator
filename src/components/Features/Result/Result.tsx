@@ -29,6 +29,8 @@ import {
     getIconFormeSuffix,
     Species,
     Forme,
+    getDomToImageCorsOptions,
+    wrapImageInCORS,
 } from "utils";
 
 import * as Styles from "./styles";
@@ -68,6 +70,7 @@ interface ResultState {
     downloadError: string | null;
     panningCoordinates: [number?, number?];
     zoomLevel: number;
+    resultBackgroundImage?: string;
 }
 
 const ZoomValues = [
@@ -157,6 +160,8 @@ export function BackspriteMontage({ pokemon }: { pokemon: Pokemon[] }) {
 
 export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
     public resultRef: React.RefObject<HTMLDivElement>;
+    private backgroundImageRequestId = 0;
+
     public constructor(props: ResultProps) {
         super(props);
         this.resultRef = React.createRef();
@@ -165,7 +170,39 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
             downloadError: null,
             panningCoordinates: [undefined, undefined],
             zoomLevel: 1,
+            resultBackgroundImage: undefined,
         };
+    }
+
+    public componentDidMount() {
+        this.updateResultBackgroundImage();
+    }
+
+    public componentDidUpdate(prevProps: ResultProps) {
+        if (
+            prevProps.style.backgroundImage !==
+            this.props.style.backgroundImage
+        ) {
+            this.updateResultBackgroundImage();
+        }
+    }
+
+    private async updateResultBackgroundImage() {
+        const backgroundImage = this.props.style.backgroundImage;
+        const requestId = ++this.backgroundImageRequestId;
+
+        if (!backgroundImage) {
+            this.setState({ resultBackgroundImage: undefined });
+            return;
+        }
+
+        const resultBackgroundImage = backgroundImage.startsWith("http")
+            ? await wrapImageInCORS(backgroundImage)
+            : `url(${backgroundImage})`;
+
+        if (requestId === this.backgroundImageRequestId) {
+            this.setState({ resultBackgroundImage });
+        }
     }
 
     private renderTeamPokemon(teamPokemon: Pokemon[]) {
@@ -207,7 +244,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
         try {
             const domToImage = await load();
             const dataUrl = await domToImage.toPng(resultNode, {
-                corsImage: true,
+                ...getDomToImageCorsOptions(),
             });
             console.log(dataUrl, resultNode);
             const link = document.createElement("a");
@@ -518,7 +555,8 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                                 ? "0"
                                 : "3rem auto",
                             backgroundColor: bgColor,
-                            backgroundImage: `url(${style.backgroundImage})`,
+                            backgroundImage:
+                                this.state.resultBackgroundImage,
                             backgroundRepeat: style.tileBackground
                                 ? "repeat"
                                 : "no-repeat",
