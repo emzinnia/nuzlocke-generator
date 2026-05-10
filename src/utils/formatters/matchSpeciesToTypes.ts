@@ -1651,8 +1651,9 @@ export const matchSpeciesToTypes = (
             return [Types.Water, Types.Flying];
         case "Aron":
         case "Lairon":
-        case "Aggron":
             return [Types.Rock, Types.Steel];
+        case "Aggron":
+            return [Types.Steel, Types.Rock];
         case "Gulpin":
         case "Swalot":
             return [Types.Poison, Types.Poison];
