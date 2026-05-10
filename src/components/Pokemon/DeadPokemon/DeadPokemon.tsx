@@ -23,32 +23,10 @@ import {
 import { selectPokemon } from "actions";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { State } from "state";
+import { getPokemonImageBackgroundStyle } from "../getPokemonImageBackgroundStyle";
 
 const spriteStyle = (style: Styles) => {
-    if (style.spritesMode) {
-        if (style.scaleSprites) {
-            return {
-                backgroundSize: "auto",
-                backgroundRepeat: "no-repeat",
-            };
-        } else {
-            return {
-                backgroundSize: "cover",
-                backgroundRepeat: "no-repeat",
-            };
-        }
-    }
-    if (style.teamImages === "dream world") {
-        return {
-            backgroundSize: "contain",
-            backgroundRepeat: "no-repeat",
-        };
-    } else {
-        return {
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-        };
-    }
+    return getPokemonImageBackgroundStyle(style);
 };
 
 export type DeadPokemonProps = {
