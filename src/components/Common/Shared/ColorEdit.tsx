@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Styles from "components/Editors/StyleEditor/styles";
 import { cx } from "emotion";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { classWithDarkTheme } from "utils";
 import { State } from "state";
 import { ChromePicker } from "react-color";

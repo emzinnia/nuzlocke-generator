@@ -1,5 +1,5 @@
 import * as React from "react";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import {
     Button,
     ButtonGroup,
@@ -17,7 +17,6 @@ import { v4 as uuid } from "uuid";
 import { persistor } from "store";
 import { newNuzlocke, replaceState } from "actions";
 import { Badge, Game, Pokemon, Trainer } from "models";
-import { omit } from "ramda";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { State } from "state";
 import { noop } from "redux-saga/utils";
@@ -43,6 +42,7 @@ import { BoxMappings } from "parsers/utils/boxMappings";
 import SaveFileWorker from "parsers/worker?worker";
 import { cx } from "emotion";
 import { StatusDropZone } from "./StatusDropZone";
+import { serializeNuzlockeJson } from "utils/nuzlockeJson";
 
 export interface DataEditorProps {
     state: State;
@@ -94,20 +94,6 @@ const handleExceptions = (data: State | Record<string, unknown>) => {
     }
 
     return isEmpty(updated) ? data : updated;
-};
-
-const stripEditorDarkModeForExport = (state: State) => {
-    const baseState = omit(["router", "._persist", "editorHistory"], state) as {
-        style?: Styles;
-        [key: string]: unknown;
-    };
-    const { editorDarkMode: _omit, ...styleWithoutDarkMode } =
-        baseState.style || {};
-
-    return {
-        ...baseState,
-        style: styleWithoutDarkMode,
-    };
 };
 
 const getImportedBadgeName = (badge: unknown) => {
@@ -350,10 +336,9 @@ export class DataEditorBase extends React.Component<
             mode: "export",
         });
         this.setState({ isOpen: true });
-        const stateForExport = stripEditorDarkModeForExport(state);
         this.setState({
             href: `data:text/plain;charset=utf-8,${encodeURIComponent(
-                JSON.stringify(stateForExport),
+                serializeNuzlockeJson(state),
             )}`,
         });
     };

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Classes, Dialog, Intent, Button } from "@blueprintjs/core";
-import { useSelector } from "react-redux";
+import { useSelector } from "store/reactZustand";
 import { State } from "state";
 import { css, cx } from "emotion";
 

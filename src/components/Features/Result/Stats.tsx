@@ -1,5 +1,5 @@
 import * as React from "react";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { State } from "state";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon/PokemonIcon";
 import { Layout, LayoutDisplay } from "components/Layout/Layout/Layout";

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Provider } from "react-redux";
+import { Provider } from "store/reactZustand";
 import { store } from "store";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";

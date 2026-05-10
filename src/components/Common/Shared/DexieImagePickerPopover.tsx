@@ -9,7 +9,7 @@ import {
 } from "@blueprintjs/core";
 import { css, cx } from "emotion";
 import * as React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch } from "store/reactZustand";
 import { toggleDialog } from "actions";
 import {
     getImagesPage,

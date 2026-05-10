@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Dialog, Classes, Card, Button, Intent, Alert, Callout } from "@blueprintjs/core";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "store/reactZustand";
 import { PokemonIconPlain } from "components";
 import { toggleDialog, editPokemon } from "actions";
 import { State } from "state";

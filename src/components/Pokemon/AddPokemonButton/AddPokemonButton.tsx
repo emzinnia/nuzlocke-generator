@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch } from "store/reactZustand";
 import { addPokemon, selectPokemon } from "actions";
 import { Button, Intent } from "@blueprintjs/core";
 import { Pokemon } from "models";

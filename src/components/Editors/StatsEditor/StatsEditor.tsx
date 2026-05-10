@@ -1,6 +1,6 @@
 import * as React from "react";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { State } from "state";
 import { Checkbox, Switch, Button, Intent, Classes } from "@blueprintjs/core";
 import { editStyle, addStat, deleteStat, editStat } from "actions";

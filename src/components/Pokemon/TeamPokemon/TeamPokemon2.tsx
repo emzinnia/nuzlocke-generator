@@ -1,7 +1,7 @@
 import { Pokemon } from "models";
 import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
-import { Provider, useSelector, useStore } from "react-redux";
+import { Provider, useSelector, useStore } from "store/reactZustand";
 import { State } from "state";
 import {
     formatBallText,
