@@ -1,9 +1,17 @@
 import * as React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import { ResultBase, BackspriteMontage } from "../Result";
 import { styleDefaults, generateEmptyPokemon } from "utils";
 import { Editor, Box, Pokemon } from "models";
+
+const domToImageMock = vi.hoisted(() => ({
+    toPng: vi.fn(),
+}));
+
+vi.mock("@emmaramirez/dom-to-image", () => ({
+    domToImage: domToImageMock,
+}));
 
 type ResultBaseProps = React.ComponentProps<typeof ResultBase>;
 type PokemonSpeciesProps = { species: string };
@@ -39,8 +47,19 @@ vi.mock("components/Features/Result/TrainerResult", () => ({
 }));
 
 vi.mock("components/Layout/TopBar/TopBar", () => ({
-    TopBar: ({ children }: { children?: React.ReactNode }) => (
-        <div data-testid="top-bar">{children}</div>
+    TopBar: ({
+        children,
+        onClickDownload,
+    }: {
+        children?: React.ReactNode;
+        onClickDownload?: () => void;
+    }) => (
+        <div data-testid="top-bar">
+            <button data-testid="download-button" onClick={onClickDownload}>
+                Download
+            </button>
+            {children}
+        </div>
     ),
 }));
 
@@ -94,6 +113,15 @@ const createPokemon = () => [
 ];
 
 describe("<ResultBase />", () => {
+    beforeEach(() => {
+        domToImageMock.toPng.mockResolvedValue("data:image/png;base64,test");
+    });
+
+    afterEach(() => {
+        domToImageMock.toPng.mockReset();
+        vi.restoreAllMocks();
+    });
+
     it("renders team and status sections with rules", () => {
         render(
             <ResultBase
@@ -123,6 +151,68 @@ describe("<ResultBase />", () => {
         expect(screen.getByText("Boxed")).toBeTruthy();
         expect(screen.getByText(/Dead/)).toBeTruthy();
         expect(screen.getByText(/Champs/)).toBeTruthy();
+    });
+
+    it("expands downloaded image dimensions to include overflowing bottom rules", async () => {
+        const linkClick = vi
+            .spyOn(HTMLAnchorElement.prototype, "click")
+            .mockImplementation(() => undefined);
+        const { container } = render(
+            <ResultBase
+                pokemon={createPokemon()}
+                game={{ name: "Red", customName: "" }}
+                trainer={{ notes: "", badges: [] }}
+                box={boxes}
+                editor={baseEditor}
+                selectPokemon={vi.fn() as unknown as ResultBaseProps["selectPokemon"]}
+                toggleMobileResultView={
+                    vi.fn() as unknown as ResultBaseProps["toggleMobileResultView"]
+                }
+                toggleDialog={vi.fn() as unknown as ResultBaseProps["toggleDialog"]}
+                style={{
+                    ...styleDefaults,
+                    displayRules: true,
+                    displayRulesLocation: "bottom",
+                    resultHeight: 870,
+                    resultWidth: 1320,
+                    trainerSectionOrientation: "horizontal",
+                    useAutoHeight: false,
+                }}
+                rules={["Rule at the bottom of an overflowing card"]}
+                customTypes={[]}
+            />,
+        );
+
+        const resultNode = container.querySelector(".result") as HTMLElement;
+        Object.defineProperties(resultNode, {
+            clientHeight: { configurable: true, value: 870 },
+            clientWidth: { configurable: true, value: 1320 },
+            offsetHeight: { configurable: true, value: 870 },
+            offsetWidth: { configurable: true, value: 1320 },
+            scrollHeight: { configurable: true, value: 1280 },
+            scrollWidth: { configurable: true, value: 1320 },
+        });
+
+        fireEvent.click(screen.getByTestId("download-button"));
+
+        await waitFor(() => {
+            expect(domToImageMock.toPng).toHaveBeenCalledWith(resultNode, {
+                corsImage: true,
+                height: 1280,
+                width: 1320,
+                style: {
+                    height: "1280px",
+                    margin: "0",
+                    maxHeight: "none",
+                    minHeight: "1280px",
+                    minWidth: "1320px",
+                    overflow: "visible",
+                    transform: "none",
+                    width: "1320px",
+                },
+            });
+        });
+        await waitFor(() => expect(linkClick).toHaveBeenCalled());
     });
 });
 
