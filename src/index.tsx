@@ -1,6 +1,7 @@
 import * as React from "react";
 import { injectGlobal } from "emotion";
 import { createRoot } from "react-dom/client";
+import { Analytics } from "@vercel/analytics/react";
 
 import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 import "@blueprintjs/core/lib/css/blueprint.css";
@@ -121,6 +122,7 @@ async function createRender() {
                     </React.Suspense>
                 </ErrorBoundary>
             </DndProvider>
+            <Analytics />
         </ReduxProvider>,
     );
 }
