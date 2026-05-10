@@ -138,6 +138,58 @@ export interface GetPokemonImage {
     egg?: Pokemon["egg"];
 }
 
+const legacyFormeAliases: Record<string, keyof typeof Forme> = {
+    alola: "Alolan",
+    alolan: "Alolan",
+    galar: "Galarian",
+    galarian: "Galarian",
+    amped: "AmpedUp",
+    "amped-up": "AmpedUp",
+    ampedup: "AmpedUp",
+    lowkey: "Lowkey",
+    "low-key": "Lowkey",
+};
+
+const normalizeFormeKey = (
+    forme?: Pokemon["forme"] | keyof typeof Forme,
+): keyof typeof Forme | undefined => {
+    if (!forme) return undefined;
+    if (forme in Forme) return forme as keyof typeof Forme;
+
+    const formeText = forme.toString();
+    const match = (
+        Object.entries(Forme) as Array<[keyof typeof Forme, string]>
+    ).find(([, value]) => value === formeText);
+    if (match) return match[0];
+
+    return legacyFormeAliases[formeText.toLowerCase()] ?? undefined;
+};
+
+const getLocalImageOverrideKey = (
+    species?: string,
+    forme?: Pokemon["forme"] | keyof typeof Forme,
+) => `${species ?? ""}|${normalizeFormeKey(forme) ?? ""}`;
+
+const standardImageOverrides: Record<string, string> = {
+    "Mime Jr.|": "img/mimejr.jpg",
+    "Mr. Mime|": "img/mr.mime.jpg",
+    "Mr. Mime|Galarian": "img/galarian-mr.mime.jpg",
+    "Mr. Rime|": "img/mr.rime.jpg",
+    "Toxtricity|AmpedUp": "img/toxtricity-amped-up.jpg",
+    "Toxtricity|Lowkey": "img/toxtricity-lowkey.jpg",
+};
+
+const sugimoriImageOverrides: Record<string, string> = {
+    "Darumaka|Galarian": "img/sugimori/554-galar.jpg",
+    "Toxtricity|Lowkey": "img/sugimori/849-low-key.png",
+};
+
+const shuffleSpeciesOverrides: Record<string, string> = {
+    "Mime Jr.": "mime-jr",
+    "Mr. Mime": "mr-mime",
+    "Mr. Rime": "mr-rime",
+};
+
 export async function getPokemonImage({
     customImage,
     forme,
@@ -278,6 +330,11 @@ export async function getPokemonImage({
     }
 
     if (style?.teamImages === "sugimori") {
+        const override = sugimoriImageOverrides[
+            getLocalImageOverrideKey(species, forme)
+        ];
+        if (override) return `url(${override})`;
+
         if (
             [521, 592, 593, 668, 678].includes(regularNumber || 0) &&
             (gender === "f" || gender === "Female")
@@ -295,10 +352,11 @@ export async function getPokemonImage({
         return `url(img/dw/${regularNumber || 1}.svg)`;
     }
 
-    const handleMimeJr = (s?: string) => (s === "Mime Jr." ? "mime-jr" : s);
-
     if (style?.teamImages === "shuffle") {
-        return `url(img/shuffle/${(handleMimeJr(species) || "Ditto")
+        const shuffleSpecies =
+            shuffleSpeciesOverrides[species ?? ""] ?? species ?? "Ditto";
+
+        return `url(img/shuffle/${shuffleSpecies
             .trim()
             .replace(/\'/g, "")
             .replace(/\s/g, "-")
@@ -330,6 +388,11 @@ export async function getPokemonImage({
     if (species === "Basculegion" && gender === "Female") {
         return "url(img/basculegion-f.jpg)";
     }
+
+    const standardOverride = standardImageOverrides[
+        getLocalImageOverrideKey(species, forme)
+    ];
+    if (standardOverride) return `url(${standardOverride})`;
 
     return `url(img/${(
         addForme(
