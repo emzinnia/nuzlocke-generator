@@ -1,7 +1,6 @@
 import { Forme } from "utils";
 
 export const getIconFormeSuffix = (forme: keyof typeof Forme) => {
-    console.log(forme);
     if (forme == null) return "";
     if (forme === "Normal") return "";
     if (forme === "Spring") return "";
