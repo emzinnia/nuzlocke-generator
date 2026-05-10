@@ -28,6 +28,7 @@ export * from "./isLocal";
 export * from "./feature";
 export * from "./matchNatureToToxtricityForme";
 export * from "./handleSignificantGenderDifferences";
+export * from "./downloadImages";
 export * from "./wrapImageInCORS";
 export * from "./gameSaveFormat";
 export * from "./getters/normalizeSpeciesName";

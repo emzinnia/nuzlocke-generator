@@ -2,7 +2,7 @@ import {} from "@blueprintjs/core";
 import { Pokemon } from "models";
 import * as React from "react";
 import { State } from "state";
-import { getPokemonImage, wrapImageInCORSPlain } from "utils";
+import { getPokemonImage, isRemoteImageUrl, wrapImageInCORSPlain } from "utils";
 import { getImageByName } from "components/Common/Shared/ImagesDrawer";
 
 export interface PokemonImageProps {
@@ -51,7 +51,7 @@ export function PokemonImage({
                     // Then fall back to the historical behavior:
                     // - http(s): use CORS proxy -> data URL
                     // - otherwise: treat as a direct src (data:, relative path, etc.)
-                    if (url.startsWith("http")) {
+                    if (isRemoteImageUrl(url)) {
                         setImage(await wrapImageInCORSPlain(url));
                     } else {
                         setImage(url);
