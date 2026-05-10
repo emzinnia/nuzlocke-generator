@@ -32,6 +32,7 @@ import {
 } from "utils";
 
 import * as Styles from "./styles";
+import { getResultDownloadOptions } from "./downloadImage";
 
 import "./Result.css";
 import "./themes.css";
@@ -203,13 +204,21 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
 
     private async toImage() {
         const resultNode = this.resultRef.current;
+        if (!resultNode) {
+            this.setState({
+                downloadError: "Failed to download. Result image was not ready.",
+                isDownloading: false,
+            });
+            return;
+        }
+
         this.setState({ isDownloading: true });
         try {
             const domToImage = await load();
-            const dataUrl = await domToImage.toPng(resultNode, {
-                corsImage: true,
-            });
-            console.log(dataUrl, resultNode);
+            const dataUrl = await domToImage.toPng(
+                resultNode,
+                getResultDownloadOptions(resultNode),
+            );
             const link = document.createElement("a");
             link.download = `nuzlocke-${uuid()}.png`;
             link.href = dataUrl;
