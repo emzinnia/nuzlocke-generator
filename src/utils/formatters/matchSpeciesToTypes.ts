@@ -535,6 +535,16 @@ export const handleSpeciesTypeEdgeCases = ({
         return [Types.Normal, Types.Fighting];
     }
 
+    if (
+        match({
+            ...data,
+            species: ["Lopunny"],
+            forme: ["Mega"],
+        })
+    ) {
+        return [Types.Normal, Types.Fighting];
+    }
+
     if (match({ ...data, species: ["Growlithe"], forme: ["Hisuian"] })) {
         return [Types.Fire, Types.Rock];
     }
@@ -1650,7 +1660,7 @@ export const matchSpeciesToTypes = (
         case "Aron":
         case "Lairon":
         case "Aggron":
-            return [Types.Rock, Types.Steel];
+            return [Types.Steel, Types.Rock];
         case "Gulpin":
         case "Swalot":
             return [Types.Poison, Types.Poison];
