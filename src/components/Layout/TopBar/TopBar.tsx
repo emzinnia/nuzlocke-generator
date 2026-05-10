@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Classes, Spinner, Intent } from "@blueprintjs/core";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import * as styles from "components/Features/Result/styles";
 import { classWithDarkTheme, getPatchlessVersion, Styles } from "utils";
 import {

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "store/reactZustand";
 
 import { TrainerInfoEditField } from "./TrainerInfoEditField";
 import { editTrainer } from "actions";
@@ -55,9 +55,9 @@ export function CheckpointsInputList({
                     {Array.isArray(checkpoints) &&
                         checkpoints?.map((badge) => (
                             <Checkbox
-                                onChange={(e: any) => {
+                                onChange={(e: React.FormEvent<HTMLInputElement>) => {
                                     if (
-                                        !e.target.checked ||
+                                        !e.currentTarget.checked ||
                                         checkpointsObtained.some(
                                             (b) => b.name === badge.name,
                                         )

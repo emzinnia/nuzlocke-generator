@@ -8,7 +8,7 @@ import {
     Intent,
     Icon,
 } from "@blueprintjs/core";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { State } from "state";
 import {
     updateNuzlocke,
@@ -25,8 +25,7 @@ import {
     Styles,
 } from "utils";
 import { omit } from "ramda";
-import { createStore } from "redux";
-import { appReducers } from "reducers";
+import { createDefaultState } from "store";
 import { NuzlockeGameTags } from "./NuzlockeGameTags";
 import { DeleteAlert } from "components/Editors/DataEditor/DeleteAlert";
 import { HallOfFameDialog } from "./HallOfFameDialog";
@@ -51,12 +50,10 @@ export interface NuzlockeSaveControlsState {
     deletionFunction?: () => void;
 }
 
-interface ContainsId {
-    id: number;
-    [prop: string]: any;
-}
-
-const sort = (a: ContainsId, b: ContainsId) => a.id - b.id;
+const sort = (
+    a: State["nuzlockes"]["saves"][number],
+    b: State["nuzlockes"]["saves"][number],
+) => a.id.localeCompare(b.id);
 
 const stripEditorDarkModeFromState = (state: State) => {
     const baseState = omit(["nuzlockes", "editorHistory"], state) as {
@@ -127,9 +124,9 @@ export class NuzlockeSaveBase extends React.Component<
                     style={{ marginBottom: "0.25rem" }}
                     onClick={() => {
                         updateNuzlocke(currentId, state);
-                        const data = createStore(appReducers)?.getState();
+                        const data = createDefaultState();
                         const preparedData = stripEditorDarkModeFromState(
-                            data as unknown as State,
+                            data,
                         );
                         newNuzlocke(JSON.stringify(preparedData), {
                             isCopy: false,
@@ -196,7 +193,7 @@ export class NuzlockeSaveBase extends React.Component<
                                 color={color}
                                 data={parsedData}
                                 isCurrent={isCurrent}
-                                isCopy={isCopy}
+                                isCopy={Boolean(isCopy)}
                                 size={((data.length * 2) / 1024).toFixed(2)}
                             />
                             <DeleteAlert
@@ -343,4 +340,4 @@ export const NuzlockeSave = connect(
         replaceState,
         updateSwitchNuzlocke,
     },
-)(NuzlockeSaveBase as any);
+)(NuzlockeSaveBase);

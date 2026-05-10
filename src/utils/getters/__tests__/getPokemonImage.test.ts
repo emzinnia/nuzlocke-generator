@@ -68,6 +68,21 @@ vi.mock("utils", () => ({
 }));
 
 import { getPokemonImage, stripURLCSS } from "../getPokemonImage";
+import type { GetPokemonImage } from "../getPokemonImage";
+
+type ImageStyle = NonNullable<GetPokemonImage["style"]>;
+type ImageGame = NonNullable<GetPokemonImage["name"]>;
+type ImageForme = NonNullable<GetPokemonImage["forme"]>;
+type ImageGender = NonNullable<GetPokemonImage["gender"]>;
+type ImageEditor = NonNullable<GetPokemonImage["editor"]>;
+
+const imageStyle = (style: Partial<ImageStyle>): ImageStyle =>
+    style as ImageStyle;
+const imageGame = (name: ImageGame): ImageGame => name;
+const imageForme = (forme: ImageForme): ImageForme => forme;
+const imageGender = (gender: ImageGender): ImageGender => gender;
+const imageEditor = (editor: Partial<ImageEditor>): ImageEditor =>
+    editor as ImageEditor;
 
 describe("@src/utils/getters/getPokemonImage.ts", () => {
     let consoleLogSpy: ReturnType<typeof vi.spyOn> | undefined;
@@ -133,7 +148,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
 
     it("returns temtem sprites when temtemMode is enabled", async () => {
         const result = await getPokemonImage({
-            editor: { temtemMode: true } as any,
+            editor: imageEditor({ temtemMode: true }),
             species: "  Platypet  ",
         });
 
@@ -142,7 +157,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
 
     it("returns egg image when egg is true", async () => {
         const result = await getPokemonImage({
-            egg: true as any,
+            egg: true,
             species: "Pikachu",
         });
 
@@ -153,9 +168,9 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("builds serebii non-shiny sprite URL for BW-era games and wraps it", async () => {
             const result = await getPokemonImage({
                 species: "Pikachu",
-                forme: "Alolan" as any,
-                name: "Black" as any,
-                style: { spritesMode: true } as any,
+                forme: imageForme("Alolan"),
+                name: imageGame("Black"),
+                style: imageStyle({ spritesMode: true }),
                 shiny: false,
             });
 
@@ -168,8 +183,8 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("builds serebii shiny sprite URL for BW-era games and wraps it", async () => {
             const result = await getPokemonImage({
                 species: "Pikachu",
-                name: "Black" as any,
-                style: { spritesMode: true } as any,
+                name: imageGame("Black"),
+                style: imageStyle({ spritesMode: true }),
                 shiny: true,
             });
 
@@ -181,14 +196,14 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("builds Scarlet/Violet sprite URLs and wraps them", async () => {
             const nonShiny = await getPokemonImage({
                 species: "Pikachu",
-                name: "Scarlet" as any,
-                style: { spritesMode: true } as any,
+                name: imageGame("Scarlet"),
+                style: imageStyle({ spritesMode: true }),
                 shiny: false,
             });
             const shiny = await getPokemonImage({
                 species: "Pikachu",
-                name: "Violet" as any,
-                style: { spritesMode: true } as any,
+                name: imageGame("Violet"),
+                style: imageStyle({ spritesMode: true }),
                 shiny: true,
             });
 
@@ -203,14 +218,14 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("builds DP/HGSS sprite URLs and wraps them", async () => {
             const nonShiny = await getPokemonImage({
                 species: "Pikachu",
-                name: "Diamond" as any,
-                style: { spritesMode: true } as any,
+                name: imageGame("Diamond"),
+                style: imageStyle({ spritesMode: true }),
                 shiny: false,
             });
             const shiny = await getPokemonImage({
                 species: "Pikachu",
-                name: "HeartGold" as any,
-                style: { spritesMode: true } as any,
+                name: imageGame("HeartGold"),
+                style: imageStyle({ spritesMode: true }),
                 shiny: true,
             });
 
@@ -223,14 +238,14 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("builds FRLG sprite URLs via pokemondb and wraps them", async () => {
             const nonShiny = await getPokemonImage({
                 species: "Pikachu",
-                name: "FireRed" as any,
-                style: { spritesMode: true } as any,
+                name: imageGame("FireRed"),
+                style: imageStyle({ spritesMode: true }),
                 shiny: false,
             });
             const shiny = await getPokemonImage({
                 species: "Pikachu",
-                name: "LeafGreen" as any,
-                style: { spritesMode: true } as any,
+                name: imageGame("LeafGreen"),
+                style: imageStyle({ spritesMode: true }),
                 shiny: true,
             });
 
@@ -246,15 +261,15 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("builds Sword/Shield sprite URLs and wraps them", async () => {
             const nonShiny = await getPokemonImage({
                 species: "Pikachu",
-                forme: "Alolan" as any,
-                name: "Sword" as any,
-                style: { spritesMode: true } as any,
+                forme: imageForme("Alolan"),
+                name: imageGame("Sword"),
+                style: imageStyle({ spritesMode: true }),
                 shiny: false,
             });
             const shiny = await getPokemonImage({
                 species: "Pikachu",
-                name: "Shield" as any,
-                style: { spritesMode: true } as any,
+                name: imageGame("Shield"),
+                style: imageStyle({ spritesMode: true }),
                 shiny: true,
             });
 
@@ -269,8 +284,8 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("uses generic serebii URL builder for other games when spritesMode is true", async () => {
             const result = await getPokemonImage({
                 species: "Pikachu",
-                name: "Green" as any,
-                style: { spritesMode: true } as any,
+                name: imageGame("Green"),
+                style: imageStyle({ spritesMode: true }),
                 shiny: false,
             });
 
@@ -284,9 +299,9 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("returns sugimori female folder for known gender-dimorphic species", async () => {
             const result = await getPokemonImage({
                 species: "Unfezant",
-                forme: "Galarian" as any,
-                gender: "Female" as any,
-                style: { teamImages: "sugimori" } as any,
+                forme: imageForme("Galarian"),
+                gender: imageGender("Female"),
+                style: imageStyle({ teamImages: "sugimori" }),
             });
 
             expect(result).toBe("url(img/sugimori/female/521-galarian.png)");
@@ -295,8 +310,8 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("returns sugimori base folder for other species", async () => {
             const result = await getPokemonImage({
                 species: "Pikachu",
-                forme: "Galarian" as any,
-                style: { teamImages: "sugimori" } as any,
+                forme: imageForme("Galarian"),
+                style: imageStyle({ teamImages: "sugimori" }),
             });
 
             expect(result).toBe("url(img/sugimori/25-galarian.png)");
@@ -305,7 +320,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("returns dream world SVGs (falls back to 1 when no number)", async () => {
             const result = await getPokemonImage({
                 species: "DoesNotExist",
-                style: { teamImages: "dream world" } as any,
+                style: imageStyle({ teamImages: "dream world" }),
             });
 
             expect(result).toBe("url(img/dw/1.svg)");
@@ -314,7 +329,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("returns shuffle assets with Mime Jr. special-cased", async () => {
             const result = await getPokemonImage({
                 species: "Mime Jr.",
-                style: { teamImages: "shuffle" } as any,
+                style: imageStyle({ teamImages: "shuffle" }),
             });
 
             expect(result).toBe("url(img/shuffle/mime-jr.png)");
@@ -323,8 +338,8 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("returns tcg assets, adding -f for significant gender differences", async () => {
             const result = await getPokemonImage({
                 species: "Pikachu",
-                gender: "Female" as any,
-                style: { teamImages: "tcg" } as any,
+                gender: imageGender("Female"),
+                style: imageStyle({ teamImages: "tcg" }),
             });
 
             expect(result).toBe("url(img/tcg/pikachu-f.jpg)");
@@ -335,7 +350,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("uses explicit stopgap for shiny Alolan Dugtrio", async () => {
             const result = await getPokemonImage({
                 species: "Dugtrio",
-                forme: "Alolan" as any,
+                forme: imageForme("Alolan"),
                 shiny: true,
             });
             expect(result).toBe("url(img/alolan-dugtrio-shiny.jpg)");
@@ -352,7 +367,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("uses explicit stopgap for Indeedee male", async () => {
             const result = await getPokemonImage({
                 species: "Indeedee",
-                gender: "Male" as any,
+                gender: imageGender("Male"),
             });
             expect(result).toBe("url(img/indeedee-m.jpg)");
         });
@@ -360,7 +375,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("uses explicit stopgap for Basculegion female", async () => {
             const result = await getPokemonImage({
                 species: "Basculegion",
-                gender: "Female" as any,
+                gender: imageGender("Female"),
             });
             expect(result).toBe("url(img/basculegion-f.jpg)");
         });
@@ -375,7 +390,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         it("normalizes species into img/<name>.jpg with forme applied via addForme", async () => {
             const result = await getPokemonImage({
                 species: "Mr. Mime",
-                forme: "Galarian" as any,
+                forme: imageForme("Galarian"),
             });
 
             // The base normalizer in getPokemonImage keeps '.' but lowercases the final string.
@@ -393,5 +408,4 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-
 

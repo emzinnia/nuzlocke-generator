@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, ButtonGroup, Slider, Classes } from "@blueprintjs/core";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "store/reactZustand";
 import { State } from "state";
 import { editStyle } from "actions";
 import { editorModeSelector } from "selectors";

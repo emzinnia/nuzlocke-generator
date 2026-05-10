@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Classes, Dialog, Intent, Button } from "@blueprintjs/core";
-import { useSelector } from "react-redux";
+import { useSelector } from "store/reactZustand";
 import { State } from "state";
 import { css, cx } from "emotion";
 
@@ -38,8 +38,6 @@ export interface CreditsData {
     dev: { name: string; link?: string; role?: string }[];
     art: { name: string; link?: string; role?: string }[];
 }
-
-export interface CreditsProps {}
 
 export function Credits() {
     const [creditsModal, setCreditsModal] = React.useState(false);

@@ -10,7 +10,7 @@ import {
 } from "@blueprintjs/core";
 import { classWithDarkTheme, feature, Styles } from "utils";
 import * as styles from "./style";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { Badge } from "models";
 import { getAllBadges } from "utils";
 import { State } from "state";
@@ -128,7 +128,7 @@ export class CheckpointsEditorBase extends React.Component<
 > {
     public state = { badgeNumber: 0 };
 
-    private addCheckpoint = (e: any) => {
+    private addCheckpoint = () => {
         this.setState(
             {
                 badgeNumber: this.state.badgeNumber + 1,

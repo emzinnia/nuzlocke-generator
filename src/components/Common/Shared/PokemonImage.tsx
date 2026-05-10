@@ -62,7 +62,7 @@ export function PokemonImage({
                     setImage(
                         await getPokemonImage({
                             customImage: customImage,
-                            forme: forme as any,
+                            forme,
                             species: species,
                             shiny: shiny,
                             style: style,

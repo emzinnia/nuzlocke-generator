@@ -15,7 +15,7 @@ import { isLocal } from "utils";
 import { ErrorBoundary } from "components";
 import { AppToasterHost } from "components/Common/Shared/appToaster";
 
-(window as any).global = window;
+(window as unknown as Window & { global: Window }).global = window;
 
 // @TODO: add back Buffer/Path
 // // @ts-ignore
@@ -44,7 +44,7 @@ async function getRollbar() {
         enabled: isLocal() ? false : true,
     });
 
-    Rollbar.init(rollbarConfig as any);
+    Rollbar.init(rollbarConfig as unknown as Parameters<typeof Rollbar.init>[0]);
 }
 
 getRollbar().then((res) => res);
@@ -93,20 +93,17 @@ void injectGlobal`
 const mountNode = document.getElementById("app");
 
 async function createRender() {
-    const { Provider } = await import("react-redux");
+    const { Provider } = await import("store/reactZustand");
 
     const { DndProvider } = await import("react-dnd");
     const { HTML5Backend } = await import("react-dnd-html5-backend");
-    const { PersistGate } = await import("redux-persist/es/integration/react");
-    const { store, persistor } = await import("./store");
-    // @TODO: add back check for tests mode
-    const isTest = false;
+    const { store } = await import("./store");
 
     const App = React.lazy(() =>
         import("components/Layout/App").then((res) => ({ default: res.App })),
     );
 
-    const ReduxProvider = Provider as any;
+    const ReduxProvider = Provider;
 
     if (!mountNode) {
         throw new Error("Failed to locate app mount node");
@@ -117,29 +114,13 @@ async function createRender() {
     root.render(
         <ReduxProvider store={store}>
             <AppToasterHost />
-            {isTest ? (
-                <PersistGate
-                    loading={<div>Loading...</div>}
-                    onBeforeLift={null}
-                    persistor={persistor}
-                >
-                    <DndProvider backend={HTML5Backend}>
-                        <ErrorBoundary>
-                            <React.Suspense fallback={"Loading App..."}>
-                                <App />
-                            </React.Suspense>
-                        </ErrorBoundary>
-                    </DndProvider>
-                </PersistGate>
-            ) : (
-                <DndProvider backend={HTML5Backend}>
-                    <ErrorBoundary>
-                        <React.Suspense fallback={"Loading App..."}>
-                            <App />
-                        </React.Suspense>
-                    </ErrorBoundary>
-                </DndProvider>
-            )}
+            <DndProvider backend={HTML5Backend}>
+                <ErrorBoundary>
+                    <React.Suspense fallback={"Loading App..."}>
+                        <App />
+                    </React.Suspense>
+                </ErrorBoundary>
+            </DndProvider>
         </ReduxProvider>,
     );
 }

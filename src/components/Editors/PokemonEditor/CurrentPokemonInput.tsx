@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "store/reactZustand";
 
 import {
     matchSpeciesToTypes,
@@ -22,6 +22,16 @@ import { cx } from "emotion";
 import { useDebounceCallback } from "@react-hook/debounce";
 import { useMemo } from "react";
 
+type PokemonInputValue =
+    | Pokemon[keyof Pokemon]
+    | string
+    | number
+    | boolean
+    | null
+    | undefined;
+type PokemonEditDraft = Partial<Pokemon> & Record<string, PokemonInputValue>;
+type SelectOption = string | { key: string; value: string | null };
+
 interface CurrentPokemonInputProps {
     labelName: string;
     inputName: string;
@@ -35,11 +45,11 @@ interface CurrentPokemonInputProps {
         | "textArea"
         | "autocomplete"
         | "rich-text";
-    value: any;
+    value: PokemonInputValue;
     placeholder?: string;
-    transform?: (v: any) => string;
+    transform?: (v: PokemonInputValue) => string;
     disabled?: boolean;
-    options?: string[] | { key: string; value: string | null }[];
+    options?: SelectOption[];
     pokemon?: Pokemon;
     usesKeyValue?: boolean;
     className?: string;
@@ -50,28 +60,43 @@ interface CurrentPokemonInputProps {
 interface ChangeArgs {
     inputName: CurrentPokemonInputProps["inputName"];
     position?: number;
-    value?: any;
+    value?: PokemonInputValue;
     pokemon?: Pokemon;
-    edit: { [x: string]: any };
+    edit: PokemonEditDraft;
 }
 
 const createEdit = ({ inputName, value, pokemon, edit }: ChangeArgs) => {
     if (inputName === "species") {
+        const species = edit["species"];
         return {
             ...edit,
-            types: matchSpeciesToTypes(edit["species"]),
+            types:
+                typeof species === "string"
+                    ? matchSpeciesToTypes(species as Species)
+                    : pokemon?.types,
         };
     } else if (inputName === "nature" && pokemon?.species === "Toxtricity") {
         return {
             ...edit,
-            forme: matchNatureToToxtricityForme(value),
+            forme:
+                typeof value === "string"
+                    ? matchNatureToToxtricityForme(
+                          value as Parameters<
+                              typeof matchNatureToToxtricityForme
+                          >[0],
+                      )
+                    : pokemon.forme,
         };
     } else if (inputName === "forme") {
         return {
             ...edit,
             types:
-                pokemon &&
-                matchSpeciesToTypes(pokemon?.species as Species, value),
+                pokemon && typeof value === "string"
+                    ? matchSpeciesToTypes(
+                          pokemon.species as Species,
+                          value as Parameters<typeof matchSpeciesToTypes>[1],
+                      )
+                    : pokemon?.types,
         };
     }
 
@@ -81,22 +106,22 @@ const createEdit = ({ inputName, value, pokemon, edit }: ChangeArgs) => {
 export type InputTypesFromState = Partial<
     Pick<State, "selectedId" | "customMoveMap" | "customTypes">
 >;
-export type InputTypesFromActions = {};
+export type InputTypesFromActions = Record<string, never>;
 export type InputTypesFromInternalState = {
-    setEdit: React.Dispatch<
-        React.SetStateAction<{
-            [x: string]: any;
-        }>
-    >;
-    edit: { [x: string]: any };
+    setEdit: React.Dispatch<React.SetStateAction<PokemonEditDraft>>;
+    edit: PokemonEditDraft;
     onChange: (event: React.ChangeEvent<HTMLElement>) => void;
 };
 export type PokemonInputProps = CurrentPokemonInputProps &
     InputTypesFromState &
     InputTypesFromInternalState;
 
-export const renderItems = (visibleItems, setSelectedItem, selectedItem) =>
-    visibleItems.map((v, i) => {
+export const renderItems = (
+    visibleItems: string[] | undefined,
+    setSelectedItem: React.Dispatch<React.SetStateAction<string | undefined>>,
+    selectedItem: string | undefined,
+) =>
+    visibleItems?.map((v, i) => {
         return (
             <li
                 key={i}
@@ -119,7 +144,7 @@ export function PokemonAutocompleteInput({
 }: PokemonInputProps) {
     const [isOpen, setIsOpen] = React.useState(false);
     const [visibleItems, setVisibleItems] = React.useState(items);
-    const [selectedItem, setSelectedItem] = React.useState();
+    const [selectedItem, setSelectedItem] = React.useState<string>();
     const handleKeyDown = () => {};
     const closeList = () => setIsOpen(false);
     const openList = () => setIsOpen(true);
@@ -135,13 +160,17 @@ export function PokemonAutocompleteInput({
                 placeholder={placeholder}
                 name={inputName}
                 type="text"
-                value={edit[inputName]}
+                value={String(edit[inputName] ?? "")}
                 disabled={disabled}
                 onInput={(e) => {
                     setEdit({ [inputName]: e.currentTarget.value });
-                    setVisibleItems(items?.filter(item => 
-                        item.toLowerCase().includes(e.currentTarget.value.toLowerCase())
-                    ));
+                    setVisibleItems(
+                        items?.filter((item) =>
+                            item
+                                .toLowerCase()
+                                .includes(e.currentTarget.value.toLowerCase()),
+                        ),
+                    );
                 }}
             />
             {isOpen ? (
@@ -168,7 +197,7 @@ export function PokemonTextInput({
             onInput={(e) => setEdit({ [inputName]: e.currentTarget.value })}
             type={type}
             name={inputName}
-            value={edit[inputName]}
+            value={String(edit[inputName] ?? "")}
             placeholder={placeholder}
             disabled={disabled}
             className={
@@ -191,7 +220,7 @@ export function PokemonTextAreaInput({
             onChange={onChange}
             onInput={(e) => setEdit({ [inputName]: e.currentTarget.value })}
             name={inputName}
-            value={edit[inputName]}
+            value={String(edit[inputName] ?? "")}
             placeholder={placeholder}
             disabled={disabled}
             style={{ width: "100%" }}
@@ -207,7 +236,6 @@ export function PokemonTextAreaInput({
 export function PokemonNumberInput({
     inputName,
     type,
-     
     value,
     placeholder,
     disabled,
@@ -221,7 +249,7 @@ export function PokemonNumberInput({
             onInput={(e) => setEdit({ [inputName]: e.currentTarget.value })}
             type={type}
             name={inputName}
-            value={edit[inputName]}
+            value={String(edit[inputName] ?? "")}
             placeholder={placeholder}
             disabled={disabled}
         />
@@ -237,16 +265,20 @@ export function PokemonSelectInput({
     setEdit,
 }: PokemonInputProps) {
     const normalizedValue =
-        inputName === "pokeball" ? normalizePokeballName(value) : value;
+        inputName === "pokeball" && typeof value === "string"
+            ? normalizePokeballName(value)
+            : value;
+    const normalizedPokeball =
+        typeof normalizedValue === "string" ? normalizedValue : undefined;
 
     const _pokeball =
         inputName === "pokeball" &&
-        normalizedValue &&
-        normalizedValue !== "None" ? (
+        normalizedPokeball &&
+        normalizedPokeball !== "None" ? (
             <img
                 style={{ position: "absolute" }}
-                alt={normalizedValue}
-                src={`icons/pokeball/${formatBallText(normalizedValue)}.png`}
+                alt={normalizedPokeball}
+                src={`icons/pokeball/${formatBallText(normalizedPokeball)}.png`}
             />
         ) : null;
 
@@ -257,20 +289,28 @@ export function PokemonSelectInput({
                 onChange(e);
                 setEdit({ [inputName]: e.currentTarget.value });
             }}
-            value={normalizedValue}
+            value={String(normalizedValue ?? "")}
             name={inputName}
         >
             {!usesKeyValue
                 ? options
-                    ? (options as any)?.map((item, index) => (
-                          <option key={index}>{item}</option>
+                    ? options.map((item, index) => (
+                          <option key={index}>
+                              {typeof item === "string" ? item : item.key}
+                          </option>
                       ))
                     : null
-                : (options as any)?.map((item, index) => (
-                      <option value={item.value} key={index}>
-                          {item.key}
-                      </option>
-                  ))}
+                : options?.map((item, index) =>
+                      typeof item === "string" ? (
+                          <option value={item} key={index}>
+                              {item}
+                          </option>
+                      ) : (
+                          <option value={item.value ?? undefined} key={index}>
+                              {item.key}
+                          </option>
+                      ),
+                  )}
         </HTMLSelect>
     );
 }
@@ -287,12 +327,25 @@ export function PokemonDoubleSelectInput({
     setEdit,
 }: PokemonInputProps) {
     // Ensure we have a valid array - fallback to default types if not
-    const editValue = Array.isArray(edit[inputName]) 
-        ? edit[inputName] 
-        : (Array.isArray(value) ? value : ["Normal", "Normal"]);
+    const currentEditValue = edit[inputName];
+    const editValueSource = Array.isArray(currentEditValue)
+        ? currentEditValue
+        : Array.isArray(value)
+          ? value
+          : ["Normal", "Normal"];
+    const editValue = editValueSource.map(String);
+    const renderOption = (item: SelectOption, index: number) => {
+        const optionValue = typeof item === "string" ? item : item.value ?? item.key;
+        const label = typeof item === "string" ? item : item.key;
+        return (
+            <option value={optionValue} key={index}>
+                {label}
+            </option>
+        );
+    };
 
     const onSelect = React.useMemo(
-        () => (position: number) => (e) => {
+        () => (position: number) => (e: React.ChangeEvent<HTMLSelectElement>) => {
             onChange(e);
             const newEdit = [...editValue];
             newEdit[position] = e.currentTarget.value;
@@ -309,11 +362,7 @@ export function PokemonDoubleSelectInput({
                 name={inputName}
             >
                 {options
-                    ? (options as any).map((item, index) => (
-                          <option value={item} key={index}>
-                              {item}
-                          </option>
-                      ))
+                    ? options.map(renderOption)
                     : null}
             </HTMLSelect>
             <span>&nbsp;</span>
@@ -323,11 +372,7 @@ export function PokemonDoubleSelectInput({
                 name={inputName}
             >
                 {options
-                    ? (options as any).map((item, index) => (
-                          <option value={item} key={index}>
-                              {item}
-                          </option>
-                      ))
+                    ? options.map(renderOption)
                     : null}
             </HTMLSelect>
         </span>
@@ -348,7 +393,7 @@ export function PokemonCheckboxInput({
                     onChange(e);
                     setEdit({ [inputName]: e.currentTarget.checked });
                 }}
-                checked={edit[inputName]}
+                checked={Boolean(edit[inputName])}
                 type={type}
                 name={inputName}
             />
@@ -399,7 +444,7 @@ export function PokemonMoveInput({
                         dispatch(editPokemon(edit, selectedId));
                     }
                 }}
-                values={value || []}
+                values={Array.isArray(value) ? value.map(String) : []}
             />
         </ErrorBoundary>
     );

@@ -2,7 +2,7 @@ import * as React from "react";
 import { TeamPokemon } from "components/Pokemon/TeamPokemon/TeamPokemon2";
 import { cx } from "emotion";
 import { Box, Pokemon } from "models";
-import { useSelector } from "react-redux";
+import { useSelector } from "store/reactZustand";
 import { State } from "state";
 import { Menu, MenuItem } from "@blueprintjs/core";
 import {
@@ -28,8 +28,15 @@ import { v4 as uuid } from "uuid";
 
 async function load() {
     const resource = await import("@emmaramirez/dom-to-image");
-    return resource.domToImage;
+    return resource.domToImage as DomToImage;
 }
+
+type DomToImage = {
+    toPng: (
+        node: HTMLElement,
+        options?: { corsImage?: boolean },
+    ) => Promise<string>;
+};
 
 const getAllByStatus = (
     boxes?: Box[],
@@ -67,27 +74,36 @@ export enum DownloadStatus {
     done = "done",
 }
 
-const toImage = (ref, setDS) => async () => {
-    const resultNode = ref?.current;
-    console.log(resultNode);
-    try {
-        setDS(DownloadStatus.active);
-        const domToImage = await load();
-        const dataUrl = await (domToImage as any).toPng(resultNode, {
-            corsImage: true,
-        });
-        const link = document.createElement("a");
-        link.download = `nuzlocke-${uuid()}.png`;
-        link.href = dataUrl;
-        link.click();
-        setDS(DownloadStatus.done);
-    } catch (e) {
-        setDS(DownloadStatus.error);
-        console.log(e);
-    }
-};
+const toImage =
+    (
+        ref: React.ForwardedRef<HTMLElement>,
+        setDS: React.Dispatch<React.SetStateAction<DownloadStatus>>,
+    ) =>
+    async () => {
+        const resultNode =
+            ref && typeof ref !== "function" ? ref.current : null;
+        if (!resultNode) {
+            setDS(DownloadStatus.error);
+            return;
+        }
+        try {
+            setDS(DownloadStatus.active);
+            const domToImage = await load();
+            const dataUrl = await domToImage.toPng(resultNode, {
+                corsImage: true,
+            });
+            const link = document.createElement("a");
+            link.download = `nuzlocke-${uuid()}.png`;
+            link.href = dataUrl;
+            link.click();
+            setDS(DownloadStatus.done);
+        } catch (e) {
+            setDS(DownloadStatus.error);
+            console.log(e);
+        }
+    };
 
-export const TopBarWithDownload = React.forwardRef((props, ref) => {
+export const TopBarWithDownload = React.forwardRef<HTMLElement>((props, ref) => {
     const [downloadStatus, setDownloadStatus] = React.useState(
         DownloadStatus.dormant,
     );
@@ -314,7 +330,6 @@ export class Result extends React.Component {
         return (
             <div className={cx(Styles.result_wrapper, "hide-scrollbars")}>
                 {/* @TODO fix this */}
-                {/* @ts-expect-error - TopBar ref type mismatch */}
                 <TopBar ref={this.ref} />
                 <ResultInner ref={this.ref} />
             </div>

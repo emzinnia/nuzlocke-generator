@@ -1,10 +1,12 @@
-import { connect } from "react-redux";
+import * as React from "react";
+import { connect } from "store/reactZustand";
 import { editTrainer } from "actions";
 import {
     TrainerInfoEditField,
     TrainerInfoEditFieldProps,
 } from "./TrainerInfoEditField";
 import { State } from "state";
+import { Dispatch } from "redux";
 
 const mapStateToProps = (
     state: Pick<State, keyof State>,
@@ -15,9 +17,9 @@ const mapStateToProps = (
     };
 };
 
-const mapDispatchToProps = (dispatch, ownProps: TrainerInfoEditFieldProps) => {
+const mapDispatchToProps = (dispatch: Dispatch, ownProps: TrainerInfoEditFieldProps) => {
     return {
-        onChange: (e: any) => {
+        onEdit: (e: React.ChangeEvent<HTMLInputElement>) => {
             dispatch(
                 editTrainer({
                     [ownProps.name]: e.target.value,
@@ -30,4 +32,4 @@ const mapDispatchToProps = (dispatch, ownProps: TrainerInfoEditFieldProps) => {
 export const LinkedTrainerInfoEditField = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(TrainerInfoEditField as any);
+)(TrainerInfoEditField);

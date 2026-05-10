@@ -1,5 +1,5 @@
 import * as React from "react";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { listOfHotkeys, HotkeyList } from "utils";
 import { Classes, Button, Intent } from "@blueprintjs/core";

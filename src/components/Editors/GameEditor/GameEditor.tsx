@@ -1,5 +1,5 @@
 import * as React from "react";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import {
     editGame,
     changeEditorSize,
@@ -15,9 +15,9 @@ import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 
 export interface GameEditorProps {
-    game: any;
-    editGame: any;
-    editor: any;
+    game: State["game"];
+    editGame: editGame;
+    editor: State["editor"];
     style: State["style"];
     editStyle: editStyle;
     changeEditorSize: changeEditorSize;
@@ -25,7 +25,7 @@ export interface GameEditorProps {
     toggleTemtemMode: toggleTemtemMode;
 }
 
-const gameSubEditorStyle: any = {
+const gameSubEditorStyle: React.CSSProperties = {
     display: "flex",
     justifyContent: "space-between",
     paddingBottom: ".25rem",
@@ -58,7 +58,10 @@ export class GameEditorBase extends React.Component<
     public render() {
         const { game } = this.props;
         // Awful hack to get rid of `isOpen` conflict warning
-        const RED: any = RulesEditorDialog;
+        const RED = RulesEditorDialog as React.ComponentType<{
+            isOpen: boolean;
+            onClose: () => void;
+        }>;
         return (
             <>
                 <RED isOpen={this.state.isOpen} onClose={this.toggleDialog} />
@@ -150,4 +153,4 @@ export const GameEditor = connect(
         resetCheckpoints,
         toggleTemtemMode,
     },
-)(GameEditorBase as any);
+)(GameEditorBase);

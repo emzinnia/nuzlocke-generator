@@ -22,7 +22,7 @@ const match = ({
         if (generation) {
             if (g && generation.includes(g)) {
                 // We know f is always a string based off of Forme's type
-                if (forme && f && forme.includes(f as any)) {
+                if (forme && f && forme.includes(f as keyof typeof Forme)) {
                     return true;
                 } else {
                     if (forme == null) return true;
@@ -33,7 +33,7 @@ const match = ({
             }
         } else {
             // Ibid: We know f is always a string based off of Forme's type
-            if (f && forme && forme.includes(f as any)) {
+            if (f && forme && forme.includes(f as keyof typeof Forme)) {
                 return true;
             } else {
                 return false;
@@ -1630,8 +1630,9 @@ export const matchSpeciesToTypes = (
             return [Types.Water, Types.Poison];
         case "Skarmory":
         case "Celesteela":
-        case "Corviknight":
             return [Types.Steel, Types.Flying];
+        case "Corviknight":
+            return [Types.Flying, Types.Steel];
 
         case "Larvitar":
         case "Pupitar":

@@ -18,7 +18,10 @@ const initialRules = [
 describe("rules reducer", () => {
     it("returns state by default", () => {
         const starting = ["rule a", "rule b"];
-        const result = rules(starting, { type: "UNKNOWN" } as any);
+        const result = rules(
+            starting,
+            { type: "UNKNOWN" } as unknown as Parameters<typeof rules>[1],
+        );
         expect(result).toEqual(starting);
     });
 
@@ -52,14 +55,23 @@ describe("rules reducer", () => {
 
     it("replaces rules when replacing state", () => {
         const replacement = ["replace me"];
-        const result = rules(["old"], replaceState({ rules: replacement }) as any);
+        const result = rules(
+            ["old"],
+            replaceState({ rules: replacement }) as unknown as Parameters<
+                typeof rules
+            >[1],
+        );
         expect(result).toEqual(replacement);
     });
 
     it("syncs rules when syncing from history", () => {
         const synced = ["history rule"];
-        const result = rules(["old"], syncStateFromHistory({ rules: synced }) as any);
+        const result = rules(
+            ["old"],
+            syncStateFromHistory({ rules: synced }) as unknown as Parameters<
+                typeof rules
+            >[1],
+        );
         expect(result).toEqual(synced);
     });
 });
-

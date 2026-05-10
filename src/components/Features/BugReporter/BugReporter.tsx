@@ -8,13 +8,14 @@ import {
     Classes,
     Spinner,
 } from "@blueprintjs/core";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { css } from "emotion";
 import { showToast } from "components/Common/Shared/appToaster";
+import { State } from "state";
 
 export interface BugReporterProps {
     reportingUrl?: string;
-    state: any;
+    state: State;
     defaultOpen?: boolean;
 }
 
@@ -25,6 +26,8 @@ export interface BugReporterState {
     stage: number;
     isSending: boolean;
 }
+
+type BugReportTextField = "userReport" | "userReportTitle";
 
 const spinner = css`
     display: inline-block;
@@ -126,7 +129,7 @@ export class BugReporterBase extends React.Component<
         stage === 1 ? "caterpie" : stage === 2 ? "metapod" : "butterfree";
 
     private updateReport =
-        (target: string) =>
+        (target: BugReportTextField) =>
         (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
             const text = e.target.value;
             const update: Pick<
@@ -134,7 +137,7 @@ export class BugReporterBase extends React.Component<
                 "userReport" | "userReportTitle"
             > = {
                 [target]: text,
-            } as unknown as any;
+            } as Pick<BugReporterState, BugReportTextField>;
             this.setState(update);
         };
 
@@ -205,4 +208,6 @@ export class BugReporterBase extends React.Component<
     };
 }
 
-export const BugReporter = connect((state) => ({ state }))(BugReporterBase);
+export const BugReporter = connect((state: State) => ({ state }))(
+    BugReporterBase,
+);

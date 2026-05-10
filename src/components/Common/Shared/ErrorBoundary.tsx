@@ -3,7 +3,7 @@ import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
 interface ErrorBoundaryProps {
     errorMessage?: React.ReactNode;
-    children?: any;
+    children?: React.ReactNode;
 }
 
 export const ErrorBoundary = ({

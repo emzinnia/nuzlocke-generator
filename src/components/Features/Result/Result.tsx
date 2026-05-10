@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { v4 as uuid } from "uuid";
 import { cx } from "emotion";
 

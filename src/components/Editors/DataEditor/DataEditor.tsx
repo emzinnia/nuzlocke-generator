@@ -1,5 +1,5 @@
 import * as React from "react";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import {
     Button,
     ButtonGroup,
@@ -16,14 +16,14 @@ import { ErrorBoundary, HotkeyIndicator } from "components/Common/Shared";
 import { v4 as uuid } from "uuid";
 import { persistor } from "store";
 import { newNuzlocke, replaceState } from "actions";
-import { Game, Pokemon, Trainer } from "models";
-import { omit } from "ramda";
+import { Badge, Game, Pokemon, Trainer } from "models";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { State } from "state";
 import { noop } from "redux-saga/utils";
 import {
     gameOfOriginToColor,
     GameSaveFormat,
+    getBadges,
     Styles,
     Game as GameName,
 } from "utils";
@@ -42,6 +42,7 @@ import { BoxMappings } from "parsers/utils/boxMappings";
 import SaveFileWorker from "parsers/worker?worker";
 import { cx } from "emotion";
 import { StatusDropZone } from "./StatusDropZone";
+import { serializeNuzlockeJson } from "utils/nuzlockeJson";
 
 export interface DataEditorProps {
     state: State;
@@ -95,19 +96,59 @@ const handleExceptions = (data: State | Record<string, unknown>) => {
     return isEmpty(updated) ? data : updated;
 };
 
-const stripEditorDarkModeForExport = (state: State) => {
-    const baseState = omit(["router", "._persist", "editorHistory"], state) as {
-        style?: Styles;
-        [key: string]: unknown;
-    };
-    const { editorDarkMode: _omit, ...styleWithoutDarkMode } =
-        baseState.style || {};
+const getImportedBadgeName = (badge: unknown) => {
+    if (typeof badge === "string") return badge;
+    if (badge && typeof badge === "object" && "name" in badge) {
+        const name = (badge as { name?: unknown }).name;
+        return typeof name === "string" ? name : undefined;
+    }
 
-    return {
-        ...baseState,
-        style: styleWithoutDarkMode,
-    };
+    return undefined;
 };
+
+const getOrdinalBadgeIndex = (name?: string) => {
+    const match = name?.match(/^Badge\s+(\d+)$/i);
+    if (!match) return undefined;
+
+    const index = Number.parseInt(match[1], 10) - 1;
+    return Number.isInteger(index) && index >= 0 ? index : undefined;
+};
+
+export const normalizeImportedBadges = (
+    badges: unknown[] | undefined,
+    gameName: GameName,
+): Badge[] => {
+    const gameBadges = getBadges(gameName);
+    if (!badges?.length) return [];
+
+    return badges.reduce<Badge[]>((normalized, badge) => {
+        const name = getImportedBadgeName(badge);
+        const ordinalIndex = getOrdinalBadgeIndex(name);
+        const matchedBadge =
+            ordinalIndex !== undefined
+                ? gameBadges[ordinalIndex]
+                : gameBadges.find((gameBadge) => gameBadge.name === name);
+
+        if (matchedBadge) {
+            normalized.push(matchedBadge);
+        } else if (
+            badge &&
+            typeof badge === "object" &&
+            "name" in badge &&
+            "image" in badge
+        ) {
+            normalized.push(badge as Badge);
+        }
+
+        return normalized;
+    }, []);
+};
+
+const ensurePokemonCheckpoints = (pokemon: Pokemon[]) =>
+    pokemon.map((poke) => ({
+        ...poke,
+        checkpoints: poke.checkpoints ?? [],
+    }));
 
 export interface SaveGameSettingsDialogProps {
     onMergeDataChange: () => void;
@@ -295,10 +336,9 @@ export class DataEditorBase extends React.Component<
             mode: "export",
         });
         this.setState({ isOpen: true });
-        const stateForExport = stripEditorDarkModeForExport(state);
         this.setState({
             href: `data:text/plain;charset=utf-8,${encodeURIComponent(
-                JSON.stringify(stateForExport),
+                serializeNuzlockeJson(state),
             )}`,
         });
     };
@@ -418,11 +458,20 @@ export class DataEditorBase extends React.Component<
                         isYellow: result.isYellow,
                         selectedGame,
                     });
+                const gameName = game.name as GameName;
+                const checkpoints = getBadges(gameName);
                 const bgColor = gameOfOriginToColor(game.name as GameName);
                 const data = {
                     game,
-                    pokemon: mergedPokemon,
-                    trainer: result.trainer,
+                    pokemon: ensurePokemonCheckpoints(mergedPokemon),
+                    checkpoints,
+                    trainer: {
+                        ...result.trainer,
+                        badges: normalizeImportedBadges(
+                            result.trainer.badges as unknown[] | undefined,
+                            gameName,
+                        ),
+                    },
                 };
                 console.log("data", data);
                 const nextStyle: Styles = bgColor

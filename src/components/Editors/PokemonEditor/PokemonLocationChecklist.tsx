@@ -13,7 +13,7 @@ import {
     Tooltip,
 } from "@blueprintjs/core";
 import { cx } from "emotion";
-import { useDispatch } from "react-redux";
+import { useDispatch } from "store/reactZustand";
 import { updateExcludedAreas, updateCustomAreas } from "actions";
 
 const EncounterMap = ({

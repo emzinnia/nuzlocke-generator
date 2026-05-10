@@ -3,6 +3,7 @@ import { Pokemon } from "models";
 import { matchSpeciesToTypes } from "utils/formatters/matchSpeciesToTypes";
 import { Forme } from "utils/Forme";
 import { Types } from "utils/Types";
+import { Game as GameName } from "utils";
 import { listOfPokemon } from "utils/data/listOfPokemon";
 import type { Species } from "utils/data/listOfPokemon";
 import type { GameSaveFormat } from "utils/gameSaveFormat";
@@ -641,6 +642,16 @@ const formatMoney = (bytes: Buffer) => bytes.readUInt32LE(0);
 const getGameFromOrigin = (value: number) =>
     ORIGIN_GAME_MAP[value] || undefined;
 
+const getGameOfOrigin = (value: number): GameName | undefined => {
+    const game = getGameFromOrigin(value);
+    if (game === "Ruby") return "Ruby";
+    if (game === "Sapphire") return "Sapphire";
+    if (game === "Emerald") return "Emerald";
+    if (game === "FireRed") return "FireRed";
+    if (game === "LeafGreen") return "LeafGreen";
+    return undefined;
+};
+
 const getBoxStatus = (boxIndex: number, options: ParserOptions) => {
     const mapping = options.boxMappings?.find(
         (entry) => entry.key === boxIndex + 1,
@@ -831,6 +842,7 @@ const decodePokemon = (
     const shiny = shinyCheck(personality, otId);
     const forme =
         speciesName === "Unown" ? determineUnownForme(personality) : undefined;
+    const gameOfOrigin = getGameOfOrigin(originGame);
 
     if (DEBUG) {
         log(
@@ -886,6 +898,7 @@ const decodePokemon = (
         moves,
         shiny,
         forme,
+        gameOfOrigin,
         item: itemId
             ? (GEN_3_HELD_ITEM_MAP[itemId] ?? `Item #${itemId}`)
             : undefined,

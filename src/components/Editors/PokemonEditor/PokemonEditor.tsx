@@ -1,6 +1,6 @@
 import { Button, ButtonGroup, Classes, Intent, Spinner } from "@blueprintjs/core";
 import * as React from "react";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { Pokemon, Box as BoxModel, Boxes, Game } from "models";
 import { State } from "state";
 import { generateEmptyPokemon } from "utils";

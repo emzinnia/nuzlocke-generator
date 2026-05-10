@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "store/reactZustand";
 import {
     getIconFormeSuffix,
     Forme,
@@ -162,7 +162,10 @@ export function PokemonIconPlain({
     includeTitle,
     imageStyle,
     editorDarkMode,
-}: PokemonIconProps & { imageStyle: any; editorDarkMode?: boolean }) {
+}: PokemonIconProps & {
+    imageStyle?: React.CSSProperties;
+    editorDarkMode?: boolean;
+}) {
     const isUnknown = normalizeSpeciesName(
         species as Species,
     ) === "unknown";

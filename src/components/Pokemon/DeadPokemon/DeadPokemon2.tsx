@@ -1,5 +1,5 @@
 import * as React from "react";
-import { connect, useDispatch } from "react-redux";
+import { connect, useDispatch } from "store/reactZustand";
 
 import { Pokemon, Game } from "models";
 import { GenderElement } from "components/Common/Shared";
@@ -17,8 +17,19 @@ export function DeadPokemon({ pokemon }: { pokemon: Pokemon }) {
     return (
         <span data-testid="dead-pokemon" style={{ filter: "grayscale(100%)" }}>
             <PokemonIconPlain
-                onClick={(e) => dispatch(selectPokemon(pokemon.id))}
-                {...(pokemon as any)}
+                onClick={() => dispatch(selectPokemon(pokemon.id))}
+                id={pokemon.id}
+                species={pokemon.species}
+                forme={pokemon.forme}
+                gender={pokemon.gender}
+                customIcon={pokemon.customIcon}
+                hidden={pokemon.hidden}
+                egg={pokemon.egg}
+                position={pokemon.position}
+                shiny={pokemon.shiny}
+                status={pokemon.status}
+                selectedId={null}
+                imageStyle={{ height: "32px", maxWidth: "auto" }}
             />
         </span>
     );

@@ -11,7 +11,7 @@ import {
 import { cx, css } from "emotion";
 
 import { deletePokemon, modifyDeletionConfirmation } from "actions";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { accentedE } from "utils";
 import { State } from "state";
 

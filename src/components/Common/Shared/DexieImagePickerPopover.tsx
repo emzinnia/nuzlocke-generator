@@ -1,6 +1,7 @@
 import {
     Button,
     Classes,
+    IconName,
     InputGroup,
     Popover,
     Position,
@@ -8,7 +9,7 @@ import {
 } from "@blueprintjs/core";
 import { css, cx } from "emotion";
 import * as React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch } from "store/reactZustand";
 import { toggleDialog } from "actions";
 import {
     getImagesPage,
@@ -83,7 +84,7 @@ export interface DexieImagePickerPopoverProps {
     /** Disable opening/selecting. */
     disabled?: boolean;
     /** Override button icon (defaults to "media"). */
-    icon?: string;
+    icon?: IconName;
     /** Tooltip text for the picker button. */
     tooltip?: string;
 }
@@ -270,7 +271,7 @@ export function DexieImagePickerPopover({
         >
             <Button
                 minimal
-                icon={icon as any}
+                icon={icon}
                 disabled={disabled}
                 title={tooltip}
                 aria-label={tooltip}
@@ -278,5 +279,4 @@ export function DexieImagePickerPopover({
         </Popover>
     );
 }
-
 

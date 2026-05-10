@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, ButtonGroup } from "@blueprintjs/core";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "store/reactZustand";
 import { State } from "state";
 import { editorStyles } from "./styles";
 import { redoEditorHistory, syncStateFromHistory, undoEditorHistory } from "actions";
@@ -21,7 +21,7 @@ export function EditorControls({ editorDarkMode, minimized }) {
     const canRedo = editorHistory?.future?.length > 0 && editorHistory?.present != null;
 
     const dispatchUndo = React.useCallback(() => {
-        if (!canUndo) return;
+        if (!canUndo || editorHistory.present == null) return;
 
         const { past, present } = editorHistory;
         const lastEntry = past[past.length - 1];
@@ -35,7 +35,7 @@ export function EditorControls({ editorDarkMode, minimized }) {
     }, [editorHistory, canUndo, dispatch]);
 
     const dispatchRedo = React.useCallback(() => {
-        if (!canRedo) return;
+        if (!canRedo || editorHistory.present == null) return;
 
         const { future, present } = editorHistory;
         const nextEntry = future[0];

@@ -41,17 +41,25 @@ export function checkpoints(
         case ADD_CUSTOM_CHECKPOINT:
             return [...state, action.checkpoint];
         case REPLACE_STATE:
-            return action.replaceWith.checkpoints;
+            return action.replaceWith.checkpoints ?? state;
         case SYNC_STATE_FROM_HISTORY:
-            return action.syncWith.checkpoints;
+            return action.syncWith.checkpoints ?? state;
         case EDIT_CHECKPOINT: {
+            const checkpointIndex = state
+                .map((n) => n.name)
+                .indexOf(action.name);
+            const checkpoint = state[checkpointIndex];
+            if (checkpointIndex < 0 || !checkpoint) {
+                return state;
+            }
+
             const newState = state.slice();
             newState.splice(
-                state.map((n) => n.name).indexOf(action.name as string),
+                checkpointIndex,
                 1,
                 {
-                    ...state.find((c) => c.name === action.name),
-                    ...(action.edits as any),
+                    ...checkpoint,
+                    ...action.edits,
                 },
             );
             return newState;

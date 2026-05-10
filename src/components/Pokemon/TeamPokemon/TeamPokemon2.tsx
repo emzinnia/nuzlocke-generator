@@ -1,10 +1,11 @@
 import { Pokemon } from "models";
 import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
-import { Provider, useSelector, useStore } from "react-redux";
+import { Provider, useSelector, useStore } from "store/reactZustand";
 import { State } from "state";
 import {
     formatBallText,
+    getHeldItemIconPath,
     getGameGeneration,
     getPokemonImage,
     stripURLCSS,
@@ -96,7 +97,7 @@ export function TeamPokemon({
         (async () => {
             const newImage = await getPokemonImage({
                 customImage: pokemon.customImage,
-                forme: pokemon.forme as any,
+                forme: pokemon.forme,
                 species: pokemon.species,
                 shiny: pokemon.shiny,
                 style: style,
@@ -167,12 +168,7 @@ export function TeamPokemon({
                 customTypes={customTypes}
             />,
         ),
-        item: pokemon.item
-            ? `icons/hold-item/${(pokemon.item || "")
-                  .toLowerCase()
-                  .replace(/'/g, "")
-                  .replace(/\s/g, "-")}.png`
-            : undefined,
+        item: pokemon.item ? getHeldItemIconPath(pokemon.item) : undefined,
         itemComponent: ReactDOMServer.renderToString(
             <PokemonItem
                 pokemon={pokemon}

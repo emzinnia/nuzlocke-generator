@@ -1,5 +1,5 @@
 import * as React from "react";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 
 import { Pokemon, Game } from "models";
 import { GenderElement } from "components/Common/Shared";
@@ -74,8 +74,30 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
             return species;
         }
     };
-    const getAccentColor = (prop: any) =>
+    const getAccentColor = (prop: DeadPokemonProps) =>
         prop.style ? prop.style.accentColor : "#111111";
+    const renderPlainIcon = () => (
+        <PokemonIconPlain
+            onClick={() => poke.selectPokemon(poke.id)}
+            id={poke.id}
+            species={poke.species}
+            forme={poke.forme}
+            gender={poke.gender}
+            customIcon={poke.customIcon}
+            hidden={poke.hidden}
+            egg={poke.egg}
+            position={poke.position}
+            shiny={poke.shiny}
+            status={poke.status}
+            selectedId={null}
+            imageStyle={{
+                height: "32px",
+                maxWidth: "auto",
+                imageRendering: poke.style.iconRendering,
+            }}
+            editorDarkMode={poke.style.editorDarkMode}
+        />
+    );
     const useGameOfOriginColor =
         poke.gameOfOrigin &&
         poke.style.displayGameOriginForBoxedAndDead &&
@@ -125,10 +147,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                     }}
                 />
                 <span style={{ filter: "grayscale(100%)", margin: "0 auto" }}>
-                    <PokemonIconPlain
-                        onClick={(e) => poke.selectPokemon(poke.id)}
-                        {...(poke as any)}
-                    />
+                    {renderPlainIcon()}
                 </span>
                 {poke.gameOfOrigin === "Black" && EMMA_MODE && (
                     <div
@@ -204,10 +223,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                 }}
             >
                 <span style={{ filter: "grayscale(100%)" }}>
-                    <PokemonIconPlain
-                        onClick={(e) => poke.selectPokemon(poke.id)}
-                        {...(poke as any)}
-                    />
+                    {renderPlainIcon()}
                 </span>
                 <div
                     style={{
@@ -271,7 +287,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
             {style.template !== "Generations" ? (
                 <PokemonImage
                     customImage={poke.customImage}
-                    forme={poke.forme as any}
+                    forme={poke.forme}
                     shiny={poke.shiny}
                     species={poke.species}
                     style={poke.style}
@@ -295,10 +311,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                 </PokemonImage>
             ) : (
                 <span style={{ filter: "grayscale(100%)" }}>
-                    <PokemonIconPlain
-                        onClick={(e) => poke.selectPokemon(poke.id)}
-                        {...(poke as any)}
-                    />
+                    {renderPlainIcon()}
                 </span>
             )}
             <div className="dead-pokemon-info">

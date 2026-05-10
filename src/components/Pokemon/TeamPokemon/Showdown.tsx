@@ -43,7 +43,7 @@ export const Showdown = ({
                         style,
                         editor,
                         gender,
-                        forme: forme as any,
+                        forme,
                         name,
                     }),
                 )}

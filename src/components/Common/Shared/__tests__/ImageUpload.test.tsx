@@ -90,12 +90,12 @@ describe("ImageUpload", () => {
 
         // Stub FileReader to resolve immediately with a predictable result.
         // Some environments expose FileReader on both `window` and `globalThis`.
-        const originalWindowFileReader = (window as any).FileReader;
-        const originalGlobalFileReader = (globalThis as any).FileReader;
+        const originalWindowFileReader = window.FileReader;
+        const originalGlobalFileReader = globalThis.FileReader;
         class MockFileReader {
             public result: string | null = null;
             public onload: null | (() => void) = null;
-            public onerror: null | ((e: any) => void) = null;
+            public onerror: null | ((e: ProgressEvent<FileReader>) => void) = null;
             readAsDataURL(file: File) {
                 this.result = `data:${file.name}`;
                 // Real FileReader fires load asynchronously; defer so ImageUpload's code
@@ -103,8 +103,8 @@ describe("ImageUpload", () => {
                 queueMicrotask(() => this.onload?.());
             }
         }
-        (window as any).FileReader = MockFileReader;
-        (globalThis as any).FileReader = MockFileReader;
+        window.FileReader = MockFileReader as unknown as typeof FileReader;
+        globalThis.FileReader = MockFileReader as unknown as typeof FileReader;
 
         const fileListLike = {
             0: file1,
@@ -124,7 +124,7 @@ describe("ImageUpload", () => {
         });
 
         // Restore
-        (window as any).FileReader = originalWindowFileReader;
-        (globalThis as any).FileReader = originalGlobalFileReader;
+        window.FileReader = originalWindowFileReader;
+        globalThis.FileReader = originalGlobalFileReader;
     });
 });

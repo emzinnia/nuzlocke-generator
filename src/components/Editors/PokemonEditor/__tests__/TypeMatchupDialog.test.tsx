@@ -4,18 +4,19 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { TypeMatchupDialog } from "../TypeMatchupDialog";
 import { store } from "store";
 import { toggleDialog } from "actions";
+import { State } from "state";
 
 describe("<TypeMatchupDialog />", () => {
     beforeEach(() => {
         // Open the dialog before each test
-        store.dispatch(toggleDialog("typeMatchups") as any);
+        store.dispatch(toggleDialog("typeMatchups"));
     });
 
     afterEach(() => {
         // Close the dialog after each test (if it's still open)
-        const state = store.getState() as any;
+        const state = store.getState() as State;
         if (state.view?.dialogs?.typeMatchups) {
-            store.dispatch(toggleDialog("typeMatchups") as any);
+            store.dispatch(toggleDialog("typeMatchups"));
         }
     });
 
@@ -84,9 +85,9 @@ describe("<TypeMatchupDialog />", () => {
     describe("closed dialog state", () => {
         beforeEach(() => {
             // Close the dialog for this test suite
-            const state = store.getState() as any;
+            const state = store.getState() as State;
             if (state.view?.dialogs?.typeMatchups) {
-                store.dispatch(toggleDialog("typeMatchups") as any);
+                store.dispatch(toggleDialog("typeMatchups"));
             }
         });
 

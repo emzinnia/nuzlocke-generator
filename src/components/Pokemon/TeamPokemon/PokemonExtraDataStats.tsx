@@ -10,16 +10,23 @@ export type PokemonExtraDataStatsProps = {
     renderStat: StatRenderer;
 };
 
+type ExtraDataRecord = Record<string, unknown> & {
+    stats?: Record<string, unknown>;
+};
+
+const isExtraDataRecord = (value: unknown): value is ExtraDataRecord =>
+    typeof value === "object" && value !== null;
+
 export const PokemonExtraDataStats = ({
     effectiveGeneration,
     extraData,
     renderStat,
 }: PokemonExtraDataStatsProps) => {
-    const ed = (extraData ?? {}) as any;
+    const ed = isExtraDataRecord(extraData) ? extraData : {};
 
-    // Gen 3 stats live under extraData.stats for party Pokémon (see `src/parsers/gen3.ts`).
-    // We fall back to the root `extraData` to avoid breaking older data shapes.
-    const gen3Stats = ed?.stats ?? ed;
+    // Modern save parsers store party battle stats under `extraData.stats`.
+    // Older imported data may have the same fields at the root, so keep that fallback.
+    const battleStats = isExtraDataRecord(ed.stats) ? ed.stats : ed;
 
     if (effectiveGeneration === Generation.Gen1) {
         return (
@@ -49,12 +56,12 @@ export const PokemonExtraDataStats = ({
     if (effectiveGeneration === Generation.Gen3) {
         return (
             <>
-                {renderStat(gen3Stats["currentHp"], "HP")}
-                {renderStat(gen3Stats["attack"], "ATK")}
-                {renderStat(gen3Stats["defense"], "DEF")}
-                {renderStat(gen3Stats["specialAttack"], "SPATK")}
-                {renderStat(gen3Stats["specialDefense"], "SPDEF")}
-                {renderStat(gen3Stats["speed"], "SPE")}
+                {renderStat(battleStats["currentHp"], "HP")}
+                {renderStat(battleStats["attack"], "ATK")}
+                {renderStat(battleStats["defense"], "DEF")}
+                {renderStat(battleStats["specialAttack"], "SPATK")}
+                {renderStat(battleStats["specialDefense"], "SPDEF")}
+                {renderStat(battleStats["speed"], "SPE")}
             </>
         );
     }
@@ -62,14 +69,12 @@ export const PokemonExtraDataStats = ({
     // Default to "modern" (split special) stats for any later gens.
     return (
         <>
-            {renderStat(ed["currentHp"], "HP")}
-            {renderStat(ed["attack"], "ATK")}
-            {renderStat(ed["defense"], "DEF")}
-            {renderStat(ed["specialAttack"], "SPATK")}
-            {renderStat(ed["specialDefense"], "SPDEF")}
-            {renderStat(ed["speed"], "SPE")}
+            {renderStat(battleStats["currentHp"], "HP")}
+            {renderStat(battleStats["attack"], "ATK")}
+            {renderStat(battleStats["defense"], "DEF")}
+            {renderStat(battleStats["specialAttack"], "SPATK")}
+            {renderStat(battleStats["specialDefense"], "SPDEF")}
+            {renderStat(battleStats["speed"], "SPE")}
         </>
     );
 };
-
-

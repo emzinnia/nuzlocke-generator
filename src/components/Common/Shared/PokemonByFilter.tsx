@@ -3,7 +3,7 @@ import { Tooltip, Position } from "@blueprintjs/core";
 import { Pokemon } from "models";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { sortPokes } from "utils";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { editPokemon } from "actions";
 import { State } from "state";
 

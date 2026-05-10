@@ -9,7 +9,7 @@ import {
     Types,
 } from "utils";
 import { Pokemon } from "models";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 import { State } from "state";
 import { noop } from "redux-saga/utils";
 import * as ReactDOMServer from "react-dom/server";

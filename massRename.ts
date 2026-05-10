@@ -7,16 +7,18 @@ console.log(`
         Press Ctrl + C to exit.
 `);
 
-const onFileReadFunction = (filepath): string => {
+type FileRenameMapper = (filepath: string) => string;
+
+const onFileReadFunction: FileRenameMapper = (filepath) => {
     return `${filepath}-scarf.png`;
 };
 
 const targetDir = process.argv[2]
     ? process.argv[2]
     : "./src/assets/icons/scarf/";
-const __onFileRead__ = process.argv[3] ? process.argv[3] : onFileReadFunction;
+const __onFileRead__: FileRenameMapper = onFileReadFunction;
 
-function readFiles(dirname: string, onFileRead: any = __onFileRead__) {
+function readFiles(dirname: string, onFileRead: FileRenameMapper = __onFileRead__) {
     fs.readdir(dirname, (err, filenames) => {
         if (err) throw err;
         filenames.forEach((filename) => {
@@ -27,11 +29,11 @@ function readFiles(dirname: string, onFileRead: any = __onFileRead__) {
                 if (pathStart === "") throw err;
                 fs.rename(
                     __path__,
-                    onFileReadFunction(dirname + pathStart),
+                    onFileRead(dirname + pathStart),
                     (err) => {
                         if (err) throw err;
                         console.log(
-                            `Renamed ${filename} to ${onFileReadFunction(dirname + pathStart)}`,
+                            `Renamed ${filename} to ${onFileRead(dirname + pathStart)}`,
                         );
                     },
                 );

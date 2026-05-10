@@ -62,7 +62,7 @@ import { Editor, Game, Pokemon } from "models";
 import { TeamPokemonBase, TeamPokemonInfo } from "../TeamPokemon";
 
 const baseStyle = { ...styleDefaults };
-const baseGame: Game = { name: "Red" as any, customName: "" };
+const baseGame: Game = { name: "Red", customName: "" };
 const baseEditor: Editor = { minimized: false };
 
 const basePokemon: Pokemon = {
@@ -273,5 +273,65 @@ describe("TeamPokemonInfo", () => {
         expect(screen.getByText("SPATK")).toBeTruthy();
         expect(screen.getByText("SPDEF")).toBeTruthy();
     });
-});
 
+    for (const generation of [Generation.Gen4, Generation.Gen5]) {
+        it(`shows Gen ${generation} save stats from nested extra data`, () => {
+            const pokemonWithSaveStats: Pokemon = {
+                ...basePokemon,
+                extraData: {
+                    friendship: 255,
+                    stats: {
+                        currentHp: 269,
+                        maxHp: 269,
+                        attack: 139,
+                        defense: 165,
+                        speed: 317,
+                        specialAttack: 305,
+                        specialDefense: 194,
+                    },
+                },
+            };
+
+            render(
+                <TeamPokemonInfo
+                    generation={generation}
+                    style={baseStyle}
+                    pokemon={pokemonWithSaveStats}
+                    customTypes={[]}
+                    linkedPokemon={undefined}
+                    game={baseGame}
+                />,
+            );
+
+            expect(screen.getByText("269")).toBeTruthy();
+            expect(screen.getByText("139")).toBeTruthy();
+            expect(screen.getByText("305")).toBeTruthy();
+            expect(screen.getByText("194")).toBeTruthy();
+            expect(screen.getByTestId("pokemon-friendship").textContent).toBe(
+                "255",
+            );
+        });
+    }
+
+    it("shows game of origin when enabled", () => {
+        const styleWithGameOrigin = {
+            ...baseStyle,
+            displayGameOriginForBoxedAndDead: true,
+        };
+
+        render(
+            <TeamPokemonInfo
+                generation={Generation.Gen5}
+                style={styleWithGameOrigin}
+                pokemon={{ ...basePokemon, gameOfOrigin: "White 2" }}
+                customTypes={[]}
+                linkedPokemon={undefined}
+                game={baseGame}
+            />,
+        );
+
+        expect(screen.getByTestId("pokemon-gameoforigin").textContent).toBe(
+            "White 2",
+        );
+    });
+});

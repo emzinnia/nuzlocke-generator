@@ -1,7 +1,7 @@
 import * as React from "react";
 import { css, cx } from "emotion";
 import { Button, Classes, Icon } from "@blueprintjs/core";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "store/reactZustand";
 import { State } from "state";
 import { jumpToHistoryState, syncStateFromHistory } from "actions";
 import { reconstructStateAtIndex } from "reducers/editorHistory";

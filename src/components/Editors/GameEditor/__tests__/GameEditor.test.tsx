@@ -7,7 +7,7 @@ import { vi } from "vitest";
 const createProps = () => ({
     game: { name: listOfGames[0], customName: "" },
     style: styleDefaults,
-    editor: { temtemMode: false },
+    editor: { minimized: false, temtemMode: false },
     editGame: vi.fn(),
     editStyle: vi.fn(),
     changeEditorSize: vi.fn(),
@@ -42,4 +42,3 @@ describe("<GameEditor />", () => {
         expect(props.editGame).toHaveBeenCalledWith({ customName: "My Run" });
     });
 });
-

@@ -12,7 +12,7 @@ import {
 import { css, cx } from "emotion";
 import * as React from "react";
 import Dexie from "dexie";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "store/reactZustand";
 import { State } from "state";
 import { isDarkModeSelector } from "selectors";
 import { Skeleton } from "./Skeletons";

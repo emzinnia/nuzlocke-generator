@@ -15,6 +15,8 @@ type PostMessageMock = ReturnType<typeof vi.fn>;
 type WorkerResult = {
     detectedGame?: { name: string };
     detectedSaveFormat?: string;
+    trainer?: { name?: string; money?: string };
+    pokemon?: { species?: string; status?: string }[];
 };
 
 describe("parsers worker", () => {
@@ -66,5 +68,144 @@ describe("parsers worker", () => {
         expect(call.detectedGame?.name).toBe("FireRed");
         expect(call.detectedSaveFormat).toBe("FRLG");
     });
-});
 
+    it("detects Diamond from diamond.sav", async () => {
+        const save = loadSav("diamond.sav");
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: { save, selectedGame: "Auto", boxMappings: [], fileName: "diamond.sav" },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        const team = call.pokemon?.filter((p) => p.status === "Team") ?? [];
+        expect(call.detectedGame?.name).toBe("Diamond");
+        expect(call.detectedSaveFormat).toBe("DP");
+        expect(team.map((p) => p.species)).toEqual([
+            "Gengar",
+            "Lapras",
+            "Dragonite",
+            "Rayquaza",
+            "Bibarel",
+            "Darkrai",
+        ]);
+    });
+
+    it.each(["attempt.sav", "boss.sav", "DS save.sav"])(
+        "ignores incidental Gen 4 abbreviation substrings in %s",
+        async (fileName) => {
+            const save = loadSav("diamond.sav");
+            const selfRef = globalThis.self as unknown as WorkerSelf;
+            await selfRef.onmessage?.({
+                data: { save, selectedGame: "Auto", boxMappings: [], fileName },
+            });
+            const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+            expect(call.detectedGame?.name).toBe("Diamond");
+            expect(call.detectedSaveFormat).toBe("DP");
+        },
+    );
+
+    it("detects HeartGold from heartgold.sav", async () => {
+        const save = loadSav("heartgold.sav");
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: { save, selectedGame: "Auto", boxMappings: [], fileName: "heartgold.sav" },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        const team = call.pokemon?.filter((p) => p.status === "Team") ?? [];
+        expect(call.detectedGame?.name).toBe("HeartGold");
+        expect(call.detectedSaveFormat).toBe("HGSS");
+        expect(team.map((p) => p.species)).toEqual([
+            "Typhlosion",
+            "Dragonite",
+            "Gyarados",
+            "Scizor",
+            "Lucario",
+            "Sceptile",
+        ]);
+    });
+
+    it("labels Pearl filenames as Pearl while using the DP parser", async () => {
+        const save = loadSav("diamond.sav");
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: { save, selectedGame: "Auto", boxMappings: [], fileName: "pearl.sav" },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.detectedGame?.name).toBe("Pearl");
+        expect(call.detectedSaveFormat).toBe("DP");
+    });
+
+    it("detects Platinum from a Platinum save fixture", async () => {
+        const save = loadSav("fixtures/gen4/projectpokemon-base-platinum-boy.sav");
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: {
+                save,
+                selectedGame: "Auto",
+                boxMappings: [],
+                fileName: "pokemon-platinum.sav",
+            },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.detectedGame?.name).toBe("Platinum");
+        expect(call.detectedSaveFormat).toBe("Platinum");
+        expect(call.trainer?.name).toBe("Platinu");
+        expect(call.trainer?.money).toBe("3000");
+    });
+
+    it("labels SoulSilver filenames as SoulSilver while using the HGSS parser", async () => {
+        const save = loadSav("heartgold.sav");
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: { save, selectedGame: "Auto", boxMappings: [], fileName: "soulsilver.sav" },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.detectedGame?.name).toBe("SoulSilver");
+        expect(call.detectedSaveFormat).toBe("HGSS");
+    });
+
+    it.each([
+        [
+            "fixtures/gen5/projectpokemon-base-black-boy.sav",
+            "pokemon-black.sav",
+            "Black",
+            "BW",
+            "Black",
+        ],
+        [
+            "fixtures/gen5/projectpokemon-base-white-boy.sav",
+            "pokemon-white.sav",
+            "White",
+            "BW",
+            "White",
+        ],
+        [
+            "fixtures/gen5/projectpokemon-base-black-2-boy.sav",
+            "pokemon-black-2.sav",
+            "Black 2",
+            "B2W2",
+            "Black",
+        ],
+        [
+            "fixtures/gen5/projectpokemon-base-white-2-boy.sav",
+            "pokemon-white-2.sav",
+            "White 2",
+            "B2W2",
+            "White",
+        ],
+    ])(
+        "detects %s as %s",
+        async (fixture, fileName, gameName, saveFormat, trainerName) => {
+            const save = loadSav(fixture);
+            const selfRef = globalThis.self as unknown as WorkerSelf;
+            await selfRef.onmessage?.({
+                data: { save, selectedGame: "Auto", boxMappings: [], fileName },
+            });
+            const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+            expect(call.detectedGame?.name).toBe(gameName);
+            expect(call.detectedSaveFormat).toBe(saveFormat);
+            expect(call.trainer?.name).toBe(trainerName);
+            expect(call.trainer?.money).toBe("3000");
+            expect(call.pokemon).toEqual([]);
+        },
+    );
+});

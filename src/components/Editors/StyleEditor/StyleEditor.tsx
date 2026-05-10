@@ -1,5 +1,5 @@
 import * as React from "react";
-import { connect } from "react-redux";
+import { connect } from "store/reactZustand";
 
 import { editStyle } from "actions";
 import {
@@ -34,30 +34,37 @@ import { customCSSGuide as text } from "utils/customCSSGuide";
 import ReactMarkdown from "react-markdown";
 import { debounce } from "utils/debounce";
 
+type StyleValue = State["style"][keyof State["style"]];
+type StyleChangeEvent =
+    | React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    | React.FormEvent<HTMLInputElement>
+    | { target: { name?: keyof State["style"]; value: StyleValue } };
+
 const editEvent = (
-    e: any,
+    e: StyleChangeEvent,
     props: StyleEditorProps,
     name?: keyof State["style"],
     game?: Game,
 ) => {
-    const propName = name || e.target.name;
-    props.editStyle({ [propName]: e.target.value });
-    if (propName === "template" && e.target.value === "Default Light") {
+    const target = "currentTarget" in e ? e.currentTarget : e.target;
+    const propName = name || (target.name as keyof State["style"]);
+    props.editStyle({ [propName]: target.value });
+    if (propName === "template" && target.value === "Default Light") {
         props.editStyle({ bgColor: "#eeeeee", topHeaderColor: "#dedede" });
     }
-    if (propName === "template" && e.target.value === "Default Dark") {
+    if (propName === "template" && target.value === "Default Dark") {
         props.editStyle({ bgColor: "#383840", topHeaderColor: "#333333" });
     }
-    if (propName === "template" && e.target.value === "Compact with Icons") {
+    if (propName === "template" && target.value === "Compact with Icons") {
         props.editStyle({ imageStyle: "square" });
     }
-    if (propName === "template" && e.target.value === "Cards") {
+    if (propName === "template" && target.value === "Cards") {
         props.editStyle({
             imageStyle: "square",
             movesPosition: "horizontal" as OrientationType,
         });
     }
-    if (propName === "template" && e.target.value === "Hexagons") {
+    if (propName === "template" && target.value === "Hexagons") {
         props.editStyle({
             resultWidth: 1320,
             accentColor: "rgba(0, 0, 0, 0)",
@@ -65,8 +72,8 @@ const editEvent = (
         });
     }
     if (
-        (propName === "template" && e.target.value === "Generations") ||
-        e.target.value === "Generations Classic"
+        (propName === "template" && target.value === "Generations") ||
+        target.value === "Generations Classic"
     ) {
         props.editStyle({
             bgColor: game ? gameOfOriginToColor(game) : "",
@@ -79,10 +86,18 @@ const editEvent = (
     }
 };
 
+const editCheckboxEvent = (
+    e: React.FormEvent<HTMLInputElement>,
+    props: StyleEditorProps,
+    name: keyof State["style"],
+) => {
+    editEvent({ target: { value: e.currentTarget.checked } }, props, name);
+};
+
 export interface StyleEditorProps {
     style: StylesType;
     editStyle: editStyle;
-    game: any;
+    game: State["game"];
 }
 
 export interface StyleEditorState {
@@ -90,18 +105,14 @@ export interface StyleEditorState {
     isCSSGuideOpen: boolean;
 }
 
-export const IconsNextToTeamPokemon = (props) => (
+export const IconsNextToTeamPokemon = (props: StyleEditorProps) => (
     <div className="style-edit">
         <Checkbox
             checked={props.style.iconsNextToTeamPokemon}
             name="iconsNextToTeamPokemon"
             label="Icons Next to Team Pokémon"
-            onChange={(e: any) =>
-                editEvent(
-                    { ...e, target: { value: e.target.checked } },
-                    props,
-                    "iconsNextToTeamPokemon",
-                )
+            onChange={(e) =>
+                editCheckboxEvent(e, props, "iconsNextToTeamPokemon")
             }
         />
     </div>
@@ -121,11 +132,11 @@ export const TextAreaDebounced = ({
     const [value, setValue] = React.useState("");
 
     const delayedValue = React.useCallback(
-        debounce((e) => edit(e, props, name), 300),
+        debounce((e: StyleChangeEvent) => edit(e, props, name), 300),
         [props.style[name]],
     );
 
-    const onChange = (e) => {
+    const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         e.persist();
         setValue(e.target.value);
         delayedValue(e);
@@ -344,15 +355,8 @@ export class StyleEditorBase extends React.Component<
                             checked={props.style.useAutoHeight}
                             name="useAutoHeight"
                             label="Auto Height"
-                            onChange={(e: any) =>
-                                editEvent(
-                                    {
-                                        ...e,
-                                        target: { value: e.target.checked },
-                                    },
-                                    props,
-                                    "useAutoHeight",
-                                )
+                            onChange={(e) =>
+                                editCheckboxEvent(e, props, "useAutoHeight")
                             }
                         />
                     </div>
@@ -402,15 +406,8 @@ export class StyleEditorBase extends React.Component<
                             checked={props.style.trainerAuto}
                             name="trainerAuto"
                             label="Auto Dimensions"
-                            onChange={(e: any) =>
-                                editEvent(
-                                    {
-                                        ...e,
-                                        target: { value: e.target.checked },
-                                    },
-                                    props,
-                                    "trainerAuto",
-                                )
+                            onChange={(e) =>
+                                editCheckboxEvent(e, props, "trainerAuto")
                             }
                         />
                     </div>
@@ -503,13 +500,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.tileBackground}
                         name="tileBackground"
                         label="Tile"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "tileBackground",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "tileBackground")}
                     />
                 </div>
 
@@ -661,13 +652,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.teamPokemonBorder}
                         name="teamPokemonBorder"
                         label="Team Pokémon Gradient Backgrounds"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "teamPokemonBorder",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "teamPokemonBorder")}
                     />
                 </div>
 
@@ -676,13 +661,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.showPokemonMoves}
                         name="showPokemonMoves"
                         label="Show Pokémon Moves"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "showPokemonMoves",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "showPokemonMoves")}
                     />
                 </div>
 
@@ -691,13 +670,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.minimalTeamLayout}
                         name="minimalTeamLayout"
                         label="Minimal Team Layout"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "minimalTeamLayout",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "minimalTeamLayout")}
                     />
                 </div>
 
@@ -706,13 +679,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.minimalBoxedLayout}
                         name="minimalBoxedLayout"
                         label="Minimal Boxed Layout"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "minimalBoxedLayout",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "minimalBoxedLayout")}
                     />
                 </div>
 
@@ -721,13 +688,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.minimalDeadLayout}
                         name="minimalDeadLayout"
                         label="Minimal Dead Layout"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "minimalDeadLayout",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "minimalDeadLayout")}
                     />
                 </div>
 
@@ -736,13 +697,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.minimalChampsLayout}
                         name="minimalChampsLayout"
                         label="Minimal Champs Layout"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "minimalChampsLayout",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "minimalChampsLayout")}
                     />
                 </div>
 
@@ -751,13 +706,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.displayBadges}
                         name="displayBadges"
                         label="Display Badges"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "displayBadges",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "displayBadges")}
                     />
                 </div>
 
@@ -766,13 +715,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.displayRules}
                         name="displayRules"
                         label="Display Nuzlocke Rules"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "displayRules",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "displayRules")}
                     />
                 </div>
 
@@ -781,13 +724,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.displayStats}
                         name="displayStats"
                         label="Display Stats"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "displayStats",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "displayStats")}
                     />
                 </div>
 
@@ -796,13 +733,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.displayExtraData}
                         name="displayExtraData"
                         label="Display Extra Data from Save Files"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "displayExtraData",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "displayExtraData")}
                     />
                 </div>
 
@@ -811,13 +742,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.usePokemonGBAFont}
                         name="usePokemonGBAFont"
                         label="Use Pokémon GBA Font"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "usePokemonGBAFont",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "usePokemonGBAFont")}
                     />
                 </div>
 
@@ -826,13 +751,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.oldMetLocationFormat}
                         name="oldMetLocationFormat"
                         label="Old Met Location Format"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "oldMetLocationFormat",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "oldMetLocationFormat")}
                     />
                 </div>
 
@@ -841,13 +760,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.grayScaleDeadPokemon}
                         name="grayScaleDeadPokemon"
                         label="Gray Scale Filter Dead Pokémon Images"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "grayScaleDeadPokemon",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "grayScaleDeadPokemon")}
                     />
                 </div>
 
@@ -856,13 +769,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.spritesMode}
                         name="spritesMode"
                         label="Sprites Mode"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "spritesMode",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "spritesMode")}
                     />
                 </div>
 
@@ -871,13 +778,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.scaleSprites}
                         name="scaleSprites"
                         label="Scale Sprites"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "scaleSprites",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "scaleSprites")}
                     />
                 </div>
 
@@ -886,13 +787,7 @@ export class StyleEditorBase extends React.Component<
                         checked={props.style.useSpritesForChampsPokemon}
                         name="useSpritesForChampsPokemon"
                         label="Use Sprites for Champs Pokémon"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "useSpritesForChampsPokemon",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "useSpritesForChampsPokemon")}
                     />
                 </div>
 
@@ -900,14 +795,8 @@ export class StyleEditorBase extends React.Component<
                     <Checkbox
                         checked={props.style.displayGameOriginForBoxedAndDead}
                         name="displayGameOriginForBoxedAndDead"
-                        label="Display Game Origin for Boxed and Dead"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "displayGameOriginForBoxedAndDead",
-                            )
-                        }
+                        label="Display Game Origin"
+                        onChange={(e) => editCheckboxEvent(e, props, "displayGameOriginForBoxedAndDead")}
                     />
                 </div>
 
@@ -924,20 +813,14 @@ export class StyleEditorBase extends React.Component<
                                 .displayGameOriginForBoxedAndDead
                                 ? undefined
                                 : "none",
-                        } as any
+                        } as React.CSSProperties
                     }
                 >
                     <Checkbox
                         checked={props.style.displayBackgroundInsteadOfBadge}
                         name="displayBackgroundInsteadOfBadge"
                         label="Display Background Color Instead of Badge"
-                        onChange={(e: any) =>
-                            editEvent(
-                                { ...e, target: { value: e.target.checked } },
-                                props,
-                                "displayBackgroundInsteadOfBadge",
-                            )
-                        }
+                        onChange={(e) => editCheckboxEvent(e, props, "displayBackgroundInsteadOfBadge")}
                     />
                 </div>
 
