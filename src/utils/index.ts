@@ -18,6 +18,7 @@ export * from "./typeToColor";
 export * from "./formatters/mapTrainerImage";
 export * from "./Types";
 export * from "./accentedE";
+export * from "./assets";
 export * from "./handleMovesGenerationExceptions";
 export * from "./dragAndDrop";
 export * from "./debounce";

@@ -7,6 +7,7 @@ import {
     formatBallText,
     getHeldItemIconPath,
     getGameGeneration,
+    getAssetUrl,
     getPokemonImage,
     stripURLCSS,
     typeToColor,
@@ -158,8 +159,11 @@ export function TeamPokemon({
         type2: pokemon?.types?.[1],
         type1Color: typeToColor(pokemon?.types?.[0] ?? "Normal"),
         type2Color: typeToColor(pokemon?.types?.[1] ?? "Normal"),
+        mvpCrown: getAssetUrl("assets/mvp-crown.png"),
         pokeball: pokemon.pokeball
-            ? `icons/pokeball/${formatBallText(pokemon?.pokeball || "None")}.png`
+            ? getAssetUrl(
+                  `icons/pokeball/${formatBallText(pokemon?.pokeball || "None")}.png`,
+              )
             : undefined,
         pokeballComponent: ReactDOMServer.renderToString(
             <PokemonPokeball

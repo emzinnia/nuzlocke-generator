@@ -8,8 +8,9 @@ import {
 } from "@blueprintjs/core";
 import { css, cx } from "emotion";
 import * as React from "react";
+import { getAssetUrl } from "utils";
 
-const hofImage = "assets/hall-of-fame.png";
+const hofImage = getAssetUrl("assets/hall-of-fame.png");
 
 const styles = {
     hallOfFameDialog: css`
