@@ -10,6 +10,7 @@ import {
     matchNatureToToxtricityForme,
     Species,
     normalizePokeballName,
+    getAssetUrl,
 } from "utils";
 import { editPokemon } from "actions";
 
@@ -278,7 +279,9 @@ export function PokemonSelectInput({
             <img
                 style={{ position: "absolute" }}
                 alt={normalizedPokeball}
-                src={`icons/pokeball/${formatBallText(normalizedPokeball)}.png`}
+                src={getAssetUrl(
+                    `icons/pokeball/${formatBallText(normalizedPokeball)}.png`,
+                )}
             />
         ) : null;
 

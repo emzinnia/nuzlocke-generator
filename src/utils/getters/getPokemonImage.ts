@@ -9,6 +9,7 @@ import {
     normalizeSpeciesName,
 } from "utils";
 import { getIconFormeSuffix } from "./getIconFormeSuffix";
+import { getAssetCssUrl } from "utils/assets";
 import { Editor, Pokemon } from "models";
 import { State } from "state";
 import { GenderElementProps } from "components";
@@ -171,11 +172,11 @@ export async function getPokemonImage({
     }
 
     if (editor?.temtemMode) {
-        return `url(img/temtem/${species?.trim()}.png)`;
+        return getAssetCssUrl(`img/temtem/${species?.trim()}.png`);
     }
 
     if (egg) {
-        return "url(img/egg.jpg)";
+        return getAssetCssUrl("img/egg.jpg");
     }
 
     if (
@@ -282,65 +283,77 @@ export async function getPokemonImage({
             [521, 592, 593, 668, 678].includes(regularNumber || 0) &&
             (gender === "f" || gender === "Female")
         ) {
-            return `url(img/sugimori/female/${regularNumber}${getIconFormeSuffix(
-                forme as keyof typeof Forme,
-            )}.png)`;
+            return getAssetCssUrl(
+                `img/sugimori/female/${regularNumber}${getIconFormeSuffix(
+                    forme as keyof typeof Forme,
+                )}.png`,
+            );
         }
-        return `url(img/sugimori/${regularNumber}${getIconFormeSuffix(
-            forme as keyof typeof Forme,
-        )}.png)`;
+        return getAssetCssUrl(
+            `img/sugimori/${regularNumber}${getIconFormeSuffix(
+                forme as keyof typeof Forme,
+            )}.png`,
+        );
     }
 
     if (style?.teamImages === "dream world") {
-        return `url(img/dw/${regularNumber || 1}.svg)`;
+        return getAssetCssUrl(`img/dw/${regularNumber || 1}.svg`);
     }
 
     const handleMimeJr = (s?: string) => (s === "Mime Jr." ? "mime-jr" : s);
 
     if (style?.teamImages === "shuffle") {
-        return `url(img/shuffle/${(handleMimeJr(species) || "Ditto")
-            .trim()
-            .replace(/\'/g, "")
-            .replace(/\s/g, "-")
-            .replace(/\./g, "-")
-            .toLocaleLowerCase()}${getIconFormeSuffix(forme as keyof typeof Forme)}.png)`;
+        return getAssetCssUrl(
+            `img/shuffle/${(handleMimeJr(species) || "Ditto")
+                .trim()
+                .replace(/\'/g, "")
+                .replace(/\s/g, "-")
+                .replace(/\./g, "-")
+                .toLocaleLowerCase()}${getIconFormeSuffix(
+                forme as keyof typeof Forme,
+            )}.png`,
+        );
     }
 
     if (style?.teamImages === "tcg") {
-        return `url(img/tcg/${(
-            handleTcgTransforms(
-                addForme(
-                    (species || "").replace(/\s/g, "").replace(/'/g, ""),
-                    forme as keyof typeof Forme,
-                ),
-                gender,
-            ) || "missingno"
-        ).toLowerCase()}.jpg)`;
+        return getAssetCssUrl(
+            `img/tcg/${(
+                handleTcgTransforms(
+                    addForme(
+                        (species || "").replace(/\s/g, "").replace(/'/g, ""),
+                        forme as keyof typeof Forme,
+                    ),
+                    gender,
+                ) || "missingno"
+            ).toLowerCase()}.jpg`,
+        );
     }
     // TEMPORARY STOPGAPS & Edge Cases & Special favors
     if (species === "Dugtrio" && forme === "Alolan" && shiny) {
-        return "url(img/alolan-dugtrio-shiny.jpg)";
+        return getAssetCssUrl("img/alolan-dugtrio-shiny.jpg");
     }
     if (species === "Gyarados" && shiny) {
-        return "url(img/gyarados-shiny.jpg)";
+        return getAssetCssUrl("img/gyarados-shiny.jpg");
     }
     if (species === "Indeedee" && gender === "Male") {
-        return "url(img/indeedee-m.jpg)";
+        return getAssetCssUrl("img/indeedee-m.jpg");
     }
     if (species === "Basculegion" && gender === "Female") {
-        return "url(img/basculegion-f.jpg)";
+        return getAssetCssUrl("img/basculegion-f.jpg");
     }
 
-    return `url(img/${(
-        addForme(
-            (species || "")
-                .trim()
-                .replace(/\s/g, "-")
-                .replace(/'/g, "")
-                .replace(/:/g, "-"),
-            forme as keyof typeof Forme,
-        ) || "missingno"
-    ).toLowerCase()}.jpg)`;
+    return getAssetCssUrl(
+        `img/${(
+            addForme(
+                (species || "")
+                    .trim()
+                    .replace(/\s/g, "-")
+                    .replace(/'/g, "")
+                    .replace(/:/g, "-"),
+                forme as keyof typeof Forme,
+            ) || "missingno"
+        ).toLowerCase()}.jpg`,
+    );
 }
 
 export const stripURLCSS = (str) =>

@@ -20,6 +20,7 @@ import { normalizeSpeciesName } from "utils/getters/normalizeSpeciesName";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { ResizedImage } from "components/Common/Shared/ResizedImage";
 import { Pokemon } from "models";
+import { getAssetUrl } from "utils/assets";
 
 export interface PokemonIconProps {
     /** The id of the Pokemon, used for selection **/
@@ -138,11 +139,13 @@ export const getIconURL = ({
             ? "female/"
             : "";
 
-    if (species === "Egg" || egg) return `${baseURL}egg.png`;
+    if (species === "Egg" || egg) return getAssetUrl(`${baseURL}egg.png`);
 
-    return `${baseURL}${isShiny}/${isFemaleSpecific}${normalizeSpeciesName(
-        species as Species,
-    )}${getIconFormeSuffix(forme as keyof typeof Forme)}.png`;
+    return getAssetUrl(
+        `${baseURL}${isShiny}/${isFemaleSpecific}${normalizeSpeciesName(
+            species as Species,
+        )}${getIconFormeSuffix(forme as keyof typeof Forme)}.png`,
+    );
 };
 
 export function PokemonIconPlain({
@@ -199,11 +202,19 @@ export function PokemonIconPlain({
                 </PokemonImage>
             ) : (
                 <img
-                    style={{...imageStyle, filter: isUnknown && editorDarkMode ? "invert(100%) drop-shadow(0 0 1px rgba(0, 0, 0, 1))" : undefined}}
+                    style={{
+                        ...imageStyle,
+                        filter:
+                            isUnknown && editorDarkMode
+                                ? "invert(100%) drop-shadow(0 0 1px rgba(0, 0, 0, 1))"
+                                : undefined,
+                    }}
                     alt={species}
                     onError={({ currentTarget }) => {
                         currentTarget.onerror = null; // prevents looping
-                        currentTarget.src = "icons/pokemon/unknown.png";
+                        currentTarget.src = getAssetUrl(
+                            "icons/pokemon/unknown.png",
+                        );
                     }}
                     src={getIconURL({
                         id,

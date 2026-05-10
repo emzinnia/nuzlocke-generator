@@ -38,6 +38,7 @@ import {
     PokemonIconProps,
 } from "components/Pokemon/PokemonIcon/PokemonIcon";
 import { showToast } from "components/Common/Shared/appToaster";
+import { getAssetCssUrl } from "utils";
 
 export type BoxProps = {
     pokemon: Pokemon[];
@@ -208,7 +209,7 @@ export const Box: React.FC<BoxProps> = (props) => {
         const bg = background || getDefaultBackground(name);
         return bg?.startsWith("http")
             ? `url(${bg})`
-            : `url(./assets/img/box/${bg}.png)`;
+            : getAssetCssUrl(`assets/img/box/${bg}.png`);
     };
 
     const getDefaultBackground = (boxName: string) => {
