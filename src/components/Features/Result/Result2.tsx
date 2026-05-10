@@ -20,7 +20,7 @@ import { ErrorBoundary } from "components/Common/Shared";
 import { TopBar } from "components/Layout/TopBar/TopBar";
 import * as Styles from "./styles";
 import { TrainerResult } from "./TrainerResult";
-import { getContrastColor } from "utils";
+import { getContrastColor, getDomToImageCorsOptions } from "utils";
 import { useEvent } from "utils/hooks";
 import { TrainerNotes } from "./TrainerNotes";
 
@@ -34,7 +34,7 @@ async function load() {
 type DomToImage = {
     toPng: (
         node: HTMLElement,
-        options?: { corsImage?: boolean },
+        options?: ReturnType<typeof getDomToImageCorsOptions>,
     ) => Promise<string>;
 };
 
@@ -90,7 +90,7 @@ const toImage =
             setDS(DownloadStatus.active);
             const domToImage = await load();
             const dataUrl = await domToImage.toPng(resultNode, {
-                corsImage: true,
+                ...getDomToImageCorsOptions(),
             });
             const link = document.createElement("a");
             link.download = `nuzlocke-${uuid()}.png`;
