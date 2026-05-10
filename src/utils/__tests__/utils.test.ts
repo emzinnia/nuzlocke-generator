@@ -111,6 +111,10 @@ describe("matchSpeciesToType", () => {
             "Grass",
             "Flying",
         ]);
+        expect(matchSpeciesToTypes("Arcanine", "Hisuian")).toEqual([
+            "Fire",
+            "Rock",
+        ]);
         listOfPokemon.map((pokemon, index) => {
             expect(matchSpeciesToTypes(pokemon).length).toBeGreaterThan(0);
         });
@@ -368,6 +372,10 @@ describe(matchNatureToToxtricityForme.name, () => {
 });
 
 describe(getAdditionalFormes.name, () => {
+    it("includes Hisuian Arcanine", () => {
+        expect(getAdditionalFormes("Arcanine")).toEqual(["Hisuian"]);
+    });
+
     it("matches snapshot for all species", () => {
         const subject = listOfPokemon.map((species) => ({
             [species]: getAdditionalFormes(species),

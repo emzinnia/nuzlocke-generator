@@ -344,6 +344,7 @@ export const getAdditionalFormes = (species: string | undefined): string[] => {
     }
     if (
         s === "growlithe" ||
+        s === "arcanine" ||
         s === "voltorb" ||
         s === "zorua" ||
         s === "zoroark" ||
