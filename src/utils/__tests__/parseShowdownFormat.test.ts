@@ -1206,6 +1206,20 @@ describe("parseShowdownFormat with Gen 8 style input", () => {
         expect(result[5].ability).toBe("Mimicry");
     });
 
+    it("parses Arcanine-Hisui regional form correctly", () => {
+        const result = parseShowdownFormat(`Arcanine-Hisui @ Charcoal
+Ability: Intimidate
+Level: 45
+Jolly Nature
+- Flare Blitz`, { generation: Generation.Gen8 });
+
+        expect(result[0].species).toBe("Arcanine");
+        expect(result[0].forme).toBe("hisui");
+        expect(result[0].types).toEqual([Types.Fire, Types.Rock]);
+        expect(result[0].item).toBe("Charcoal");
+        expect(result[0].ability).toBe("Intimidate");
+    });
+
     it("parses Pokemon types correctly", () => {
         const result = parseShowdownFormat(gen8ShowdownInput, { generation: Generation.Gen8 });
         // Toxtricity is Electric/Poison
@@ -2139,4 +2153,3 @@ describe("Type validation against matchSpeciesToTypes", () => {
         });
     });
 });
-

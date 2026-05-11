@@ -184,7 +184,7 @@ function handleShowdownSpecies(species: string): { species: string; forme: Forme
             "Ponyta", "Rapidash", "Farfetch'd", "Weezing", "Mr. Rime",
             "Corsola", "Zigzagoon", "Linoone", "Darumaka", "Darmanitan",
             "Yamask", "Slowpoke", "Slowbro", "Slowking", "Articuno",
-            "Zapdos", "Moltres",
+            "Zapdos", "Moltres", "Growlithe", "Arcanine",
             "Venusaur", "Charizard", "Blastoise", "Alakazam", "Gengar",
             "Kangaskhan", "Pinsir", "Gyarados", "Aerodactyl", "Mewtwo",
             "Ampharos", "Scizor", "Heracross", "Houndoom", "Tyranitar",
