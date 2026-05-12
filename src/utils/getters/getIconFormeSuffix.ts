@@ -1,10 +1,13 @@
-import { Forme } from "utils";
+import { Forme, normalizeFormeKey } from "../Forme";
 
-export const getIconFormeSuffix = (forme: keyof typeof Forme) => {
-    console.log(forme);
-    if (forme == null) return "";
-    if (forme === "Normal") return "";
-    if (forme === "Spring") return "";
+export const getIconFormeSuffix = (
+    forme?: keyof typeof Forme | Forme | string,
+) => {
+    const normalizedForme = normalizeFormeKey(forme) ?? forme;
+
+    if (normalizedForme == null) return "";
+    if (normalizedForme === "Normal") return "";
+    if (normalizedForme === "Spring") return "";
     if (
         [
             "Heat",
@@ -15,14 +18,14 @@ export const getIconFormeSuffix = (forme: keyof typeof Forme) => {
             "Summer",
             "Winter",
             "Autumn",
-        ].includes(forme)
+        ].includes(normalizedForme)
     )
-        return `-${forme.toLowerCase()}`;
-    if (forme === "10%") return "-10-percent";
-    if (forme === "Complete") return "-complete";
-    if (forme === "!") return "-exclamation";
-    if (forme === "?") return "-question";
-    if (forme === "EternalFlower") return "-eternal";
-    if (Forme[forme]) return `-${Forme[forme]}`;
+        return `-${normalizedForme.toLowerCase()}`;
+    if (normalizedForme === "10%") return "-10-percent";
+    if (normalizedForme === "Complete") return "-complete";
+    if (normalizedForme === "!") return "-exclamation";
+    if (normalizedForme === "?") return "-question";
+    if (normalizedForme === "EternalFlower") return "-eternal";
+    if (Forme[normalizedForme]) return `-${Forme[normalizedForme]}`;
     return "";
 };

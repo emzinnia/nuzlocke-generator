@@ -10,6 +10,7 @@ import {
     Generation,
     typeToColor,
     isEmpty,
+    getIconFormeSuffix,
 } from "utils";
 import * as React from "react";
 import * as Color from "color";
@@ -48,6 +49,22 @@ describe("addForme", () => {
     it("returns a hisuian species", () => {
         const forme = addForme("arcanine", "Hisuian");
         expect(forme).toEqual("hisuian-arcanine");
+    });
+    it("returns a hisuian species from a normalized forme value", () => {
+        const forme = addForme("arcanine", Forme.Hisuian);
+        expect(forme).toEqual("hisuian-arcanine");
+    });
+});
+
+describe(getIconFormeSuffix.name, () => {
+    it("returns Hisuian icon suffixes from forme names and normalized values", () => {
+        expect(getIconFormeSuffix("Hisuian")).toEqual("-hisui");
+        expect(getIconFormeSuffix(Forme.Hisuian)).toEqual("-hisui");
+    });
+
+    it("keeps Spring as the default icon suffix from forme names and normalized values", () => {
+        expect(getIconFormeSuffix("Spring")).toEqual("");
+        expect(getIconFormeSuffix(Forme.Spring)).toEqual("");
     });
 });
 
