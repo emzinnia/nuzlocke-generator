@@ -535,7 +535,9 @@ export const handleSpeciesTypeEdgeCases = ({
         return [Types.Normal, Types.Fighting];
     }
 
-    if (match({ ...data, species: ["Growlithe"], forme: ["Hisuian"] })) {
+    if (
+        match({ ...data, species: ["Growlithe", "Arcanine"], forme: ["Hisuian"] })
+    ) {
         return [Types.Fire, Types.Rock];
     }
 

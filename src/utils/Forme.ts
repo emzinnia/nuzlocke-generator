@@ -119,3 +119,19 @@ export enum Forme {
     "Single Strike Gigantamax" = "single-strike-gigantamax",
     "Rapid Strike Gigantamax" = "rapid-strike-gigantamax",
 }
+
+export type FormeKey = keyof typeof Forme;
+
+export const normalizeFormeKey = (
+    forme?: FormeKey | Forme | string,
+): FormeKey | undefined => {
+    if (forme == null || forme === "") return undefined;
+
+    if (Object.prototype.hasOwnProperty.call(Forme, forme)) {
+        return forme as FormeKey;
+    }
+
+    return (Object.entries(Forme) as Array<[FormeKey, string]>).find(
+        ([, value]) => value === forme,
+    )?.[0];
+};
