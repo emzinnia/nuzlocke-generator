@@ -45,6 +45,10 @@ describe("addForme", () => {
         const forme = addForme("alakazam", "Mega");
         expect(forme).toEqual("alakazam-mega");
     });
+    it("returns a hisuian species", () => {
+        const forme = addForme("arcanine", "Hisuian");
+        expect(forme).toEqual("hisuian-arcanine");
+    });
 });
 
 describe("choose", () => {
