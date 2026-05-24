@@ -4,7 +4,7 @@ import { connect } from "store/reactZustand";
 import { State } from "state";
 import { Checkbox, Switch, Button, Intent, Classes } from "@blueprintjs/core";
 import { editStyle, addStat, deleteStat, editStat } from "actions";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import { ErrorBoundary } from "components";
 
 export interface StatsEditorProps {

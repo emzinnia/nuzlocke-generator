@@ -99,16 +99,17 @@ export const historyMiddleware: Middleware = (store) => {
         lastCommittedState = newState;
     }, HISTORY_DEBOUNCE_MS);
 
-    return (next) => (action: AnyAction) => {
+    return (next) => (action: unknown) => {
+        const typedAction = action as AnyAction;
         // Let the action pass through to reducers first
-        const result = next(action);
+        const result = next(typedAction);
 
         // Get the new state after the action was processed
         const fullState = store.getState() as State;
         const newState = getTrackableState(fullState);
 
         // Initialize history on first action (usually persist/REHYDRATE)
-        if (!initialized && action.type === "persist/REHYDRATE") {
+        if (!initialized && typedAction.type === "persist/REHYDRATE") {
             initialized = true;
             lastCommittedState = newState;
             store.dispatch(initEditorHistory(newState) as AnyAction);
@@ -116,15 +117,15 @@ export const historyMiddleware: Middleware = (store) => {
         }
 
         // Skip history tracking for excluded actions
-        if (EXCLUDED_ACTIONS.has(action.type)) {
+        if (EXCLUDED_ACTIONS.has(typedAction.type)) {
             // When undo/redo/jump starts, cancel any pending debounced commits
-            if (action.type === UNDO_EDITOR_HISTORY || action.type === REDO_EDITOR_HISTORY || action.type === JUMP_TO_HISTORY_STATE) {
+            if (typedAction.type === UNDO_EDITOR_HISTORY || typedAction.type === REDO_EDITOR_HISTORY || typedAction.type === JUMP_TO_HISTORY_STATE) {
                 debouncedCommit.cancel();
             }
             
             // Update lastCommittedState ONLY after SYNC_STATE_FROM_HISTORY
             // This is when all reducers have been updated to the undo/redo state
-            if (action.type === SYNC_STATE_FROM_HISTORY) {
+            if (typedAction.type === SYNC_STATE_FROM_HISTORY) {
                 debouncedCommit.cancel();
                 lastCommittedState = newState;
             }

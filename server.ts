@@ -19,8 +19,6 @@ const logger = pino({});
 
 const isLocal = process.env.NODE_ENV === "local";
 
-let middleware, compiler;
-
 const GH_URL = "https://api.github.com/repos/emzinnia/nuzlocke-generator";
 const GH_ACCESS_TOKEN = process.env.GH_ACCESS_TOKEN;
 const productionFlag = process.env.NODE_ENV === "production";
@@ -28,9 +26,8 @@ const productionFlag = process.env.NODE_ENV === "production";
 app.use(express.json({ limit: "50mb" }));
 app.use(cors());
 app.use(compression());
-if (isLocal && middleware && compiler) {
+if (isLocal) {
     logger.info(`Running server in development mode.`);
-    app.use(middleware(compiler, {}));
 } else {
     logger.info(`Running server in production mode.`);
 }
@@ -356,7 +353,7 @@ app.get("/nuzlockes", async (_req, res) => {
     res.status(501).send({ status: 501, error: "Not implemented" });
 });
 
-app.get("*", (req, res) => {
+app.get(/.*/, (req, res) => {
     res.sendFile(path.join(distPath, "index.html"));
 });
 

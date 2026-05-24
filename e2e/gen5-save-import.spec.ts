@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -107,9 +107,27 @@ const buildBlack2HaxorusSave = (heldItemIds = [0]) => {
 const readBlack2LivingDexSave = () =>
     readFileSync(path.join(process.cwd(), "src", "parsers", "black2.sav"));
 
+const uploadSaveFile = async (
+    page: Page,
+    file:
+        | string
+        | {
+              name: string;
+              mimeType: string;
+              buffer: Buffer;
+          },
+) => {
+    await expect(page.getByTestId("import-save-file-button")).toBeVisible({
+        timeout: 20_000,
+    });
+    await page.getByTestId("save-file-input").setInputFiles(file);
+};
+
 test("shows Gen 5 save formats in advanced import options", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await expect(page.getByRole("button", { name: "Advanced Import Options" })).toBeVisible({
+        timeout: 20_000,
+    });
 
     await page.getByRole("button", { name: "Advanced Import Options" }).click();
     const formatSelect = page.locator(".data-editor-save-file-form select").first();
@@ -120,20 +138,22 @@ test("shows Gen 5 save formats in advanced import options", async ({ page }) => 
 
 test("imports a Gen 5 Black 2 save through the save upload UI", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await expect(page.getByLabel("Display Game Origin")).toBeVisible({
+        timeout: 20_000,
+    });
     await page.getByLabel("Display Game Origin").check({ force: true });
 
-    const fileChooserPromise = page.waitForEvent("filechooser");
-    await page.getByTestId("import-save-file-button").click();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles({
+    await uploadSaveFile(page, {
         name: "black-2-haxorus.sav",
         mimeType: "application/octet-stream",
         buffer: buildBlack2HaxorusSave(),
     });
 
+    await expect(page.locator("select").first()).toHaveValue("Black 2", {
+        timeout: 60_000,
+    });
     const teamSlots = page.locator(".team-container .pokemon-container");
-    await expect(teamSlots).toHaveCount(1, { timeout: 20_000 });
+    await expect(teamSlots).toHaveCount(1, { timeout: 60_000 });
     await expect(teamSlots.first().locator(".pokemon-name")).toHaveText("Haxorus", {
         timeout: 20_000,
     });
@@ -160,19 +180,21 @@ test("imports a Gen 5 Black 2 save through the save upload UI", async ({ page })
 
 test("imports Gen 5 held item images", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await expect(page.getByTestId("import-save-file-button")).toBeVisible({
+        timeout: 20_000,
+    });
 
-    const fileChooserPromise = page.waitForEvent("filechooser");
-    await page.getByTestId("import-save-file-button").click();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles({
+    await uploadSaveFile(page, {
         name: "black-2-held-items.sav",
         mimeType: "application/octet-stream",
         buffer: buildBlack2HaxorusSave([92, 246]),
     });
 
+    await expect(page.locator("select").first()).toHaveValue("Black 2", {
+        timeout: 60_000,
+    });
     const teamSlots = page.locator(".team-container .pokemon-container");
-    await expect(teamSlots).toHaveCount(2, { timeout: 20_000 });
+    await expect(teamSlots).toHaveCount(2, { timeout: 60_000 });
 
     await expect(teamSlots.nth(0).locator(".pokemon-item img")).toHaveAttribute(
         "src",
@@ -186,20 +208,22 @@ test("imports Gen 5 held item images", async ({ page }) => {
 
 test("imports Black 2 boxed Pokemon with derived levels", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await expect(page.getByLabel("Display Game Origin")).toBeVisible({
+        timeout: 20_000,
+    });
     await page.getByLabel("Display Game Origin").check({ force: true });
 
-    const fileChooserPromise = page.waitForEvent("filechooser");
-    await page.getByTestId("import-save-file-button").click();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles({
+    await uploadSaveFile(page, {
         name: "black2.sav",
         mimeType: "application/octet-stream",
         buffer: readBlack2LivingDexSave(),
     });
 
+    await expect(page.locator("select").first()).toHaveValue("Black 2", {
+        timeout: 60_000,
+    });
     const teamSlots = page.locator(".team-container .pokemon-container");
-    await expect(teamSlots).toHaveCount(6, { timeout: 20_000 });
+    await expect(teamSlots).toHaveCount(6, { timeout: 60_000 });
     await expect(teamSlots.first().locator(".pokemon-name")).toHaveText("Emboar");
 
     const extraData = teamSlots.first().locator(".pokemon-extra-data");

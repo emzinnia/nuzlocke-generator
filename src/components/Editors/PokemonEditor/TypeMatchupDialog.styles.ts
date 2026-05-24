@@ -1,4 +1,4 @@
-import { css } from "emotion";
+import { css } from "@emotion/css";
 
 export const typeMatchupsCard = css`
     margin: 0;
@@ -20,7 +20,7 @@ export const typeMatchups = css`
         margin-bottom: 0.25rem;
     }
 
-    :global(.bp5-dark) &,
+    :global(:is(.bp5-dark, .bp6-dark)) &,
     :global(.bp-3-dark) & {
         --matchup-row-odd-bg: rgba(255, 255, 255, 0.06);
         --matchup-weak: #ff6b6b;
@@ -52,8 +52,8 @@ export const matchupTable = css`
         border: 1px solid rgba(0, 0, 0, 0.12);
     }
 
-    :global(.bp5-dark) & th,
-    :global(.bp5-dark) & td,
+    :global(:is(.bp5-dark, .bp6-dark)) & th,
+    :global(:is(.bp5-dark, .bp6-dark)) & td,
     :global(.bp-3-dark) & th,
     :global(.bp-3-dark) & td {
         border-color: rgba(255, 255, 255, 0.12);
@@ -143,7 +143,7 @@ export const matchupMatrixCell = css`
         background: rgba(137, 82, 204, 0.14);
     }
 
-    :global(.bp5-dark) &,
+    :global(:is(.bp5-dark, .bp6-dark)) &,
     :global(.bp-3-dark) & {
         &[data-mult="2"] {
             background: rgba(110, 231, 183, 0.18);
@@ -186,7 +186,7 @@ export const typeMatchupsTeamEntry = css`
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     }
 
-    :global(.bp5-dark) &:hover,
+    :global(:is(.bp5-dark, .bp6-dark)) &:hover,
     :global(.bp-3-dark) &:hover {
         background: rgba(72, 175, 240, 0.18);
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
@@ -207,7 +207,7 @@ export const typeMatchupsTeamEntryRemove = css`
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     }
 
-    :global(.bp5-dark) &:hover,
+    :global(:is(.bp5-dark, .bp6-dark)) &:hover,
     :global(.bp-3-dark) &:hover {
         background: rgba(239, 68, 68, 0.22);
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
@@ -250,7 +250,7 @@ export const typeMatchupsOther = css`
     &:hover::-webkit-scrollbar-thumb {
         background: rgba(0, 0, 0, 0.3);
     }
-    :global(.bp5-dark) &:hover::-webkit-scrollbar-thumb,
+    :global(:is(.bp5-dark, .bp6-dark)) &:hover::-webkit-scrollbar-thumb,
     :global(.bp-3-dark) &:hover::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.3);
     }
@@ -290,7 +290,7 @@ export const typeMatchupsOtherEntry = css`
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     }
 
-    :global(.bp5-dark) &:hover,
+    :global(:is(.bp5-dark, .bp6-dark)) &:hover,
     :global(.bp-3-dark) &:hover {
         background: rgba(72, 175, 240, 0.18);
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
@@ -328,7 +328,7 @@ export const typeChip = css`
         filter: brightness(1.05);
     }
 
-    :global(.bp5-dark) &:hover,
+    :global(:is(.bp5-dark, .bp6-dark)) &:hover,
     :global(.bp-3-dark) &:hover {
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
         filter: brightness(1.08);
