@@ -15,6 +15,7 @@ const createDownloadedJsonFixture = (): State => ({
         name: "Emerald",
         customName: "Downloaded Compatibility Run",
     },
+    customAreas: ["Route 120 Rainy Grass", "Safari Zone Extension"],
     pokemon: TeamFixture.map((pokemon, index) => ({
         ...pokemon,
         id: `downloaded-pokemon-${index}`,
@@ -39,6 +40,7 @@ describe("nuzlocke.json export compatibility", () => {
         const exported = stripEditorDarkModeForExport(state) as Partial<State>;
 
         expect(exported.editorHistory).toBeUndefined();
+        expect(exported.customAreas).toEqual(state.customAreas);
         expect(exported.pokemon).toEqual(state.pokemon);
         expect(exported.trainer).toEqual(state.trainer);
         expect(exported.style).toMatchObject({
@@ -59,6 +61,7 @@ describe("nuzlocke.json export compatibility", () => {
 
         expect(nextState.pokemon).toEqual(state.pokemon);
         expect(nextState.trainer).toEqual(state.trainer);
+        expect(nextState.customAreas).toEqual(state.customAreas);
         expect(nextState.game).toEqual(state.game);
         expect(nextState.style.bgColor).toBe("#0f766e");
         expect(nextState.style.editorDarkMode).toBe(
