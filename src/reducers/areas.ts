@@ -30,9 +30,9 @@ export function customAreas(
         case UPDATE_CUSTOM_AREAS:
             return action.areas;
         case REPLACE_STATE:
-            return action.replaceWith.areas ?? [];
+            return action.replaceWith.customAreas ?? [];
         case SYNC_STATE_FROM_HISTORY:
-            return action.syncWith.areas ?? [];
+            return action.syncWith.customAreas ?? [];
         default:
             return state;
     }
