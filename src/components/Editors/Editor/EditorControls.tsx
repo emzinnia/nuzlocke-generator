@@ -9,6 +9,21 @@ import { HistoryPanel } from "./HistoryPanel";
 import { reconstructPreviousState, reconstructNextState } from "reducers/editorHistory";
 import { HotkeyIndicator } from "components/Common/Shared";
 
+const hasShortcutModifier = (event: KeyboardEvent) =>
+    event.ctrlKey || event.metaKey;
+
+export const isUndoShortcut = (event: KeyboardEvent) =>
+    hasShortcutModifier(event) &&
+    !event.shiftKey &&
+    event.key.toLowerCase() === "z";
+
+export const isRedoShortcut = (event: KeyboardEvent) => {
+    if (!hasShortcutModifier(event)) return false;
+
+    const key = event.key.toLowerCase();
+    return key === "y" || (event.shiftKey && key === "z");
+};
+
 export function EditorControls({ editorDarkMode, minimized }) {
     const editorHistory = useSelector<State, State["editorHistory"]>(
         (state) => state.editorHistory,
@@ -49,7 +64,7 @@ export function EditorControls({ editorDarkMode, minimized }) {
     }, [editorHistory, canRedo, dispatch]);
 
     const handleUndo = React.useCallback((event: KeyboardEvent) => {
-        if ((event.ctrlKey || event.metaKey) && event.key === "z") {
+        if (isUndoShortcut(event)) {
             event.preventDefault();
             dispatchUndo();
         }
@@ -57,7 +72,7 @@ export function EditorControls({ editorDarkMode, minimized }) {
 
     const handleRedo = React.useCallback((event: KeyboardEvent) => {
         // Support both Ctrl+Y and Ctrl+Shift+Z for redo
-        if ((event.ctrlKey || event.metaKey) && (event.key === "y" || (event.key === "z"))) {
+        if (isRedoShortcut(event)) {
             event.preventDefault();
             dispatchRedo();
         }
