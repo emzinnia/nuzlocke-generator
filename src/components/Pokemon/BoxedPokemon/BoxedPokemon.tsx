@@ -23,6 +23,7 @@ const determineWidth = (isMinimal, numerator): string => {
 // @TODO: fix this messy prop soup
 export const BoxedPokemonBase = (poke: BoxedPokemonProps) => {
     const isMinimal = poke?.style?.minimalBoxedLayout;
+    const useAutoWidth = isMinimal || poke?.style?.template === "Compact";
     const useGameOfOriginColor =
         poke?.gameOfOrigin &&
         poke?.style?.displayGameOriginForBoxedAndDead &&
@@ -42,7 +43,7 @@ export const BoxedPokemonBase = (poke: BoxedPokemonProps) => {
                           )
                         : getContrastColor(getAccentColor(poke)),
                 width: determineWidth(
-                    isMinimal,
+                    useAutoWidth,
                     poke?.style.boxedPokemonPerLine,
                 ),
             }}
