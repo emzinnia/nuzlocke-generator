@@ -145,6 +145,47 @@ describe("TeamPokemonBase", () => {
         expect(screen.getByTestId("pokemon-icon")).toBeTruthy();
     });
 
+    it("hides visible pokemon names when configured", () => {
+        render(
+            <TeamPokemonBase
+                pokemon={basePokemon}
+                linkedPokemon={{ ...basePokemon, nickname: "Partner" }}
+                style={{ ...baseStyle, hidePokemonNames: true }}
+                game={baseGame}
+                selectPokemon={vi.fn()}
+                editor={baseEditor}
+                customTypes={[]}
+            />,
+        );
+
+        expect(screen.queryByText("Bulby")).toBeNull();
+        expect(screen.queryByText("Bulbasaur")).toBeNull();
+        expect(screen.queryByText("Partner")).toBeNull();
+        expect(screen.getByText(/lv\. 10/i)).toBeTruthy();
+        expect(screen.getByText(/Linked To/i)).toBeTruthy();
+    });
+
+    it("hides visible pokemon names in minimal layout when configured", () => {
+        render(
+            <TeamPokemonBase
+                pokemon={basePokemon}
+                style={{
+                    ...baseStyle,
+                    hidePokemonNames: true,
+                    minimalTeamLayout: true,
+                }}
+                game={baseGame}
+                selectPokemon={vi.fn()}
+                editor={baseEditor}
+                customTypes={[]}
+            />,
+        );
+
+        expect(screen.queryByText("Bulby")).toBeNull();
+        expect(screen.queryByText("Bulbasaur")).toBeNull();
+        expect(screen.getByText(/lv\. 10/i)).toBeTruthy();
+    });
+
     it("renders tera and alpha indicators when provided", () => {
         render(
             <TeamPokemonBase
@@ -217,6 +258,29 @@ describe("TeamPokemonInfo", () => {
         );
 
         expect(screen.queryByTestId("moves")).toBeNull();
+    });
+
+    it("hides visible pokemon names while preserving other details", () => {
+        render(
+            <TeamPokemonInfo
+                generation={Generation.Gen3}
+                style={{
+                    ...baseStyle,
+                    hidePokemonNames: true,
+                    itemStyle: "text",
+                }}
+                pokemon={{ ...basePokemon, item: "Leftovers" }}
+                customTypes={[]}
+                linkedPokemon={undefined}
+                game={baseGame}
+            />,
+        );
+
+        expect(screen.queryByText("Bulby")).toBeNull();
+        expect(screen.queryByText("Bulbasaur")).toBeNull();
+        expect(screen.getByText(/lv\. 10/i)).toBeTruthy();
+        expect(screen.getByText("Overgrow")).toBeTruthy();
+        expect(screen.getByText("@ Leftovers")).toBeTruthy();
     });
 
     it("shows Gen 1 special stat label", () => {

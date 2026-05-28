@@ -102,6 +102,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
         poke.gameOfOrigin &&
         poke.style.displayGameOriginForBoxedAndDead &&
         poke.style.displayBackgroundInsteadOfBadge;
+    const showPokemonNames = !poke.style.hidePokemonNames;
     const EMMA_MODE = feature.emmaMode;
 
     if (isMinimal && isCompactWithIcons) {
@@ -164,7 +165,8 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                         }}
                     >
                         <div>
-                            {poke.nickname} {GenderElement(poke.gender)} Levels{" "}
+                            {showPokemonNames ? `${poke.nickname} ` : null}
+                            {GenderElement(poke.gender)} Levels{" "}
                             {poke.metLevel}
                             &mdash;
                             {poke.level}
@@ -237,7 +239,8 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                     }}
                 >
                     <div>
-                        {poke.nickname} {GenderElement(poke.gender)} Levels{" "}
+                        {showPokemonNames ? `${poke.nickname} ` : null}
+                        {GenderElement(poke.gender)} Levels{" "}
                         {poke.metLevel}&mdash;
                         {poke.level}
                     </div>
@@ -316,7 +319,8 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
             )}
             <div className="dead-pokemon-info">
                 <div className="pokemon-d-nickname">
-                    {poke.nickname} {GenderElement(poke.gender)}
+                    {showPokemonNames ? `${poke.nickname} ` : null}
+                    {GenderElement(poke.gender)}
                 </div>
                 <div className="pokemon-levels">
                     Levels {poke.metLevel}&mdash;{poke.level}

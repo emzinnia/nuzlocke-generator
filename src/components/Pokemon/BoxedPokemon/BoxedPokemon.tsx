@@ -27,6 +27,7 @@ export const BoxedPokemonBase = (poke: BoxedPokemonProps) => {
         poke?.gameOfOrigin &&
         poke?.style?.displayGameOriginForBoxedAndDead &&
         poke?.style?.displayBackgroundInsteadOfBadge;
+    const showPokemonNames = !poke?.style?.hidePokemonNames;
     return (
         <div
             className={cx("boxed-pokemon-container")}
@@ -79,7 +80,8 @@ export const BoxedPokemonBase = (poke: BoxedPokemonProps) => {
                         data-testid="boxed-pokemon-name"
                         className="boxed-pokemon-name"
                     >
-                        {poke?.nickname} {GenderElement(poke?.gender)}{" "}
+                        {showPokemonNames ? `${poke?.nickname} ` : null}
+                        {GenderElement(poke?.gender)}{" "}
                         {poke?.level ? <span>lv. {poke?.level}</span> : null}
                         {poke?.style?.displayGameOriginForBoxedAndDead &&
                             !poke?.style?.displayBackgroundInsteadOfBadge &&
