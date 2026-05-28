@@ -22,15 +22,15 @@ export function TrainerInfoEditField({
     value,
     element,
 }: TrainerInfoEditFieldProps) {
-    const [innerValue, setValue] = React.useState<string | undefined>("");
+    const [innerValue, setValue] = React.useState("");
 
     const delayedValue = React.useCallback(
         debounce((e: React.ChangeEvent<HTMLInputElement>) => onEdit?.(e), 300),
-        [value],
+        [onEdit],
     );
 
     React.useEffect(() => {
-        setValue(value);
+        setValue(value ?? "");
     }, [value]);
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {

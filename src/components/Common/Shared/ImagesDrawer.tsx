@@ -9,7 +9,7 @@ import {
     Intent,
     NonIdealState,
 } from "@blueprintjs/core";
-import { css, cx } from "emotion";
+import { css, cx } from "@emotion/css";
 import * as React from "react";
 import Dexie from "dexie";
 import { useDispatch, useSelector } from "store/reactZustand";

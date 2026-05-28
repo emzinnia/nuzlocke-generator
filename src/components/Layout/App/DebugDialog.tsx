@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Button, NumericInput } from "@blueprintjs/core";
 import { noop } from "utils";
-import { css } from "emotion";
+import { css } from "@emotion/css";
 
 interface DebugDialogProps {
     onAddRandomPokemon: () => void;

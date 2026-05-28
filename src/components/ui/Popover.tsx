@@ -231,7 +231,7 @@ export const Popover: React.FC<PopoverProps> = ({
         }
     };
 
-    const triggerElement = React.cloneElement(children, {
+    const triggerElement = React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
         onClick: handleTriggerClick,
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
