@@ -14,6 +14,7 @@ import { State } from "state";
 import * as ReactDOMServer from "react-dom/server";
 
 const noop = () => {};
+const toClassSlug = (value: string) => value.replace(/\s/g, "-").toLowerCase();
 
 export interface MovesProps {
     generation: Generation;
@@ -57,7 +58,7 @@ export const Move = ({
             className={
                 stripClasses
                     ? ""
-                    : `move move-${move.replace(/\s/g, "-")?.toLowerCase()} move-${type.toLowerCase()} ${
+                    : `move move-${toClassSlug(move)} move-${toClassSlug(type)} move-type-${toClassSlug(type)} ${
                           move.length >= 10 ? "long-text-move" : ""
                       }`
             }
