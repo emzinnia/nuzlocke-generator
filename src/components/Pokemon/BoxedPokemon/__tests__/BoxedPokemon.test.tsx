@@ -18,4 +18,38 @@ describe(BoxedPokemonBase.name, () => {
             PokemonFixtures.Pikachu.nickname,
         );
     });
+
+    it("can hide game origin for boxed pokemon while the global option is enabled", () => {
+        // @ts-expect-error - Test props may not match full interface
+        const props: BoxedPokemonProps = {
+            ...PokemonFixtures.Pikachu,
+            gameOfOrigin: "Red",
+            style: {
+                ...styleDefaults,
+                displayGameOriginForBoxedAndDead: true,
+                displayGameOriginForBoxedPokemon: false,
+                displayGameOriginForDeadPokemon: true,
+            },
+        };
+
+        render(<BoxedPokemonBase {...props} />);
+
+        expect(screen.queryByText("Red")).toBeNull();
+    });
+
+    it("shows game origin for boxed pokemon by default when the global option is enabled", () => {
+        // @ts-expect-error - Test props may not match full interface
+        const props: BoxedPokemonProps = {
+            ...PokemonFixtures.Pikachu,
+            gameOfOrigin: "Red",
+            style: {
+                ...styleDefaults,
+                displayGameOriginForBoxedAndDead: true,
+            },
+        };
+
+        render(<BoxedPokemonBase {...props} />);
+
+        expect(screen.getByText("Red")).toBeTruthy();
+    });
 });

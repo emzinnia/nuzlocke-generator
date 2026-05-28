@@ -57,6 +57,8 @@ export interface Styles {
     useSpritesForChampsPokemon: boolean;
     boxedPokemonPerLine: number;
     displayGameOriginForBoxedAndDead: boolean;
+    displayGameOriginForBoxedPokemon: boolean;
+    displayGameOriginForDeadPokemon: boolean;
     displayBackgroundInsteadOfBadge: boolean;
     displayExtraData: boolean;
     useAutoHeight: boolean;
@@ -105,6 +107,8 @@ export const styleDefaults: Styles = {
     useSpritesForChampsPokemon: false,
     boxedPokemonPerLine: 6,
     displayGameOriginForBoxedAndDead: false,
+    displayGameOriginForBoxedPokemon: true,
+    displayGameOriginForDeadPokemon: true,
     displayBackgroundInsteadOfBadge: false,
     displayExtraData: true,
     useAutoHeight: true,
