@@ -27,6 +27,7 @@ export interface State {
     customTypes: { type: string; color: string; id: string }[];
     stats: Record<"id" | "value" | "key", string | undefined>[];
     nuzlockes: Nuzlockes;
+    nicknamePresets: string[];
     editorHistory: History<Omit<State, "editorHistory">>;
     view: View;
 }

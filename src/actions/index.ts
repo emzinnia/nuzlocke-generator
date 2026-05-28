@@ -35,6 +35,7 @@ export * from "./triggerDownload";
 export * from "./toggleDialog";
 export * from "./updateExcludedAreas";
 export * from "./updateCustomAreas";
+export * from "./updateNicknamePresets";
 export * from "./syncStateFromHistory";
 export * from "./editHotkey";
 export * from "./saveUploadSettings";

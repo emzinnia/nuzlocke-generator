@@ -21,6 +21,7 @@ import { excludedAreas, customAreas } from "./areas";
 import { view } from "./view";
 import { hotkeys } from "./hotkeys";
 import { saveUploadSettings } from "./saveUploadSettings";
+import { nicknamePresets } from "./nicknamePresets";
 
 export const reducers = {
     box,
@@ -34,6 +35,7 @@ export const reducers = {
     game,
     hotkeys,
     nuzlockes,
+    nicknamePresets,
     pokemon,
     editor,
     saveUploadSettings,
