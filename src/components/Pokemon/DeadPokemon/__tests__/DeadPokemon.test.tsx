@@ -1,5 +1,8 @@
 import * as React from "react";
-import { DeadPokemonBase } from "../DeadPokemon";
+import {
+    DeadPokemonBase,
+    isLikelyLegacyDeathNoteCustomImage,
+} from "../DeadPokemon";
 import { generateEmptyPokemon, styleDefaults } from "utils";
 import { render, screen } from "utils/testUtils";
 
@@ -25,6 +28,45 @@ describe("<DeadPokemon />", () => {
         );
         expect(screen.getByTestId("cause-of-death").textContent).toContain(
             poke.causeOfDeath,
+        );
+    });
+
+    it("renders legacy death notes saved in customImage", () => {
+        const legacyDeathNote = "Psychic from one of Tate & Lizas Pokemon";
+
+        render(
+            <DeadPokemonBase
+                game={{ name: "Sapphire", customName: "" }}
+                style={styleDefaults}
+                selectPokemon={vi.fn()}
+                minimal={false}
+                {...poke}
+                causeOfDeath={undefined}
+                customImage={legacyDeathNote}
+            />,
+        );
+
+        expect(screen.getByTestId("cause-of-death").textContent).toContain(
+            legacyDeathNote,
+        );
+    });
+
+    it("only treats text-like customImage values as legacy death notes", () => {
+        expect(
+            isLikelyLegacyDeathNoteCustomImage(
+                "Psychic from one of Tate & Lizas Pokemon",
+            ),
+        ).toBe(true);
+        expect(isLikelyLegacyDeathNoteCustomImage("img/custom.png")).toBe(
+            false,
+        );
+        expect(
+            isLikelyLegacyDeathNoteCustomImage(
+                "https://example.com/custom.png",
+            ),
+        ).toBe(false);
+        expect(isLikelyLegacyDeathNoteCustomImage("saved-image-name")).toBe(
+            false,
         );
     });
 });
