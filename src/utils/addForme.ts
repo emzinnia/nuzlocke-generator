@@ -79,6 +79,10 @@ export const addForme = (
                 "Origin",
                 "Sky",
 
+                "Sunny",
+                "Rainy",
+                "Snowy",
+
                 "Attack",
                 "Defense",
                 "Speed",
