@@ -45,6 +45,11 @@ describe("addForme", () => {
         const forme = addForme("alakazam", "Mega");
         expect(forme).toEqual("alakazam-mega");
     });
+    it("returns Castform weather formes", () => {
+        expect(addForme("castform", "Sunny")).toEqual("castform-sunny");
+        expect(addForme("castform", "Rainy")).toEqual("castform-rainy");
+        expect(addForme("castform", "Snowy")).toEqual("castform-snowy");
+    });
 });
 
 describe("choose", () => {
