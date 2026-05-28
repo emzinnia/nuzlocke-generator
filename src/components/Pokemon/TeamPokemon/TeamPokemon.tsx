@@ -29,6 +29,7 @@ import { PokemonPokeball } from "./PokemonPokeball";
 import { PokemonFriendship } from "./PokemonFriendship";
 import { normalizePokeballName } from "utils";
 import { PokemonExtraDataStats } from "./PokemonExtraDataStats";
+import { PokemonShinyIndicator } from "components/Pokemon/PokemonShinyIndicator";
 
 export interface TeamPokemonInfoProps {
     generation: Generation;
@@ -194,6 +195,9 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                             </span>
                             <span className="pokemon-name">
                                 {!pokemon.egg ? pokemon.species : "???"}
+                                <PokemonShinyIndicator
+                                    shiny={pokemon.shiny}
+                                />
                                 {pokemon.item && style.itemStyle === "text"
                                     ? ` @ ${pokemon.item}`
                                     : null}
@@ -385,6 +389,7 @@ export function TeamPokemonBaseMinimal(
                     <span className="pokemon-nickname">{pokemon.nickname}</span>
                     <span className="pokemon-name">
                         {!pokemon.egg ? pokemon.species : "???"}
+                        <PokemonShinyIndicator shiny={pokemon.shiny} />
                     </span>
                     {pokemon.level ? (
                         <span className="pokemon-level">

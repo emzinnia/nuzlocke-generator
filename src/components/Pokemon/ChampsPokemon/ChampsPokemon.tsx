@@ -16,6 +16,7 @@ import { Pokemon } from "models";
 import { GenderElement } from "components/Common/Shared";
 import { css, cx } from "emotion";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
+import { PokemonShinyIndicator } from "components/Pokemon/PokemonShinyIndicator";
 
 type ChampsPokemonStyleOptions = {
     height: string;
@@ -157,6 +158,9 @@ export class ChampsPokemon extends React.Component<ChampsPokemonProps> {
                         style={{ margin: "0 4px" }}
                     >
                         {this.props.showNickname && this.props.nickname}
+                        {this.props.showNickname && (
+                            <PokemonShinyIndicator shiny={this.props.shiny} />
+                        )}
                     </span>
                     {this.props.showGender && GenderElement(this.props.gender)}
                     <span
