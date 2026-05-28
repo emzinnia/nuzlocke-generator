@@ -554,6 +554,7 @@ export const EvolutionTree: EvolutionTree = {
     Glimmet: ["Glimmora"],
     Greavard: ["Houndstone"],
     Cetoddle: ["Cetitan"],
+    Poltchageist: ["Sinistcha"],
     Frigibax: ["Arctibax"],
     Arctibax: ["Baxcalibur"],
     Gimmighoul: ["Gholdengo"],
