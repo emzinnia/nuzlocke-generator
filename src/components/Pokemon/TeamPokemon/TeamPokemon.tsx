@@ -19,7 +19,7 @@ import { GenderElement, ErrorBoundary } from "components/Common/Shared";
 import { selectPokemon } from "actions";
 import { Moves } from "./Moves";
 import { State } from "state";
-import { css, cx } from "emotion";
+import { css, cx } from "@emotion/css";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon/PokemonIcon";
 import { getMetLocationString } from "./getMetLocationString";
 import { CheckpointsDisplay } from "components/Features/Result/TrainerResult";

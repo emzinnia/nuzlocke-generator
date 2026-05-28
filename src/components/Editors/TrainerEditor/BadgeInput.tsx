@@ -14,7 +14,7 @@ import {
     Classes,
 } from "@blueprintjs/core";
 import { CheckpointsEditor } from "./CheckpointsEditor";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import { State } from "state";
 import { Checkpoints } from "reducers/checkpoints";
 import * as Styles from "./style";

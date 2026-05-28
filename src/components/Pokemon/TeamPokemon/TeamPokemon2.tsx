@@ -11,7 +11,7 @@ import {
     stripURLCSS,
     typeToColor,
 } from "utils";
-import { css } from "emotion";
+import { css } from "@emotion/css";
 import Mustache from "mustache";
 import { ErrorBoundary, PokemonIconPlain } from "components";
 import { uniq } from "ramda";
