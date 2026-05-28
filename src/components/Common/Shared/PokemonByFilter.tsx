@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Tooltip, Position } from "@blueprintjs/core";
+import { Button, Tooltip, Position } from "@blueprintjs/core";
 import { Pokemon } from "models";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { sortPokes } from "utils";
@@ -31,6 +31,22 @@ const SELECTION_COLOR_LIGHT = "rgba(0, 0, 0, 0.33)";
 const SELECTION_COLOR_DARK = "rgba(255, 255, 255, 0.25)";
 
 export class PokemonByFilterBase extends React.PureComponent<PokemonByFilterProps> {
+    private levelUpPokemon = (poke: Pokemon) => (
+        event: React.MouseEvent<HTMLElement>,
+    ) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const level = Number.parseInt(String(poke.level ?? "0"), 10);
+
+        this.props.editPokemon(
+            {
+                level: (Number.isNaN(level) ? 0 : level) + 1,
+            },
+            poke.id,
+        );
+    };
+
     public render() {
         const { team, status, matchedIds, hasSearchQuery, isDarkMode, selectedId } = this.props;
 
@@ -54,33 +70,55 @@ export class PokemonByFilterBase extends React.PureComponent<PokemonByFilterProp
                     backgroundColor = searchHighlightColor;
                 }
 
+                const displayName = poke.nickname || poke.species || "Pokemon";
+
                 return (
-                    <Tooltip
+                    <span
                         key={poke.id}
-                        content={poke.nickname || poke.species}
-                        position={Position.TOP}
+                        style={{
+                            alignItems: "center",
+                            display: "inline-flex",
+                            gap: "0.125rem",
+                        }}
                     >
-                        <PokemonIcon
-                            style={
-                                backgroundColor
-                                    ? {
-                                          backgroundColor,
-                                          borderRadius: "50%",
-                                      }
-                                    : undefined
-                            }
-                            id={poke.id}
-                            status={poke.status}
-                            species={poke.species}
-                            forme={poke.forme}
-                            shiny={poke.shiny}
-                            gender={poke.gender}
-                            customIcon={poke.customIcon}
-                            hidden={poke.hidden}
-                            position={poke.position}
-                            egg={poke.egg}
-                        />
-                    </Tooltip>
+                        <Tooltip
+                            content={displayName}
+                            position={Position.TOP}
+                        >
+                            <PokemonIcon
+                                style={
+                                    backgroundColor
+                                        ? {
+                                              backgroundColor,
+                                              borderRadius: "50%",
+                                          }
+                                        : undefined
+                                }
+                                id={poke.id}
+                                status={poke.status}
+                                species={poke.species}
+                                forme={poke.forme}
+                                shiny={poke.shiny}
+                                gender={poke.gender}
+                                customIcon={poke.customIcon}
+                                hidden={poke.hidden}
+                                position={poke.position}
+                                egg={poke.egg}
+                            />
+                        </Tooltip>
+                        <Tooltip
+                            content={`Level up ${displayName}`}
+                            position={Position.TOP}
+                        >
+                            <Button
+                                aria-label={`Level up ${displayName}`}
+                                icon="plus"
+                                minimal
+                                small
+                                onClick={this.levelUpPokemon(poke)}
+                            />
+                        </Tooltip>
+                    </span>
                 );
             });
     }
