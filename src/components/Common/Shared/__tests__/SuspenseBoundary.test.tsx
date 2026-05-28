@@ -39,7 +39,7 @@ describe("SuspenseBoundary", () => {
         );
 
         // Should show skeleton while suspending
-        expect(container.querySelector(".bp5-skeleton")).not.toBeNull();
+        expect(container.querySelector(".bp6-skeleton, .bp5-skeleton")).not.toBeNull();
     });
 
     it("catches errors from children via ErrorBoundary", () => {

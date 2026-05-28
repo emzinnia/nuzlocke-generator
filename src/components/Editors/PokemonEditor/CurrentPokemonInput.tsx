@@ -18,7 +18,7 @@ import { ErrorBoundary } from "components/Common/Shared";
 import { TagInput, Classes, TextArea, HTMLSelect } from "@blueprintjs/core";
 import { State } from "state";
 import { Pokemon } from "models";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import { useDebounceCallback } from "@react-hook/debounce";
 import { useMemo } from "react";
 

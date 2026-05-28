@@ -1,5 +1,5 @@
 import * as React from "react";
-import { css, cx } from "emotion";
+import { css, cx } from "@emotion/css";
 import { Pokemon } from "models";
 import { State } from "state";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
