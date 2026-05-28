@@ -22,6 +22,19 @@ const handleTcgTransforms = (species?: string, gender?: GenderElementProps) => {
     return species;
 };
 
+const getPokemonDbSpriteUrl = ({
+    folder,
+    shiny,
+    species,
+}: {
+    folder: string;
+    shiny?: boolean;
+    species?: string;
+}) =>
+    `https://img.pokemondb.net/sprites/${folder}/${shiny ? "shiny" : "normal"}/${normalizeSpeciesName(
+        species as Species,
+    )}.png`;
+
 const getGameName = (name: Game) => {
     if (name === "Red" || name === "Blue") return "rb";
     if (
@@ -180,10 +193,20 @@ export async function getPokemonImage({
 
     if (
         style?.spritesMode &&
+        (name === "Ruby" || name === "Sapphire" || name === "Emerald")
+    ) {
+        return await wrapImageInCORS(
+            getPokemonDbSpriteUrl({
+                folder: "emerald",
+                shiny,
+                species,
+            }),
+        );
+    }
+
+    if (
+        style?.spritesMode &&
         (name === "Black" ||
-            name === "Emerald" ||
-            name === "Ruby" ||
-            name === "Sapphire" ||
             name === "White" ||
             name === "Black 2" ||
             name === "White 2" ||
@@ -242,19 +265,13 @@ export async function getPokemonImage({
     if (style?.spritesMode && (name === "LeafGreen" || name === "FireRed")) {
         const frlgSpriteFolder =
             (regularNumber ?? 0) > 151 ? "emerald" : "firered-leafgreen";
-        if (!shiny) {
-            const url = `https://img.pokemondb.net/sprites/${frlgSpriteFolder}/normal/${normalizeSpeciesName(
-                species as Species,
-            )}.png`;
-
-            return await wrapImageInCORS(url);
-        } else {
-            const url = `https://img.pokemondb.net/sprites/${frlgSpriteFolder}/shiny/${normalizeSpeciesName(
-                species as Species,
-            )}.png`;
-
-            return await wrapImageInCORS(url);
-        }
+        return await wrapImageInCORS(
+            getPokemonDbSpriteUrl({
+                folder: frlgSpriteFolder,
+                shiny,
+                species,
+            }),
+        );
     }
 
     if (style?.spritesMode && (name === "Sword" || name === "Shield")) {

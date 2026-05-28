@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => {
                 Ditto: 132,
                 Pikachu: 25,
                 Chikorita: 152,
+                Treecko: 252,
                 Torchic: 255,
                 Unfezant: 521,
                 Gyarados: 130,
@@ -214,6 +215,28 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             );
             expect(shiny).toBe(
                 "cors(https://serebii.net/Shiny/SV/new/025.png)",
+            );
+        });
+
+        it("uses PokemonDB Emerald sprite assets for Ruby/Sapphire/Emerald sprite mode", async () => {
+            const normal = await getPokemonImage({
+                species: "Treecko",
+                name: imageGame("Ruby"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: false,
+            });
+            const shiny = await getPokemonImage({
+                species: "Treecko",
+                name: imageGame("Emerald"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: true,
+            });
+
+            expect(normal).toBe(
+                "cors(https://img.pokemondb.net/sprites/emerald/normal/treecko.png)",
+            );
+            expect(shiny).toBe(
+                "cors(https://img.pokemondb.net/sprites/emerald/shiny/treecko.png)",
             );
         });
 
