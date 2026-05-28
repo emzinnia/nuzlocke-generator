@@ -124,6 +124,35 @@ describe("<ResultBase />", () => {
         expect(screen.getByText(/Dead/)).toBeTruthy();
         expect(screen.getByText(/Champs/)).toBeTruthy();
     });
+
+    it("applies the configured custom font family", () => {
+        const { container } = render(
+            <ResultBase
+                pokemon={createPokemon()}
+                game={{ name: "Red", customName: "" }}
+                trainer={{ notes: "", badges: [] }}
+                box={boxes}
+                editor={baseEditor}
+                selectPokemon={vi.fn() as unknown as ResultBaseProps["selectPokemon"]}
+                toggleMobileResultView={
+                    vi.fn() as unknown as ResultBaseProps["toggleMobileResultView"]
+                }
+                toggleDialog={vi.fn() as unknown as ResultBaseProps["toggleDialog"]}
+                style={{
+                    ...styleDefaults,
+                    font: "Papyrus",
+                    trainerSectionOrientation: "horizontal",
+                }}
+                rules={[]}
+                customTypes={[]}
+            />,
+        );
+
+        expect(
+            (container.querySelector(".result") as HTMLElement).style
+                .fontFamily,
+        ).toBe("Papyrus");
+    });
 });
 
 describe("<BackspriteMontage />", () => {
