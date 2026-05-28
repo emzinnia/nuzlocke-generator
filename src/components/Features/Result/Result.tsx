@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { connect } from "store/reactZustand";
 import { v4 as uuid } from "uuid";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 
 import { selectPokemon, toggleMobileResultView, toggleDialog } from "actions";
 import {
@@ -88,7 +88,7 @@ const TopBarItems = ({ editorDarkMode, setZoomLevel, currentZoomLevel }) => {
     // @TODO: make this look decent
     return (
         <Select<ZoomValue>
-            className={cx({ "bp5-dark": editorDarkMode })}
+            className={cx({ [Classes.DARK]: editorDarkMode })}
             filterable={false}
             items={ZoomValues}
             itemRenderer={(item, { handleClick }) => (
@@ -156,7 +156,7 @@ export function BackspriteMontage({ pokemon }: { pokemon: Pokemon[] }) {
 }
 
 export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
-    public resultRef: React.RefObject<HTMLDivElement>;
+    public resultRef: React.RefObject<HTMLDivElement | null>;
     public constructor(props: ResultProps) {
         super(props);
         this.resultRef = React.createRef();
@@ -517,8 +517,10 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                             margin: this.state.isDownloading
                                 ? "0"
                                 : "3rem auto",
-                            backgroundColor: bgColor,
-                            backgroundImage: `url(${style.backgroundImage})`,
+                            background: bgColor,
+                            backgroundImage: style.backgroundImage
+                                ? `url(${style.backgroundImage})`
+                                : undefined,
                             backgroundRepeat: style.tileBackground
                                 ? "repeat"
                                 : "no-repeat",

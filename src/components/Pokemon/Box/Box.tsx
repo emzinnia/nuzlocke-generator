@@ -238,7 +238,9 @@ export const Box: React.FC<BoxProps> = (props) => {
 
     return (
         <div
-            ref={dropRef}
+            ref={(node) => {
+                dropRef(node);
+            }}
             style={{
                 backgroundImage: getBoxBackground(),
                 opacity: isDragging ? 0.5 : 1,
@@ -350,7 +352,9 @@ export const Box: React.FC<BoxProps> = (props) => {
                     }}
                 >
                     <span
-                        ref={dragRef}
+                        ref={(node) => {
+                            dragRef(node);
+                        }}
                         style={{
                             cursor: isDragging ? "grabbing" : "grab",
                             display: "inline-flex",

@@ -61,8 +61,8 @@ export const createReduxCompatibleZustandStore = ({
     );
     dispatchRef.current = chain.reduceRight(
         (next, middleware) => middleware(next),
-        baseDispatch,
-    );
+        baseDispatch as (action: unknown) => unknown,
+    ) as Dispatch<AnyAction>;
 
     return store as unknown as ReduxCompatibleZustandStore;
 };

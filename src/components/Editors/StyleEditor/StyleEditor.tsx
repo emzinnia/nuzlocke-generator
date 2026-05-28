@@ -27,7 +27,7 @@ import {
 import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { ColorEdit, rgbaOrHex } from "components/Common/Shared";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import * as Styles from "./styles";
 import { ThemeEditor } from "components/Editors/ThemeEditor/ThemeEditor";
 import { customCSSGuide as text } from "utils/customCSSGuide";
