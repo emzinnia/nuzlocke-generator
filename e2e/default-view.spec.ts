@@ -6,8 +6,7 @@ test('captures screenshot of default page view', async ({ page }) => {
 
     await page.goto('/');
 
-    // Wait for the page to be fully loaded (may redirect)
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByTestId('app')).toBeVisible({ timeout: 20_000 });
 
     // Take a screenshot of the default view
     await page.screenshot({
@@ -18,4 +17,3 @@ test('captures screenshot of default page view', async ({ page }) => {
     // Verify the page loaded successfully (app redirects to beta-login)
     await expect(page).toHaveURL(/localhost:8080/);
 });
-

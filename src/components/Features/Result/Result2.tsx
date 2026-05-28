@@ -1,6 +1,6 @@
 import * as React from "react";
 import { TeamPokemon } from "components/Pokemon/TeamPokemon/TeamPokemon2";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import { Box, Pokemon } from "models";
 import { useSelector } from "store/reactZustand";
 import { State } from "state";
@@ -24,19 +24,7 @@ import { getContrastColor } from "utils";
 import { useEvent } from "utils/hooks";
 import { TrainerNotes } from "./TrainerNotes";
 
-import { v4 as uuid } from "uuid";
-
-async function load() {
-    const resource = await import("@emmaramirez/dom-to-image");
-    return resource.domToImage as DomToImage;
-}
-
-type DomToImage = {
-    toPng: (
-        node: HTMLElement,
-        options?: { corsImage?: boolean },
-    ) => Promise<string>;
-};
+import { downloadResultAsPng } from "./downloadImage";
 
 const getAllByStatus = (
     boxes?: Box[],
@@ -78,6 +66,7 @@ const toImage =
     (
         ref: React.ForwardedRef<HTMLElement>,
         setDS: React.Dispatch<React.SetStateAction<DownloadStatus>>,
+        customCSS: string,
     ) =>
     async () => {
         const resultNode =
@@ -88,14 +77,10 @@ const toImage =
         }
         try {
             setDS(DownloadStatus.active);
-            const domToImage = await load();
-            const dataUrl = await domToImage.toPng(resultNode, {
-                corsImage: true,
+            await downloadResultAsPng({
+                node: resultNode,
+                customCSS,
             });
-            const link = document.createElement("a");
-            link.download = `nuzlocke-${uuid()}.png`;
-            link.href = dataUrl;
-            link.click();
             setDS(DownloadStatus.done);
         } catch (e) {
             setDS(DownloadStatus.error);
@@ -107,12 +92,15 @@ export const TopBarWithDownload = React.forwardRef<HTMLElement>((props, ref) => 
     const [downloadStatus, setDownloadStatus] = React.useState(
         DownloadStatus.dormant,
     );
+    const customCSS = useSelector<State, State["style"]["customCSS"]>(
+        (state) => state.style.customCSS,
+    );
 
     return (
         <ErrorBoundary>
             <TopBar
                 isDownloading={downloadStatus === DownloadStatus.active}
-                onClickDownload={toImage(ref, setDownloadStatus)}
+                onClickDownload={toImage(ref, setDownloadStatus, customCSS)}
             ></TopBar>
         </ErrorBoundary>
     );
@@ -320,7 +308,7 @@ export const ResultInner = React.forwardRef(
 ResultInner.displayName = "ResultInner";
 
 export class Result extends React.Component {
-    public ref: React.RefObject<HTMLDivElement>;
+    public ref: React.RefObject<HTMLDivElement | null>;
     public constructor(props) {
         super(props);
         this.ref = React.createRef();

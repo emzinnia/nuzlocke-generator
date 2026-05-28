@@ -15,7 +15,6 @@ import {
 } from "react-dnd";
 import { useDrag, useDrop } from "react-dnd";
 import { State } from "state";
-import { Omit } from "ramda";
 import { normalizeSpeciesName } from "utils/getters/normalizeSpeciesName";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { ResizedImage } from "components/Common/Shared/ResizedImage";
@@ -50,7 +49,7 @@ export interface PokemonIconProps {
     isDragging?: boolean;
 }
 
-type BasePokemonIconProps = Omit<PokemonIconProps, "onClick" | "selectedId">;
+type BasePokemonIconProps = globalThis.Omit<PokemonIconProps, "onClick" | "selectedId">;
 
 type IconURLArgs = Pick<
     Pokemon,
@@ -240,7 +239,11 @@ export const PokemonIcon = (props: BasePokemonIconProps) => {
     };
 
     return (
-        <div ref={(node) => dragRef(dropRef(node))}>
+        <div
+            ref={(node) => {
+                dragRef(dropRef(node));
+            }}
+        >
             <PokemonIconPlain
                 onClick={onClick}
                 imageStyle={imageStyle}

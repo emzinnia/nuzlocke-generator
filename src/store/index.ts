@@ -25,7 +25,7 @@ export const history = createBrowserHistory();
 export const createDefaultState = (): State =>
     appReducers(
         undefined,
-        { type: "@@zustand/INIT" } as AnyAction,
+        { type: "@@zustand/INIT" } as never,
     ) as unknown as State;
 
 export const createMiddlewares = (enableLogger: boolean): Middleware[] => {

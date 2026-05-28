@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Classes, HTMLSelect } from "@blueprintjs/core";
 import * as css from "./styles";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import { head, last } from "ramda";
 
 export interface CSSUnitInputProps {

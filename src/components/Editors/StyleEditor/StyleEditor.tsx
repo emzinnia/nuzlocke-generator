@@ -27,7 +27,7 @@ import {
 import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { ColorEdit, rgbaOrHex } from "components/Common/Shared";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import * as Styles from "./styles";
 import { ThemeEditor } from "components/Editors/ThemeEditor/ThemeEditor";
 import { customCSSGuide as text } from "utils/customCSSGuide";
@@ -132,14 +132,16 @@ export const TextAreaDebounced = ({
     const [value, setValue] = React.useState("");
 
     const delayedValue = React.useCallback(
-        debounce((e: StyleChangeEvent) => edit(e, props, name), 300),
-        [props.style[name]],
+        debounce((nextValue: string) => {
+            edit({ target: { name, value: nextValue } }, props, name);
+        }, 300),
+        [edit, name, props],
     );
 
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        e.persist();
-        setValue(e.target.value);
-        delayedValue(e);
+        const nextValue = e.currentTarget.value;
+        setValue(nextValue);
+        delayedValue(nextValue);
     };
 
     React.useEffect(() => {
