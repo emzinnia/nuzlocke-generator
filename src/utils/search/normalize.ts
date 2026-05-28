@@ -37,6 +37,7 @@ export function normalizePokemon(pokemon: Pokemon): NormalizedPokemon {
         item: normalizeString(pokemon.item),
         ability: normalizeString(pokemon.ability),
         nature: normalizeString(pokemon.nature),
+        characteristic: normalizeString(pokemon.characteristic),
         level: pokemon.level ?? 0,
         metLevel: pokemon.metLevel ?? 0,
         status: normalizeString(pokemon.status),
@@ -98,5 +99,4 @@ export function clearNormalizationCache(): void {
     // WeakMap doesn't have a clear method, so we just create a new one
     // This function exists for API consistency but the WeakMap handles cleanup automatically
 }
-
 

@@ -574,6 +574,7 @@ export class DataEditorBase extends React.Component<
         const hasNoItem = !pokemon.item;
         const hasNoMoves = !pokemon.moves || pokemon.moves.length === 0;
         const hasNoAbility = !pokemon.ability;
+        const hasNoCharacteristic = !pokemon.characteristic;
         const hasNoCustomizations =
             !pokemon.customImage && !pokemon.customIcon && !pokemon.notes;
 
@@ -583,6 +584,7 @@ export class DataEditorBase extends React.Component<
             hasNoItem &&
             hasNoMoves &&
             hasNoAbility &&
+            hasNoCharacteristic &&
             hasNoCustomizations
         );
     };
