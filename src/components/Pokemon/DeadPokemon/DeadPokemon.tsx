@@ -58,6 +58,21 @@ export type DeadPokemonProps = {
     minimal: boolean;
 } & Pokemon;
 
+const likelyImageReferencePattern =
+    /^(https?:|data:|blob:|\/|\.\/|\.\.\/)|\.(avif|bmp|gif|jpe?g|png|svg|webp)$/i;
+
+export const isLikelyLegacyDeathNoteCustomImage = (
+    customImage?: string,
+): boolean => {
+    const value = customImage?.trim();
+
+    if (!value || likelyImageReferencePattern.test(value)) {
+        return false;
+    }
+
+    return value.split(/\s+/).length >= 4 || /[,.!?&'"]/.test(value);
+};
+
 // TODO: Convert to Class
 export const DeadPokemonBase = (poke: DeadPokemonProps) => {
     const style = poke.style;
@@ -103,6 +118,15 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
         poke.style.displayGameOriginForBoxedAndDead &&
         poke.style.displayBackgroundInsteadOfBadge;
     const EMMA_MODE = feature.emmaMode;
+    const customImageHasLegacyDeathNote =
+        !poke.causeOfDeath &&
+        isLikelyLegacyDeathNoteCustomImage(poke.customImage);
+    const causeOfDeath = customImageHasLegacyDeathNote
+        ? poke.customImage
+        : poke.causeOfDeath;
+    const customImage = customImageHasLegacyDeathNote
+        ? undefined
+        : poke.customImage;
 
     if (isMinimal && isCompactWithIcons) {
         return (
@@ -169,9 +193,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                             &mdash;
                             {poke.level}
                         </div>
-                        <div data-testid="cause-of-death">
-                            {poke.causeOfDeath}
-                        </div>
+                        <div data-testid="cause-of-death">{causeOfDeath}</div>
                         {style.displayGameOriginForBoxedAndDead &&
                             !poke.style.displayBackgroundInsteadOfBadge &&
                             poke.gameOfOrigin && (
@@ -241,7 +263,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                         {poke.metLevel}&mdash;
                         {poke.level}
                     </div>
-                    <div data-testid="cause-of-death">{poke.causeOfDeath}</div>
+                    <div data-testid="cause-of-death">{causeOfDeath}</div>
                     {style.displayGameOriginForBoxedAndDead &&
                         !poke.style.displayBackgroundInsteadOfBadge &&
                         poke.gameOfOrigin && (
@@ -286,7 +308,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
         >
             {style.template !== "Generations" ? (
                 <PokemonImage
-                    customImage={poke.customImage}
+                    customImage={customImage}
                     forme={poke.forme}
                     shiny={poke.shiny}
                     species={poke.species}
@@ -326,7 +348,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                     data-testid="cause-of-death"
                     className="pokemon-causeofdeath"
                 >
-                    {poke.causeOfDeath}
+                    {causeOfDeath}
                 </div>
                 {style.displayGameOriginForBoxedAndDead &&
                     !poke.style.displayBackgroundInsteadOfBadge &&

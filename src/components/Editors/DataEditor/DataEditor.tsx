@@ -19,7 +19,6 @@ import { newNuzlocke, replaceState } from "actions";
 import { Badge, Game, Pokemon, Trainer } from "models";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { State } from "state";
-import { noop } from "redux-saga/utils";
 import {
     gameOfOriginToColor,
     GameSaveFormat,
@@ -40,9 +39,11 @@ import { Generation, getGameGeneration } from "utils/getters/getGameGeneration";
 // import codegen from 'codegen.macro';
 import { BoxMappings } from "parsers/utils/boxMappings";
 import SaveFileWorker from "parsers/worker?worker";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import { StatusDropZone } from "./StatusDropZone";
 import { serializeNuzlockeJson } from "utils/nuzlockeJson";
+
+const noop = () => {};
 
 export interface DataEditorProps {
     state: State;
@@ -251,8 +252,8 @@ export class DataEditorBase extends React.Component<
     DataEditorProps,
     DataEditorState
 > {
-    public textarea: HTMLTextAreaElement | null;
-    public nuzlockeJsonFileInput: HTMLInputElement | null;
+    public textarea: HTMLTextAreaElement | null = null;
+    public nuzlockeJsonFileInput: HTMLInputElement | null = null;
     public advancedImportRef = React.createRef<import("./AdvancedImportOptions").AdvancedImportOptionsHandle>();
 
     public constructor(props: DataEditorProps) {
@@ -771,9 +772,9 @@ export class DataEditorBase extends React.Component<
                                     <input
                                         style={{ padding: ".25rem" }}
                                         className={Classes.FILE_INPUT}
-                                        ref={(ref) =>
-                                            (this.nuzlockeJsonFileInput = ref)
-                                        }
+                                        ref={(ref) => {
+                                            this.nuzlockeJsonFileInput = ref;
+                                        }}
                                         onChange={this.uploadNuzlockeJsonFile}
                                         type="file"
                                         id="jsonFile"

@@ -1,8 +1,8 @@
 import * as React from "react";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import "./Autocomplete.css";
 import { useDebounceCallback } from "@react-hook/debounce";
-import { css } from "emotion";
+import { css } from "@emotion/css";
 
 export interface AutocompleteProps {
     items: string[];

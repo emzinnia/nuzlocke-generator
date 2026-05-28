@@ -5,7 +5,7 @@ import { Skeleton } from "../Skeletons";
 describe("Skeleton", () => {
     it("renders a skeleton element", () => {
         const { container } = render(Skeleton);
-        const skeletonElement = container.querySelector(".bp5-skeleton");
+        const skeletonElement = container.querySelector(".bp6-skeleton, .bp5-skeleton");
         expect(skeletonElement).toBeDefined();
         expect(skeletonElement).not.toBeNull();
     });
@@ -13,7 +13,7 @@ describe("Skeleton", () => {
     it("has the skeleton class from blueprintjs", () => {
         const { container } = render(Skeleton);
         const skeletonElement = container.firstChild as HTMLElement;
-        expect(skeletonElement.className).toContain("bp5-skeleton");
+        expect(skeletonElement.className).toContain("bp6-skeleton");
     });
 
     it("has correct dimensions", () => {

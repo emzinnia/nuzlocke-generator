@@ -1,4 +1,4 @@
-.bp5-light .release-notes {
+:is(.bp5-light, .bp6-light) .release-notes {
     background: #fafafa;
 }
 .release-notes-wrapper .release-notes {
@@ -59,10 +59,14 @@
     margin-left: 2.5rem;
 }
 
-.bp5-dark .release-dialog h1,
-.bp5-dark .release-dialog h2,
-.bp5-dark .release-dialog h3,
-.bp5-dark .release-dialog h4 {
+:is(.bp5-dark, .bp6-dark) .release-dialog h1,
+:is(.bp5-dark, .bp6-dark) .release-dialog h2,
+:is(.bp5-dark, .bp6-dark) .release-dialog h3,
+:is(.bp5-dark, .bp6-dark) .release-dialog h4,
+.release-dialog:is(.bp5-dark, .bp6-dark) h1,
+.release-dialog:is(.bp5-dark, .bp6-dark) h2,
+.release-dialog:is(.bp5-dark, .bp6-dark) h3,
+.release-dialog:is(.bp5-dark, .bp6-dark) h4 {
     color: #fff !important;
 }
 .release-dialog {
@@ -81,14 +85,14 @@
 .no-list-item-types {
     list-style-type: none;
 }
-.bp5-tag-input {
+:is(.bp5-tag-input, .bp6-tag-input) {
     align-items: center !important;
 }
-.bp5-tag-input-icon {
+:is(.bp5-tag-input-icon, .bp6-tag-input-icon) {
     margin: 0 !important;
     margin-right: 0.25rem !important;
 }
-.bp5-switch {
+:is(.bp5-switch, .bp6-switch) {
     margin-bottom: 0 !important;
 }
 
@@ -102,21 +106,22 @@ html.dark {
     --app-bp-input-border-focus: #58a6ff;
 }
 
-.bp5-input:not(.bp5-input-ghost),
-.bp5-tag-input,
-.bp5-html-select select {
+:is(.bp5-input, .bp6-input):not(:is(.bp5-input-ghost, .bp6-input-ghost)),
+:is(.bp5-tag-input, .bp6-tag-input),
+:is(.bp5-html-select, .bp6-html-select) select {
     border: 1px solid var(--app-bp-input-border) !important;
     box-shadow: none !important;
 }
 
-.bp5-input:not(.bp5-input-ghost):focus,
-.bp5-input:not(.bp5-input-ghost).bp5-active,
-.bp5-tag-input:focus-within,
-.bp5-html-select select:focus {
+:is(.bp5-input, .bp6-input):not(:is(.bp5-input-ghost, .bp6-input-ghost)):focus,
+:is(.bp5-input, .bp6-input):not(:is(.bp5-input-ghost, .bp6-input-ghost)).bp5-active,
+:is(.bp5-input, .bp6-input):not(:is(.bp5-input-ghost, .bp6-input-ghost)).bp6-active,
+:is(.bp5-tag-input, .bp6-tag-input):focus-within,
+:is(.bp5-html-select, .bp6-html-select) select:focus {
     border-color: var(--app-bp-input-border-focus) !important;
     box-shadow: none !important;
 }
 
-.bp5-tab-panel {
+:is(.bp5-tab-panel, .bp6-tab-panel) {
     margin-top: 0;
 }

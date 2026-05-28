@@ -6,7 +6,7 @@ import { getPokemonImage, wrapImageInCORSPlain } from "utils";
 import { getImageByName } from "components/Common/Shared/ImagesDrawer";
 
 export interface PokemonImageProps {
-    children?: (image: string) => JSX.Element;
+    children?: (image: string) => React.JSX.Element;
     customImage?: Pokemon["customImage"];
     forme?: Pokemon["forme"];
     shiny?: Pokemon["shiny"];
