@@ -43,6 +43,7 @@ import SaveFileWorker from "parsers/worker?worker";
 import { cx } from "emotion";
 import { StatusDropZone } from "./StatusDropZone";
 import { serializeNuzlockeJson } from "utils/nuzlockeJson";
+import { normalizeImportedJsonData } from "utils/pkhexJsonImport";
 
 export interface DataEditorProps {
     state: State;
@@ -301,7 +302,24 @@ export class DataEditorBase extends React.Component<
             customMoveMap: [],
         };
         const override = this.state.overrideImport;
-        const data = handleExceptions(JSON.parse(this.state.data));
+        const data = normalizeImportedJsonData(
+            handleExceptions(JSON.parse(this.state.data)),
+        );
+        if (Array.isArray(data)) {
+            showToast({
+                message: "Unsupported JSON import format",
+                intent: Intent.DANGER,
+            });
+            return;
+        }
+        if (!data || typeof data !== "object") {
+            showToast({
+                message: "Unsupported JSON import format",
+                intent: Intent.DANGER,
+            });
+            return;
+        }
+        const importData = data as Partial<State>;
         const nuz = this.props.state;
         // @NOTE this prevents previously undefined states from blowing up the app
         const safeguards = {
@@ -311,17 +329,18 @@ export class DataEditorBase extends React.Component<
             excludedAreas: [],
             customAreas: [],
         };
-        if (!Array.isArray(data.customMoveMap)) {
+        if (!Array.isArray(importData.customMoveMap)) {
             noop();
         } else {
-            cmm = { customMoveMap: data.customMoveMap };
+            cmm = { customMoveMap: importData.customMoveMap };
         }
-        this.props.replaceState({
+        const nextData = {
             ...safeguards,
-            ...(override ? data : nuz),
+            ...(override ? importData : nuz),
             ...cmm,
-        });
-        this.props.newNuzlocke(this.state.data, { isCopy: false });
+        };
+        this.props.replaceState(nextData);
+        this.props.newNuzlocke(JSON.stringify(nextData), { isCopy: false });
         this.writeAllData();
         this.setState({ isOpen: false });
     };
@@ -346,7 +365,9 @@ export class DataEditorBase extends React.Component<
     private renderTeam(data: string) {
         let d: { pokemon?: Pokemon[] };
         try {
-            d = handleExceptions(JSON.parse(data)) as { pokemon?: Pokemon[] };
+            d = normalizeImportedJsonData(
+                handleExceptions(JSON.parse(data)),
+            ) as { pokemon?: Pokemon[] };
         } catch {
             d = {};
         }
