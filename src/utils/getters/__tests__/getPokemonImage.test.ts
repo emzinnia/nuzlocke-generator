@@ -9,6 +9,9 @@ const mocks = vi.hoisted(() => {
             const map: Record<string, number> = {
                 Ditto: 132,
                 Pikachu: 25,
+                Chikorita: 152,
+                Treecko: 252,
+                Torchic: 255,
                 Unfezant: 521,
                 Gyarados: 130,
                 Dugtrio: 51,
@@ -215,6 +218,28 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             );
         });
 
+        it("uses PokemonDB Emerald sprite assets for Ruby/Sapphire/Emerald sprite mode", async () => {
+            const normal = await getPokemonImage({
+                species: "Treecko",
+                name: imageGame("Ruby"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: false,
+            });
+            const shiny = await getPokemonImage({
+                species: "Treecko",
+                name: imageGame("Emerald"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: true,
+            });
+
+            expect(normal).toBe(
+                "cors(https://img.pokemondb.net/sprites/emerald/normal/treecko.png)",
+            );
+            expect(shiny).toBe(
+                "cors(https://img.pokemondb.net/sprites/emerald/shiny/treecko.png)",
+            );
+        });
+
         it("builds DP/HGSS sprite URLs and wraps them", async () => {
             const nonShiny = await getPokemonImage({
                 species: "Pikachu",
@@ -255,6 +280,28 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             );
             expect(shiny).toBe(
                 "cors(https://img.pokemondb.net/sprites/firered-leafgreen/shiny/pikachu.png)",
+            );
+        });
+
+        it("uses Emerald sprite assets for Gen 2 and Gen 3 Pokemon in FRLG sprite mode", async () => {
+            const gen2 = await getPokemonImage({
+                species: "Chikorita",
+                name: imageGame("FireRed"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: false,
+            });
+            const gen3 = await getPokemonImage({
+                species: "Torchic",
+                name: imageGame("LeafGreen"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: true,
+            });
+
+            expect(gen2).toBe(
+                "cors(https://img.pokemondb.net/sprites/emerald/normal/chikorita.png)",
+            );
+            expect(gen3).toBe(
+                "cors(https://img.pokemondb.net/sprites/emerald/shiny/torchic.png)",
             );
         });
 
@@ -408,4 +455,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-
