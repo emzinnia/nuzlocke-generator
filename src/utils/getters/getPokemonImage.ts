@@ -22,6 +22,45 @@ const handleTcgTransforms = (species?: string, gender?: GenderElementProps) => {
     return species;
 };
 
+const tcgFormeAssetOverrides: Record<string, Record<string, string>> = {
+    burmy: {
+        Plant: "burmy-grass",
+        Sandy: "burmy-sand",
+        Trash: "burmy-trash",
+    },
+    wormadam: {
+        Plant: "wormadam-plant",
+        Sandy: "wormadam-sandy",
+        Trash: "wormadam-trash",
+    },
+    hoopa: {
+        Unbound: "hoopa-unbound",
+    },
+};
+
+const getTcgAssetName = ({
+    forme,
+    gender,
+    species,
+}: Pick<GetPokemonImage, "forme" | "gender" | "species">) => {
+    const normalizedSpecies = (species || "").replace(/\s/g, "").replace(/'/g, "");
+    const override =
+        tcgFormeAssetOverrides[normalizedSpecies.toLowerCase()]?.[
+            forme as string
+        ];
+
+    return (
+        handleTcgTransforms(
+            override ||
+                addForme(
+                    normalizedSpecies,
+                    forme as keyof typeof Forme,
+                ),
+            gender,
+        ) || "missingno"
+    ).toLowerCase();
+};
+
 const getGameName = (name: Game) => {
     if (name === "Red" || name === "Blue") return "rb";
     if (
@@ -307,15 +346,11 @@ export async function getPokemonImage({
     }
 
     if (style?.teamImages === "tcg") {
-        return `url(img/tcg/${(
-            handleTcgTransforms(
-                addForme(
-                    (species || "").replace(/\s/g, "").replace(/'/g, ""),
-                    forme as keyof typeof Forme,
-                ),
-                gender,
-            ) || "missingno"
-        ).toLowerCase()}.jpg)`;
+        return `url(img/tcg/${getTcgAssetName({
+            forme,
+            gender,
+            species,
+        })}.jpg)`;
     }
     // TEMPORARY STOPGAPS & Edge Cases & Special favors
     if (species === "Dugtrio" && forme === "Alolan" && shiny) {

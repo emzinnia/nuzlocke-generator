@@ -11,7 +11,7 @@ import {
     toggleMobileResultView,
 } from "actions";
 import { version } from "package";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import { Pokemon, Editor } from "models";
 import { ErrorBoundary, HotkeyIndicator, ReleaseDialog } from "components/Common/Shared";
 import { State } from "state";

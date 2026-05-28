@@ -1,6 +1,6 @@
 import * as React from "react";
 import { TeamPokemon } from "components/Pokemon/TeamPokemon/TeamPokemon2";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import { Box, Pokemon } from "models";
 import { useSelector } from "store/reactZustand";
 import { State } from "state";
@@ -320,7 +320,7 @@ export const ResultInner = React.forwardRef(
 ResultInner.displayName = "ResultInner";
 
 export class Result extends React.Component {
-    public ref: React.RefObject<HTMLDivElement>;
+    public ref: React.RefObject<HTMLDivElement | null>;
     public constructor(props) {
         super(props);
         this.ref = React.createRef();

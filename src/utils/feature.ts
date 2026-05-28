@@ -32,5 +32,3 @@ const featuresToBooleans = (f: typeof featuresFromEnv): FeatureObject => {
 };
 
 export const feature = Object.freeze(featuresToBooleans(featuresFromEnv));
-
-console.log(feature);

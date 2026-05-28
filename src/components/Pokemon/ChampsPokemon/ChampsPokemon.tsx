@@ -14,7 +14,7 @@ import {
 } from "utils";
 import { Pokemon } from "models";
 import { GenderElement } from "components/Common/Shared";
-import { css, cx } from "emotion";
+import { css, cx } from "@emotion/css";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 
 type ChampsPokemonStyleOptions = {
