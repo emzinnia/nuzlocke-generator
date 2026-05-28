@@ -2,7 +2,6 @@ import * as React from "react";
 import {
     OrientationType,
     mapTrainerImage,
-    Game,
     Styles,
     getContrastColor,
     getBadges,
@@ -21,7 +20,7 @@ export interface TrainerResultProps {
 
     checkpoints: Checkpoints;
     trainer: Trainer;
-    game: { name: Game; customName: string };
+    game: State["game"];
     style: Styles;
     rules: string[];
 }
@@ -169,6 +168,9 @@ export class TrainerResultBase extends React.Component<TrainerResultProps> {
         const tciProps = { trainer, orientation };
         const enableStats = style.displayStats;
         const emmaMode = feature.emmaMode;
+        const defaultTitle = `${this.props.game.name}${
+            this.props.game.randomized ? " Randomized" : ""
+        } Nuzlocke`;
 
         return (
             <div
@@ -201,6 +203,18 @@ export class TrainerResultBase extends React.Component<TrainerResultProps> {
                 >
                     {game.customName || game.name}
                 </div>
+                {game.randomized ? (
+                    <div
+                        className="game-randomized-tag"
+                        style={{
+                            ...baseDivStyle,
+                            fontWeight: "bold",
+                            textTransform: "uppercase",
+                        }}
+                    >
+                        Randomized
+                    </div>
+                ) : null}
                 {trainer.image ? (
                     <img
                         className="trainer-image"
@@ -214,7 +228,7 @@ export class TrainerResultBase extends React.Component<TrainerResultProps> {
                     </div>
                 ) : (
                     <div style={baseDivStyle} className="nuzlocke-title">
-                        {this.props.game.name} Nuzlocke
+                        {defaultTitle}
                     </div>
                 )}
                 {feature.resultv2 ? (

@@ -5,6 +5,7 @@ export function game(
     state: Game = {
         name: "None",
         customName: "",
+        randomized: false,
     },
     action: Action<EDIT_GAME | REPLACE_STATE | SYNC_STATE_FROM_HISTORY>,
 ) {
