@@ -15,7 +15,7 @@ import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { ErrorBoundary, HotkeyIndicator } from "components/Common/Shared";
 import { v4 as uuid } from "uuid";
 import { persistor } from "store";
-import { newNuzlocke, replaceState } from "actions";
+import { newNuzlocke, replaceState, updateNuzlocke } from "actions";
 import { Badge, Game, Pokemon, Trainer } from "models";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { State } from "state";
@@ -48,6 +48,7 @@ export interface DataEditorProps {
     state: State;
     replaceState: replaceState;
     newNuzlocke: newNuzlocke;
+    updateNuzlocke: updateNuzlocke;
 }
 
 export interface DataEditorState {
@@ -296,6 +297,13 @@ export class DataEditorBase extends React.Component<
         });
     };
 
+    private syncCurrentNuzlocke = (state: State = this.props.state) => {
+        const currentId = this.props.state.nuzlockes.currentId;
+        if (!currentId) return;
+
+        this.props.updateNuzlocke(currentId, serializeNuzlockeJson(state));
+    };
+
     private confirmImport = () => {
         let cmm: { customMoveMap: State["customMoveMap"] } = {
             customMoveMap: [],
@@ -316,13 +324,14 @@ export class DataEditorBase extends React.Component<
         } else {
             cmm = { customMoveMap: data.customMoveMap };
         }
-        this.props.replaceState({
+        const newState = {
             ...safeguards,
             ...(override ? data : nuz),
             ...cmm,
-        });
+        };
+        this.props.replaceState(newState);
         this.props.newNuzlocke(this.state.data, { isCopy: false });
-        this.writeAllData();
+        this.writeAllData(newState as State);
         this.setState({ isOpen: false });
     };
 
@@ -419,7 +428,7 @@ export class DataEditorBase extends React.Component<
         const t0 = performance.now();
         const worker = new SaveFileWorker();
         const reader = new FileReader();
-        const { replaceState, state } = this.props;
+        const { replaceState, state, updateNuzlocke } = this.props;
         const { selectedGame, boxMappings, mergeDataMode } = settings;
 
         console.log(file, reader, settings, worker);
@@ -490,6 +499,12 @@ export class DataEditorBase extends React.Component<
 
                 const newState = { ...state, ...data, style: nextStyle };
                 replaceState(newState);
+                if (state.nuzlockes.currentId) {
+                    updateNuzlocke(
+                        state.nuzlockes.currentId,
+                        serializeNuzlockeJson(newState),
+                    );
+                }
                 if (result.detectedGame) {
                     showToast({
                         message: `Detected game: ${result.detectedGame.name}`,
@@ -518,7 +533,8 @@ export class DataEditorBase extends React.Component<
         window.location.reload();
     };
 
-    private writeAllData = () => {
+    private writeAllData = (state: State = this.props.state) => {
+        this.syncCurrentNuzlocke(state);
         Promise.resolve(persistor.flush())
             .then(() => {
                 showToast({
@@ -622,6 +638,7 @@ export class DataEditorBase extends React.Component<
         const mergedPokemon = [...existingPokemon, ...newPokemon];
         const newState = { ...state, pokemon: mergedPokemon };
         replaceState(newState);
+        this.syncCurrentNuzlocke(newState);
 
         showToast({
             message: `Imported ${newPokemon.length} Pokemon from Showdown format!`,
@@ -926,7 +943,7 @@ export class DataEditorBase extends React.Component<
                     <ButtonGroup>
                         <Button
                             intent={Intent.SUCCESS}
-                            onClick={this.writeAllData}
+                            onClick={() => this.writeAllData()}
                             icon="floppy-disk"
                         >
                             Force Save{" "}
@@ -961,4 +978,5 @@ export class DataEditorBase extends React.Component<
 export const DataEditor = connect((state: State) => ({ state: state }), {
     replaceState,
     newNuzlocke,
+    updateNuzlocke,
 })(DataEditorBase);
