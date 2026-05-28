@@ -209,7 +209,7 @@ export function parseQuery(input: string): ParseResult {
         const fieldToken = advance(); // FIELD token
         const field = resolveField(fieldToken.value, fieldToken);
 
-        let comparator: Comparator = ":";
+        let comparator: Comparator;
 
         // Determine comparator
         if (match("COLON")) {
@@ -316,4 +316,3 @@ function levenshteinDistance(a: string, b: string): number {
 
     return matrix[a.length][b.length];
 }
-
