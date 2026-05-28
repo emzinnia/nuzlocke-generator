@@ -45,6 +45,15 @@ describe("addForme", () => {
         const forme = addForme("alakazam", "Mega");
         expect(forme).toEqual("alakazam-mega");
     });
+    it("returns paldean Tauros formes", () => {
+        expect(addForme("tauros", "Paldean")).toEqual("paldean-tauros");
+        expect(addForme("tauros", "Paldean-Aqua")).toEqual(
+            "paldean-aqua-tauros",
+        );
+        expect(addForme("tauros", "Paldean-Blaze")).toEqual(
+            "paldean-blaze-tauros",
+        );
+    });
 });
 
 describe("choose", () => {
