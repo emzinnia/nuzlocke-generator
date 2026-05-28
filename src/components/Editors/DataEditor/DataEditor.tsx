@@ -96,6 +96,20 @@ const handleExceptions = (data: State | Record<string, unknown>) => {
     return isEmpty(updated) ? data : updated;
 };
 
+type SaveWorkerSuccess = {
+    pokemon: Pokemon[];
+    isYellow?: boolean;
+    trainer: Trainer;
+    detectedGame?: Game;
+    detectedSaveFormat?: GameSaveFormat;
+};
+
+type SaveWorkerFailure = {
+    error: string;
+};
+
+type SaveWorkerMessage = SaveWorkerSuccess | SaveWorkerFailure;
+
 const getImportedBadgeName = (badge: unknown) => {
     if (typeof badge === "string") return badge;
     if (badge && typeof badge === "object" && "name" in badge) {
@@ -429,23 +443,18 @@ export class DataEditorBase extends React.Component<
         reader.addEventListener("load", async function () {
             const save = new Uint8Array(this.result as ArrayBuffer);
 
-            worker.postMessage({
-                selectedGame,
-                save,
-                boxMappings,
-                fileName: file.name,
-            });
-
-            worker.onmessage = (
-                e: MessageEvent<{
-                    pokemon: Pokemon[];
-                    isYellow?: boolean;
-                    trainer: Trainer;
-                    detectedGame?: Game;
-                    detectedSaveFormat?: GameSaveFormat;
-                }>,
-            ) => {
+            worker.onmessage = (e: MessageEvent<SaveWorkerMessage>) => {
                 const result = e.data;
+                if ("error" in result) {
+                    showToast({
+                        message: `Failed to parse save file. ${result.error}`,
+                        intent: Intent.DANGER,
+                    });
+                    console.error(result.error);
+                    worker.terminate();
+                    return;
+                }
+
                 const mergedPokemon = mergeDataMode
                     ? DataEditorBase.pokeMerge(
                           state.pokemon,
@@ -496,6 +505,7 @@ export class DataEditorBase extends React.Component<
                         intent: Intent.PRIMARY,
                     });
                 }
+                worker.terminate();
             };
 
             worker.onmessageerror = (err) => {
@@ -504,7 +514,24 @@ export class DataEditorBase extends React.Component<
                     intent: Intent.DANGER,
                 });
                 console.error(err);
+                worker.terminate();
             };
+
+            worker.onerror = (err) => {
+                showToast({
+                    message: `Failed to parse save file. ${err.message}`,
+                    intent: Intent.DANGER,
+                });
+                console.error(err);
+                worker.terminate();
+            };
+
+            worker.postMessage({
+                selectedGame,
+                save,
+                boxMappings,
+                fileName: file.name,
+            });
 
             const t1 = performance.now();
             console.info(
