@@ -307,6 +307,7 @@ describe(getEncounterMap.name, () => {
         const JohtoGen4 = getEncounterMap("HeartGold");
         expect(KantoGen3.length).toBeGreaterThan(KantoGen1.length);
         expect(JohtoGen4).toContain("Route 29");
+        expect(JohtoGen4).toContain("Mahogany Town");
     });
 });
 
