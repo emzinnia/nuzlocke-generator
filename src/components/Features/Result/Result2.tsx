@@ -274,7 +274,7 @@ export const ResultInner = React.forwardRef(
                     overflowY: "auto",
                     fontFamily: style.usePokemonGBAFont
                         ? "pokemon_font"
-                        : "inherit",
+                        : style.font || "inherit",
                     fontSize: style.usePokemonGBAFont ? "125%" : "100%",
                 }}
             >

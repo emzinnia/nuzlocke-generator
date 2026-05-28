@@ -512,7 +512,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                         style={{
                             fontFamily: style.usePokemonGBAFont
                                 ? "pokemon_font"
-                                : "inherit",
+                                : style.font || "inherit",
                             fontSize: style.usePokemonGBAFont ? "125%" : "100%",
                             margin: this.state.isDownloading
                                 ? "0"
