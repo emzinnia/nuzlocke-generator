@@ -4,6 +4,7 @@ vi.mock("utils", async () => {
     const actual = await vi.importActual<typeof import("utils")>("utils");
     return {
         ...actual,
+        getBackgroundGradient: vi.fn().mockReturnValue('url("mock-gradient.png")'),
         getPokemonImage: vi.fn().mockResolvedValue("mock-pokemon-image"),
     };
 });
@@ -272,6 +273,46 @@ describe("TeamPokemonInfo", () => {
 
         expect(screen.getByText("SPATK")).toBeTruthy();
         expect(screen.getByText("SPDEF")).toBeTruthy();
+    });
+
+    it("uses type colors for compact mode by default", () => {
+        const { container } = render(
+            <TeamPokemonInfo
+                generation={Generation.Gen3}
+                style={{ ...baseStyle, template: "Compact" }}
+                pokemon={basePokemon}
+                customTypes={[]}
+                linkedPokemon={undefined}
+                game={baseGame}
+            />,
+        );
+
+        expect(
+            (container.querySelector(".pokemon-info") as HTMLElement).style
+                .backgroundImage,
+        ).toContain("mock-gradient.png");
+    });
+
+    it("falls back to the accent color when compact type colors are disabled", () => {
+        const { container } = render(
+            <TeamPokemonInfo
+                generation={Generation.Gen3}
+                style={{
+                    ...baseStyle,
+                    template: "Compact",
+                    accentColor: "#ffffff",
+                    useTypeColorsInCompact: false,
+                }}
+                pokemon={basePokemon}
+                customTypes={[]}
+                linkedPokemon={undefined}
+                game={baseGame}
+            />,
+        );
+
+        const info = container.querySelector(".pokemon-info") as HTMLElement;
+        expect(info.style.backgroundImage).toBe("");
+        expect(info.style.backgroundColor).toBe("rgb(255, 255, 255)");
     });
 
     for (const generation of [Generation.Gen4, Generation.Gen5]) {

@@ -28,6 +28,7 @@ export interface Styles {
     editorDarkMode: boolean;
     font: string;
     usePokemonGBAFont: boolean;
+    useTypeColorsInCompact: boolean;
     iconsNextToTeamPokemon: boolean;
     iconRendering: IconRenderingType;
     imageStyle: RadiusType;
@@ -109,6 +110,7 @@ export const styleDefaults: Styles = {
     displayExtraData: true,
     useAutoHeight: true,
     usePokemonGBAFont: false,
+    useTypeColorsInCompact: true,
     displayItemAsText: false,
     displayRulesLocation: "bottom" as RulesLocation,
     trainerWidth: "20%",

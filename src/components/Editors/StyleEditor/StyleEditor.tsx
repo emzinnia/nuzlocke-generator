@@ -748,6 +748,15 @@ export class StyleEditorBase extends React.Component<
 
                 <div className={styleEdit}>
                     <Checkbox
+                        checked={props.style.useTypeColorsInCompact}
+                        name="useTypeColorsInCompact"
+                        label="Use Type Colors in Compact Mode"
+                        onChange={(e) => editCheckboxEvent(e, props, "useTypeColorsInCompact")}
+                    />
+                </div>
+
+                <div className={styleEdit}>
+                    <Checkbox
                         checked={props.style.oldMetLocationFormat}
                         name="oldMetLocationFormat"
                         label="Old Met Location Format"

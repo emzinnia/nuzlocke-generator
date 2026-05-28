@@ -127,6 +127,8 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
         const isCompactTheme =
             style.template === TemplateName.Compact ||
             style.template === TemplateName.CompactWithIcons;
+        const useCompactTypeColors =
+            isCompactTheme && style.useTypeColorsInCompact !== false;
         const getTypeOrNone = () => {
             if (pokemon) {
                 if (pokemon.types) {
@@ -164,7 +166,7 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                               ? gameOfOriginColor
                               : accentColor,
                         // backgroundImage: isCardsTheme ? undefined : `linear-gradient(to right, #2d2d2d 1px, transparent 1px), linear-gradient(to bottom, #2d2d2d 1px, transparent 1px)`,
-                        backgroundImage: isCompactTheme
+                        backgroundImage: useCompactTypeColors
                             ? getBackgroundGradient(
                                   pokemon.types != null && !pokemon.egg
                                       ? pokemon?.types[1]
@@ -175,7 +177,7 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                                   customTypes,
                               )
                             : undefined,
-                        color: isCompactTheme
+                        color: useCompactTypeColors
                             ? getContrastColor(
                                   typeToColor(getTypeOrNone(), customTypes),
                               )
