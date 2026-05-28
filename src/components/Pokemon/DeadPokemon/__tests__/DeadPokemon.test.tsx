@@ -27,4 +27,22 @@ describe("<DeadPokemon />", () => {
             poke.causeOfDeath,
         );
     });
+
+    it("hides the pokemon name when configured", () => {
+        render(
+            <DeadPokemonBase
+                game={{ name: "Red", customName: "" }}
+                style={{ ...styleDefaults, hidePokemonNames: true }}
+                selectPokemon={vi.fn()}
+                minimal={false}
+                {...poke}
+            />,
+        );
+
+        expect(screen.queryByText(poke.nickname)).toBeNull();
+        expect(screen.getByText(/Levels 3/)).toBeTruthy();
+        expect(screen.getByTestId("cause-of-death").textContent).toContain(
+            poke.causeOfDeath,
+        );
+    });
 });

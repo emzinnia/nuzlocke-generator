@@ -7,6 +7,7 @@ import { Editor, Box, Pokemon } from "models";
 
 type ResultBaseProps = React.ComponentProps<typeof ResultBase>;
 type PokemonSpeciesProps = { species: string };
+type ChampsPokemonProps = PokemonSpeciesProps & { showNickname?: boolean };
 type PokemonProp = { pokemon: Pokemon };
 type ChildrenProps = { children?: React.ReactNode };
 
@@ -29,8 +30,13 @@ vi.mock("components/Pokemon/DeadPokemon/DeadPokemon", () => ({
 }));
 
 vi.mock("components/Pokemon/ChampsPokemon/ChampsPokemon", () => ({
-    ChampsPokemon: ({ species }: PokemonSpeciesProps) => (
-        <div data-testid={`champs-${species}`}>{species}</div>
+    ChampsPokemon: ({ species, showNickname }: ChampsPokemonProps) => (
+        <div
+            data-testid={`champs-${species}`}
+            data-show-nickname={String(showNickname)}
+        >
+            {species}
+        </div>
     ),
 }));
 
@@ -123,6 +129,36 @@ describe("<ResultBase />", () => {
         expect(screen.getByText("Boxed")).toBeTruthy();
         expect(screen.getByText(/Dead/)).toBeTruthy();
         expect(screen.getByText(/Champs/)).toBeTruthy();
+    });
+
+    it("passes hidden pokemon names through to champs pokemon", () => {
+        render(
+            <ResultBase
+                pokemon={createPokemon()}
+                game={{ name: "Red", customName: "" }}
+                trainer={{ notes: "", badges: [] }}
+                box={boxes}
+                editor={baseEditor}
+                selectPokemon={vi.fn() as unknown as ResultBaseProps["selectPokemon"]}
+                toggleMobileResultView={
+                    vi.fn() as unknown as ResultBaseProps["toggleMobileResultView"]
+                }
+                toggleDialog={vi.fn() as unknown as ResultBaseProps["toggleDialog"]}
+                style={{
+                    ...styleDefaults,
+                    hidePokemonNames: true,
+                    minimalChampsLayout: false,
+                }}
+                rules={[]}
+                customTypes={[]}
+            />,
+        );
+
+        expect(
+            screen
+                .getByTestId("champs-Victor")
+                .getAttribute("data-show-nickname"),
+        ).toBe("false");
     });
 });
 
