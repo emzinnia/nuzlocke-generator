@@ -1,9 +1,9 @@
 import { Forme } from "utils";
 
 export const getIconFormeSuffix = (forme: keyof typeof Forme) => {
-    console.log(forme);
     if (forme == null) return "";
     if (forme === "Normal") return "";
+    if (forme === "Midday") return "";
     if (forme === "Spring") return "";
     if (
         [
@@ -15,6 +15,8 @@ export const getIconFormeSuffix = (forme: keyof typeof Forme) => {
             "Summer",
             "Winter",
             "Autumn",
+            "Dusk",
+            "Midnight",
         ].includes(forme)
     )
         return `-${forme.toLowerCase()}`;
