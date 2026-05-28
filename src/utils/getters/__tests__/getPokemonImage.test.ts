@@ -58,7 +58,7 @@ vi.mock("utils", () => ({
         Alolan: "alolan",
         Galarian: "galarian",
     },
-    significantGenderDifferenceList: ["Pikachu"],
+    significantGenderDifferenceList: ["Frillish", "Jellicent", "Unfezant"],
     speciesToNumber: mocks.speciesToNumber,
     getForme: mocks.getForme,
     addForme: mocks.addForme,
@@ -335,14 +335,30 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             expect(result).toBe("url(img/shuffle/mime-jr.png)");
         });
 
-        it("returns tcg assets, adding -f for significant gender differences", async () => {
+        it("returns tcg assets, adding -f when a female asset exists", async () => {
             const result = await getPokemonImage({
-                species: "Pikachu",
+                species: "Unfezant",
                 gender: imageGender("Female"),
                 style: imageStyle({ teamImages: "tcg" }),
             });
 
-            expect(result).toBe("url(img/tcg/pikachu-f.jpg)");
+            expect(result).toBe("url(img/tcg/unfezant-f.jpg)");
+        });
+
+        it("returns base tcg assets for female Frillish and Jellicent", async () => {
+            const frillish = await getPokemonImage({
+                species: "Frillish",
+                gender: imageGender("Female"),
+                style: imageStyle({ teamImages: "tcg" }),
+            });
+            const jellicent = await getPokemonImage({
+                species: "Jellicent",
+                gender: imageGender("Female"),
+                style: imageStyle({ teamImages: "tcg" }),
+            });
+
+            expect(frillish).toBe("url(img/tcg/frillish.jpg)");
+            expect(jellicent).toBe("url(img/tcg/jellicent.jpg)");
         });
     });
 
@@ -408,4 +424,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-
