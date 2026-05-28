@@ -575,7 +575,10 @@ export class DataEditorBase extends React.Component<
         const hasNoMoves = !pokemon.moves || pokemon.moves.length === 0;
         const hasNoAbility = !pokemon.ability;
         const hasNoCustomizations =
-            !pokemon.customImage && !pokemon.customIcon && !pokemon.notes;
+            !pokemon.customImage &&
+            !pokemon.customIcon &&
+            !pokemon.notes &&
+            !pokemon.staticEncounter;
 
         return (
             isSpeciesEmpty &&

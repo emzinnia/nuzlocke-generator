@@ -340,6 +340,13 @@ export class CurrentPokemonEditBase extends React.Component<
                         key={this.state.selectedId + "gift"}
                     />
                     <CurrentPokemonInput
+                        labelName="Static"
+                        inputName="staticEncounter"
+                        value={currentPokemon?.staticEncounter}
+                        type="checkbox"
+                        key={this.state.selectedId + "staticEncounter"}
+                    />
+                    <CurrentPokemonInput
                         labelName="Alpha"
                         inputName="alpha"
                         value={currentPokemon?.alpha}
