@@ -216,6 +216,8 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
 
         it("builds DP/HGSS sprite URLs and wraps them", async () => {
+            mocks.getForme.mockReturnValueOnce("").mockReturnValueOnce("");
+
             const nonShiny = await getPokemonImage({
                 species: "Pikachu",
                 name: imageGame("Diamond"),
@@ -233,6 +235,37 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 "cors(https://www.serebii.net/pokearth/sprites/dp/025.png)",
             );
             expect(shiny).toBe("cors(https://www.serebii.net/Shiny/DP/025.png)");
+        });
+
+        it("includes the East Sea Shellos forme in DP/HGSS sprite URLs", async () => {
+            mocks.speciesToNumber
+                .mockReturnValueOnce(422)
+                .mockReturnValueOnce(422)
+                .mockReturnValueOnce(422)
+                .mockReturnValueOnce(422);
+            mocks.getForme.mockReturnValueOnce("-e").mockReturnValueOnce("-e");
+
+            const nonShiny = await getPokemonImage({
+                species: "Shellos",
+                name: imageGame("SoulSilver"),
+                style: imageStyle({ spritesMode: true }),
+                forme: imageForme("East Sea"),
+                shiny: false,
+            });
+            const shiny = await getPokemonImage({
+                species: "Shellos",
+                name: imageGame("Pearl"),
+                style: imageStyle({ spritesMode: true }),
+                forme: imageForme("East Sea"),
+                shiny: true,
+            });
+
+            expect(nonShiny).toBe(
+                "cors(https://www.serebii.net/pokearth/sprites/dp/422-e.png)",
+            );
+            expect(shiny).toBe(
+                "cors(https://www.serebii.net/Shiny/DP/422-e.png)",
+            );
         });
 
         it("builds FRLG sprite URLs via pokemondb and wraps them", async () => {
@@ -408,4 +441,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-
