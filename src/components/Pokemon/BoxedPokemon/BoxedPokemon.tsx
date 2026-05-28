@@ -8,6 +8,7 @@ import { getContrastColor, Styles, gameOfOriginToColor } from "utils";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon/PokemonIcon";
 import { GenderElement } from "components/Common/Shared";
 import { State } from "state";
+import { PokemonShinyIndicator } from "components/Pokemon/PokemonShinyIndicator";
 
 export type BoxedPokemonProps = Pokemon & { selectPokemon: selectPokemon } & {
     style: Styles;
@@ -79,7 +80,9 @@ export const BoxedPokemonBase = (poke: BoxedPokemonProps) => {
                         data-testid="boxed-pokemon-name"
                         className="boxed-pokemon-name"
                     >
-                        {poke?.nickname} {GenderElement(poke?.gender)}{" "}
+                        {poke?.nickname}
+                        <PokemonShinyIndicator shiny={poke?.shiny} />{" "}
+                        {GenderElement(poke?.gender)}{" "}
                         {poke?.level ? <span>lv. {poke?.level}</span> : null}
                         {poke?.style?.displayGameOriginForBoxedAndDead &&
                             !poke?.style?.displayBackgroundInsteadOfBadge &&
