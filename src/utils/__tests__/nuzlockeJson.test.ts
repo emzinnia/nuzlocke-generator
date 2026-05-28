@@ -39,6 +39,7 @@ describe("nuzlocke.json export compatibility", () => {
         const exported = stripEditorDarkModeForExport(state) as Partial<State>;
 
         expect(exported.editorHistory).toBeUndefined();
+        expect(exported.nuzlockes).toBeUndefined();
         expect(exported.pokemon).toEqual(state.pokemon);
         expect(exported.trainer).toEqual(state.trainer);
         expect(exported.style).toMatchObject({

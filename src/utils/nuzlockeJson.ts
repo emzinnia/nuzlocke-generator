@@ -4,7 +4,7 @@ import { omit } from "ramda";
 
 export const stripEditorDarkModeForExport = (state: State) => {
     const baseState = omit(
-        ["router", "._persist", "_persist", "editorHistory"],
+        ["router", "._persist", "_persist", "editorHistory", "nuzlockes"],
         state,
     ) as {
         style?: Styles;
