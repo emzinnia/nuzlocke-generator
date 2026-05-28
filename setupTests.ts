@@ -1,6 +1,6 @@
 import Dexie from "dexie";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-Dexie.dependencies.indexedDB = require("fake-indexeddb");
+Dexie.dependencies.indexedDB = require("fake-indexeddb").indexedDB;
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 Dexie.dependencies.IDBKeyRange = require("fake-indexeddb/lib/FDBKeyRange");
 

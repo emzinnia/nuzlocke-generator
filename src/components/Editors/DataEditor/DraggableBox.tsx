@@ -22,7 +22,9 @@ export function DraggableBox({ box, isDarkMode }: DraggableBoxProps) {
 
     return (
         <div
-            ref={drag}
+            ref={(node) => {
+                drag(node);
+            }}
             style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -51,4 +53,3 @@ export function DraggableBox({ box, isDarkMode }: DraggableBoxProps) {
         </div>
     );
 }
-

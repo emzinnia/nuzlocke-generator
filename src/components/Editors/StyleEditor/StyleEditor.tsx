@@ -27,7 +27,7 @@ import {
 import { State } from "state";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { ColorEdit, rgbaOrHex } from "components/Common/Shared";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import * as Styles from "./styles";
 import { ThemeEditor } from "components/Editors/ThemeEditor/ThemeEditor";
 import { customCSSGuide as text } from "utils/customCSSGuide";
@@ -743,6 +743,15 @@ export class StyleEditorBase extends React.Component<
                         name="usePokemonGBAFont"
                         label="Use Pokémon GBA Font"
                         onChange={(e) => editCheckboxEvent(e, props, "usePokemonGBAFont")}
+                    />
+                </div>
+
+                <div className={styleEdit}>
+                    <Checkbox
+                        checked={props.style.useTypeColorsInCompact}
+                        name="useTypeColorsInCompact"
+                        label="Use Type Colors in Compact Mode"
+                        onChange={(e) => editCheckboxEvent(e, props, "useTypeColorsInCompact")}
                     />
                 </div>
 
