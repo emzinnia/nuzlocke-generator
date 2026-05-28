@@ -2915,7 +2915,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Corvisquire": [],
   },
   {
-    "Corviknight": [],
+    "Corviknight": [
+      "Gigantamax",
+    ],
   },
   {
     "Blipbug": [],
