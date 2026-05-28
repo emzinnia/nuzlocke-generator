@@ -37,6 +37,11 @@ const BOX_OFFSETS = [
     0x4000, 0x4462, 0x48c4, 0x4d26, 0x5188, 0x55ea, 0x6000, 0x6462, 0x68c4,
     0x6d26, 0x7188, 0x75ea,
 ];
+const PARTY_CAPACITY = 6;
+const PARTY_POKEMON_SIZE = 44;
+const BOX_CAPACITY = 20;
+const BOX_POKEMON_SIZE = 33;
+const POKEMON_NAME_SIZE = 11;
 
 const checksum = (data: Uint8Array) => {
     let checksumN = 255;
@@ -155,21 +160,33 @@ const parsePartyPokemon = (buf: Buffer, boxed = false) => {
     };
 };
 
-const getPokemonListForParty = (buf: Buffer, entries: number = 6) => {
-    const party = splitUp(Buffer.from(buf), entries);
+const getPokemonListForParty = (
+    buf: Buffer,
+    entries: number = PARTY_CAPACITY,
+) => {
+    if (entries <= 0) return [];
+    const party = splitUp(
+        Buffer.from(buf).slice(0, entries * PARTY_POKEMON_SIZE),
+        entries,
+    );
     const pokes = party.map((box) => parsePartyPokemon(box));
     return pokes;
 };
 
-const getPokemonListForBox = (buf: Buffer, entries: number = 6) => {
-    const box = splitUp(Buffer.from(buf), entries);
+const getPokemonListForBox = (buf: Buffer, entries: number = BOX_CAPACITY) => {
+    if (entries <= 0) return [];
+    const box = splitUp(
+        Buffer.from(buf).slice(0, entries * BOX_POKEMON_SIZE),
+        entries,
+    );
 
     const pokes = box.map((box) => parsePartyPokemon(box, true));
 
     return pokes;
 };
 
-const getPokemonNames = (buf: Buffer, entries: number = 6) => {
+const getPokemonNames = (buf: Buffer, entries: number = PARTY_CAPACITY) => {
+    if (entries <= 0) return [];
     const pokes = splitUp(Buffer.from(buf), entries);
     const names = pokes.map((poke) => convertWithCharMap(poke, true));
     return names;
@@ -194,15 +211,18 @@ const removeLastEntries = (entries: number, arr: unknown[]) => {
 
 const parsePokemonParty = (buf: Buffer) => {
     const party = Buffer.from(buf);
-    const entriesUsed = party[0x0000];
+    const entriesUsed = Math.min(party[0x0000], PARTY_CAPACITY);
     const rawSpeciesList = party.slice(0x0001, 0x0007);
     const speciesList = getSpeciesList(rawSpeciesList);
     const pokemonList = getPokemonListForParty(
-        party.slice(0x0008, 0x0008 + 264),
-        6,
+        party.slice(0x0008, 0x0008 + PARTY_CAPACITY * PARTY_POKEMON_SIZE),
+        entriesUsed,
     );
     const OTNames = party.slice(0x0110, 0x0110 + 66);
-    const pokemonNames = getPokemonNames(party.slice(0x0152, 0x152 + 66), 6);
+    const pokemonNames = getPokemonNames(
+        party.slice(0x0152, 0x152 + entriesUsed * POKEMON_NAME_SIZE),
+        entriesUsed,
+    );
 
     return {
         entriesUsed,
@@ -215,16 +235,16 @@ const parsePokemonParty = (buf: Buffer) => {
 
 const parseBoxedPokemon = (buf: Buffer): Gen1PokemonObject => {
     const box = Buffer.from(buf);
-    const entriesUsed = box[0x0000];
+    const entriesUsed = Math.min(box[0x0000], BOX_CAPACITY);
     const rawSpeciesList = box.slice(0x0001, 0x0001 + 21);
     const speciesList = getSpeciesList(rawSpeciesList);
     const pokemonList = getPokemonListForBox(
-        box.slice(0x0016, 0x0016 + 660),
+        box.slice(0x0016, 0x0016 + BOX_CAPACITY * BOX_POKEMON_SIZE),
         entriesUsed,
     );
     const OTNames = box.slice(0x02aa, 0x02aa + 220);
     const pokemonNames = getPokemonNames(
-        box.slice(0x0386, 0x0386 + 220),
+        box.slice(0x0386, 0x0386 + entriesUsed * POKEMON_NAME_SIZE),
         entriesUsed,
     );
 
