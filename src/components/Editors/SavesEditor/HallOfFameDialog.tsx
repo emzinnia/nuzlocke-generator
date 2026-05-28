@@ -6,7 +6,7 @@ import {
     DialogProps,
     Intent,
 } from "@blueprintjs/core";
-import { css, cx } from "emotion";
+import { css, cx } from "@emotion/css";
 import * as React from "react";
 
 const hofImage = "assets/hall-of-fame.png";
