@@ -192,6 +192,7 @@ export function PokemonIconPlain({
                             src={image}
                             width={64}
                             height={64}
+                            draggable={false}
                             style={imageStyle}
                             alt={species}
                         />
@@ -199,7 +200,14 @@ export function PokemonIconPlain({
                 </PokemonImage>
             ) : (
                 <img
-                    style={{...imageStyle, filter: isUnknown && editorDarkMode ? "invert(100%) drop-shadow(0 0 1px rgba(0, 0, 0, 1))" : undefined}}
+                    draggable={false}
+                    style={{
+                        ...imageStyle,
+                        filter:
+                            isUnknown && editorDarkMode
+                                ? "invert(100%) drop-shadow(0 0 1px rgba(0, 0, 0, 1))"
+                                : undefined,
+                    }}
                     alt={species}
                     onError={({ currentTarget }) => {
                         currentTarget.onerror = null; // prevents looping
