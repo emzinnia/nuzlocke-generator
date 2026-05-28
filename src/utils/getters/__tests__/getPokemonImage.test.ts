@@ -344,6 +344,43 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
 
             expect(result).toBe("url(img/tcg/pikachu-f.jpg)");
         });
+
+        it.each([
+            ["Burmy", "Plant", "url(img/tcg/burmy-grass.jpg)"],
+            ["Burmy", "Sandy", "url(img/tcg/burmy-sand.jpg)"],
+            ["Burmy", "Trash", "url(img/tcg/burmy-trash.jpg)"],
+            ["Wormadam", "Plant", "url(img/tcg/wormadam-plant.jpg)"],
+            ["Wormadam", "Sandy", "url(img/tcg/wormadam-sandy.jpg)"],
+            ["Wormadam", "Trash", "url(img/tcg/wormadam-trash.jpg)"],
+            ["Hoopa", "Unbound", "url(img/tcg/hoopa-unbound.jpg)"],
+        ])(
+            "maps included TCG forme artwork for %s %s",
+            async (species, forme, expected) => {
+                const result = await getPokemonImage({
+                    species,
+                    forme: imageForme(forme as ImageForme),
+                    style: imageStyle({ teamImages: "tcg" }),
+                });
+
+                expect(result).toBe(expected);
+            },
+        );
+
+        it.each([
+            ["Wishiwashi", "School", "url(img/tcg/wishiwashi-school.jpg)"],
+            ["Meloetta", "Pirouette", "url(img/tcg/meloetta-pirouette.jpg)"],
+        ])(
+            "keeps standard TCG forme paths for %s %s",
+            async (species, forme, expected) => {
+                const result = await getPokemonImage({
+                    species,
+                    forme: imageForme(forme as ImageForme),
+                    style: imageStyle({ teamImages: "tcg" }),
+                });
+
+                expect(result).toBe(expected);
+            },
+        );
     });
 
     describe("stopgaps / edge cases", () => {
@@ -408,4 +445,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-
