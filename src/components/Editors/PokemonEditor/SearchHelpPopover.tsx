@@ -193,6 +193,7 @@ const SearchHelpContent: React.FC = () => (
                     "game",
                     "shiny",
                     "egg",
+                    "static",
                     "alpha",
                     "mvp",
                 ].map((field) => (

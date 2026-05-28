@@ -25,6 +25,7 @@ const createPokemon = (overrides: Partial<Pokemon> = {}): Pokemon => ({
     alpha: false,
     mvp: false,
     gift: false,
+    staticEncounter: false,
     ...overrides,
 });
 
@@ -341,6 +342,23 @@ describe("searchPokemon", () => {
     it("filters by gender", () => {
         const { matchedIds } = searchPokemon(testTeam, "gender:f");
         expect(matchedIds.size).toBe(4);
+    });
+
+    it("filters by static encounters", () => {
+        const { matchedIds } = searchPokemon(
+            [
+                ...testTeam,
+                createPokemon({
+                    id: "8",
+                    species: "Snorlax",
+                    staticEncounter: true,
+                }),
+            ],
+            "static:true",
+        );
+
+        expect(matchedIds.size).toBe(1);
+        expect(matchedIds.has("8")).toBe(true);
     });
 
     it("filters by negation", () => {
