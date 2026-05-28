@@ -305,8 +305,10 @@ describe(getEncounterMap.name, () => {
         const KantoGen1 = getEncounterMap("Red");
         const KantoGen3 = getEncounterMap("FireRed");
         const JohtoGen4 = getEncounterMap("HeartGold");
+        const SinnohGen4 = getEncounterMap("Platinum");
         expect(KantoGen3.length).toBeGreaterThan(KantoGen1.length);
         expect(JohtoGen4).toContain("Route 29");
+        expect(SinnohGen4).toContain("Verity Lakefront");
     });
 });
 
