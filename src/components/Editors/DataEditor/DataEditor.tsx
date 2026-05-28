@@ -612,7 +612,7 @@ export class DataEditorBase extends React.Component<
 
         if (newPokemon.length === 0) {
             showToast({
-                message: "No Pokemon found in the input.",
+                message: "No Pokémon found in the input.",
                 intent: Intent.WARNING,
             });
             return;
@@ -624,7 +624,7 @@ export class DataEditorBase extends React.Component<
         replaceState(newState);
 
         showToast({
-            message: `Imported ${newPokemon.length} Pokemon from Showdown format!`,
+            message: `Imported ${newPokemon.length} Pokémon from Showdown format!`,
             intent: Intent.SUCCESS,
         });
 
@@ -658,7 +658,7 @@ export class DataEditorBase extends React.Component<
                 }}
             >
                 <div style={{ marginBottom: "0.5rem", fontWeight: 500 }}>
-                    Preview: {pokemon.length} Pokemon found
+                    Preview: {pokemon.length} Pokémon found
                 </div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
                     {pokemon.map((p) => (
@@ -822,7 +822,7 @@ export class DataEditorBase extends React.Component<
                         )}
                     >
                         <Callout intent={Intent.PRIMARY} style={{ marginBottom: "0.5rem" }}>
-                            Paste your Pokemon Showdown format text below. Each Pokemon
+                            Paste your Pokémon Showdown format text below. Each Pokémon
                             will be added to your Team.
                         </Callout>
                         <div style={{ marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
@@ -876,7 +876,7 @@ export class DataEditorBase extends React.Component<
                                 onClick={this.confirmShowdownImport}
                                 disabled={this.state.showdownData.trim() === ""}
                             >
-                                Import Pokemon
+                                Import Pokémon
                             </Button>
                         </div>
                     </div>

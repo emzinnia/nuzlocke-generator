@@ -11,7 +11,7 @@ export const GEN_3_HELD_ITEM_MAP: Record<number, string | undefined> = {
     1: "Master Ball",
     2: "Ultra Ball",
     3: "Great Ball",
-    4: "Poke Ball",
+    4: "Poké Ball",
     5: "Safari Ball",
     6: "Net Ball",
     7: "Dive Ball",

@@ -11,7 +11,7 @@ import {
 
 const initialState = [
     "Each Pokémon that faints is considered dead and must be released or permaboxed",
-    "You can only catch the first Pokemon you encounter in an area",
+    "You can only catch the first Pokémon you encounter in an area",
     "All Pokémon must be nicknamed",
 ];
 

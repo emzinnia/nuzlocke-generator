@@ -395,7 +395,7 @@ export function ImagesDrawerInner() {
                     <NonIdealState
                         icon="media"
                         title="No images uploaded"
-                        description="Upload images to use as custom Pokemon artwork"
+                        description="Upload images to use as custom Pokémon artwork"
                     />
                 )}
                 {images?.map((image) => (

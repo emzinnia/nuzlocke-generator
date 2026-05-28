@@ -10,6 +10,8 @@ import {
     Generation,
     typeToColor,
     isEmpty,
+    normalizePokeballName,
+    formatBallText,
 } from "utils";
 import * as React from "react";
 import * as Color from "color";
@@ -69,6 +71,18 @@ describe("isEmpty", () => {
 
     it("works with empty arrays", () => {
         expect(isEmpty([])).toBe(true);
+    });
+});
+
+describe("pokeball formatters", () => {
+    it("uses official Poké Ball display text", () => {
+        expect(normalizePokeballName("Poke Ball")).toBe("Poké Ball");
+        expect(normalizePokeballName("Poké Ball")).toBe("Poké Ball");
+    });
+
+    it("keeps the Poké Ball icon key ASCII", () => {
+        expect(formatBallText("Poké Ball")).toBe("poke");
+        expect(formatBallText("Poke Ball")).toBe("poke");
     });
 });
 

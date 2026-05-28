@@ -59,12 +59,12 @@ export class DeletePokemonButtonBase extends React.Component<
                         }
                         this.toggleDialog();
                     }}
-                    confirmButtonText="Delete Pokemon"
+                    confirmButtonText="Delete Pokémon"
                     cancelButtonText="Cancel"
                     intent={Intent.DANGER}
                 >
                     <p>
-                        This will delete the currently selected Pokemon. Are you
+                        This will delete the currently selected Pokémon. Are you
                         sure you want to do that?
                     </p>
 
@@ -102,7 +102,7 @@ export class DeletePokemonButtonBase extends React.Component<
                             }
                         }}
                         icon="trash"
-                        title="Delete Pokemon"
+                        title="Delete Pokémon"
                     />
                 </Popover>
             </div>

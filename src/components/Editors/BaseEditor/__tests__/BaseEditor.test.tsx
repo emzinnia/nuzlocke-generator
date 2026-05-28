@@ -20,4 +20,11 @@ describe("<BaseEditor />", () => {
         );
         expect(screen.findByText("Hello World!")).toBeDefined();
     });
+
+    it("can keep a stable class name separate from its display name", () => {
+        render(<BaseEditor name="Pokémon" className="pokemon-editor" />);
+        const editor = screen.getByTestId("base-editor");
+        expect(editor.className).toContain("pokemon-editor");
+        expect(editor.textContent).toContain("Pokémon");
+    });
 });

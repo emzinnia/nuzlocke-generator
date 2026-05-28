@@ -50,6 +50,11 @@ import { normalizePokeballName } from "utils";
 
 const pokeball = "./assets/pokeball.png";
 
+const formatPokeballOption = (ball: string) => {
+    const label = `${ball.charAt(0).toUpperCase() + ball.slice(1)} Ball`;
+    return normalizePokeballName(label) ?? label;
+};
+
 export interface CopyPokemonButtonProps {
     onClick: (event: React.MouseEvent<HTMLElement>) => void;
 }
@@ -68,7 +73,7 @@ export const CopyPokemonButton: React.FunctionComponent<
             }
         >
             <Icon
-                title="Copy Pokemon"
+                title="Copy Pokémon"
                 icon="duplicate"
                 className={cx(Styles.copyButton)}
                 onClick={onClick}
@@ -461,10 +466,7 @@ export class CurrentPokemonEditBase extends React.Component<
                     type="select"
                     options={[
                         "None",
-                        ...listOfPokeballs.map(
-                            (ball) =>
-                                `${ball.charAt(0).toUpperCase() + ball.slice(1, ball.length)} Ball`,
-                        ),
+                        ...listOfPokeballs.map(formatPokeballOption),
                     ]}
                     key={this.state.selectedId + "ball"}
                 />

@@ -43,7 +43,7 @@ export const DebugDialog: React.FC<DebugDialogProps> = ({
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                 <Button fill onClick={onAddRandomPokemon}>
-                    Add Random Pokemon
+                    Add Random Pokémon
                 </Button>
                 <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
                     <Button 
@@ -66,4 +66,3 @@ export const DebugDialog: React.FC<DebugDialogProps> = ({
         </div>
     );
 };
-

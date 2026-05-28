@@ -312,7 +312,7 @@ export const PokemonLocationChecklist = ({
                 style={{ fontSize: "80%", marginTop: "0.5rem" }}
             >
                 Tip: Pokémon with the &quot;hidden&quot; attribute are a great
-                option for including Pokemon that got away on a certain route!
+                option for including Pokémon that got away on a certain route!
             </Callout>
         </div>
     );
