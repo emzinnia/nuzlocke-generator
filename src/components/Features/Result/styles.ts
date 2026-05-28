@@ -154,13 +154,13 @@ export const move = css`
     border: 4px solid rgba(255, 255, 255, 0.3);
     border-radius: 4px;
     color: #222;
-    font-size: 0.9rem;
+    font-size: 12px;
     height: 1.7rem;
     margin: 0.25rem;
     padding: 0;
     text-align: center;
     &.long-text-move {
-        font-size: 0.7rem;
+        font-size: 11px;
     }
 `;
 
