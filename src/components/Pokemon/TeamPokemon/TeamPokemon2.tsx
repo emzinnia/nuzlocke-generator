@@ -190,6 +190,7 @@ export function TeamPokemon({
             <GenderElementReact gender={pokemon?.gender} />,
         ),
         notes: pokemon.notes ?? "",
+        extraNotes: pokemon.extraNotes ?? "",
         linkedPokemon: ReactDOMServer.renderToString(
             <LinkedPokemon style={style} linkedPokemon={linkedPokemon} />,
         ),
@@ -233,6 +234,7 @@ export function TeamPokemon({
         .replace(/\{{icon}}/g, view.icon)
         .replace(/\{{linkedPokemon}}/g, view.linkedPokemon)
         .replace(/\{{notes}}/g, view.notes)
+        .replace(/\{{extraNotes}}/g, view.extraNotes)
         .replace(/\{{itemComponent}}/g, view.itemComponent)
         .replace(/\{{pokeballComponent}}/g, view.pokeballComponent)
         .replace(/\{{movesColoredWithClasses}}/g, view.movesColoredWithClasses)

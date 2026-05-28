@@ -49,6 +49,7 @@ export function normalizePokemon(pokemon: Pokemon): NormalizedPokemon {
         mvp: Boolean(pokemon.mvp),
         gift: Boolean(pokemon.gift),
         notes: normalizeString(pokemon.notes),
+        extraNotes: normalizeString(pokemon.extraNotes),
     };
 }
 
@@ -98,5 +99,4 @@ export function clearNormalizationCache(): void {
     // WeakMap doesn't have a clear method, so we just create a new one
     // This function exists for API consistency but the WeakMap handles cleanup automatically
 }
-
 
