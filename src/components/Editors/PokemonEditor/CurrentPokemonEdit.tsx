@@ -103,6 +103,23 @@ const getEvos = (species): string[] | undefined => {
     return EvolutionTree?.[species];
 };
 
+export const getFormeInputConfig = (species: Pokemon["species"]) => {
+    const isCustomSpecies =
+        Boolean(species) && !listOfPokemon.includes(species as Species);
+
+    if (isCustomSpecies) {
+        return {
+            type: "text" as const,
+            options: undefined,
+        };
+    }
+
+    return {
+        type: "select" as const,
+        options: ["Normal", ...getAdditionalFormes(species)],
+    };
+};
+
 export function EvolutionSelection({ currentPokemon, onEvolve }) {
     const evos = getEvos(currentPokemon?.species);
 
@@ -268,6 +285,7 @@ export class CurrentPokemonEditBase extends React.Component<
             key: `${p.nickname} (${p.species})`,
             value: p.id,
         }));
+        const formeInputConfig = getFormeInputConfig(currentPokemon.species);
 
         return (
             <div className="expanded-edit">
@@ -276,11 +294,8 @@ export class CurrentPokemonEditBase extends React.Component<
                     inputName="forme"
                     placeholder=""
                     value={currentPokemon.forme}
-                    type="select"
-                    options={[
-                        "Normal",
-                        ...getAdditionalFormes(currentPokemon.species),
-                    ]}
+                    type={formeInputConfig.type}
+                    options={formeInputConfig.options}
                     pokemon={currentPokemon}
                     key={this.state.selectedId + "forme"}
                 />
