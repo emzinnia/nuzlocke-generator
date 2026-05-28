@@ -1,6 +1,6 @@
 import * as React from "react";
 import { connect } from "store/reactZustand";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import { reducers } from "reducers";
 
 import * as css from "./styles";

@@ -1,4 +1,3 @@
-/* eslint-env node */
 // vite.config.js
 /// <reference types="vitest" />
 import { defineConfig } from "vitest/config";
@@ -21,17 +20,33 @@ export default defineConfig({
         // Copy static assets
         viteStaticCopy({
             targets: [
-                { src: "src/img/*", dest: "img" },
-                { src: "src/assets/*", dest: "assets" },
-                { src: "src/assets/icons/*", dest: "icons" },
-                // Copy assets/img subdirectory (box backgrounds, etc.)
-                { src: "src/assets/img/*", dest: "assets/img" },
-                // Copy only non-icon assets to avoid duplicating icons folder (~13MB savings)
-                { src: "src/assets/*.png", dest: "assets" },
-                { src: "src/assets/*.jpg", dest: "assets" },
-                { src: "src/assets/*.woff", dest: "assets" },
-                { src: "src/assets/*.ttf", dest: "assets" },
-                { src: "src/assets/*.css", dest: "assets" },
+                {
+                    src: "src/img/**/*",
+                    dest: "img",
+                    rename: { stripBase: 2 },
+                },
+                {
+                    src: "src/assets/img/**/*",
+                    dest: "assets/img",
+                    rename: { stripBase: 3 },
+                },
+                {
+                    src: "src/assets/icons/**/*",
+                    dest: "icons",
+                    rename: { stripBase: 3 },
+                },
+                {
+                    src: [
+                        "src/assets/*.png",
+                        "src/assets/*.jpg",
+                        "src/assets/*.gif",
+                        "src/assets/*.woff",
+                        "src/assets/*.ttf",
+                        "src/assets/*.css",
+                    ],
+                    dest: "assets",
+                    rename: { stripBase: 2 },
+                },
             ],
         }),
         // Plugin to mock CSS and static files in tests only
@@ -102,8 +117,13 @@ export default defineConfig({
         // Code splitting
         rollupOptions: {
             output: {
-                manualChunks: {
-                    vendor: ["react", "react-dom"],
+                manualChunks(id) {
+                    if (
+                        id.includes("node_modules/react/") ||
+                        id.includes("node_modules/react-dom/")
+                    ) {
+                        return "vendor";
+                    }
                 },
             },
         },

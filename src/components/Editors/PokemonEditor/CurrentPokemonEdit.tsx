@@ -17,14 +17,13 @@ import {
     Species,
 } from "utils";
 import { Pokemon, Editor } from "models";
-import { Boxes } from "models";
 import { CurrentPokemonInput } from "./CurrentPokemonInput";
 import { DeletePokemonButton } from "components/Pokemon/DeletePokemonButton/DeletePokemonButton";
 import { Autocomplete, ErrorBoundary } from "components/Common/Shared";
 import { selectPokemon, editPokemon } from "actions";
 import { connect } from "store/reactZustand";
 import { listOfGames, accentedE } from "utils";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import * as Styles from "./styles";
 import { v4 as uuid } from "uuid";
 import {
@@ -94,7 +93,6 @@ export interface CurrentPokemonEditState {
     selectedId: string;
     expandedView: boolean;
     isMoveEditorOpen: boolean;
-    box: Boxes;
     currentPokemon?: Pokemon;
     images?: Image[];
 }
@@ -161,7 +159,6 @@ export class CurrentPokemonEditBase extends React.Component<
         super(props);
         this.state = {
             selectedId: "5",
-            box: [],
             isMoveEditorOpen: false,
             expandedView: false,
             images: [],
@@ -171,15 +168,13 @@ export class CurrentPokemonEditBase extends React.Component<
     public UNSAFE_componentWillMount() {
         this.setState({
             selectedId: this.props.selectedId,
-            box: this.props.box,
         });
     }
 
     public UNSAFE_componentWillReceiveProps(
         nextProps: CurrentPokemonEditProps,
-        prevProps: CurrentPokemonEditProps,
     ) {
-        if (nextProps.selectedId !== prevProps.selectedId) {
+        if (nextProps.selectedId !== this.props.selectedId) {
             this.setState({
                 selectedId: nextProps.selectedId,
             });
@@ -547,6 +542,9 @@ export class CurrentPokemonEditBase extends React.Component<
     public render() {
         const currentPokemon = this.getCurrentPokemon();
         const { customAreas } = this.props;
+        const boxOptions = [...this.props.box]
+            .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+            .map((box) => box.name);
 
         if (currentPokemon == null) {
             return (
@@ -581,7 +579,7 @@ export class CurrentPokemonEditBase extends React.Component<
                         inputName="status"
                         value={currentPokemon.status}
                         type="select"
-                        options={this.state.box.map((n) => n.name)}
+                        options={boxOptions}
                         key={this.state.selectedId + "status"}
                     />
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { connect } from "store/reactZustand";
-import { css, cx } from "emotion";
+import { css, cx } from "@emotion/css";
 
 import { Pokemon } from "models";
 import { selectPokemon } from "actions";

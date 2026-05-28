@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "es6",
         "module": "esnext",
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "declaration": false,
         "noImplicitAny": false,
         "removeComments": true,
@@ -17,9 +17,12 @@
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "allowJs": true,
-        "lib": ["dom", "dom.iterable", "ES2017", "ES2018", "ES2019", "ES2020"],
+        "lib": ["dom", "dom.iterable", "ES2022"],
+        "types": ["node", "vitest/globals"],
         "typeRoots": ["./node_modules/@types"],
-        "baseUrl": "./src"
+        "paths": {
+            "*": ["./src/*"]
+        }
     },
     "include": ["./src"],
     "exclude": ["node_modules", "./node_modules/@types"],
