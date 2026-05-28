@@ -124,11 +124,10 @@ export class AppBase extends React.Component<AppProps, { result2?: boolean }> {
     }
 
     public render() {
-        const { style, view } = this.props;
+        const { style } = this.props;
         const { result2 } = this.state;
-        const isDarkMode = style.editorDarkMode;
-        const showDebugPanel = isLocal();
-        console.log("features", feature);
+        const showDebugPanel =
+            isLocal() && import.meta.env.VITE_DEBUG_PANEL === "true";
 
         return (
             <ErrorBoundary

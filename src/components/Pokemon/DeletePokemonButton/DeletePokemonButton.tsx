@@ -8,7 +8,7 @@ import {
     PopoverInteractionKind,
     Classes,
 } from "@blueprintjs/core";
-import { cx, css } from "emotion";
+import { cx, css } from "@emotion/css";
 
 import { deletePokemon, modifyDeletionConfirmation } from "actions";
 import { connect } from "store/reactZustand";

@@ -6,7 +6,7 @@
     align-items: center;
     border-bottom: 1px solid rgba(0, 0, 0, 0.33);
 }
-.bp5-dark .top-bar {
+:is(.bp5-dark, .bp6-dark) .top-bar {
     background: #222;
 }
 .boxed-pokemon-icon {
@@ -26,7 +26,7 @@
     text-align: center;
     color: #eee;
 }
-.bp5-dark .bp5-callout {
+:is(.bp5-dark, .bp6-dark) :is(.bp5-callout, .bp6-callout) {
     color: #fff;
 }
 .result-notes {

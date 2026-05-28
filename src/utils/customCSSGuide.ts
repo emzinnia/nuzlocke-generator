@@ -25,6 +25,43 @@ Creates a purple to dark-blue gradient.
 
 > [This site](https://cssgradient.io/) contains a useful gradient generator
 
+## Team Pokemon Layout
+
+* Scope: Each Pokemon in the team section
+
+### Showing long notes above moves
+
+Long notes can overlap the moves, item, or image in the default templates because each Pokemon card keeps a fixed height. If you use notes as battle summaries, give each card more vertical room and let the notes wrap before the moves.
+
+\`\`\`css
+.pokemon-info {
+    min-height: 18rem;
+    align-items: stretch;
+}
+
+.pokemon-info-inner {
+    max-width: 65%;
+}
+
+.pokemon-notes {
+    white-space: pre-line;
+    line-height: 1.25;
+    margin-top: 0.35rem;
+    max-width: 100%;
+}
+
+.pokemon-moves {
+    position: static;
+    margin-top: 0.5rem;
+}
+
+.pokemon-image-wrapper {
+    align-self: center;
+}
+\`\`\`
+
+If your notes are still too tall, increase the \`min-height\` value. If your moves should stay beside the notes instead of below them, remove the \`.pokemon-moves\` rule and increase \`.pokemon-info-inner\` less aggressively.
+
 
 
 

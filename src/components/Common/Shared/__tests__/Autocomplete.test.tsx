@@ -85,9 +85,7 @@ describe("<Autcomplete />", () => {
 
         // Even after timers flush, it should remain open
         vi.runAllTimers();
-
-        await waitFor(() => {
-            expect(document.querySelector(".autocomplete-items")).not.toBeNull();
-        });
+        expect(document.querySelector(".autocomplete-items")).not.toBeNull();
+        vi.useRealTimers();
     });
 });

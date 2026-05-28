@@ -11,8 +11,9 @@ import {
 import { Pokemon } from "models";
 import { connect } from "store/reactZustand";
 import { State } from "state";
-import { noop } from "redux-saga/utils";
 import * as ReactDOMServer from "react-dom/server";
+
+const noop = () => {};
 
 export interface MovesProps {
     generation: Generation;
