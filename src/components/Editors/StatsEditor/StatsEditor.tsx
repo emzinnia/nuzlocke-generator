@@ -40,6 +40,18 @@ export class StatsEditorBase extends React.Component<StatsEditorProps> {
         });
     };
 
+    private onStatsOptionValueChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+        const stats = this.props.style?.statsOptions;
+        this.props.editStyle({
+            statsOptions: {
+                ...stats,
+                [e.currentTarget.name]: e.currentTarget.value,
+            },
+        });
+    };
+
     private onChange =
         (stat: State["stats"][number], use: "key" | "value") =>
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,6 +108,37 @@ export class StatsEditorBase extends React.Component<StatsEditorProps> {
                                 name="averageLevelDetailed"
                                 label="Average Level (Detailed)"
                                 onChange={this.onStatsOptionChange}
+                            />
+                        </li>
+
+                        <li
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                            }}
+                        >
+                            <Switch
+                                checked={stats?.levelCap}
+                                name="levelCap"
+                                label="Level Cap"
+                                onChange={this.onStatsOptionChange}
+                            />
+                            <input
+                                aria-label="Level Cap Value"
+                                className={cx(Classes.INPUT, "small-input")}
+                                disabled={!stats?.levelCap}
+                                min="1"
+                                name="levelCapValue"
+                                onChange={this.onStatsOptionValueChange}
+                                placeholder="cap"
+                                style={{
+                                    marginBottom: "10px",
+                                    marginLeft: "8px",
+                                    opacity: stats?.levelCap ? 1 : 0.3,
+                                    width: "5rem",
+                                }}
+                                type="number"
+                                value={stats?.levelCapValue ?? ""}
                             />
                         </li>
 
