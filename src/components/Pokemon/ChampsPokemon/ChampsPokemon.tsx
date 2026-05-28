@@ -11,6 +11,7 @@ import {
     getContrastColor,
     gameOfOriginToColor,
     styleDefaults,
+    Types,
 } from "utils";
 import { Pokemon } from "models";
 import { GenderElement } from "components/Common/Shared";
@@ -63,11 +64,18 @@ export class ChampsPokemon extends React.Component<ChampsPokemonProps> {
         const base = 48;
         return (
             base +
+            (this.hasMonolockeType() ? 24 : 0) +
             (this.props.showGender ? 24 : 0) +
             (this.props.showNickname ? 128 : 0) +
             (this.props.showLevel ? 24 : 0)
         );
     };
+
+    private hasMonolockeType = () =>
+        Boolean(
+            this.props.monolockeType &&
+                this.props.monolockeType !== ("None" as Types),
+        );
 
     private getPokemonImage() {
         const {
@@ -158,6 +166,15 @@ export class ChampsPokemon extends React.Component<ChampsPokemonProps> {
                     >
                         {this.props.showNickname && this.props.nickname}
                     </span>
+                    {this.hasMonolockeType() && (
+                        <span className="champs-pokemon-monolocke-type">
+                            <img
+                                alt={`Monolocke: ${this.props.monolockeType}`}
+                                style={{ height: "1rem", margin: "0 2px" }}
+                                src={`icons/tera/${this.props.monolockeType?.toLowerCase()}.png`}
+                            />
+                        </span>
+                    )}
                     {this.props.showGender && GenderElement(this.props.gender)}
                     <span
                         className="champs-pokemon-level"
