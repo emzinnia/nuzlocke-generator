@@ -1,7 +1,6 @@
 import * as React from "react";
 
 import { connect } from "store/reactZustand";
-import { v4 as uuid } from "uuid";
 import { cx } from "@emotion/css";
 
 import { selectPokemon, toggleMobileResultView, toggleDialog } from "actions";
@@ -43,11 +42,7 @@ import { resultSelector } from "selectors";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { normalizeSpeciesName } from "utils/getters/normalizeSpeciesName";
 import { Select } from "@blueprintjs/select";
-
-async function load() {
-    const resource = await import("@emmaramirez/dom-to-image");
-    return resource.domToImage;
-}
+import { downloadResultAsPng } from "./downloadImage";
 
 interface ResultProps {
     pokemon: Pokemon[];
@@ -203,17 +198,19 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
 
     private async toImage() {
         const resultNode = this.resultRef.current;
+        if (!resultNode) {
+            this.setState({
+                downloadError: "Failed to download. The result is not available.",
+            });
+            return;
+        }
+
         this.setState({ isDownloading: true });
         try {
-            const domToImage = await load();
-            const dataUrl = await domToImage.toPng(resultNode, {
-                corsImage: true,
+            await downloadResultAsPng({
+                node: resultNode,
+                customCSS: this.props.style.customCSS,
             });
-            console.log(dataUrl, resultNode);
-            const link = document.createElement("a");
-            link.download = `nuzlocke-${uuid()}.png`;
-            link.href = dataUrl;
-            link.click();
             this.setState({ downloadError: null, isDownloading: false });
         } catch (e) {
             console.log(e);
