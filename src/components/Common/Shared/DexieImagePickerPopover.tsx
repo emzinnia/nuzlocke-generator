@@ -3,6 +3,7 @@ import {
     Classes,
     IconName,
     InputGroup,
+    Intent,
     Popover,
     Position,
     Spinner,
@@ -14,8 +15,10 @@ import { toggleDialog } from "actions";
 import {
     getImagesPage,
     searchImagesByNamePrefix,
+    uploadImageFiles,
     Image as DexieImage,
 } from "./ImagesDrawer";
+import { showToast } from "./appToaster";
 
 const styles = {
     popover: css`
@@ -68,11 +71,30 @@ const styles = {
         justify-content: space-between;
         align-items: center;
         margin-top: 0.5rem;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    `,
+    footerActions: css`
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
     `,
     empty: css`
         margin-top: 0.75rem;
         color: rgba(0, 0, 0, 0.7);
         font-size: 0.9rem;
+    `,
+    uploadWrapper: css`
+        position: relative;
+        display: inline-flex;
+    `,
+    hiddenInput: css`
+        cursor: pointer;
+        opacity: 0;
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
     `,
 };
 
@@ -171,6 +193,74 @@ export function DexieImagePickerPopover({
         [onSelect],
     );
 
+    const onUploadFromDevice = React.useCallback(
+        async (e: React.ChangeEvent<HTMLInputElement>) => {
+            const files: File[] = Array.from(
+                e.target.files ?? e.currentTarget.files ?? [],
+            );
+            if (!files.length) return;
+
+            const uploadSummary = await uploadImageFiles(files);
+            const selectedImage = uploadSummary.uploaded[0];
+
+            try {
+                e.target.value = "";
+            } catch {
+                // Ignore browser-specific file input reset failures.
+            }
+
+            if (uploadSummary.uploaded.length > 0) {
+                setImages((prev) => [
+                    ...uploadSummary.uploaded.filter(
+                        (image) => (image.name ?? "").trim().length > 0,
+                    ),
+                    ...prev,
+                ]);
+                setOffset((prev) => prev + uploadSummary.uploaded.length);
+                if (selectedImage?.name) {
+                    onSelect(selectedImage.name);
+                    setIsOpen(false);
+                }
+                showToast({
+                    message:
+                        uploadSummary.uploaded.length === 1
+                            ? "Uploaded and selected image."
+                            : `Uploaded ${uploadSummary.uploaded.length} images.`,
+                    intent:
+                        uploadSummary.failed.length > 0 ||
+                        uploadSummary.tooLarge.length > 0
+                            ? Intent.WARNING
+                            : Intent.SUCCESS,
+                });
+                return;
+            }
+
+            showToast({
+                message:
+                    uploadSummary.tooLarge.length > 0
+                        ? "File size of 500KB exceeded."
+                        : "Error in parsing file.",
+                intent: Intent.DANGER,
+            });
+        },
+        [onSelect],
+    );
+
+    const uploadFromDeviceButton = (
+        <div className={styles.uploadWrapper}>
+            <Button small icon="upload">
+                Upload from Device
+            </Button>
+            <input
+                accept="image/*"
+                aria-label="Upload image from device"
+                className={styles.hiddenInput}
+                onChange={(e) => void onUploadFromDevice(e)}
+                type="file"
+            />
+        </div>
+    );
+
     const content = (
         <div className={styles.popover}>
             <div className={styles.headerRow}>
@@ -199,14 +289,16 @@ export function DexieImagePickerPopover({
             ) : images.length === 0 ? (
                 <div className={cx(styles.empty, Classes.TEXT_MUTED)}>
                     <p style={{ margin: 0 }}>No uploaded images yet.</p>
-                    <Button
-                        small
-                        icon="folder-open"
-                        onClick={openGallery}
-                        style={{ marginTop: "0.5rem" }}
-                    >
-                        Open Gallery to Upload
-                    </Button>
+                    <div className={styles.footerActions}>
+                        {uploadFromDeviceButton}
+                        <Button
+                            small
+                            icon="folder-open"
+                            onClick={openGallery}
+                        >
+                            Open Gallery
+                        </Button>
+                    </div>
                 </div>
             ) : (
                 <>
@@ -237,13 +329,16 @@ export function DexieImagePickerPopover({
                             ))}
                     </div>
                     <div className={styles.footerRow}>
-                        <Button
-                            small
-                            icon="folder-open"
-                            onClick={openGallery}
-                        >
-                            Open Gallery
-                        </Button>
+                        <div className={styles.footerActions}>
+                            {uploadFromDeviceButton}
+                            <Button
+                                small
+                                icon="folder-open"
+                                onClick={openGallery}
+                            >
+                                Open Gallery
+                            </Button>
+                        </div>
                         {hasMore ? (
                             <Button
                                 small
@@ -279,4 +374,3 @@ export function DexieImagePickerPopover({
         </Popover>
     );
 }
-
