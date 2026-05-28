@@ -648,7 +648,9 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                         </div>
 
                         {enableStats && !EMMA_MODE && (
-                            <Stats color={getContrastColor(bgColor)} />
+                            <div style={paddingForVerticalTrainerSection}>
+                                <Stats color={getContrastColor(bgColor)} />
+                            </div>
                         )}
 
                         {enableBackSpriteMontage && (
