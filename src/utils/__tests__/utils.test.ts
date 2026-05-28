@@ -317,6 +317,39 @@ describe(getMoveType.name, () => {
         expect(moveA).toBe(Types.Fire);
         expect(moveB).toBe(Types.Normal);
     });
+
+    it("maps Hisui moves to their types", () => {
+        const hisuiMoves: Array<[string, Types]> = [
+            ["Barb Barrage", Types.Poison],
+            ["Bitter Malice", Types.Ghost],
+            ["Bleakwind Storm", Types.Flying],
+            ["Ceaseless Edge", Types.Dark],
+            ["Chloroblast", Types.Grass],
+            ["Dire Claw", Types.Poison],
+            ["Esper Wing", Types.Psychic],
+            ["Headlong Rush", Types.Ground],
+            ["Infernal Parade", Types.Ghost],
+            ["Lunar Blessing", Types.Psychic],
+            ["Mountain Gale", Types.Ice],
+            ["Mystical Power", Types.Psychic],
+            ["Power Shift", Types.Normal],
+            ["Psyshield Bash", Types.Psychic],
+            ["Raging Fury", Types.Fire],
+            ["Sandsear Storm", Types.Ground],
+            ["Shelter", Types.Steel],
+            ["Springtide Storm", Types.Fairy],
+            ["Stone Axe", Types.Rock],
+            ["Take Heart", Types.Psychic],
+            ["Triple Arrows", Types.Fighting],
+            ["Victory Dance", Types.Fighting],
+            ["Wave Crash", Types.Water],
+            ["Wildbolt Storm", Types.Electric],
+        ];
+
+        hisuiMoves.forEach(([move, type]) => {
+            expect(getMoveType(move)).toBe(type);
+        });
+    });
 });
 
 describe(getDisplayNameForTest.name, () => {
