@@ -272,6 +272,21 @@ export class DataEditorBase extends React.Component<
         };
     }
 
+    public componentWillUnmount() {
+        this.releaseExportHref();
+    }
+
+    private releaseExportHref = () => {
+        if (this.state.href.startsWith("blob:")) {
+            URL.revokeObjectURL(this.state.href);
+        }
+    };
+
+    private closeDataDialog = () => {
+        this.releaseExportHref();
+        this.setState({ isOpen: false, href: "" });
+    };
+
     private uploadJSON = (e) => {
         if (isValidJSON(e.target.value)) {
             this.setState({ data: e.target.value });
@@ -333,14 +348,18 @@ export class DataEditorBase extends React.Component<
     };
 
     private exportState = (state) => {
+        const href = URL.createObjectURL(
+            new Blob([serializeNuzlockeJson(state)], {
+                type: "application/json",
+            }),
+        );
+        this.releaseExportHref();
         this.setState({
             mode: "export",
         });
         this.setState({ isOpen: true });
         this.setState({
-            href: `data:text/plain;charset=utf-8,${encodeURIComponent(
-                serializeNuzlockeJson(state),
-            )}`,
+            href,
         });
     };
 
@@ -680,7 +699,7 @@ export class DataEditorBase extends React.Component<
                 />
                 <Dialog
                     isOpen={this.state.isOpen}
-                    onClose={() => this.setState({ isOpen: false })}
+                    onClose={this.closeDataDialog}
                     title={
                         this.state.mode === "export"
                             ? "Exported Nuzlocke Save"
