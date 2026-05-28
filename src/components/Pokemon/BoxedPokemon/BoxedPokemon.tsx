@@ -8,9 +8,12 @@ import { getContrastColor, Styles, gameOfOriginToColor } from "utils";
 import { PokemonIcon } from "components/Pokemon/PokemonIcon/PokemonIcon";
 import { GenderElement } from "components/Common/Shared";
 import { State } from "state";
+import { PokemonImage } from "components/Common/Shared/PokemonImage";
 
 export type BoxedPokemonProps = Pokemon & { selectPokemon: selectPokemon } & {
     style: Styles;
+    editor: State["editor"];
+    game: State["game"];
 };
 
 const getAccentColor = (prop: BoxedPokemonProps) =>
@@ -23,6 +26,8 @@ const determineWidth = (isMinimal, numerator): string => {
 // @TODO: fix this messy prop soup
 export const BoxedPokemonBase = (poke: BoxedPokemonProps) => {
     const isMinimal = poke?.style?.minimalBoxedLayout;
+    const imageBorderRadius =
+        poke?.style?.imageStyle === "round" ? "50%" : "4px";
     const useGameOfOriginColor =
         poke?.gameOfOrigin &&
         poke?.style?.displayGameOriginForBoxedAndDead &&
@@ -52,17 +57,46 @@ export const BoxedPokemonBase = (poke: BoxedPokemonProps) => {
                 // Its dependent on the way react-dnd is wired
                 // which needs to be updated to v11 anyhow
             }
-            <PokemonIcon
-                position={poke?.position}
-                species={poke?.species}
-                id={poke?.id}
-                forme={poke?.forme}
-                shiny={poke?.shiny}
-                gender={poke?.gender}
-                egg={poke?.egg}
-                customIcon={poke?.customIcon}
-                className={"boxed-pokemon-icon"}
-            />
+            {poke?.style?.useArtworkForBoxedPokemon ? (
+                <PokemonImage
+                    customImage={poke?.customImage}
+                    forme={poke?.forme}
+                    species={poke?.species}
+                    shiny={poke?.shiny}
+                    gender={poke?.gender}
+                    egg={poke?.egg}
+                    style={poke?.style}
+                    editor={poke?.editor}
+                    name={poke?.game?.name}
+                >
+                    {(image) => (
+                        <img
+                            alt={`${poke?.species || "Pokemon"} artwork`}
+                            className="boxed-pokemon-icon boxed-pokemon-art"
+                            data-testid="boxed-pokemon-art"
+                            src={image}
+                            style={{
+                                borderRadius: imageBorderRadius,
+                                height: "3rem",
+                                objectFit: "cover",
+                                width: "3rem",
+                            }}
+                        />
+                    )}
+                </PokemonImage>
+            ) : (
+                <PokemonIcon
+                    position={poke?.position}
+                    species={poke?.species}
+                    id={poke?.id}
+                    forme={poke?.forme}
+                    shiny={poke?.shiny}
+                    gender={poke?.gender}
+                    egg={poke?.egg}
+                    customIcon={poke?.customIcon}
+                    className={"boxed-pokemon-icon"}
+                />
+            )}
             {isMinimal ? null : (
                 <div
                     className="boxed-pokemon-info"
@@ -112,7 +146,11 @@ export const BoxedPokemonBase = (poke: BoxedPokemonProps) => {
 };
 
 export const BoxedPokemon = connect(
-    (state: Pick<State, keyof State>) => ({ style: state.style }),
+    (state: Pick<State, keyof State>) => ({
+        editor: state.editor,
+        game: state.game,
+        style: state.style,
+    }),
     {
         selectPokemon,
     },

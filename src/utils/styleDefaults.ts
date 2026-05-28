@@ -34,6 +34,7 @@ export interface Styles {
     itemStyle: ItemStyle;
     pokeballStyle: ItemStyle;
     grayScaleDeadPokemon: boolean;
+    useArtworkForBoxedPokemon: boolean;
     minimalBoxedLayout: boolean;
     minimalTeamLayout: boolean;
     minimalDeadLayout: boolean;
@@ -85,6 +86,7 @@ export const styleDefaults: Styles = {
     pokeballStyle: "outer glow",
     iconRendering: "auto",
     grayScaleDeadPokemon: false,
+    useArtworkForBoxedPokemon: false,
     minimalBoxedLayout: false,
     minimalTeamLayout: false,
     minimalDeadLayout: false,
