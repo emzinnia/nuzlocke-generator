@@ -679,7 +679,7 @@ export class CurrentPokemonEditBase extends React.Component<
                         placeholder="Pallet Town"
                         value={currentPokemon.met || ""}
                         onChange={(e) => {
-                            if (!e?.target?.value) {
+                            if (!e?.target) {
                                 return;
                             }
                             const edit = {
