@@ -517,8 +517,10 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                             margin: this.state.isDownloading
                                 ? "0"
                                 : "3rem auto",
-                            backgroundColor: bgColor,
-                            backgroundImage: `url(${style.backgroundImage})`,
+                            background: bgColor,
+                            backgroundImage: style.backgroundImage
+                                ? `url(${style.backgroundImage})`
+                                : undefined,
                             backgroundRepeat: style.tileBackground
                                 ? "repeat"
                                 : "no-repeat",

@@ -124,6 +124,36 @@ describe("<ResultBase />", () => {
         expect(screen.getByText(/Dead/)).toBeTruthy();
         expect(screen.getByText(/Champs/)).toBeTruthy();
     });
+
+    it("applies CSS gradient background values to the result surface", () => {
+        const gradient = "linear-gradient(135deg, #123456 0%, #abcdef 100%)";
+        const { container } = render(
+            <ResultBase
+                pokemon={createPokemon()}
+                game={{ name: "Red", customName: "" }}
+                trainer={{ notes: "", badges: [] }}
+                box={boxes}
+                editor={baseEditor}
+                selectPokemon={vi.fn() as unknown as ResultBaseProps["selectPokemon"]}
+                toggleMobileResultView={
+                    vi.fn() as unknown as ResultBaseProps["toggleMobileResultView"]
+                }
+                toggleDialog={vi.fn() as unknown as ResultBaseProps["toggleDialog"]}
+                style={{
+                    ...styleDefaults,
+                    bgColor: gradient,
+                    backgroundImage: "",
+                    trainerSectionOrientation: "horizontal",
+                }}
+                rules={[]}
+                customTypes={[]}
+            />,
+        );
+
+        const result = container.querySelector(".result") as HTMLElement;
+        expect(result.getAttribute("style")).toContain("linear-gradient");
+        expect(result.style.backgroundImage).not.toContain("url(");
+    });
 });
 
 describe("<BackspriteMontage />", () => {

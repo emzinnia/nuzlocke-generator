@@ -20,6 +20,11 @@ describe("rgbaOrHex", () => {
         expect(result).toBe("#00ff00");
     });
 
+    it("returns CSS gradient strings unchanged", () => {
+        const gradient = "linear-gradient(135deg, #123456 0%, #abcdef 100%)";
+        expect(rgbaOrHex(gradient)).toBe(gradient);
+    });
+
     it("handles missing alpha value", () => {
         const result = rgbaOrHex({ hex: "#0000ff", rgb: { r: 0, g: 0, b: 255 } });
         expect(result).toBe("#0000ff");
@@ -58,10 +63,19 @@ describe("ColorEditBase", () => {
     it("calls onChange when text input value changes", () => {
         render(<ColorEditBase {...defaultProps} />);
         const input = screen.getByRole("textbox");
-        
+
         fireEvent.change(input, { target: { value: "#00ff00" } });
-        
+
         expect(mockOnChange).toHaveBeenCalled();
+    });
+
+    it("renders gradient values in the text input", () => {
+        const gradient = "linear-gradient(135deg, #123456 0%, #abcdef 100%)";
+        render(<ColorEditBase {...defaultProps} value={gradient} />);
+
+        const input = screen.getByRole("textbox") as HTMLInputElement;
+        expect(input.type).toBe("text");
+        expect(input.value).toBe(gradient);
     });
 
     it("has the correct name attribute on input", () => {
