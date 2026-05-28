@@ -10,6 +10,7 @@ import {
     Generation,
     typeToColor,
     isEmpty,
+    getIconFormeSuffix,
 } from "utils";
 import * as React from "react";
 import * as Color from "color";
@@ -107,6 +108,10 @@ describe("matchSpeciesToType", () => {
             "Steel",
             "Steel",
         ]);
+        expect(matchSpeciesToTypes("Muk", "Alolan")).toEqual([
+            "Poison",
+            "Dark",
+        ]);
         expect(matchSpeciesToTypes("Shaymin", "Sky")).toEqual([
             "Grass",
             "Flying",
@@ -123,6 +128,14 @@ describe("matchSpeciesToType", () => {
         console.log(noMatches.length);
         console.log(noMatches);
         expect(false).toBe(true);
+    });
+});
+
+describe(getIconFormeSuffix.name, () => {
+    it("builds Lycanroc icon suffixes for each forme", () => {
+        expect(getIconFormeSuffix("Midday")).toEqual("");
+        expect(getIconFormeSuffix("Dusk")).toEqual("-dusk");
+        expect(getIconFormeSuffix("Midnight")).toEqual("-midnight");
     });
 });
 

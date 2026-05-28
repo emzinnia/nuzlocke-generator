@@ -131,6 +131,15 @@ export const handleSpeciesTypeEdgeCases = ({
     if (
         match({
             ...data,
+            species: ["Grimer", "Muk"],
+            forme: ["Alolan"],
+        })
+    )
+        return [Types.Poison, Types.Dark];
+
+    if (
+        match({
+            ...data,
             species: ["Meowth"],
             forme: ["Galarian"],
         })

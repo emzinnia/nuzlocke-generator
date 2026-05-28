@@ -88,6 +88,10 @@ export enum Forme {
     "East Sea" = "east",
     "West Sea" = "west",
 
+    Midday = "midday",
+    Midnight = "midnight",
+    Dusk = "dusk",
+
     Lowkey = "lowkey",
     AmpedUp = "amped",
 
