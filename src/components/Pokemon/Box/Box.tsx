@@ -8,6 +8,7 @@ import {
     editBox,
     deleteBox,
     deletePokemon,
+    reorderBoxes,
     updateBoxes,
 } from "actions";
 import { Box as BoxType } from "models";
@@ -157,20 +158,10 @@ export const Box: React.FC<BoxProps> = (props) => {
             if (itemType === "BOX") {
                 const boxItem = item as { id: number; position: number };
                 if (props.id == null || boxItem.id == null || boxItem.id === props.id) {
-                    return; // Don't swap with self
+                    return;
                 }
-                
-                // Swap positions between the two boxes
-                dispatch(
-                    editBox(props.id, {
-                        position: boxItem.position,
-                    }),
-                );
-                dispatch(
-                    editBox(boxItem.id, {
-                        position: props.position,
-                    }),
-                );
+
+                dispatch(reorderBoxes(boxItem.id, props.id));
             }
         },
         collect: (monitor) => ({
@@ -360,6 +351,7 @@ export const Box: React.FC<BoxProps> = (props) => {
                             borderRadius: "0.125rem",
                         }}
                         title="Drag to reorder"
+                        aria-label={`Drag ${name} box to reorder`}
                     >
                         <Icon style={{ opacity: 0.5 }} icon="drag-handle-vertical" />
                     </span>

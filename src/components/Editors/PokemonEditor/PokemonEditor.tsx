@@ -46,10 +46,10 @@ export class BoxesComponent extends React.Component<BoxesComponentProps> {
     private renderBoxes(boxes: Boxes, team: Pokemon[]) {
         const { matchedIds, hasSearchQuery, searchTerm } = this.props;
 
-        return boxes
+        return [...boxes]
             .sort((a: BoxModel, b: BoxModel) => {
-                const positionA = a.position || 0;
-                const positionB = b.position || 1;
+                const positionA = a.position ?? 0;
+                const positionB = b.position ?? 1;
                 return positionA - positionB;
             })
             .map((box) => {
