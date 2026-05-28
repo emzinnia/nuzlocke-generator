@@ -7,7 +7,7 @@ import {
     Position,
     Spinner,
 } from "@blueprintjs/core";
-import { css, cx } from "emotion";
+import { css, cx } from "@emotion/css";
 import * as React from "react";
 import { useDispatch } from "store/reactZustand";
 import { toggleDialog } from "actions";

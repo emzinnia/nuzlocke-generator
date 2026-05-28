@@ -2,7 +2,7 @@ import * as React from "react";
 import { Classes, Dialog, Intent, Button } from "@blueprintjs/core";
 import { useSelector } from "store/reactZustand";
 import { State } from "state";
-import { css, cx } from "emotion";
+import { css, cx } from "@emotion/css";
 
 import credits from "./credits.json";
 
@@ -65,16 +65,20 @@ export function Credits() {
                         style={{ width: "50%", padding: "1rem" }}
                     >
                         <strong>Development/Design</strong>
-                        {(credits as CreditsData).dev.map((creditItem) => {
-                            return (
-                                <div key={creditItem.name}>
-                                    {creditItem.role}:{" "}
-                                    <a href={creditItem.link}>
-                                        {creditItem.name}
-                                    </a>
-                                </div>
-                            );
-                        })}
+                        {(credits as CreditsData).dev.map(
+                            (creditItem, index) => {
+                                return (
+                                    <div
+                                        key={`${creditItem.role}-${creditItem.name}-${index}`}
+                                    >
+                                        {creditItem.role}:{" "}
+                                        <a href={creditItem.link}>
+                                            {creditItem.name}
+                                        </a>
+                                    </div>
+                                );
+                            },
+                        )}
                     </div>
                     <div
                         className={creditsItem}
@@ -86,9 +90,11 @@ export function Credits() {
                         <strong>Art</strong>
                         {(credits as CreditsData).art
                             .sort(sortByRole)
-                            .map((creditItem) => {
+                            .map((creditItem, index) => {
                                 return (
-                                    <div key={creditItem.name}>
+                                    <div
+                                        key={`${creditItem.role}-${creditItem.name}-${index}`}
+                                    >
                                         {creditItem.role}:{" "}
                                         <a href={creditItem.link}>
                                             {creditItem.name}
