@@ -240,14 +240,16 @@ export async function getPokemonImage({
     }
 
     if (style?.spritesMode && (name === "LeafGreen" || name === "FireRed")) {
+        const frlgSpriteFolder =
+            (regularNumber ?? 0) > 151 ? "emerald" : "firered-leafgreen";
         if (!shiny) {
-            const url = `https://img.pokemondb.net/sprites/firered-leafgreen/normal/${normalizeSpeciesName(
+            const url = `https://img.pokemondb.net/sprites/${frlgSpriteFolder}/normal/${normalizeSpeciesName(
                 species as Species,
             )}.png`;
 
             return await wrapImageInCORS(url);
         } else {
-            const url = `https://img.pokemondb.net/sprites/firered-leafgreen/shiny/${normalizeSpeciesName(
+            const url = `https://img.pokemondb.net/sprites/${frlgSpriteFolder}/shiny/${normalizeSpeciesName(
                 species as Species,
             )}.png`;
 

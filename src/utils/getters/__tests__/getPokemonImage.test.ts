@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => {
             const map: Record<string, number> = {
                 Ditto: 132,
                 Pikachu: 25,
+                Chikorita: 152,
+                Torchic: 255,
                 Unfezant: 521,
                 Gyarados: 130,
                 Dugtrio: 51,
@@ -258,6 +260,28 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             );
         });
 
+        it("uses Emerald sprite assets for Gen 2 and Gen 3 Pokemon in FRLG sprite mode", async () => {
+            const gen2 = await getPokemonImage({
+                species: "Chikorita",
+                name: imageGame("FireRed"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: false,
+            });
+            const gen3 = await getPokemonImage({
+                species: "Torchic",
+                name: imageGame("LeafGreen"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: true,
+            });
+
+            expect(gen2).toBe(
+                "cors(https://img.pokemondb.net/sprites/emerald/normal/chikorita.png)",
+            );
+            expect(gen3).toBe(
+                "cors(https://img.pokemondb.net/sprites/emerald/shiny/torchic.png)",
+            );
+        });
+
         it("builds Sword/Shield sprite URLs and wraps them", async () => {
             const nonShiny = await getPokemonImage({
                 species: "Pikachu",
@@ -408,4 +432,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-
