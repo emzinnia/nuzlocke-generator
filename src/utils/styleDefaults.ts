@@ -25,6 +25,7 @@ export interface Styles {
     customCSS: string;
     displayBadges: boolean;
     displayRules: boolean;
+    displayHighlightMoments: boolean;
     editorDarkMode: boolean;
     font: string;
     usePokemonGBAFont: boolean;
@@ -77,6 +78,7 @@ export const styleDefaults: Styles = {
     customCSS: "",
     displayBadges: true,
     displayRules: false,
+    displayHighlightMoments: false,
     editorDarkMode: false,
     font: "Open Sans",
     iconsNextToTeamPokemon: false,
