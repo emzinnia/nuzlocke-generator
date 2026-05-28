@@ -716,6 +716,10 @@
 .compact-with-icons .badge-wrapper img {
     height: 2rem !important;
 }
+.compact-with-icons .badge-wrapper img.custom-checkpoint {
+    flex-basis: 2rem;
+    width: 2rem;
+}
 .compact-with-icons
     .dead-pokemon-container
     div:nth-of-type(2)
