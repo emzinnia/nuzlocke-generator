@@ -57,6 +57,29 @@ describe("<CurrentPokemonEdit />", () => {
         vi.useRealTimers();
     });
 
+    it("updates the status dropdown when custom boxes are added after mount", () => {
+        const pokemon = createPokemon("poke-a", "Voltorb");
+        const { rerender } = renderEditor(pokemon.id, [pokemon], vi.fn());
+        expect(screen.queryByRole("option", { name: "Armory" })).toBeNull();
+
+        rerender(
+            <CurrentPokemonEditBase
+                selectedId={pokemon.id}
+                box={[...boxes, { id: 3, position: 3, name: "Armory" }]}
+                pokemon={[pokemon]}
+                selectPokemon={vi.fn() as unknown as selectPokemon}
+                editPokemon={vi.fn() as unknown as editPokemon}
+                addPokemon={vi.fn() as unknown as addPokemon}
+                game={{ name: "Red", customName: "" }}
+                editor={editor}
+                customTypes={[]}
+                customAreas={[]}
+            />,
+        );
+
+        expect(screen.getByRole("option", { name: "Armory" })).toBeDefined();
+    });
+
     it("does not apply a pending species edit to a newly selected Pokémon", async () => {
         vi.useFakeTimers();
         const pikachu = createPokemon("poke-a", "Pikachu");
