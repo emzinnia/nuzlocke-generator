@@ -9,6 +9,7 @@ import {
     getContrastColor,
     matchNatureToToxtricityForme,
     Species,
+    listOfPokemon,
     normalizePokeballName,
 } from "utils";
 import { editPokemon } from "actions";
@@ -65,7 +66,7 @@ interface ChangeArgs {
     edit: PokemonEditDraft;
 }
 
-const createEdit = ({ inputName, value, pokemon, edit }: ChangeArgs) => {
+export const createEdit = ({ inputName, value, pokemon, edit }: ChangeArgs) => {
     if (inputName === "species") {
         const species = edit["species"];
         return {
@@ -88,6 +89,13 @@ const createEdit = ({ inputName, value, pokemon, edit }: ChangeArgs) => {
                     : pokemon.forme,
         };
     } else if (inputName === "forme") {
+        if (
+            pokemon?.species &&
+            !listOfPokemon.includes(pokemon.species as Species)
+        ) {
+            return edit;
+        }
+
         return {
             ...edit,
             types:
