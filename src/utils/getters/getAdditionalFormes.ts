@@ -343,17 +343,22 @@ export const getAdditionalFormes = (species: string | undefined): string[] => {
         return ["Ice Rider", "Shadow Rider"];
     }
     if (
+        s === "arcanine" ||
+        s === "avalugg" ||
+        s === "braviary" ||
+        s === "decidueye" ||
+        s === "electrode" ||
+        s === "goodra" ||
         s === "growlithe" ||
+        s === "lilligant" ||
+        s === "qwilfish" ||
+        s === "samurott" ||
+        s === "sliggoo" ||
+        s === "sneasel" ||
+        s === "typhlosion" ||
         s === "voltorb" ||
         s === "zorua" ||
-        s === "zoroark" ||
-        s === "braviary" ||
-        s === "sneasel" ||
-        s === "sligoo" ||
-        s === "goodra" ||
-        s === "avalugg" ||
-        s === "lilligant" ||
-        s === "qwilfish"
+        s === "zoroark"
     ) {
         return ["Hisuian"];
     }
