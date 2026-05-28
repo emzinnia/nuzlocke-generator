@@ -29,6 +29,8 @@ import { matchNatureToToxtricityForme } from "utils/matchNatureToToxtricityForme
 import { Nature } from "utils/Nature";
 import { getAdditionalFormes } from "utils/getters/getAdditionalFormes";
 import { getEvolutionLine } from "utils";
+import { EvolutionTree } from "utils/data/listOfEvolutions";
+import { GEN3_SPECIES_MAP } from "parsers/utils/gen3";
 
 const objectPropertiesWhere = (
     obj: object,
@@ -123,6 +125,19 @@ describe("matchSpeciesToType", () => {
         console.log(noMatches.length);
         console.log(noMatches);
         expect(false).toBe(true);
+    });
+});
+
+describe("Treecko spelling", () => {
+    it("uses Treecko consistently across species data", () => {
+        expect(listOfPokemon).toContain("Treecko");
+        expect(listOfPokemon).not.toContain("Three");
+        expect(EvolutionTree.Treecko).toEqual(["Grovyle"]);
+        expect(matchSpeciesToTypes("Treecko")).toEqual([
+            Types.Grass,
+            Types.Grass,
+        ]);
+        expect(GEN3_SPECIES_MAP[0x115]).toBe("Treecko");
     });
 });
 
