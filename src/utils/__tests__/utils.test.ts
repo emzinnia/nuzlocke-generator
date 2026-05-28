@@ -29,6 +29,7 @@ import { matchNatureToToxtricityForme } from "utils/matchNatureToToxtricityForme
 import { Nature } from "utils/Nature";
 import { getAdditionalFormes } from "utils/getters/getAdditionalFormes";
 import { getEvolutionLine } from "utils";
+import { existsSync } from "node:fs";
 
 const objectPropertiesWhere = (
     obj: object,
@@ -44,6 +45,12 @@ describe("addForme", () => {
     it("returns a mega forme", () => {
         const forme = addForme("alakazam", "Mega");
         expect(forme).toEqual("alakazam-mega");
+    });
+
+    it("points Mega Sableye to a bundled standard image", () => {
+        expect(getAdditionalFormes("Sableye")).toContain("Mega");
+        expect(addForme("sableye", "Mega")).toEqual("sableye-mega");
+        expect(existsSync("src/img/sableye-mega.jpg")).toBe(true);
     });
 });
 

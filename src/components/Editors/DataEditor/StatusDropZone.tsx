@@ -34,7 +34,9 @@ export function StatusDropZone({
 
     return (
         <div
-            ref={drop}
+            ref={(node) => {
+                drop(node);
+            }}
             style={{
                 display: "flex",
                 flexDirection: "row",
@@ -101,4 +103,3 @@ export function StatusDropZone({
         </div>
     );
 }
-

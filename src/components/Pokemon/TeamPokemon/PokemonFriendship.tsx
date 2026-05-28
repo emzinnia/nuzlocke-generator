@@ -23,7 +23,7 @@ export const generateHearts = (
 ) => {
     return Array.from(Array(friendship).keys()).map((k) => (
         <Icon
-            iconSize={12}
+            size={12}
             data-testid="friendship-icon"
             key={uuid()}
             icon="heart"
@@ -43,7 +43,7 @@ export function PokemonFriendship({ friendship }: PokemonFriendshipProps) {
     if (numberOfHearts === 0)
         return (
             <Icon
-                iconSize={12}
+                size={12}
                 data-testid="friendship-broken-icon"
                 icon="heart-broken"
             />

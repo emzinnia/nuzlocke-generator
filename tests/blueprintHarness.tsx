@@ -23,7 +23,7 @@ export const renderWithPortal = (
         container.remove();
     };
 
-    const portal = () => document.body.querySelector(".bp5-portal");
+    const portal = () => document.body.querySelector(".bp6-portal, .bp5-portal");
 
     return Object.assign(rtlResult, { portal, cleanup });
 };
@@ -33,5 +33,4 @@ export const flushPromises = async () => {
         await Promise.resolve();
     });
 };
-
 
