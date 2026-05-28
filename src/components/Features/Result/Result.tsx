@@ -84,11 +84,18 @@ type ZoomValue = (typeof ZoomValues)[number];
 
 const convertToPercentage = (n: number) => `${n * 100}%`;
 
-const TopBarItems = ({ editorDarkMode, setZoomLevel, currentZoomLevel }) => {
+export const TopBarItems = ({
+    editorDarkMode,
+    setZoomLevel,
+    currentZoomLevel,
+}) => {
     // @TODO: make this look decent
     return (
         <Select<ZoomValue>
-            className={cx({ "bp5-dark": editorDarkMode })}
+            className={cx({ [Classes.DARK]: editorDarkMode })}
+            popoverProps={{
+                popoverClassName: cx({ [Classes.DARK]: editorDarkMode }),
+            }}
             filterable={false}
             items={ZoomValues}
             itemRenderer={(item, { handleClick }) => (
