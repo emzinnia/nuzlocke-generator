@@ -165,7 +165,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
     });
 
     describe("spritesMode (remote sprite URLs)", () => {
-        it("builds serebii non-shiny sprite URL for BW-era games and wraps it", async () => {
+        it("builds serebii non-shiny sprite URL for BW-era games without proxying it", async () => {
             const result = await getPokemonImage({
                 species: "Pikachu",
                 forme: imageForme("Alolan"),
@@ -176,11 +176,11 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
 
             const expectedUrl =
                 "https://www.serebii.net/blackwhite/pokemon/025-Alolan.png";
-            expect(mocks.wrapImageInCORS).toHaveBeenCalledWith(expectedUrl);
-            expect(result).toBe(`cors(${expectedUrl})`);
+            expect(mocks.wrapImageInCORS).not.toHaveBeenCalled();
+            expect(result).toBe(`url(${expectedUrl})`);
         });
 
-        it("builds serebii shiny sprite URL for BW-era games and wraps it", async () => {
+        it("builds serebii shiny sprite URL for BW-era games without proxying it", async () => {
             const result = await getPokemonImage({
                 species: "Pikachu",
                 name: imageGame("Black"),
@@ -189,11 +189,11 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             });
 
             const expectedUrl = "https://www.serebii.net/Shiny/BW/025.png";
-            expect(mocks.wrapImageInCORS).toHaveBeenCalledWith(expectedUrl);
-            expect(result).toBe(`cors(${expectedUrl})`);
+            expect(mocks.wrapImageInCORS).not.toHaveBeenCalled();
+            expect(result).toBe(`url(${expectedUrl})`);
         });
 
-        it("builds Scarlet/Violet sprite URLs and wraps them", async () => {
+        it("builds Scarlet/Violet sprite URLs without proxying them", async () => {
             const nonShiny = await getPokemonImage({
                 species: "Pikachu",
                 name: imageGame("Scarlet"),
@@ -208,14 +208,15 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             });
 
             expect(nonShiny).toBe(
-                "cors(https://serebii.net/scarletviolet/pokemon/new/025.png)",
+                "url(https://serebii.net/scarletviolet/pokemon/new/025.png)",
             );
             expect(shiny).toBe(
-                "cors(https://serebii.net/Shiny/SV/new/025.png)",
+                "url(https://serebii.net/Shiny/SV/new/025.png)",
             );
+            expect(mocks.wrapImageInCORS).not.toHaveBeenCalled();
         });
 
-        it("builds DP/HGSS sprite URLs and wraps them", async () => {
+        it("builds DP/HGSS sprite URLs without proxying them", async () => {
             const nonShiny = await getPokemonImage({
                 species: "Pikachu",
                 name: imageGame("Diamond"),
@@ -230,12 +231,13 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             });
 
             expect(nonShiny).toBe(
-                "cors(https://www.serebii.net/pokearth/sprites/dp/025.png)",
+                "url(https://www.serebii.net/pokearth/sprites/dp/025.png)",
             );
-            expect(shiny).toBe("cors(https://www.serebii.net/Shiny/DP/025.png)");
+            expect(shiny).toBe("url(https://www.serebii.net/Shiny/DP/025.png)");
+            expect(mocks.wrapImageInCORS).not.toHaveBeenCalled();
         });
 
-        it("builds FRLG sprite URLs via pokemondb and wraps them", async () => {
+        it("builds FRLG sprite URLs via pokemondb without proxying them", async () => {
             const nonShiny = await getPokemonImage({
                 species: "Pikachu",
                 name: imageGame("FireRed"),
@@ -251,14 +253,15 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
 
             expect(mocks.normalizeSpeciesName).toHaveBeenCalledWith("Pikachu");
             expect(nonShiny).toBe(
-                "cors(https://img.pokemondb.net/sprites/firered-leafgreen/normal/pikachu.png)",
+                "url(https://img.pokemondb.net/sprites/firered-leafgreen/normal/pikachu.png)",
             );
             expect(shiny).toBe(
-                "cors(https://img.pokemondb.net/sprites/firered-leafgreen/shiny/pikachu.png)",
+                "url(https://img.pokemondb.net/sprites/firered-leafgreen/shiny/pikachu.png)",
             );
+            expect(mocks.wrapImageInCORS).not.toHaveBeenCalled();
         });
 
-        it("builds Sword/Shield sprite URLs and wraps them", async () => {
+        it("builds Sword/Shield sprite URLs without proxying them", async () => {
             const nonShiny = await getPokemonImage({
                 species: "Pikachu",
                 forme: imageForme("Alolan"),
@@ -274,11 +277,12 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             });
 
             expect(nonShiny).toBe(
-                "cors(https://www.serebii.net/swordshield/pokemon/025-Alolan.png)",
+                "url(https://www.serebii.net/swordshield/pokemon/025-Alolan.png)",
             );
             expect(shiny).toBe(
-                "cors(https://www.serebii.net/Shiny/SWSH/025.png)",
+                "url(https://www.serebii.net/Shiny/SWSH/025.png)",
             );
+            expect(mocks.wrapImageInCORS).not.toHaveBeenCalled();
         });
 
         it("uses generic serebii URL builder for other games when spritesMode is true", async () => {
@@ -290,7 +294,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             });
 
             expect(result).toBe(
-                "cors(https://www.serebii.net/green/pokemon/025.png)",
+                "url(https://www.serebii.net/green/pokemon/025.png)",
             );
         });
     });
@@ -408,4 +412,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-
