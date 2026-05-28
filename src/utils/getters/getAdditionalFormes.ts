@@ -160,7 +160,7 @@ export const getAdditionalFormes = (species: string | undefined): string[] => {
         return ["Alolan"];
     }
     if (s === "meowth") {
-        return ["Alolan", "Galarian"];
+        return ["Alolan", "Galarian", "Gigantamax"];
     }
     if (
         s === "ponyta" ||
@@ -304,13 +304,14 @@ export const getAdditionalFormes = (species: string | undefined): string[] => {
             "Ruby Swirl",
             "Caramel Swirl",
             "Rainbow Swirl",
+            "Gigantamax",
         ];
     }
     if (
         s === "snorlax" ||
         s === "eevee" ||
         s === "butterfree" ||
-        s === "corvinight" ||
+        s === "corviknight" ||
         s === "alcremie" ||
         s === "drednaw" ||
         s === "machamp" ||
@@ -321,7 +322,7 @@ export const getAdditionalFormes = (species: string | undefined): string[] => {
         s === "grimmsnarl" ||
         s === "hatterene" ||
         s === "copperajah" ||
-        s === "duralodon" ||
+        s === "duraludon" ||
         s === "flapple" ||
         s === "appletun" ||
         s === "orbeetle" ||
@@ -344,16 +345,21 @@ export const getAdditionalFormes = (species: string | undefined): string[] => {
     }
     if (
         s === "growlithe" ||
+        s === "arcanine" ||
         s === "voltorb" ||
+        s === "electrode" ||
+        s === "typhlosion" ||
+        s === "samurott" ||
         s === "zorua" ||
         s === "zoroark" ||
         s === "braviary" ||
         s === "sneasel" ||
-        s === "sligoo" ||
+        s === "sliggoo" ||
         s === "goodra" ||
         s === "avalugg" ||
         s === "lilligant" ||
-        s === "qwilfish"
+        s === "qwilfish" ||
+        s === "decidueye"
     ) {
         return ["Hisuian"];
     }

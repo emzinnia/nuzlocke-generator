@@ -86,6 +86,84 @@ describe("styleDefaults", () => {
     });
 });
 
+describe("getAdditionalFormes", () => {
+    it("includes every Gigantamax species option", () => {
+        const gigantamaxSpecies = [
+            "Venusaur",
+            "Charizard",
+            "Blastoise",
+            "Butterfree",
+            "Pikachu",
+            "Meowth",
+            "Machamp",
+            "Gengar",
+            "Kingler",
+            "Lapras",
+            "Eevee",
+            "Snorlax",
+            "Garbodor",
+            "Melmetal",
+            "Rillaboom",
+            "Cinderace",
+            "Inteleon",
+            "Corviknight",
+            "Orbeetle",
+            "Drednaw",
+            "Coalossal",
+            "Flapple",
+            "Appletun",
+            "Sandaconda",
+            "Toxtricity",
+            "Centiskorch",
+            "Hatterene",
+            "Grimmsnarl",
+            "Alcremie",
+            "Copperajah",
+            "Duraludon",
+        ];
+
+        const missing = gigantamaxSpecies.filter(
+            (species) => !getAdditionalFormes(species).includes("Gigantamax"),
+        );
+
+        expect(missing).toEqual([]);
+
+        expect(getAdditionalFormes("Urshifu")).toEqual(
+            expect.arrayContaining([
+                "Single Strike Gigantamax",
+                "Rapid Strike Gigantamax",
+            ]),
+        );
+    });
+
+    it("includes every Hisuian regional form option", () => {
+        const hisuianSpecies = [
+            "Growlithe",
+            "Arcanine",
+            "Voltorb",
+            "Electrode",
+            "Typhlosion",
+            "Qwilfish",
+            "Sneasel",
+            "Samurott",
+            "Lilligant",
+            "Zorua",
+            "Zoroark",
+            "Braviary",
+            "Sliggoo",
+            "Goodra",
+            "Avalugg",
+            "Decidueye",
+        ];
+
+        const missing = hisuianSpecies.filter(
+            (species) => !getAdditionalFormes(species).includes("Hisuian"),
+        );
+
+        expect(missing).toEqual([]);
+    });
+});
+
 describe("matchSpeciesToType", () => {
     it("returns a type for a Pokemon", () => {
         expect(matchSpeciesToTypes("Bulbasaur")).toEqual(["Grass", "Poison"]);
@@ -110,6 +188,38 @@ describe("matchSpeciesToType", () => {
         expect(matchSpeciesToTypes("Shaymin", "Sky")).toEqual([
             "Grass",
             "Flying",
+        ]);
+        expect(matchSpeciesToTypes("Arcanine", "Hisuian")).toEqual([
+            "Fire",
+            "Rock",
+        ]);
+        expect(matchSpeciesToTypes("Electrode", "Hisuian")).toEqual([
+            "Electric",
+            "Grass",
+        ]);
+        expect(matchSpeciesToTypes("Typhlosion", "Hisuian")).toEqual([
+            "Fire",
+            "Ghost",
+        ]);
+        expect(matchSpeciesToTypes("Samurott", "Hisuian")).toEqual([
+            "Water",
+            "Dark",
+        ]);
+        expect(matchSpeciesToTypes("Lilligant", "Hisuian")).toEqual([
+            "Grass",
+            "Fighting",
+        ]);
+        expect(matchSpeciesToTypes("Goodra", "Hisuian")).toEqual([
+            "Steel",
+            "Dragon",
+        ]);
+        expect(matchSpeciesToTypes("Avalugg", "Hisuian")).toEqual([
+            "Ice",
+            "Rock",
+        ]);
+        expect(matchSpeciesToTypes("Decidueye", "Hisuian")).toEqual([
+            "Grass",
+            "Fighting",
         ]);
         listOfPokemon.map((pokemon, index) => {
             expect(matchSpeciesToTypes(pokemon).length).toBeGreaterThan(0);
