@@ -60,6 +60,7 @@ export class StatsEditorBase extends React.Component<StatsEditorProps> {
         const { style, editStyle } = this.props;
         const { addStat, deleteStat } = this.props;
         const stats = style?.statsOptions;
+        const customStats = [...(this.props.stats ?? [])].sort(sortById);
 
         return (
             <BaseEditor icon="chart" name="Stats">
@@ -126,7 +127,7 @@ export class StatsEditorBase extends React.Component<StatsEditorProps> {
                             />
                         </li>
 
-                        {this.props.stats?.sort(sortById).map((stat) => (
+                        {customStats.map((stat) => (
                             <li
                                 style={{
                                     display: "flex",
@@ -140,16 +141,18 @@ export class StatsEditorBase extends React.Component<StatsEditorProps> {
                                     style={{ margin: "4px" }}
                                     className={Classes.INPUT}
                                     type="text"
+                                    aria-label="custom stat label"
                                     placeholder="custom label"
-                                    value={stat.key}
+                                    value={stat.key ?? ""}
                                 />
                                 <input
                                     onChange={this.onChange(stat, "value")}
                                     style={{ margin: "4px" }}
                                     className={Classes.INPUT}
                                     type="text"
+                                    aria-label="custom stat value"
                                     placeholder="custom value"
-                                    value={stat.value}
+                                    value={stat.value ?? ""}
                                 />
                                 <Button
                                     icon="trash"
