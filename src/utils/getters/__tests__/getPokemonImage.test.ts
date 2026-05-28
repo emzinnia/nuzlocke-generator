@@ -281,6 +281,30 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             );
         });
 
+        it("builds female Indeedee Sword/Shield sprite URLs", async () => {
+            const nonShiny = await getPokemonImage({
+                species: "Indeedee",
+                gender: imageGender("Female"),
+                name: imageGame("Sword"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: false,
+            });
+            const shiny = await getPokemonImage({
+                species: "Indeedee",
+                gender: imageGender("f"),
+                name: imageGame("Shield"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: true,
+            });
+
+            expect(nonShiny).toBe(
+                "cors(https://www.serebii.net/swordshield/pokemon/876-f.png)",
+            );
+            expect(shiny).toBe(
+                "cors(https://www.serebii.net/Shiny/SWSH/876-f.png)",
+            );
+        });
+
         it("uses generic serebii URL builder for other games when spritesMode is true", async () => {
             const result = await getPokemonImage({
                 species: "Pikachu",
@@ -408,4 +432,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-
