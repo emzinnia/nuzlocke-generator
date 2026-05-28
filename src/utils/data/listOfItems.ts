@@ -288,7 +288,7 @@ export const listOfItems = [
     "Pack of Potatoes",
     "Packaged Curry",
     "Pasta",
-    "Pokemon Box Link",
+    "Pokémon Box Link",
     "Precooked Burger",
     "Pungent Root",
     "Quiet Mint",

@@ -6,9 +6,8 @@ export const normalizePokeballName = (name?: string | null) => {
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "");
 
-    if (ascii.toLowerCase() === "poke ball") return "Poke Ball";
+    if (ascii.toLowerCase() === "poke ball") return "Poké Ball";
 
     return ascii;
 };
-
 

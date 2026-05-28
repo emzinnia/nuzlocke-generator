@@ -129,7 +129,7 @@ const componentTree: ComponentNode[] = [
         id: 8,
         icon: "style",
         isExpanded: true,
-        label: "Team Pokemon",
+        label: "Team Pokémon",
         component: TeamPokemon,
         options: {
             props: {
@@ -150,7 +150,7 @@ const componentTree: ComponentNode[] = [
         id: 91,
         icon: "style",
         isExpanded: true,
-        label: "Boxed Pokemon",
+        label: "Boxed Pokémon",
         component: BoxedPokemon,
         options: {
             props: {},
@@ -163,7 +163,7 @@ const componentTree: ComponentNode[] = [
         id: 10,
         icon: "style",
         isExpanded: true,
-        label: "Dead Pokemon",
+        label: "Dead Pokémon",
         component: DeadPokemon,
         options: {
             props: {
@@ -179,7 +179,7 @@ const componentTree: ComponentNode[] = [
         id: 9,
         icon: "style",
         isExpanded: true,
-        label: "Champs Pokemon Collection",
+        label: "Champs Pokémon Collection",
         component: ChampsPokemonView,
         options: {
             props: {
@@ -196,7 +196,7 @@ const componentTree: ComponentNode[] = [
             {
                 id: 12,
                 isExpanded: true,
-                label: "Champs Pokemon",
+                label: "Champs Pokémon",
                 component: ChampsPokemon,
                 options: {
                     props: {

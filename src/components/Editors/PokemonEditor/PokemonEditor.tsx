@@ -143,7 +143,11 @@ export class PokemonEditorBase extends React.Component<
 
         return (
             <>
-                <BaseEditor icon="circle" name="Pokemon">
+                <BaseEditor
+                    className="pokemon-editor"
+                    icon="circle"
+                    name="Pokémon"
+                >
                     <div
                         data-testid="pokemon-editor"
                         className="button-row"

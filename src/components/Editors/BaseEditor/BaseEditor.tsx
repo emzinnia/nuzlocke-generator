@@ -8,6 +8,7 @@ export interface BaseEditorState {
 export interface BaseEditorProps {
     name: string;
     icon?: IconName;
+    className?: string;
     defaultOpen?: boolean;
     children?: React.ReactNode;
 }
@@ -29,10 +30,14 @@ export class BaseEditor extends React.Component<
     };
 
     public render() {
+        const className =
+            this.props.className ??
+            `${this.props.name.toLowerCase().replace(/\s/g, "-")}-editor`;
+
         return (
             <div
                 data-testid="base-editor"
-                className={`${this.props.name.toLowerCase().replace(/\s/g, "-")}-editor base-editor`}
+                className={`${className} base-editor`}
             >
                 <h4
                     title={`${this.state.isOpen ? "Collapse" : "Open"} this editor.`}

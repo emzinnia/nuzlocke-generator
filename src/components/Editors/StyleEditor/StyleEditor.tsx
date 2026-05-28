@@ -618,7 +618,7 @@ export class StyleEditorBase extends React.Component<
                         htmlFor="boxedPokemonPerLine"
                         className={cx(Classes.LABEL, Classes.INLINE)}
                     >
-                        Pokemon Per Line (Boxed)
+                        Pokémon Per Line (Boxed)
                     </label>
                     <input
                         name="boxedPokemonPerLine"
@@ -637,7 +637,7 @@ export class StyleEditorBase extends React.Component<
                         htmlFor="linkedPokemonText"
                         className={cx(Classes.LABEL, Classes.INLINE)}
                     >
-                        Linked Pokemon Text
+                        Linked Pokémon Text
                     </label>
                     <input
                         name="linkedPokemonText"
