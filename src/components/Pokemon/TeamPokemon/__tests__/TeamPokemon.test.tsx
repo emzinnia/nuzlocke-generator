@@ -72,6 +72,7 @@ const basePokemon: Pokemon = {
     level: 10,
     types: [Types.Grass, Types.Poison],
     ability: "Overgrow",
+    characteristic: "Alert to sounds",
     moves: ["Tackle", "Growl"],
 };
 
@@ -91,6 +92,7 @@ describe("TeamPokemonBase", () => {
         expect(screen.getByText("Bulby")).toBeTruthy();
         expect(screen.getByText("Bulbasaur")).toBeTruthy();
         expect(screen.getByText(/lv\. 10/i)).toBeTruthy();
+        expect(screen.getByText("Alert to sounds")).toBeTruthy();
     });
 
     it("invokes selectPokemon when the image wrapper is clicked", () => {
