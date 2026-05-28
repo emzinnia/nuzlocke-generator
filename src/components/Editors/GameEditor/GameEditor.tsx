@@ -53,6 +53,10 @@ export class GameEditorBase extends React.Component<
         this.props.editGame({ customName: e.target.value });
     };
 
+    private onRandomizedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        this.props.editGame({ randomized: e.target.checked });
+    };
+
     private toggleDialog = () => this.setState({ isOpen: !this.state.isOpen });
 
     public render() {
@@ -134,6 +138,11 @@ export class GameEditorBase extends React.Component<
                             </Button>
                         )}
                     </div>
+                    <Switch
+                        label="Randomized"
+                        checked={Boolean(game.randomized)}
+                        onChange={this.onRandomizedChange}
+                    />
                 </BaseEditor>
             </>
         );

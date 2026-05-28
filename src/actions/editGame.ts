@@ -6,6 +6,8 @@ export const EDIT_GAME: EDIT_GAME = "EDIT_GAME";
 
 export interface GameType {
     name?: Game;
+    customName?: string;
+    randomized?: boolean;
 }
 
 export type editGame = (e: object) => Action<EDIT_GAME>;
