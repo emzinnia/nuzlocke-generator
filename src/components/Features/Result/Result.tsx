@@ -155,6 +155,67 @@ export function BackspriteMontage({ pokemon }: { pokemon: Pokemon[] }) {
     );
 }
 
+const getPokemonDisplayName = (pokemon: Pokemon) =>
+    pokemon.nickname?.trim() || pokemon.species;
+
+export const HighlightMoments = ({
+    pokemon,
+    color,
+    style,
+}: {
+    pokemon: Pokemon[];
+    color: string;
+    style: React.CSSProperties;
+}) => {
+    const highlights = pokemon.filter(
+        (poke) => poke.mvp || Boolean(poke.notes?.trim()),
+    );
+
+    if (!highlights.length) return null;
+
+    return (
+        <div
+            className="highlight-moments-container"
+            style={{ ...style, color }}
+        >
+            <h3 style={{ color }}>Highlight Moments</h3>
+            <ol className="highlight-moments-list">
+                {highlights.map((poke) => {
+                    const note = poke.notes?.trim();
+                    return (
+                        <li key={poke.id} className="highlight-moment">
+                            <span className="highlight-moment-pokemon">
+                                {getPokemonDisplayName(poke)}
+                            </span>
+                            {poke.nickname?.trim() ? (
+                                <span className="highlight-moment-species">
+                                    {" "}
+                                    ({poke.species})
+                                </span>
+                            ) : null}
+                            {poke.status ? (
+                                <span className="highlight-moment-status">
+                                    {" "}
+                                    - {poke.status}
+                                </span>
+                            ) : null}
+                            {poke.mvp ? (
+                                <span className="highlight-moment-mvp">
+                                    {" "}
+                                    MVP
+                                </span>
+                            ) : null}
+                            {note ? (
+                                <p className="highlight-moment-note">{note}</p>
+                            ) : null}
+                        </li>
+                    );
+                })}
+            </ol>
+        </div>
+    );
+};
+
 export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
     public resultRef: React.RefObject<HTMLDivElement>;
     public constructor(props: ResultProps) {
@@ -585,6 +646,13 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                             ? rulesContainer
                             : null}
                         {teamContainer}
+                        {style.displayHighlightMoments ? (
+                            <HighlightMoments
+                                pokemon={pokemonWithId}
+                                color={getContrastColor(bgColor)}
+                                style={paddingForVerticalTrainerSection}
+                            />
+                        ) : null}
                         {style.template === "Generations" &&
                         trainerSectionOrientation === "vertical" ? (
                             <div className="statuses-wrapper">
