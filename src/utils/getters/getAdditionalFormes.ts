@@ -344,12 +344,17 @@ export const getAdditionalFormes = (species: string | undefined): string[] => {
     }
     if (
         s === "growlithe" ||
+        s === "arcanine" ||
         s === "voltorb" ||
+        s === "electrode" ||
+        s === "typhlosion" ||
+        s === "samurott" ||
+        s === "decidueye" ||
         s === "zorua" ||
         s === "zoroark" ||
         s === "braviary" ||
         s === "sneasel" ||
-        s === "sligoo" ||
+        s === "sliggoo" ||
         s === "goodra" ||
         s === "avalugg" ||
         s === "lilligant" ||
