@@ -209,6 +209,7 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Meowth": [
       "Alolan",
       "Galarian",
+      "Gigantamax",
     ],
   },
   {
@@ -234,7 +235,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     ],
   },
   {
-    "Arcanine": [],
+    "Arcanine": [
+      "Hisuian",
+    ],
   },
   {
     "Poliwag": [],
@@ -394,7 +397,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     ],
   },
   {
-    "Electrode": [],
+    "Electrode": [
+      "Hisuian",
+    ],
   },
   {
     "Exeggcute": [],
@@ -603,7 +608,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Quilava": [],
   },
   {
-    "Typhlosion": [],
+    "Typhlosion": [
+      "Hisuian",
+    ],
   },
   {
     "Totodile": [],
@@ -1800,7 +1807,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Dewott": [],
   },
   {
-    "Samurott": [],
+    "Samurott": [
+      "Hisuian",
+    ],
   },
   {
     "Patrat": [],
@@ -2517,7 +2526,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Goomy": [],
   },
   {
-    "Sliggoo": [],
+    "Sliggoo": [
+      "Hisuian",
+    ],
   },
   {
     "Goodra": [
@@ -2586,7 +2597,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Dartrix": [],
   },
   {
-    "Decidueye": [],
+    "Decidueye": [
+      "Hisuian",
+    ],
   },
   {
     "Litten": [],
@@ -2915,7 +2928,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Corvisquire": [],
   },
   {
-    "Corviknight": [],
+    "Corviknight": [
+      "Gigantamax",
+    ],
   },
   {
     "Blipbug": [],
@@ -3085,6 +3100,7 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
       "Ruby Swirl",
       "Caramel Swirl",
       "Rainbow Swirl",
+      "Gigantamax",
     ],
   },
   {
@@ -3134,7 +3150,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     "Arctovish": [],
   },
   {
-    "Duraludon": [],
+    "Duraludon": [
+      "Gigantamax",
+    ],
   },
   {
     "Dreepy": [],
