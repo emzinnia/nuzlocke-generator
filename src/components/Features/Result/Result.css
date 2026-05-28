@@ -57,6 +57,8 @@
 }
 .pokemon-image-wrapper {
     align-self: center;
+    align-items: center;
+    justify-content: center;
 }
 .logo {
     height: 2.5rem;
@@ -462,4 +464,3 @@
 .pokemon-checkpoint.obtained {
     display: flex;
 }
-
