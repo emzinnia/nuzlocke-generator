@@ -257,10 +257,22 @@ const parseBoxedPokemon = (buf: Buffer): Gen1PokemonObject => {
     };
 };
 
-const transformPokemon = (
+const getUniqueSavePokemonId = (
+    baseId: string,
+    idTracker: Map<string, number>,
+) => {
+    const id = `${baseId}-sav`;
+    const currentCount = idTracker.get(id) || 0;
+    idTracker.set(id, currentCount + 1);
+
+    return currentCount > 0 ? `${id}-${currentCount}` : id;
+};
+
+export const transformPokemon = (
     pokemonObject: Gen1PokemonObject,
     status: string,
     boxIndex = 1,
+    idTracker = new Map<string, number>(),
 ) => {
     return pokemonObject.pokemonList
         .map((poke, index) => {
@@ -272,7 +284,7 @@ const transformPokemon = (
                 types: [poke.type1, poke.type2],
                 moves: poke.moves,
                 nickname: pokemonObject.pokemonNames[index],
-                id: `${poke.id}-sav`,
+                id: getUniqueSavePokemonId(poke.id, idTracker),
                 extraData: poke.extraData,
             };
         })
@@ -327,6 +339,8 @@ export const parseGen1Save = async (file: Buffer, options: ParserOptions) => {
     // banked box in BOX_OFFSETS stays stale until the player switches boxes, so
     // imports must read the cache for the active box index.
     const currentBoxIndex = file[OFFSETS.CURRENT_POKEMON_BOX_NUM] & 0x0f;
+    const idTracker = new Map<string, number>();
+    const partyPokemon = transformPokemon(pokemonParty, "Team", 1, idTracker);
     const pokemonFromBoxes = BOX_OFFSETS.map((box, boxIndex) => {
         const boxData =
             boxIndex === currentBoxIndex
@@ -336,6 +350,7 @@ export const parseGen1Save = async (file: Buffer, options: ParserOptions) => {
             parseBoxedPokemon(boxData),
             options.boxMappings[boxIndex]?.["status"] ?? "Boxed",
             boxIndex + 1,
+            idTracker,
         );
     }).flat();
 
@@ -367,7 +382,7 @@ export const parseGen1Save = async (file: Buffer, options: ParserOptions) => {
             badges: badges,
         },
         pokemon: [
-            ...transformPokemon(pokemonParty, "Team"),
+            ...partyPokemon,
             ...pokemonFromBoxes,
         ],
     };
