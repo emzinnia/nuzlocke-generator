@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import * as React from "react";
 import { Dialog, Classes, Button, DialogProps } from "@blueprintjs/core";
-import { css, cx } from "emotion";
+import { css, cx } from "@emotion/css";
 import * as styles from "components/Features/Result/styles";
 import { Styles, classWithDarkTheme, getPatchlessVersion } from "utils";
 import ReactMarkdown from "react-markdown";
@@ -156,9 +156,9 @@ export function ReleaseDialog(props: DialogProps & ReleaseDialogProps) {
                         />
                     </h3>
                     {data && (
-                        <ReactMarkdown className="release-notes">
-                            {note.note}
-                        </ReactMarkdown>
+                        <div className="release-notes">
+                            <ReactMarkdown>{note.note}</ReactMarkdown>
+                        </div>
                     )}
                     {error && (
                         <div>There was an error retrieving release notes.</div>
@@ -177,12 +177,9 @@ export function ReleaseDialog(props: DialogProps & ReleaseDialogProps) {
                         allNotes.map((note: ReleaseNote) => {
                             const source = `#### ![${mascot}](${getMascot(getPatchlessVersion(note.version))}) ${note.version}\n${note.note}\n\n_Uploaded on ${new Date(note.timestamp).toLocaleString()}_`;
                             return (
-                                <ReactMarkdown
-                                    key={note.id}
-                                    className="release-notes"
-                                >
-                                    {source}
-                                </ReactMarkdown>
+                                <div key={note.id} className="release-notes">
+                                    <ReactMarkdown>{source}</ReactMarkdown>
+                                </div>
                             );
                         })}
                 </div>
