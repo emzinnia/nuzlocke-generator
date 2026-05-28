@@ -417,7 +417,7 @@ export class CurrentPokemonEditBase extends React.Component<
                     labelName="Cause of Death"
                     inputName="causeOfDeath"
                     value={currentPokemon.causeOfDeath}
-                    type="text"
+                    type="textArea"
                     key={this.state.selectedId + "cod"}
                 />
                 <Autocomplete
