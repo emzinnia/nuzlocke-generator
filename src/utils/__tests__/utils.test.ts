@@ -111,6 +111,18 @@ describe("matchSpeciesToType", () => {
             "Grass",
             "Flying",
         ]);
+        expect(matchSpeciesToTypes("Typhlosion", "Hisuian")).toEqual([
+            "Fire",
+            "Ghost",
+        ]);
+        expect(matchSpeciesToTypes("Samurott", "Hisuian")).toEqual([
+            "Water",
+            "Dark",
+        ]);
+        expect(matchSpeciesToTypes("Goodra", "Hisuian")).toEqual([
+            "Steel",
+            "Dragon",
+        ]);
         listOfPokemon.map((pokemon, index) => {
             expect(matchSpeciesToTypes(pokemon).length).toBeGreaterThan(0);
         });
