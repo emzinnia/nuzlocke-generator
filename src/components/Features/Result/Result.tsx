@@ -322,6 +322,9 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                                     }
                                     key={poke.id}
                                     {...poke}
+                                    gameOfOrigin={
+                                        poke.gameOfOrigin || this.props.game.name
+                                    }
                                 />
                             );
                         if (box?.name === "Team" || box?.inheritFrom === "Team")
