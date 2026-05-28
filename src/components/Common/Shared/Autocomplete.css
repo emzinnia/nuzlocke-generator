@@ -33,15 +33,15 @@
     }
 }
 
-.bp5-dark .autocomplete-items {
+:is(.bp5-dark, .bp6-dark) .autocomplete-items {
     background: #111;
     color: #eee;
 }
 
-.bp5-dark .autocomplete-items li:hover {
+:is(.bp5-dark, .bp6-dark) .autocomplete-items li:hover {
     background: rgba(238, 238, 238, 0.1);
 }
 
-.bp5-dark .autocomplete-selected {
+:is(.bp5-dark, .bp6-dark) .autocomplete-selected {
     color: rgb(37, 211, 223);
 }

@@ -14,7 +14,7 @@ import { Trainer, Badge } from "models";
 import { State } from "state";
 import { Checkpoints } from "reducers/checkpoints";
 import { Stats } from "./Stats";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 
 export interface TrainerResultProps {
     orientation: OrientationType;
