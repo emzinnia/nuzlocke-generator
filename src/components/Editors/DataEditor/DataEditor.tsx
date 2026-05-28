@@ -54,7 +54,7 @@ export interface DataEditorState {
     isOpen: boolean;
     isClearAllDataOpen: boolean;
     isShowdownOpen: boolean;
-    mode: "import" | "export";
+    mode: "import" | "export" | "share";
     data: string;
     showdownData: string;
     showdownGeneration: Generation;
@@ -331,9 +331,12 @@ export class DataEditorBase extends React.Component<
         this.setState({ isOpen: true });
     };
 
-    private exportState = (state) => {
+    private exportState = (
+        state: State,
+        mode: DataEditorState["mode"] = "export",
+    ) => {
         this.setState({
-            mode: "export",
+            mode,
         });
         this.setState({ isOpen: true });
         this.setState({
@@ -342,6 +345,23 @@ export class DataEditorBase extends React.Component<
             )}`,
         });
     };
+
+    private getDownloadFileName = () => {
+        const slug =
+            this.props?.state?.trainer?.title?.toLowerCase().replace(/\s/g, "-") ||
+            this.props?.state?.game?.name?.toLowerCase().replace(/\s/g, "-") ||
+            "";
+        const prefix = this.state.mode === "share" ? "shared_nuzlocke" : "nuzlocke";
+
+        return `${prefix}_${slug}_${uuid().slice(0, 4)}.json`;
+    };
+
+    private getExportedJsonPreview = () =>
+        JSON.stringify(
+            JSON.parse(serializeNuzlockeJson(this.props.state)),
+            null,
+            2,
+        );
 
     private renderTeam(data: string) {
         let d: { pokemon?: Pokemon[] };
@@ -681,9 +701,11 @@ export class DataEditorBase extends React.Component<
                     isOpen={this.state.isOpen}
                     onClose={() => this.setState({ isOpen: false })}
                     title={
-                        this.state.mode === "export"
-                            ? "Exported Nuzlocke Save"
-                            : "Import Nuzlocke Save"
+                        this.state.mode === "import"
+                            ? "Import Nuzlocke Save"
+                            : this.state.mode === "share"
+                              ? "Share Nuzlocke Save"
+                              : "Exported Nuzlocke Save"
                     }
                     className={
                         this.props.state.style.editorDarkMode
@@ -692,10 +714,12 @@ export class DataEditorBase extends React.Component<
                     }
                     icon="floppy-disk"
                 >
-                    {this.state.mode === "export" ? (
+                    {this.state.mode !== "import" ? (
                         <>
-                            <Callout>
-                                Copy this and paste it somewhere safe!
+                            <Callout intent={this.state.mode === "share" ? Intent.PRIMARY : Intent.NONE}>
+                                {this.state.mode === "share"
+                                    ? "Download this file and send it to another person. Importing creates a local copy; edits do not stay synced between browsers."
+                                    : "Copy this and paste it somewhere safe!"}
                             </Callout>
                             <div
                                 style={{ height: "40vh", overflow: "auto" }}
@@ -708,27 +732,21 @@ export class DataEditorBase extends React.Component<
                                     suppressContentEditableWarning={true}
                                     contentEditable={true}
                                 >
-                                    {JSON.stringify(this.props.state, null, 2)}
+                                    {this.getExportedJsonPreview()}
                                 </span>
                             </div>
                             <div className={Classes.DIALOG_FOOTER}>
                                 <a
                                     href={this.state.href}
-                                    download={`nuzlocke_${
-                                        this.props?.state?.trainer?.title
-                                            ?.toLowerCase()
-                                            .replace(/\s/g, "-") ||
-                                        this.props?.state?.game?.name
-                                            ?.toLowerCase()
-                                            .replace(/\s/g, "-") ||
-                                        ""
-                                    }_${uuid().slice(0, 4)}.json`}
+                                    download={this.getDownloadFileName()}
                                 >
                                     <Button
                                         icon={"download"}
                                         intent={Intent.PRIMARY}
                                     >
-                                        Download
+                                        {this.state.mode === "share"
+                                            ? "Download Shared Run"
+                                            : "Download"}
                                     </Button>
                                 </a>
                             </div>
@@ -741,6 +759,9 @@ export class DataEditorBase extends React.Component<
                                     "has-nice-scrollbars",
                                 )}
                             >
+                                <Callout intent={Intent.PRIMARY} style={{ marginBottom: "0.5rem" }}>
+                                    Imported files become a local copy in this browser. They do not stay synced with the sender.
+                                </Callout>
                                 <TextArea
                                     className={cx(
                                         "custom-css-input",
@@ -908,6 +929,15 @@ export class DataEditorBase extends React.Component<
                                 showModifier={false}
                                 style={{ marginLeft: "0.35rem" }}
                             />
+                        </Button>
+                        <Button
+                            data-testid="share-run-button"
+                            onClick={() =>
+                                this.exportState(this.props.state, "share")
+                            }
+                            icon="share"
+                        >
+                            Share Run
                         </Button>
                         <Button
                             icon="folder-open"
