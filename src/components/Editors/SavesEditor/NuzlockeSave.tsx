@@ -50,11 +50,6 @@ export interface NuzlockeSaveControlsState {
     deletionFunction?: () => void;
 }
 
-const sort = (
-    a: State["nuzlockes"]["saves"][number],
-    b: State["nuzlockes"]["saves"][number],
-) => a.id.localeCompare(b.id);
-
 const stripEditorDarkModeFromState = (state: State) => {
     const baseState = omit(["nuzlockes", "editorHistory"], state) as {
         style?: Styles;
@@ -110,7 +105,7 @@ export class NuzlockeSaveBase extends React.Component<
         const { nuzlockes } = this.props;
         const { currentId } = this.props.nuzlockes;
         const { isHofOpen, isDeletingNuzlocke, deletionFunction } = this.state;
-        const saves = nuzlockes.saves.sort(sort);
+        const saves = nuzlockes.saves;
 
         return (
             <div
@@ -143,7 +138,6 @@ export class NuzlockeSaveBase extends React.Component<
                 </Button>
                 {saves.map((nuzlocke) => {
                     const id = nuzlocke.id;
-                    console.log(nuzlocke.id);
                     const { isCopy } = nuzlocke;
                     const isCurrent = currentId === id;
                     const data = nuzlocke.data;

@@ -19,6 +19,32 @@ export interface Nuzlockes {
     saves: NuzlockeSaveEntry[];
 }
 
+const updateSaveInPlace = (
+    saves: NuzlockeSaveEntry[],
+    id: string,
+    data: string,
+): NuzlockeSaveEntry[] => {
+    const index = saves.findIndex((save) => save.id === id);
+    if (index === -1) {
+        return [
+            ...saves,
+            {
+                id,
+                data,
+            },
+        ];
+    }
+
+    return saves.map((save, saveIndex) =>
+        saveIndex === index
+            ? {
+                  ...save,
+                  data,
+              }
+            : save,
+    );
+};
+
 export function nuzlockes(
     state: Nuzlockes = {
         currentId: "",
@@ -63,13 +89,7 @@ export function nuzlockes(
             return {
                 ...state,
                 currentId: action.newId,
-                saves: [
-                    ...state.saves.filter((s) => s.id !== action.id),
-                    {
-                        id: action.id,
-                        data: action.data,
-                    },
-                ],
+                saves: updateSaveInPlace(state.saves, action.id, action.data),
             };
         case UPDATE_NUZLOCKE:
             // const updateItem = state.saves.find(s => s.id === action.id);
@@ -89,13 +109,7 @@ export function nuzlockes(
             // }
             return {
                 ...state,
-                saves: [
-                    ...state.saves.filter((s) => s.id !== action.id),
-                    {
-                        id: action.id,
-                        data: action.data,
-                    },
-                ],
+                saves: updateSaveInPlace(state.saves, action.id, action.data),
             };
         default:
             return state;
