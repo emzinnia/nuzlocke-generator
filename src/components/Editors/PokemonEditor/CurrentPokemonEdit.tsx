@@ -112,8 +112,12 @@ export function EvolutionSelection({ currentPokemon, onEvolve }) {
 
     if (evos?.length === 1) {
         const species = evos?.[0];
+        const label = `Evolve ${currentPokemon.species} to ${species}`;
+
         return (
             <Button
+                aria-label={label}
+                icon="arrow-right"
                 onClick={onEvolve(species)}
                 className={Classes.MINIMAL}
                 intent={Intent.PRIMARY}
@@ -133,6 +137,7 @@ export function EvolutionSelection({ currentPokemon, onEvolve }) {
                         {evos.map((evo) => (
                             <div
                                 role="button"
+                                aria-label={`Evolve ${currentPokemon.species} to ${evo}`}
                                 tabIndex={-2}
                                 className={Styles.evoMenuItem}
                                 key={evo}
@@ -145,7 +150,12 @@ export function EvolutionSelection({ currentPokemon, onEvolve }) {
                     </>
                 }
             >
-                <Button className={Classes.MINIMAL} intent={Intent.PRIMARY}>
+                <Button
+                    aria-label={`Choose evolution for ${currentPokemon.species}`}
+                    className={Classes.MINIMAL}
+                    icon="arrow-right"
+                    intent={Intent.PRIMARY}
+                >
                     Evolve
                 </Button>
             </Popover>
