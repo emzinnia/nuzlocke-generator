@@ -126,6 +126,19 @@ const getGameNameSerebii = (name: Game) => {
     }
 };
 
+const getSWSHForme = (
+    species: GetPokemonImage["species"],
+    forme: GetPokemonImage["forme"],
+) => {
+    // Obstagoon is already the Galarian evolution line's final form, so Serebii
+    // stores its Sword/Shield sprite as 862.png rather than 862-g.png.
+    if (species === "Obstagoon" && forme === "Galarian") {
+        return undefined;
+    }
+
+    return forme;
+};
+
 export interface GetPokemonImage {
     customImage?: string;
     forme?: Pokemon["forme"] | keyof typeof Forme;
@@ -259,7 +272,9 @@ export async function getPokemonImage({
         if (!shiny) {
             const url = `https://www.serebii.net/${getGameName(
                 name,
-            )}/pokemon/${leadingZerosNumber}${getForme(forme)}.png`;
+            )}/pokemon/${leadingZerosNumber}${getForme(
+                getSWSHForme(species, forme),
+            )}.png`;
 
             return await wrapImageInCORS(url);
         }
