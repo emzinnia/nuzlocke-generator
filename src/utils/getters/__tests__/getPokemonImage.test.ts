@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => {
                 Unfezant: 521,
                 Gyarados: 130,
                 Dugtrio: 51,
+                Obstagoon: 862,
                 Indeedee: 876,
                 Basculegion: 902,
                 "Mime Jr.": 439,
@@ -281,6 +282,30 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             );
         });
 
+        it("omits the Galarian suffix for Obstagoon Sword/Shield sprites", async () => {
+            const nonShiny = await getPokemonImage({
+                species: "Obstagoon",
+                forme: imageForme("Galarian"),
+                name: imageGame("Sword"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: false,
+            });
+            const shiny = await getPokemonImage({
+                species: "Obstagoon",
+                forme: imageForme("Galarian"),
+                name: imageGame("Shield"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: true,
+            });
+
+            expect(nonShiny).toBe(
+                "cors(https://www.serebii.net/swordshield/pokemon/862.png)",
+            );
+            expect(shiny).toBe(
+                "cors(https://www.serebii.net/Shiny/SWSH/862.png)",
+            );
+        });
+
         it("uses generic serebii URL builder for other games when spritesMode is true", async () => {
             const result = await getPokemonImage({
                 species: "Pikachu",
@@ -408,4 +433,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-
