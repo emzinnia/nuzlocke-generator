@@ -30,6 +30,7 @@ import { matchNatureToToxtricityForme } from "utils/matchNatureToToxtricityForme
 import { Nature } from "utils/Nature";
 import { getAdditionalFormes } from "utils/getters/getAdditionalFormes";
 import { getEvolutionLine } from "utils";
+import { EvolutionTree } from "utils";
 
 const objectPropertiesWhere = (
     obj: object,
@@ -508,6 +509,12 @@ describe(getAdditionalFormes.name, () => {
             [species]: getAdditionalFormes(species),
         }));
         expect(subject).toMatchSnapshot();
+    });
+});
+
+describe("EvolutionTree", () => {
+    it("includes Poltchageist evolving into Sinistcha", () => {
+        expect(EvolutionTree.Poltchageist).toEqual(["Sinistcha"]);
     });
 });
 
