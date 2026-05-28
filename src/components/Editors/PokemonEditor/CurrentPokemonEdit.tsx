@@ -14,6 +14,7 @@ import {
     listOfPokeballs,
     listOfPokemon,
     matchSpeciesToTypes,
+    parseNicknamePresetText,
     Species,
 } from "utils";
 import { Pokemon, Editor } from "models";
@@ -21,7 +22,7 @@ import { Boxes } from "models";
 import { CurrentPokemonInput } from "./CurrentPokemonInput";
 import { DeletePokemonButton } from "components/Pokemon/DeletePokemonButton/DeletePokemonButton";
 import { Autocomplete, ErrorBoundary } from "components/Common/Shared";
-import { selectPokemon, editPokemon } from "actions";
+import { selectPokemon, editPokemon, updateNicknamePresets } from "actions";
 import { connect } from "store/reactZustand";
 import { listOfGames, accentedE } from "utils";
 import { cx } from "emotion";
@@ -36,6 +37,8 @@ import {
     Button,
     Intent,
     ButtonGroup,
+    HTMLSelect,
+    TextArea,
     Tooltip,
 } from "@blueprintjs/core";
 import { addPokemon } from "actions";
@@ -88,6 +91,8 @@ export interface CurrentPokemonEditProps {
     editor: Editor;
     customTypes: State["customTypes"];
     customAreas: State["customAreas"];
+    nicknamePresets: State["nicknamePresets"];
+    updateNicknamePresets: updateNicknamePresets;
 }
 
 export interface CurrentPokemonEditState {
@@ -253,6 +258,12 @@ export class CurrentPokemonEditBase extends React.Component<
     private toggleDialog = () =>
         this.setState({ isMoveEditorOpen: !this.state.isMoveEditorOpen });
 
+    private setNicknamePreset = (nickname: string) => {
+        if (!nickname) return;
+        this.props.editPokemon({ nickname }, this.state.selectedId);
+        this.props.selectPokemon(this.state.selectedId);
+    };
+
     private getTypes(includeShadow = true) {
         const { customTypes, editor } = this.props;
         return getListOfTypes(customTypes, editor.temtemMode).filter((type) =>
@@ -284,6 +295,31 @@ export class CurrentPokemonEditBase extends React.Component<
                     pokemon={currentPokemon}
                     key={this.state.selectedId + "forme"}
                 />
+                <CurrentPokemonLayoutItem fullWidth>
+                    <span
+                        className="current-pokemon-input-wrapper"
+                        style={{ width: "100%" }}
+                    >
+                        <label htmlFor="nicknamePresetList">
+                            Nickname Presets
+                        </label>
+                        <TextArea
+                            id="nicknamePresetList"
+                            name="nicknamePresets"
+                            fill
+                            growVertically
+                            placeholder="One name per line, or comma-separated"
+                            value={this.props.nicknamePresets.join("\n")}
+                            onChange={(event) =>
+                                this.props.updateNicknamePresets(
+                                    parseNicknamePresetText(
+                                        event.currentTarget.value,
+                                    ),
+                                )
+                            }
+                        />
+                    </span>
+                </CurrentPokemonLayoutItem>
                 <CurrentPokemonInput
                     labelName="Types"
                     inputName="types"
@@ -662,6 +698,33 @@ export class CurrentPokemonEditBase extends React.Component<
                         type="text"
                         key={this.state.selectedId + "nickname"}
                     />
+                    <span className="current-pokemon-input-wrapper">
+                        <label htmlFor="nicknamePresetSelect">
+                            Preset Name
+                        </label>
+                        <HTMLSelect
+                            id="nicknamePresetSelect"
+                            name="nicknamePresetSelect"
+                            value=""
+                            disabled={!this.props.nicknamePresets.length}
+                            onChange={(event) =>
+                                this.setNicknamePreset(
+                                    event.currentTarget.value,
+                                )
+                            }
+                        >
+                            <option value="">
+                                {this.props.nicknamePresets.length
+                                    ? "Choose..."
+                                    : "No presets"}
+                            </option>
+                            {this.props.nicknamePresets.map((nickname) => (
+                                <option key={nickname} value={nickname}>
+                                    {nickname}
+                                </option>
+                            ))}
+                        </HTMLSelect>
+                    </span>
                 </CurrentPokemonLayoutItem>
                 <CurrentPokemonLayoutItem>
                     <CurrentPokemonInput
@@ -787,10 +850,12 @@ export const CurrentPokemonEdit = connect(
         editor: state.editor,
         customTypes: state.customTypes,
         customAreas: state.customAreas,
+        nicknamePresets: state.nicknamePresets,
     }),
     {
         selectPokemon,
         editPokemon,
         addPokemon,
+        updateNicknamePresets,
     },
 )(CurrentPokemonEditBase);
