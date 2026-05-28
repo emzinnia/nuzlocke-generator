@@ -20,9 +20,13 @@ const mocks = vi.hoisted(() => {
             return map[species] ?? 0;
         }),
         getForme: vi.fn((forme?: string) => (forme ? `-${forme}` : "")),
-        addForme: vi.fn((species: string, forme?: string) =>
-            species ? `${species}${forme ? `-${forme}` : ""}` : "",
-        ),
+        addForme: vi.fn((species: string, forme?: string) => {
+            if (!species || forme === "Normal") {
+                return species;
+            }
+
+            return `${species}${forme ? `-${forme}` : ""}`;
+        }),
         normalizeSpeciesName: vi.fn((species: string) =>
             species
                 .trim()
@@ -344,6 +348,35 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
 
             expect(result).toBe("url(img/tcg/pikachu-f.jpg)");
         });
+
+        it("keeps base Giratina on the Altered Forme TCG asset", async () => {
+            const result = await getPokemonImage({
+                species: "Giratina",
+                style: imageStyle({ teamImages: "tcg" }),
+            });
+
+            expect(result).toBe("url(img/tcg/giratina.jpg)");
+        });
+
+        it("keeps Normal Giratina on the Altered Forme TCG asset", async () => {
+            const result = await getPokemonImage({
+                species: "Giratina",
+                forme: imageForme("Normal"),
+                style: imageStyle({ teamImages: "tcg" }),
+            });
+
+            expect(result).toBe("url(img/tcg/giratina.jpg)");
+        });
+
+        it("keeps Origin Giratina on the Origin Forme TCG asset", async () => {
+            const result = await getPokemonImage({
+                species: "Giratina",
+                forme: imageForme("Origin"),
+                style: imageStyle({ teamImages: "tcg" }),
+            });
+
+            expect(result).toBe("url(img/tcg/giratina-origin.jpg)");
+        });
     });
 
     describe("stopgaps / edge cases", () => {
@@ -408,4 +441,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-
