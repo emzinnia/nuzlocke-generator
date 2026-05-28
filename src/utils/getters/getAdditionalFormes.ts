@@ -310,7 +310,7 @@ export const getAdditionalFormes = (species: string | undefined): string[] => {
         s === "snorlax" ||
         s === "eevee" ||
         s === "butterfree" ||
-        s === "corvinight" ||
+        s === "corviknight" ||
         s === "alcremie" ||
         s === "drednaw" ||
         s === "machamp" ||

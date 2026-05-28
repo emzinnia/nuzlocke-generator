@@ -368,6 +368,10 @@ describe(matchNatureToToxtricityForme.name, () => {
 });
 
 describe(getAdditionalFormes.name, () => {
+    it("returns Gigantamax for Corviknight", () => {
+        expect(getAdditionalFormes("Corviknight")).toEqual(["Gigantamax"]);
+    });
+
     it("matches snapshot for all species", () => {
         const subject = listOfPokemon.map((species) => ({
             [species]: getAdditionalFormes(species),
