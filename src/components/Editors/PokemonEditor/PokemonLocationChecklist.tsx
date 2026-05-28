@@ -12,7 +12,7 @@ import {
     TextArea,
     Tooltip,
 } from "@blueprintjs/core";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import { useDispatch } from "store/reactZustand";
 import { updateExcludedAreas, updateCustomAreas } from "actions";
 

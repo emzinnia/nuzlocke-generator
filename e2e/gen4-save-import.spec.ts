@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, Page } from "@playwright/test";
 import path from "node:path";
 
 type SaveFixture = {
@@ -44,20 +44,25 @@ const saves: SaveFixture[] = [
 
 test.describe.configure({ mode: "serial" });
 
+const uploadSaveFile = async (page: Page, fileName: string) => {
+    await expect(page.getByTestId("import-save-file-button")).toBeVisible({
+        timeout: 20_000,
+    });
+    await page
+        .getByTestId("save-file-input")
+        .setInputFiles(path.join(process.cwd(), "src", "parsers", fileName));
+};
+
 for (const save of saves) {
     test(`imports ${save.fileName} through the save upload UI`, async ({ page }) => {
         await page.goto("/");
-        await page.waitForLoadState("networkidle");
+        await uploadSaveFile(page, save.fileName);
 
-        const fileChooserPromise = page.waitForEvent("filechooser");
-        await page.getByTestId("import-save-file-button").click();
-        const fileChooser = await fileChooserPromise;
-        await fileChooser.setFiles(
-            path.join(process.cwd(), "src", "parsers", save.fileName),
-        );
-
+        await expect(page.locator("select").first()).toHaveValue(save.detectedGame, {
+            timeout: 60_000,
+        });
         const teamSlots = page.locator(".team-container .pokemon-container");
-        await expect(teamSlots).toHaveCount(save.party.length, { timeout: 20_000 });
+        await expect(teamSlots).toHaveCount(save.party.length, { timeout: 60_000 });
 
         for (const [index, species] of save.party.entries()) {
             const slot = teamSlots.nth(index);
