@@ -97,14 +97,16 @@ export class ChampsPokemon extends React.Component<ChampsPokemonProps> {
                 }
             >
                 {(backgroundImage) => (
-                    <img
+                    <span
                         className="champs-pokemon-image"
-                        alt={""}
+                        role="img"
+                        aria-label={`${nickname || species || "Champion Pokémon"} sprite`}
                         style={{
                             backgroundImage,
                             backgroundPosition: "center center",
                             backgroundSize: "contain",
                             backgroundRepeat: "no-repeat",
+                            display: "inline-block",
                             height: "48px",
                             width: "48px",
                         }}

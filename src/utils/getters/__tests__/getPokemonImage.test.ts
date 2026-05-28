@@ -193,6 +193,26 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             expect(result).toBe(`cors(${expectedUrl})`);
         });
 
+        it("builds PokeAPI sprite URLs for generation one games and wraps them", async () => {
+            const red = await getPokemonImage({
+                species: "Pikachu",
+                name: imageGame("Red"),
+                style: imageStyle({ spritesMode: true }),
+            });
+            const yellow = await getPokemonImage({
+                species: "Pikachu",
+                name: imageGame("Yellow"),
+                style: imageStyle({ spritesMode: true }),
+            });
+
+            expect(red).toBe(
+                "cors(https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/red-blue/transparent/25.png)",
+            );
+            expect(yellow).toBe(
+                "cors(https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/yellow/transparent/25.png)",
+            );
+        });
+
         it("builds Scarlet/Violet sprite URLs and wraps them", async () => {
             const nonShiny = await getPokemonImage({
                 species: "Pikachu",
@@ -408,4 +428,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-
