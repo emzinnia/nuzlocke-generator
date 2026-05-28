@@ -37,18 +37,13 @@ export class StatsBase extends React.Component<
 
         this.props.pokemon.forEach((poke) => {
             if (poke && Array.isArray(poke.types)) {
-                const type1 = poke.types[0];
-                const type2 = poke.types[1];
+                const uniqueTypes = Array.from(
+                    new Set(poke.types.filter(Boolean)),
+                );
 
-                typesFreq[type1] = (typesFreq[type1] ?? 0) + 1;
-
-                if (Object.prototype.hasOwnProperty.call(typesFreq, type2)) {
-                    if (type1 !== type2) {
-                        typesFreq[type2] = (typesFreq[type2] ?? 0) + 1;
-                    }
-                } else {
-                    typesFreq[type2] = 1;
-                }
+                uniqueTypes.forEach((type) => {
+                    typesFreq[type] = (typesFreq[type] ?? 0) + 1;
+                });
             }
         });
 
