@@ -15,12 +15,14 @@ import { editPokemon } from "actions";
 
 import { ErrorBoundary } from "components/Common/Shared";
 
-import { TagInput, Classes, TextArea, HTMLSelect } from "@blueprintjs/core";
+import { Classes, TextArea, HTMLSelect } from "@blueprintjs/core";
 import { State } from "state";
 import { Pokemon } from "models";
 import { cx } from "emotion";
 import { useDebounceCallback } from "@react-hook/debounce";
 import { useMemo } from "react";
+
+const MAX_MOVE_SLOTS = 4;
 
 type PokemonInputValue =
     | Pokemon[keyof Pokemon]
@@ -409,46 +411,101 @@ export function PokemonMoveInput({
     selectedId,
 }: PokemonInputProps) {
     const dispatch = useDispatch();
-    const moves = useMemo(
+    const getCustomMoveType = useMemo(
         () => (v: string) => customMoveMap?.find((m) => m?.move === v)?.type,
         [customMoveMap],
     );
+    const values = Array.isArray(value) ? value.map(String) : [];
+    const slotValues = Array.from(
+        { length: MAX_MOVE_SLOTS },
+        (_, index) => values[index] ?? "",
+    );
+    const getMoveColor = (move: string) => {
+        if (!move.trim()) return undefined;
+
+        return (
+            typeToColor(
+                (getCustomMoveType(move) ||
+                    getMoveType(move.trim())) as Parameters<
+                    typeof typeToColor
+                >[0],
+                customTypes,
+            ) || undefined
+        );
+    };
+    const updateMoveSlot =
+        (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+            const moves = setMoveAtSlot(values, index, event.currentTarget.value);
+            if (selectedId) {
+                dispatch(editPokemon({ moves }, selectedId));
+            }
+        };
 
     return (
         <ErrorBoundary>
-            <TagInput
-                fill
-                leftIcon="ninja"
-                tagProps={(v, _i) => {
-                    // @TODO: Fix inconsitencies with bad parameter types
-                    const background =
-                        typeToColor(
-                            // @ts-expect-error @TODO: fix mapping
-                            moves(v) ||
-                                getMoveType(v?.toString()?.trim() || ""),
-                            customTypes,
-                        ) || "transparent";
-                    const color = getContrastColor(background);
-                    return {
-                        style: {
-                            background,
-                            color,
-                        },
-                    };
+            <div
+                style={{
+                    display: "grid",
+                    gap: "0.25rem",
+                    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
                 }}
-                onChange={(values) => {
-                    const edit = {
-                        moves: values,
-                    };
-                    if (selectedId) {
-                        dispatch(editPokemon(edit, selectedId));
-                    }
-                }}
-                values={Array.isArray(value) ? value.map(String) : []}
-            />
+            >
+                {slotValues.map((move, index) => {
+                    const background = getMoveColor(move);
+                    const color = background
+                        ? getContrastColor(background)
+                        : undefined;
+
+                    return (
+                        <label
+                            key={index}
+                            style={{
+                                display: "grid",
+                                gap: "0.125rem",
+                                minWidth: 0,
+                            }}
+                        >
+                            <span className={Classes.TEXT_MUTED}>
+                                Move {index + 1}
+                            </span>
+                            <input
+                                aria-label={`Move ${index + 1}`}
+                                className={Classes.INPUT}
+                                name={`move-${index + 1}`}
+                                onChange={updateMoveSlot(index)}
+                                placeholder={`Move ${index + 1}`}
+                                style={{
+                                    background,
+                                    color,
+                                    minWidth: 0,
+                                }}
+                                value={move}
+                            />
+                        </label>
+                    );
+                })}
+            </div>
         </ErrorBoundary>
     );
 }
+
+export const setMoveAtSlot = (
+    moves: string[],
+    slot: number,
+    value: string,
+) => {
+    const nextMoves = Array.from(
+        { length: MAX_MOVE_SLOTS },
+        (_, index) => moves[index] ?? "",
+    );
+    nextMoves[slot] = value;
+
+    while (nextMoves.length && nextMoves[nextMoves.length - 1].trim() === "") {
+        nextMoves.pop();
+    }
+
+    return nextMoves;
+};
 
 export function CurrentPokemonInput(props: CurrentPokemonInputProps) {
     const { inputName, value, className } = props;
