@@ -57,7 +57,7 @@ vi.mock("components/Pokemon/PokemonIcon/PokemonIcon", () => ({
 import * as React from "react";
 import { fireEvent, render, screen } from "utils/testUtils";
 import { styleDefaults } from "utils/styleDefaults";
-import { Generation, Types } from "utils";
+import { Game as GameName, Generation, Types } from "utils";
 import { Editor, Game, Pokemon } from "models";
 import { TeamPokemonBase, TeamPokemonInfo } from "../TeamPokemon";
 
@@ -165,24 +165,102 @@ describe("TeamPokemonBase", () => {
         expect(screen.getByAltText("Tera: Fire")).toBeTruthy();
     });
 
-    it("uses minimal layout when enabled", () => {
-        const minimalStyle = { ...baseStyle, minimalTeamLayout: true };
+    const minimalLayoutCases = [
+        {
+            label: "issue #417 saved Platinum team with sprite mode",
+            pokemon: {
+                ...basePokemon,
+                id: "issue-417",
+                species: "Venusaur",
+                nickname: "",
+                level: undefined,
+                position: 11,
+                moves: [
+                    "synthesis",
+                    "leaf blade",
+                    "earth power",
+                    "sleep powder",
+                ],
+            },
+            style: {
+                ...baseStyle,
+                minimalTeamLayout: true,
+                spritesMode: true,
+                scaleSprites: true,
+                showPokemonMoves: true,
+                usePokemonGBAFont: true,
+            },
+            game: { name: "Platinum", customName: "" } as Game,
+            expectedText: "Venusaur",
+        },
+        {
+            label: "issue #493 LeafGreen team with minimal layout enabled",
+            pokemon: {
+                ...basePokemon,
+                id: "issue-493",
+                species: "Charmander",
+                nickname: "Cinna",
+                level: 5,
+                gameOfOrigin: "LeafGreen" as GameName,
+            },
+            style: {
+                ...baseStyle,
+                minimalTeamLayout: true,
+                minimalBoxedLayout: true,
+                minimalDeadLayout: true,
+                spritesMode: true,
+                showPokemonMoves: false,
+                teamPokemonBorder: false,
+            },
+            game: { name: "LeafGreen", customName: "Genlocke" } as Game,
+            expectedText: "Cinna",
+        },
+        {
+            label: "issue #509 newly added FireRed Pokemon",
+            pokemon: {
+                ...basePokemon,
+                id: "issue-509",
+                species: "Charmander",
+                nickname: "",
+                level: undefined,
+                gameOfOrigin: "FireRed" as GameName,
+            },
+            style: {
+                ...baseStyle,
+                minimalTeamLayout: true,
+                minimalBoxedLayout: true,
+                grayScaleDeadPokemon: true,
+                showPokemonMoves: false,
+                oldMetLocationFormat: true,
+                resultWidth: "800",
+            },
+            game: { name: "FireRed", customName: "" } as Game,
+            expectedText: "Charmander",
+        },
+    ];
 
-        render(
-            <TeamPokemonBase
-                pokemon={basePokemon}
-                style={minimalStyle}
-                game={baseGame}
-                selectPokemon={vi.fn()}
-                editor={baseEditor}
-                customTypes={[]}
-            />,
-        );
+    minimalLayoutCases.forEach(({ label, pokemon, style, game, expectedText }) => {
+        it(`uses minimal layout without blanking for ${label}`, () => {
+            render(
+                <TeamPokemonBase
+                    pokemon={pokemon}
+                    style={style}
+                    game={game}
+                    selectPokemon={vi.fn()}
+                    editor={baseEditor}
+                    customTypes={[]}
+                />,
+            );
 
-        const wrapper = screen.getByRole("presentation").parentElement;
-        expect(wrapper?.className ?? "").toContain("pokemon-container");
-        expect(wrapper?.className ?? "").toContain("minimal");
-        expect(screen.queryByTestId("moves")).toBeNull();
+            const wrapper = screen.getByRole("presentation").parentElement;
+            expect(wrapper?.className ?? "").toContain("pokemon-container");
+            expect(wrapper?.className ?? "").toContain("minimal");
+            expect(screen.getByText(expectedText)).toBeTruthy();
+            expect(
+                screen.queryByText("A Pokémon could not be rendered."),
+            ).toBeNull();
+            expect(screen.queryByTestId("moves")).toBeNull();
+        });
     });
 });
 
