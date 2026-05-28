@@ -19,7 +19,6 @@ import { newNuzlocke, replaceState } from "actions";
 import { Badge, Game, Pokemon, Trainer } from "models";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { State } from "state";
-import { noop } from "redux-saga/utils";
 import {
     gameOfOriginToColor,
     GameSaveFormat,
@@ -43,6 +42,7 @@ import SaveFileWorker from "parsers/worker?worker";
 import { cx } from "emotion";
 import { StatusDropZone } from "./StatusDropZone";
 import { serializeNuzlockeJson } from "utils/nuzlockeJson";
+import { normalizeCustomMoveMap } from "utils/normalizeCustomMoveMap";
 
 export interface DataEditorProps {
     state: State;
@@ -297,9 +297,6 @@ export class DataEditorBase extends React.Component<
     };
 
     private confirmImport = () => {
-        let cmm: { customMoveMap: State["customMoveMap"] } = {
-            customMoveMap: [],
-        };
         const override = this.state.overrideImport;
         const data = handleExceptions(JSON.parse(this.state.data));
         const nuz = this.props.state;
@@ -311,15 +308,10 @@ export class DataEditorBase extends React.Component<
             excludedAreas: [],
             customAreas: [],
         };
-        if (!Array.isArray(data.customMoveMap)) {
-            noop();
-        } else {
-            cmm = { customMoveMap: data.customMoveMap };
-        }
         this.props.replaceState({
             ...safeguards,
             ...(override ? data : nuz),
-            ...cmm,
+            customMoveMap: normalizeCustomMoveMap(data.customMoveMap),
         });
         this.props.newNuzlocke(this.state.data, { isCopy: false });
         this.writeAllData();

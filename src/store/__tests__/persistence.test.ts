@@ -104,6 +104,33 @@ describe("Zustand persistence compatibility", () => {
         unsubscribePersistence();
     });
 
+    it("drops malformed legacy custom move map entries during rehydration", () => {
+        const legacyEnvelope = JSON.stringify({
+            customMoveMap: JSON.stringify([
+                { key: 0, name: "Team" },
+                { move: "Custom Beam", type: "Electric" },
+            ]),
+            _persist: JSON.stringify({
+                version: "1.6.0",
+                rehydrated: true,
+            }),
+        });
+
+        window.localStorage.setItem(PERSIST_KEY, legacyEnvelope);
+
+        const savedState = deserializePersistedState(
+            window.localStorage.getItem(PERSIST_KEY),
+        );
+
+        expect(savedState?.customMoveMap).toEqual([
+            {
+                id: "custom-move-1",
+                move: "Custom Beam",
+                type: "Electric",
+            },
+        ]);
+    });
+
     it("dispatches through Zustand and flushes the current state back to localStorage", async () => {
         const { persistor, store, unsubscribePersistence, zustandStore } =
             createNuzlockeStore({

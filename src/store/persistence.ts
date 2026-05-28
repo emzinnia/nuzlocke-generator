@@ -1,6 +1,7 @@
 import { version } from "../../package.json";
 import { State } from "state";
 import { styleDefaults } from "utils/styleDefaults";
+import { normalizeCustomMoveMap } from "utils/normalizeCustomMoveMap";
 
 export const PERSIST_KEY = "persist:root";
 
@@ -144,10 +145,16 @@ export const deserializePersistedState = (
             state[key] = typeof value === "string" ? JSON.parse(value) : value;
         }
 
-        return migratePersistedState(
+        const migratedState = migratePersistedState(
             state as Partial<State>,
             getPersistedVersion(envelope),
         );
+        return {
+            ...migratedState,
+            customMoveMap: normalizeCustomMoveMap(
+                migratedState.customMoveMap,
+            ),
+        };
     } catch {
         return undefined;
     }
