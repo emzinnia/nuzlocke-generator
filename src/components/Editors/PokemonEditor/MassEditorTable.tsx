@@ -21,6 +21,65 @@ export interface MassEditorTableProps {
     editPokemon: editPokemonType;
 }
 
+type SortDirection = "asc" | "desc";
+
+export interface MassEditorSort {
+    key: keyof Pokemon;
+    direction: SortDirection;
+}
+
+const getSortValue = (pokemon: Pokemon, key: keyof Pokemon): string | number => {
+    const value = pokemon[key];
+
+    if (typeof value === "number") {
+        return value;
+    }
+
+    if (typeof value === "boolean") {
+        return value ? 1 : 0;
+    }
+
+    if (value == null) {
+        return "";
+    }
+
+    if (Array.isArray(value)) {
+        return value.join(", ").toLocaleLowerCase();
+    }
+
+    if (typeof value === "object") {
+        return JSON.stringify(value).toLocaleLowerCase();
+    }
+
+    return String(value).toLocaleLowerCase();
+};
+
+export const sortPokemonForMassEditor = (
+    pokemon: Pokemon[],
+    sort?: MassEditorSort,
+) => {
+    if (sort == null) {
+        return pokemon;
+    }
+
+    const direction = sort.direction === "asc" ? 1 : -1;
+
+    return [...pokemon].sort((a, b) => {
+        const aValue = getSortValue(a, sort.key);
+        const bValue = getSortValue(b, sort.key);
+
+        if (aValue === bValue) {
+            return 0;
+        }
+
+        if (typeof aValue === "number" && typeof bValue === "number") {
+            return (aValue - bValue) * direction;
+        }
+
+        return String(aValue).localeCompare(String(bValue)) * direction;
+    });
+};
+
 const determineCell = (
     key: keyof Pokemon,
     value: unknown,
@@ -85,15 +144,56 @@ const cellRenderer: (
         );
     };
 
-export function renderColumns(pokemon, editPokemon) {
+const getNextSort = (
+    currentSort: MassEditorSort | undefined,
+    key: keyof Pokemon,
+): MassEditorSort => {
+    if (currentSort?.key !== key) {
+        return { key, direction: "asc" };
+    }
+
+    return {
+        key,
+        direction: currentSort.direction === "asc" ? "desc" : "asc",
+    };
+};
+
+export function renderColumns(
+    pokemon,
+    editPokemon,
+    sort?: MassEditorSort,
+    setSort?: React.Dispatch<React.SetStateAction<MassEditorSort | undefined>>,
+) {
     return Object.keys(PokemonKeys).map((key) => {
+        const pokemonKey = key as keyof Pokemon;
+        const isSorted = sort?.key === pokemonKey;
+
         return (
             <Column
                 key={key}
                 name={key}
+                nameRenderer={(name) => (
+                    <Button
+                        aria-label={`Sort by ${name}`}
+                        icon={
+                            isSorted
+                                ? sort.direction === "asc"
+                                    ? "sort-asc"
+                                    : "sort-desc"
+                                : "sort"
+                        }
+                        minimal
+                        small
+                        onClick={() => setSort?.((currentSort) =>
+                            getNextSort(currentSort, pokemonKey),
+                        )}
+                    >
+                        {name}
+                    </Button>
+                )}
                 cellRenderer={cellRenderer(
                     pokemon,
-                    key as keyof Pokemon,
+                    pokemonKey,
                     editPokemon,
                 )}
             />
@@ -167,16 +267,19 @@ export function MassEditorTableBase({
     pokemon,
     editPokemon,
 }: MassEditorTableProps) {
+    const [sort, setSort] = React.useState<MassEditorSort | undefined>();
+    const sortedPokemon = sortPokemonForMassEditor(pokemon, sort);
+
     return (
         <>
-            <Table numRows={pokemon.length} numFrozenColumns={2}>
-                {renderColumns(pokemon, editPokemon)}
+            <Table numRows={sortedPokemon.length} numFrozenColumns={2}>
+                {renderColumns(sortedPokemon, editPokemon, sort, setSort)}
             </Table>
             <div style={{ display: "flex", justifyContent: "space-between", paddingTop: "1rem" }}>
                 <AddPokemonButton pokemon={generateEmptyPokemon(pokemon)} />
                 <Button
                     icon="download"
-                    onClick={() => downloadCSV(pokemon)}
+                    onClick={() => downloadCSV(sortedPokemon)}
                 >
                     Download as CSV
                 </Button>
