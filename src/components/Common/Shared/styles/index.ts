@@ -1,1 +1,1 @@
-import {} from "emotion";
+import {} from "@emotion/css";

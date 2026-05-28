@@ -202,8 +202,8 @@ describe("Blueprint form controls characterization", () => {
         expect(handleChange).toHaveBeenCalledTimes(1);
     });
 
-    it("TextArea respects growVertically, fill, and disabled", () => {
-        const { container } = render(<TextArea growVertically fill disabled rows={3} />);
+    it("TextArea respects fill, disabled, and row props", () => {
+        const { container } = render(<TextArea fill disabled rows={3} />);
         const textarea = container.querySelector("textarea") as HTMLTextAreaElement;
         expect(textarea.disabled).toBe(true);
         expect(textarea.getAttribute("rows")).toBe("3");
@@ -472,11 +472,11 @@ describe("Blueprint overlays characterization", () => {
             </Tabs>,
         );
 
-        const root = container.querySelector(".bp5-tabs") as HTMLElement | null;
+        const root = container.querySelector(".bp6-tabs, .bp5-tabs") as HTMLElement | null;
         expect(root).not.toBeNull();
         // Blueprint uses classes for vertical/large styling; aria-orientation is not guaranteed.
-        expect(root?.className ?? "").toContain("bp5-vertical");
-        expect(container.querySelector(".bp5-large")).not.toBeNull();
+        expect(root?.className ?? "").toContain("bp6-vertical");
+        expect(container.querySelector(".bp6-large, .bp5-large")).not.toBeNull();
     });
 });
 
@@ -485,15 +485,21 @@ describe("Blueprint toaster characterization", () => {
         const container = document.createElement("div");
         document.body.appendChild(container);
 
-        const toaster = OverlayToaster.create({ position: Position.TOP }, container);
+        const toaster = await OverlayToaster.create({
+            position: Position.TOP,
+        }, {
+            container,
+            domRenderer: (element, containerElement) => {
+                render(element, { container: containerElement as HTMLElement });
+            },
+        });
         toaster.show({ message: "Toast message", intent: Intent.SUCCESS });
 
         await flushPromises();
-        const toast = document.body.querySelector('[role="status"], .bp5-toast');
+        const toast = document.body.querySelector('[role="status"], .bp6-toast, .bp5-toast');
         expect(toast?.textContent).toContain("Toast message");
 
         toaster.clear();
         container.remove();
     });
 });
-

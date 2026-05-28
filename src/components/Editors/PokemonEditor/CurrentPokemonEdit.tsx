@@ -24,7 +24,7 @@ import { Autocomplete, ErrorBoundary } from "components/Common/Shared";
 import { selectPokemon, editPokemon } from "actions";
 import { connect } from "store/reactZustand";
 import { listOfGames, accentedE } from "utils";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import * as Styles from "./styles";
 import { v4 as uuid } from "uuid";
 import {

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
 
-import { ResultBase, BackspriteMontage } from "../Result";
+import { ResultBase, BackspriteMontage, getNextZoomLevel } from "../Result";
 import { styleDefaults, generateEmptyPokemon } from "utils";
 import { Editor, Box, Pokemon } from "models";
 
@@ -123,6 +123,18 @@ describe("<ResultBase />", () => {
         expect(screen.getByText("Boxed")).toBeTruthy();
         expect(screen.getByText(/Dead/)).toBeTruthy();
         expect(screen.getByText(/Champs/)).toBeTruthy();
+    });
+});
+
+describe("getNextZoomLevel", () => {
+    it("zooms incrementally from the current zoom level", () => {
+        expect(getNextZoomLevel(1, -100)).toBe(1.2);
+        expect(getNextZoomLevel(1.2, 100)).toBe(1);
+    });
+
+    it("clamps zoom changes to readable bounds", () => {
+        expect(getNextZoomLevel(1, 10000)).toBe(0.1);
+        expect(getNextZoomLevel(1, -10000)).toBe(5);
     });
 });
 

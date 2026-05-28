@@ -11,7 +11,7 @@ import {
     toggleMobileResultView,
 } from "actions";
 import { version } from "package";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import { Pokemon, Editor } from "models";
 import { ErrorBoundary, HotkeyIndicator, ReleaseDialog } from "components/Common/Shared";
 import { State } from "state";
@@ -69,7 +69,9 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
         } = this.props;
         const { isMenuOpen } = this.state;
 
-        const shouldShow = isMobile() ? isMenuOpen : true;
+        const shouldShow = isMobile()
+            ? isMenuOpen && !showResultInMobile
+            : true;
 
         return (
             <div
@@ -85,20 +87,22 @@ export class TopBarBase extends React.Component<TopBarProps, TopBarState> {
             >
                 {isMobile() && (
                     <>
-                        <Button
-                            style={darkModeStyle(
-                                this.props.style.editorDarkMode,
-                            )}
-                            onClick={() =>
-                                this.setState((state) => ({
-                                    isMenuOpen: !state.isMenuOpen,
-                                }))
-                            }
-                            className={Classes.MINIMAL}
-                            icon={"menu"}
-                        >
-                            Nuzlocke Generator
-                        </Button>
+                        {!showResultInMobile && (
+                            <Button
+                                style={darkModeStyle(
+                                    this.props.style.editorDarkMode,
+                                )}
+                                onClick={() =>
+                                    this.setState((state) => ({
+                                        isMenuOpen: !state.isMenuOpen,
+                                    }))
+                                }
+                                className={Classes.MINIMAL}
+                                icon={"menu"}
+                            >
+                                Nuzlocke Generator
+                            </Button>
+                        )}
                         <Button
                             style={{
                                 ...darkModeStyle(
