@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Classes, Icon } from "@blueprintjs/core";
-import { css } from "emotion";
+import { css } from "@emotion/css";
 import { HotkeyIndicator } from "components/Common/Shared";
 import { SearchHelpPopover } from "./SearchHelpPopover";
 import { searchPokemon, SearchResult } from "utils/search";
@@ -39,7 +39,7 @@ const styles = {
         padding: 0.25rem 0.5rem;
         margin-bottom: 0.5rem;
 
-        .bp5-dark & {
+        :is(.bp5-dark, .bp6-dark) & {
             color: #ff6b6b;
         }
     `,
@@ -49,7 +49,7 @@ const styles = {
         padding: 0.25rem 0.5rem;
         margin-bottom: 0.5rem;
 
-        .bp5-dark & {
+        :is(.bp5-dark, .bp6-dark) & {
             color: #ffc107;
         }
 
@@ -61,7 +61,7 @@ const styles = {
             font-size: 0.8rem;
         }
 
-        .bp5-dark & code {
+        :is(.bp5-dark, .bp6-dark) & code {
             background: rgba(255, 255, 255, 0.1);
             color: #ffc107;
         }
@@ -73,7 +73,7 @@ const styles = {
         text-align: center;
         font-style: italic;
 
-        .bp5-dark & {
+        :is(.bp5-dark, .bp6-dark) & {
             color: #a7b6c2;
         }
     `,

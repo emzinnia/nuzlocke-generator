@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "store/reactZustand";
 import { State } from "state";
 import { editStyle } from "actions";
 import { editorModeSelector } from "selectors";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import { useDebounceCallback } from "@react-hook/debounce";
 
 const zoomLevelSelector = (state) => state.style.zoomLevel;
