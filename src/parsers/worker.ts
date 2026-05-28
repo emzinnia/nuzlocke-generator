@@ -40,6 +40,13 @@ type SaveParseResult = {
     [key: string]: unknown;
 };
 
+const getErrorMessage = (err: unknown) =>
+    err instanceof Error
+        ? err.message
+        : typeof err === "string"
+          ? err
+          : "Unknown save parsing error.";
+
 type ParseContext = {
     buf: Buffer;
     gen1Gen2Buf: Buffer;
@@ -599,10 +606,14 @@ const createParseContext = ({
         isGen3SizedSave(buf)
             ? (fileName ? detectGen3SaveFormatFromString(fileName) : undefined)
             : undefined;
-    const gen5SaveFormatHint = detectGen5SaveFormat(buf, fileName);
+    const gen4SaveFormatFromBuffer =
+        buf.length >= SAVE_SIZE_GEN4 ? detectGen4VariantFromBuffer(buf) : undefined;
+    const gen5SaveFormatHint = gen4SaveFormatFromBuffer
+        ? detectGen5SaveFormat(buf)
+        : detectGen5SaveFormat(buf, fileName);
     const gen4SaveFormatHint =
         buf.length >= SAVE_SIZE_GEN4 && !gen5SaveFormatHint
-            ? detectGen4SaveFormat(buf, fileName)
+            ? (gen4SaveFormatFromBuffer ?? detectGen4SaveFormat(buf, fileName))
             : undefined;
 
     return {
@@ -834,20 +845,25 @@ const getParserHandler = (gameChoice: NonAutoGameSaveFormat) => {
 };
 
 self.onmessage = async ({ data }: MessageData) => {
-    const context = createParseContext(data);
-    const gameChoice = selectGameChoice(context);
-    const handler = getParserHandler(gameChoice);
-    const result = await handler.parse(context, gameChoice);
-    const pokemon = result.pokemon.filter((poke) => poke.species);
-    const detectedGame = handler.detectGame(context, gameChoice, {
-        ...result,
-        pokemon,
-    });
+    try {
+        const context = createParseContext(data);
+        const gameChoice = selectGameChoice(context);
+        const handler = getParserHandler(gameChoice);
+        const result = await handler.parse(context, gameChoice);
+        const pokemon = result.pokemon.filter((poke) => poke.species);
+        const detectedGame = handler.detectGame(context, gameChoice, {
+            ...result,
+            pokemon,
+        });
 
-    self.postMessage({
-        ...result,
-        pokemon,
-        detectedGame,
-        detectedSaveFormat: gameChoice,
-    });
+        self.postMessage({
+            ...result,
+            pokemon,
+            detectedGame,
+            detectedSaveFormat: gameChoice,
+        });
+    } catch (err) {
+        console.error("save worker parse error", err);
+        self.postMessage({ error: getErrorMessage(err) });
+    }
 };

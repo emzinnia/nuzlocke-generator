@@ -13,6 +13,7 @@ const loadSav = (name: string) =>
 
 type PostMessageMock = ReturnType<typeof vi.fn>;
 type WorkerResult = {
+    error?: string;
     detectedGame?: { name: string };
     detectedSaveFormat?: string;
     trainer?: { name?: string; money?: string };
@@ -102,6 +103,37 @@ describe("parsers worker", () => {
             expect(call.detectedSaveFormat).toBe("DP");
         },
     );
+
+    it.each(["my-white-nuzlocke.sav", "blackout-platinum.sav"])(
+        "prefers structurally detected Gen 4 saves over Gen 5 filename hints in %s",
+        async (fileName) => {
+            const save = loadSav("diamond.sav");
+            const selfRef = globalThis.self as unknown as WorkerSelf;
+            await selfRef.onmessage?.({
+                data: { save, selectedGame: "Auto", boxMappings: [], fileName },
+            });
+            const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+            expect(call.error).toBeUndefined();
+            expect(call.detectedGame?.name).toBe("Diamond");
+            expect(call.detectedSaveFormat).toBe("DP");
+        },
+    );
+
+    it("posts parser errors instead of throwing from the worker", async () => {
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await expect(
+            selfRef.onmessage?.({
+                data: {
+                    save: new Uint8Array(0x80000),
+                    selectedGame: "BW",
+                    boxMappings: [],
+                    fileName: "not-a-save.sav",
+                },
+            }),
+        ).resolves.toBeUndefined();
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.error).toContain("Unable to validate BW save data");
+    });
 
     it("detects HeartGold from heartgold.sav", async () => {
         const save = loadSav("heartgold.sav");
