@@ -28,6 +28,7 @@ import { capitalize } from "utils/formatters/capitalize";
 import { matchNatureToToxtricityForme } from "utils/matchNatureToToxtricityForme";
 import { Nature } from "utils/Nature";
 import { getAdditionalFormes } from "utils/getters/getAdditionalFormes";
+import { getIconFormeSuffix } from "utils/getters/getIconFormeSuffix";
 import { getEvolutionLine } from "utils";
 
 const objectPropertiesWhere = (
@@ -373,6 +374,15 @@ describe(getAdditionalFormes.name, () => {
             [species]: getAdditionalFormes(species),
         }));
         expect(subject).toMatchSnapshot();
+    });
+});
+
+describe(getIconFormeSuffix.name, () => {
+    it("maps Flabebe line flower colors to icon suffixes", () => {
+        expect(getIconFormeSuffix("Yellow")).toBe("-yellow");
+        expect(getIconFormeSuffix("Orange")).toBe("-orange");
+        expect(getIconFormeSuffix("Blue")).toBe("-blue");
+        expect(getIconFormeSuffix("White")).toBe("-white");
     });
 });
 

@@ -91,7 +91,10 @@ export enum Forme {
     Lowkey = "lowkey",
     AmpedUp = "amped",
 
+    Blue = "blue",
+    Orange = "orange",
     White = "white",
+    Yellow = "yellow",
     Black = "black",
     Zen = "zen",
 
