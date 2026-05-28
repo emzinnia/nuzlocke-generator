@@ -13,6 +13,7 @@ const loadSav = (name: string) =>
 
 type PostMessageMock = ReturnType<typeof vi.fn>;
 type WorkerResult = {
+    error?: string;
     detectedGame?: { name: string };
     detectedSaveFormat?: string;
     trainer?: { name?: string; money?: string };
@@ -40,6 +41,22 @@ describe("parsers worker", () => {
         const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
         expect(call.detectedGame?.name).toBe("Emerald");
         expect(call.detectedSaveFormat).toBe("Emerald");
+    });
+
+    it("posts parse errors instead of throwing out of the worker", async () => {
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await expect(
+            selfRef.onmessage?.({
+                data: {
+                    selectedGame: "Auto",
+                    boxMappings: [],
+                    fileName: "missing.sav",
+                },
+            }),
+        ).resolves.not.toThrow();
+
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.error).toBe("No save file detected.");
     });
 
     it("detects Emerald from emerald2.sav", async () => {

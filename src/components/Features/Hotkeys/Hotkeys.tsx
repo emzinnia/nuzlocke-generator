@@ -5,13 +5,21 @@ import {
     deletePokemon,
     addPokemon,
     newNuzlocke,
+    updateNuzlocke,
+    replaceState,
     changeEditorSize,
     toggleDialog,
     editPokemon,
     editStyle,
 } from "actions";
 import { Pokemon, Boxes } from "models";
-import { sortPokes, sortPokesReverse, noop, generateEmptyPokemon } from "utils";
+import {
+    sortPokes,
+    sortPokesReverse,
+    noop,
+    generateEmptyPokemon,
+    stripEditorDarkModeFromState,
+} from "utils";
 import { listOfHotkeys, HotkeyList } from "utils";
 import { createDefaultState, persistor } from "store";
 import { State } from "state";
@@ -25,6 +33,8 @@ export interface HotkeysProps {
     deletePokemon: deletePokemon;
     addPokemon: addPokemon;
     newNuzlocke: newNuzlocke;
+    updateNuzlocke: updateNuzlocke;
+    replaceState: replaceState;
     changeEditorSize: changeEditorSize;
     toggleDialog: toggleDialog;
     editPokemon: typeof editPokemon;
@@ -33,6 +43,8 @@ export interface HotkeysProps {
     selectedId: string;
     editor: Editor;
     style: State["style"];
+    currentId: State["nuzlockes"]["currentId"];
+    state: string;
     customHotkeys: HotkeyBindings;
     editStyle: editStyle;
 }
@@ -262,7 +274,11 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
 
     private newNuzlocke() {
         const data = createDefaultState();
-        this.props.newNuzlocke(JSON.stringify(data), { isCopy: false });
+        const preparedData = stripEditorDarkModeFromState(data);
+
+        this.props.updateNuzlocke(this.props.currentId, this.props.state);
+        this.props.newNuzlocke(JSON.stringify(preparedData), { isCopy: false });
+        this.props.replaceState(data);
     }
 
     private toggleEditor() {
@@ -448,6 +464,8 @@ export const Hotkeys = connect(
         selectedId: state.selectedId,
         editor: state.editor,
         style: state.style,
+        currentId: state.nuzlockes.currentId,
+        state: JSON.stringify(stripEditorDarkModeFromState(state)),
         customHotkeys: state.hotkeys,
     }),
     {
@@ -455,6 +473,8 @@ export const Hotkeys = connect(
         deletePokemon,
         addPokemon,
         newNuzlocke,
+        updateNuzlocke,
+        replaceState,
         changeEditorSize,
         toggleDialog,
         editPokemon,

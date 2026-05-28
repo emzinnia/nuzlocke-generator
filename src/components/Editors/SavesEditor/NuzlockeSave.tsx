@@ -22,9 +22,8 @@ import {
     feature,
     gameOfOriginToColor,
     getContrastColor,
-    Styles,
+    stripEditorDarkModeFromState,
 } from "utils";
-import { omit } from "ramda";
 import { createDefaultState } from "store";
 import { NuzlockeGameTags } from "./NuzlockeGameTags";
 import { DeleteAlert } from "components/Editors/DataEditor/DeleteAlert";
@@ -54,20 +53,6 @@ const sort = (
     a: State["nuzlockes"]["saves"][number],
     b: State["nuzlockes"]["saves"][number],
 ) => a.id.localeCompare(b.id);
-
-const stripEditorDarkModeFromState = (state: State) => {
-    const baseState = omit(["nuzlockes", "editorHistory"], state) as {
-        style?: Styles;
-        [key: string]: unknown;
-    };
-    const { editorDarkMode: _omit, ...styleWithoutDarkMode } =
-        baseState.style || {};
-
-    return {
-        ...baseState,
-        style: styleWithoutDarkMode,
-    };
-};
 
 export class NuzlockeSaveBase extends React.Component<
     NuzlockeSaveControlsProps,

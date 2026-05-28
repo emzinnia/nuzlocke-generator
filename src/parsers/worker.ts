@@ -833,21 +833,28 @@ const getParserHandler = (gameChoice: NonAutoGameSaveFormat) => {
     return handler;
 };
 
-self.onmessage = async ({ data }: MessageData) => {
-    const context = createParseContext(data);
-    const gameChoice = selectGameChoice(context);
-    const handler = getParserHandler(gameChoice);
-    const result = await handler.parse(context, gameChoice);
-    const pokemon = result.pokemon.filter((poke) => poke.species);
-    const detectedGame = handler.detectGame(context, gameChoice, {
-        ...result,
-        pokemon,
-    });
+const getErrorMessage = (error: unknown) =>
+    error instanceof Error ? error.message : String(error);
 
-    self.postMessage({
-        ...result,
-        pokemon,
-        detectedGame,
-        detectedSaveFormat: gameChoice,
-    });
+self.onmessage = async ({ data }: MessageData) => {
+    try {
+        const context = createParseContext(data);
+        const gameChoice = selectGameChoice(context);
+        const handler = getParserHandler(gameChoice);
+        const result = await handler.parse(context, gameChoice);
+        const pokemon = result.pokemon.filter((poke) => poke.species);
+        const detectedGame = handler.detectGame(context, gameChoice, {
+            ...result,
+            pokemon,
+        });
+
+        self.postMessage({
+            ...result,
+            pokemon,
+            detectedGame,
+            detectedSaveFormat: gameChoice,
+        });
+    } catch (error) {
+        self.postMessage({ error: getErrorMessage(error) });
+    }
 };
