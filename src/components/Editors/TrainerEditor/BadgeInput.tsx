@@ -2,7 +2,7 @@ import * as React from "react";
 import { useDispatch, useSelector } from "store/reactZustand";
 
 import { TrainerInfoEditField } from "./TrainerInfoEditField";
-import { editTrainer } from "actions";
+import { editPokemon, editTrainer } from "actions";
 
 import {
     Popover,
@@ -18,6 +18,7 @@ import { cx } from "@emotion/css";
 import { State } from "state";
 import { Checkpoints } from "reducers/checkpoints";
 import * as Styles from "./style";
+import { Pokemon } from "models";
 
 export interface BadgeInputProps {
     checkpointsCleared?: Checkpoints;
@@ -30,6 +31,22 @@ export interface CheckpointsInputListProps {
     toggle?: () => void;
     buttonText?: string;
 }
+
+export const isAliveForCheckpointAward = (pokemon: Pokemon) =>
+    pokemon.status !== "Dead";
+
+export const mergeCheckpointAwards = (
+    currentCheckpoints: Checkpoints | undefined,
+    awardedCheckpoints: Checkpoints,
+) => [
+    ...(currentCheckpoints ?? []),
+    ...awardedCheckpoints.filter(
+        (checkpoint) =>
+            !(currentCheckpoints ?? []).some(
+                (current) => current.name === checkpoint.name,
+            ),
+    ),
+];
 
 export function CheckpointsInputList({
     onChange,
@@ -105,8 +122,12 @@ export function CheckpointsInputList({
 
 export function BadgeInput({ onChange, checkpointsCleared }: BadgeInputProps) {
     const [isOpen, setIsOpen] = React.useState(false);
+    const dispatch = useDispatch();
     const checkpoints = useSelector<State, State["checkpoints"]>(
         (state) => state.checkpoints,
+    );
+    const pokemon = useSelector<State, State["pokemon"]>(
+        (state) => state.pokemon,
     );
     const trainer = useSelector<State, State["trainer"]>(
         (state) => state.trainer,
@@ -115,11 +136,26 @@ export function BadgeInput({ onChange, checkpointsCleared }: BadgeInputProps) {
     const onChangeInternal = (badges: Checkpoints) =>
         dispatch(editTrainer({ badges }));
     const onChangeUseable = onChange ?? onChangeInternal;
-    const dispatch = useDispatch();
 
     const toggle = () => setIsOpen(!isOpen);
 
     const checkpointsObtained = checkpointsCleared ?? trainer.badges ?? [];
+    const awardCheckpointsToAlivePokemon = () => {
+        pokemon.filter(isAliveForCheckpointAward).forEach((poke) => {
+            dispatch(
+                editPokemon(
+                    {
+                        checkpoints: mergeCheckpointAwards(
+                            poke.checkpoints,
+                            checkpointsObtained,
+                        ),
+                    },
+                    poke.id,
+                ),
+            );
+        });
+    };
+
     return (
         <>
             <Dialog
@@ -156,6 +192,16 @@ export function BadgeInput({ onChange, checkpointsCleared }: BadgeInputProps) {
                             toggle={toggle}
                             checkpointsObtained={checkpointsObtained}
                         />
+                        {!onChange && (
+                            <Button
+                                fill
+                                disabled={checkpointsObtained.length === 0}
+                                onClick={awardCheckpointsToAlivePokemon}
+                                style={{ borderRadius: 0, marginTop: "0.5rem" }}
+                            >
+                                Award Checkpoints to Alive Pokemon
+                            </Button>
+                        )}
                     </div>
                 )}
             />
