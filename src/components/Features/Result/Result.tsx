@@ -84,6 +84,22 @@ type ZoomValue = (typeof ZoomValues)[number];
 
 const convertToPercentage = (n: number) => `${n * 100}%`;
 
+export const getNextZoomLevel = (currentZoomLevel: number, deltaY: number) =>
+    clamp(0.1, 5, currentZoomLevel - deltaY / 500);
+
+const waitForNextFrame = () =>
+    new Promise<void>((resolve) => {
+        if (typeof window === "undefined") {
+            resolve();
+            return;
+        }
+
+        const requestFrame =
+            window.requestAnimationFrame ??
+            ((callback: FrameRequestCallback) => window.setTimeout(callback, 0));
+        requestFrame(() => resolve());
+    });
+
 const TopBarItems = ({ editorDarkMode, setZoomLevel, currentZoomLevel }) => {
     // @TODO: make this look decent
     return (
@@ -203,7 +219,11 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
 
     private async toImage() {
         const resultNode = this.resultRef.current;
-        this.setState({ isDownloading: true });
+        await new Promise<void>((resolve) =>
+            this.setState({ isDownloading: true }, resolve),
+        );
+        await waitForNextFrame();
+
         try {
             const domToImage = await load();
             const dataUrl = await domToImage.toPng(resultNode, {
@@ -375,7 +395,10 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
     private onZoom = (e?: React.WheelEvent<HTMLElement>) => {
         if (e?.shiftKey) {
             const deltaY = e?.deltaY ?? -3;
-            this.setState({ zoomLevel: clamp(0.1, 5, -deltaY / 3) });
+            e.preventDefault();
+            this.setState((state) => ({
+                zoomLevel: getNextZoomLevel(state.zoomLevel, deltaY),
+            }));
         }
     };
 
