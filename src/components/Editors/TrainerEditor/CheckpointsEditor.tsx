@@ -1,5 +1,5 @@
 import * as React from "react";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 import {
     Classes,
     Button,
@@ -89,7 +89,7 @@ export class CheckpointsSelect extends React.Component<
                     <div
                         className={cx(
                             styles.checkpointSelect,
-                            Classes.SELECT,
+                            Classes.HTML_SELECT,
                             Classes.BUTTON,
                             "has-nice-scrollbars",
                         )}

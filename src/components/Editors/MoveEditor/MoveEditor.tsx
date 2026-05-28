@@ -20,7 +20,7 @@ import {
 } from "actions";
 import { ErrorBoundary } from "components";
 import { TypesEditor } from "./TypesEditor";
-import { cx } from "emotion";
+import { cx } from "@emotion/css";
 
 export interface MoveEditorProps {
     game: State["game"];
@@ -222,7 +222,7 @@ export class MoveEditorBase extends React.Component<
                                 type="text"
                             />
                             <div
-                                className={Classes.SELECT}
+                                className={Classes.HTML_SELECT}
                                 style={{ width: "8rem", margin: "0 .25rem" }}
                             >
                                 <select

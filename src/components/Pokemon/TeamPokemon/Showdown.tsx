@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Pokemon } from "models";
-import { css } from "emotion";
+import { css } from "@emotion/css";
 import { stripURLCSS, getPokemonImage } from "utils";
 import { State } from "state";
 

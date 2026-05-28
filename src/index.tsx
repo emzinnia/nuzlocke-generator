@@ -1,5 +1,5 @@
 import * as React from "react";
-import { injectGlobal } from "emotion";
+import { injectGlobal } from "@emotion/css";
 import { createRoot } from "react-dom/client";
 import { Analytics } from "@vercel/analytics/react";
 

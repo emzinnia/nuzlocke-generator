@@ -2,7 +2,7 @@ import * as React from "react";
 import { Classes, Dialog, Intent, Button } from "@blueprintjs/core";
 import { useSelector } from "store/reactZustand";
 import { State } from "state";
-import { css, cx } from "emotion";
+import { css, cx } from "@emotion/css";
 
 import credits from "./credits.json";
 

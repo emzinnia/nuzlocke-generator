@@ -109,10 +109,9 @@ function parseFirstLine(line: string): {
     forme: Forme | undefined;
     gender: "Male" | "Female" | null;
 } {
-    let species = "";
+    let species: string;
     let nickname: string | null = null;
     let item: string | null = null;
-    let forme: Forme | undefined = undefined;
     let gender: "Male" | "Female" | null = null;
 
     const itemSplit = line.split("@");
@@ -150,10 +149,14 @@ function parseFirstLine(line: string): {
     }
 
     const handled = handleShowdownSpecies(species);
-    species = handled.species;
-    forme = handled.forme;
 
-    return { species, nickname, item, forme, gender };
+    return {
+        species: handled.species,
+        nickname,
+        item,
+        forme: handled.forme,
+        gender,
+    };
 }
 
 function handleShowdownSpecies(species: string): { species: string; forme: Forme | undefined } {

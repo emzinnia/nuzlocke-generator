@@ -1,6 +1,7 @@
-import { css } from "emotion";
+import { css } from "@emotion/css";
 
-const BP_VERSION = "bp5";
+const BP_VERSION = "bp6";
+const DARK_BORDER = "#30363d";
 
 export const colorTextInput_dark = css`
     background: rgba(16, 22, 26, 0.3);
@@ -47,6 +48,10 @@ export const styleEdit = css`
     gap: 0.25rem;
     align-items: baseline;
     justify-content: flex-start;
+    html.dark &,
+    :is(.bp5-dark, .bp6-dark) & {
+        border-bottom-color: ${DARK_BORDER};
+    }
 }
     .${BP_VERSION}-label {
         margin: 0;
@@ -86,7 +91,7 @@ export const autoHeightCheckbox = css`
 `;
 
 export const styleEdit_dark = css`
-    border-bottom: 1px solid #111;
+    border-bottom: 1px solid ${DARK_BORDER};
 `;
 
 export const styleEditLabel = css``;

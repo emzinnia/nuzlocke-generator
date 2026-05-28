@@ -112,8 +112,15 @@ export const AdvancedImportOptions = React.forwardRef<
 
             {/* Single hidden file input - always available for both panel button and parent's Import Save button */}
             <input
-                style={{ display: "none" }}
+                style={{
+                    position: "absolute",
+                    width: 1,
+                    height: 1,
+                    opacity: 0,
+                    pointerEvents: "none",
+                }}
                 ref={fileInputRef}
+                data-testid="save-file-input"
                 onChange={handleFileChange}
                 type="file"
                 id="file-hidden"
