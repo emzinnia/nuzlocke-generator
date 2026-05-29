@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { version } from "../../../package.json";
-import { editStyle, newNuzlocke } from "actions";
+import { editStyle, newNuzlocke, replaceState, syncStateFromHistory } from "actions";
 import { PokemonFixtures, TeamFixture } from "utils/fixtures";
 import {
     createDefaultState,
@@ -44,6 +44,7 @@ describe("Zustand persistence compatibility", () => {
     });
 
     afterEach(() => {
+        vi.useRealTimers();
         window.localStorage.clear();
     });
 
@@ -143,6 +144,65 @@ describe("Zustand persistence compatibility", () => {
         expect(JSON.parse(savedState?.nuzlockes?.saves[0].data ?? "")).toEqual(
             JSON.parse(exportedNuzlockeJson),
         );
+
+        unsubscribePersistence();
+    });
+
+    it("cancels pending history commits when replacing state", () => {
+        vi.useFakeTimers();
+        const { store, unsubscribePersistence } = createNuzlockeStore({
+            enableLogger: false,
+            storage: window.localStorage,
+        });
+        const replacedState: State = {
+            ...store.getState(),
+            game: {
+                name: "Blue",
+                customName: "",
+            },
+            style: {
+                ...store.getState().style,
+                bgColor: "#222222",
+            },
+        };
+
+        store.dispatch(editStyle({ bgColor: "#111111" }));
+        store.dispatch(replaceState(replacedState));
+        vi.advanceTimersByTime(350);
+
+        expect(store.getState().game.name).toBe("Blue");
+        expect(store.getState().style.bgColor).toBe("#222222");
+        expect(store.getState().editorHistory.present?.game.name).toBe("Blue");
+        expect(store.getState().editorHistory.present?.style.bgColor).toBe("#222222");
+        expect(store.getState().editorHistory.past).toEqual([]);
+
+        unsubscribePersistence();
+        vi.useRealTimers();
+    });
+
+    it("syncs nuzlocke save metadata during history restores", () => {
+        const { store, unsubscribePersistence } = createNuzlockeStore({
+            enableLogger: false,
+            storage: window.localStorage,
+        });
+        const restoredNuzlockes: State["nuzlockes"] = {
+            currentId: "restored-save",
+            saves: [
+                {
+                    id: "restored-save",
+                    data: "{\"game\":{\"name\":\"Blue\"}}",
+                },
+            ],
+        };
+
+        store.dispatch(
+            syncStateFromHistory({
+                ...store.getState(),
+                nuzlockes: restoredNuzlockes,
+            }),
+        );
+
+        expect(store.getState().nuzlockes).toEqual(restoredNuzlockes);
 
         unsubscribePersistence();
     });
