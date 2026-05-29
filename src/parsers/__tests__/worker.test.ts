@@ -15,6 +15,7 @@ type PostMessageMock = ReturnType<typeof vi.fn>;
 type WorkerResult = {
     detectedGame?: { name: string };
     detectedSaveFormat?: string;
+    error?: string;
     trainer?: { name?: string; money?: string };
     pokemon?: { species?: string; status?: string }[];
 };
@@ -208,4 +209,19 @@ describe("parsers worker", () => {
             expect(call.pokemon).toEqual([]);
         },
     );
+
+    it("posts parse errors back to the main thread", async () => {
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: {
+                save: new Uint8Array([1, 2, 3]),
+                selectedGame: "Auto",
+                boxMappings: [],
+                fileName: "invalid.sav",
+            },
+        });
+
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.error).toBeTruthy();
+    });
 });

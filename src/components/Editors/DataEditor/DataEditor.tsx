@@ -43,6 +43,19 @@ import SaveFileWorker from "parsers/worker?worker";
 import { cx } from "emotion";
 import { StatusDropZone } from "./StatusDropZone";
 import { serializeNuzlockeJson } from "utils/nuzlockeJson";
+import { mergeImportedPokemon } from "./mergeImportedPokemon";
+
+type SaveFileWorkerMessage =
+    | {
+          pokemon: Pokemon[];
+          isYellow?: boolean;
+          trainer: Trainer;
+          detectedGame?: Game;
+          detectedSaveFormat?: GameSaveFormat;
+      }
+    | {
+          error: string;
+      };
 
 export interface DataEditorProps {
     state: State;
@@ -397,20 +410,7 @@ export class DataEditorBase extends React.Component<
     private static pokeMerge = (
         pokemonListA: Pokemon[],
         pokemonListB: Pokemon[],
-    ) => {
-        return pokemonListB.map((poke) => {
-            const id = poke.id;
-            const aListPoke = pokemonListA.find((p) => p.id === id);
-            if (aListPoke) {
-                return {
-                    ...aListPoke,
-                    ...poke,
-                };
-            } else {
-                return poke;
-            }
-        });
-    };
+    ) => mergeImportedPokemon(pokemonListA, pokemonListB);
 
     private handleFileSelect = (
         file: File,
@@ -436,16 +436,15 @@ export class DataEditorBase extends React.Component<
                 fileName: file.name,
             });
 
-            worker.onmessage = (
-                e: MessageEvent<{
-                    pokemon: Pokemon[];
-                    isYellow?: boolean;
-                    trainer: Trainer;
-                    detectedGame?: Game;
-                    detectedSaveFormat?: GameSaveFormat;
-                }>,
-            ) => {
+            worker.onmessage = (e: MessageEvent<SaveFileWorkerMessage>) => {
                 const result = e.data;
+                if ("error" in result) {
+                    showToast({
+                        message: `Failed to parse save file. ${result.error}`,
+                        intent: Intent.DANGER,
+                    });
+                    return;
+                }
                 const mergedPokemon = mergeDataMode
                     ? DataEditorBase.pokeMerge(
                           state.pokemon,
@@ -464,8 +463,9 @@ export class DataEditorBase extends React.Component<
                 const data = {
                     game,
                     pokemon: ensurePokemonCheckpoints(mergedPokemon),
-                    checkpoints,
+                    checkpoints: mergeDataMode ? state.checkpoints : checkpoints,
                     trainer: {
+                        ...(mergeDataMode ? state.trainer : {}),
                         ...result.trainer,
                         badges: normalizeImportedBadges(
                             result.trainer.badges as unknown[] | undefined,
@@ -501,6 +501,14 @@ export class DataEditorBase extends React.Component<
             worker.onmessageerror = (err) => {
                 showToast({
                     message: `Failed to parse save file. ${err}`,
+                    intent: Intent.DANGER,
+                });
+                console.error(err);
+            };
+
+            worker.onerror = (err) => {
+                showToast({
+                    message: `Failed to parse save file. ${err.message}`,
                     intent: Intent.DANGER,
                 });
                 console.error(err);

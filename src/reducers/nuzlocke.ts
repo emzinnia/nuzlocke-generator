@@ -2,6 +2,8 @@ import {
     Action,
     NEW_NUZLOCKE,
     DELETE_NUZLOCKE,
+    REPLACE_STATE,
+    SYNC_STATE_FROM_HISTORY,
     SWITCH_NUZLOCKE,
     UPDATE_NUZLOCKE,
     UPDATE_SWITCH_NUZLOCKE,
@@ -27,6 +29,8 @@ export function nuzlockes(
     action: Action<
         | NEW_NUZLOCKE
         | DELETE_NUZLOCKE
+        | REPLACE_STATE
+        | SYNC_STATE_FROM_HISTORY
         | SWITCH_NUZLOCKE
         | UPDATE_NUZLOCKE
         | UPDATE_SWITCH_NUZLOCKE
@@ -97,6 +101,10 @@ export function nuzlockes(
                     },
                 ],
             };
+        case REPLACE_STATE:
+            return action.replaceWith?.nuzlockes ?? state;
+        case SYNC_STATE_FROM_HISTORY:
+            return action.syncWith?.nuzlockes ?? state;
         default:
             return state;
     }
