@@ -43,7 +43,7 @@ describe("historyMiddleware", () => {
         );
 
         expect(editorHistory.past).toHaveLength(1);
-        expect(previousState.trainer.name).toBe("Imported Trainer");
+        expect(previousState?.trainer.name).toBe("Imported Trainer");
 
         unsubscribePersistence();
     });
