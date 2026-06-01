@@ -108,7 +108,7 @@
         "vite": "^7.1.11",
         "vite-plugin-static-copy": "^3.1.4",
         "vite-tsconfig-paths": "^5.1.4",
-        "vitest": "^4.0.12",
+        "vitest": "^4.1.8",
         "zustand": "^5.0.13"
     },
     "devDependencies": {
@@ -140,8 +140,8 @@
         "@types/redux": "^3.6.0",
         "@types/redux-logger": "^3.0.5",
         "@types/uuid": "^3.4.4",
-        "@vitest/coverage-v8": "^4.0.12",
-        "@vitest/ui": "^4.0.12",
+        "@vitest/coverage-v8": "^4.1.8",
+        "@vitest/ui": "^4.1.8",
         "babel-plugin-codegen": "^4.1.4",
         "chai": "^4.1.2",
         "cheerio": "^1.0.0-rc.2",
