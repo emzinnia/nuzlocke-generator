@@ -118,12 +118,25 @@ export const historyMiddleware: Middleware = (store) => {
         // Skip history tracking for excluded actions
         if (EXCLUDED_ACTIONS.has(action.type)) {
             // When undo/redo/jump starts, cancel any pending debounced commits
-            if (action.type === UNDO_EDITOR_HISTORY || action.type === REDO_EDITOR_HISTORY || action.type === JUMP_TO_HISTORY_STATE) {
+            if (
+                action.type === UNDO_EDITOR_HISTORY ||
+                action.type === REDO_EDITOR_HISTORY ||
+                action.type === JUMP_TO_HISTORY_STATE
+            ) {
                 debouncedCommit.cancel();
             }
-            
-            // Update lastCommittedState ONLY after SYNC_STATE_FROM_HISTORY
-            // This is when all reducers have been updated to the undo/redo state
+
+            // Full-state replacement starts a new undo baseline. Cancel any pending
+            // commit from the previous run so it cannot overwrite the fresh history.
+            if (action.type === REPLACE_STATE) {
+                debouncedCommit.cancel();
+                initialized = true;
+                lastCommittedState = newState;
+                store.dispatch(initEditorHistory(newState) as AnyAction);
+            }
+
+            // Update lastCommittedState after SYNC_STATE_FROM_HISTORY. This is when
+            // all reducers have been updated to the undo/redo state.
             if (action.type === SYNC_STATE_FROM_HISTORY) {
                 debouncedCommit.cancel();
                 lastCommittedState = newState;
