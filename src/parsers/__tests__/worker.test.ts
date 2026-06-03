@@ -69,6 +69,19 @@ describe("parsers worker", () => {
         expect(call.detectedSaveFormat).toBe("FRLG");
     });
 
+    it.each(["friend.sav", "elegant.sav", "response.sav"])(
+        "ignores incidental Gen 3 abbreviation substrings in %s",
+        async (fileName) => {
+            const save = loadSav("emerald.sav");
+            const selfRef = globalThis.self as unknown as WorkerSelf;
+            await selfRef.onmessage?.({
+                data: { save, selectedGame: "Auto", boxMappings: [], fileName },
+            });
+            const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+            expect(call.detectedSaveFormat).toBe("Emerald");
+        },
+    );
+
     it("detects Diamond from diamond.sav", async () => {
         const save = loadSav("diamond.sav");
         const selfRef = globalThis.self as unknown as WorkerSelf;
@@ -91,6 +104,20 @@ describe("parsers worker", () => {
 
     it.each(["attempt.sav", "boss.sav", "DS save.sav"])(
         "ignores incidental Gen 4 abbreviation substrings in %s",
+        async (fileName) => {
+            const save = loadSav("diamond.sav");
+            const selfRef = globalThis.self as unknown as WorkerSelf;
+            await selfRef.onmessage?.({
+                data: { save, selectedGame: "Auto", boxMappings: [], fileName },
+            });
+            const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+            expect(call.detectedGame?.name).toBe("Diamond");
+            expect(call.detectedSaveFormat).toBe("DP");
+        },
+    );
+
+    it.each(["pokemon-white-version.sav", "my-black-nuzlocke.sav"])(
+        "does not route confirmed Gen 4 saves to Gen 5 from %s",
         async (fileName) => {
             const save = loadSav("diamond.sav");
             const selfRef = globalThis.self as unknown as WorkerSelf;
