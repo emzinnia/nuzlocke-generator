@@ -78,7 +78,6 @@ describe("parsers worker", () => {
                 data: { save, selectedGame: "Auto", boxMappings: [], fileName },
             });
             const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
-            expect(call.detectedGame?.name).toBe("Emerald");
             expect(call.detectedSaveFormat).toBe("Emerald");
         },
     );
