@@ -140,15 +140,16 @@ const isGen5SaveFormat = (
 
 const detectGen3GameNameFromString = (text: string): GameName | undefined => {
     const s = normalizeForTokenSearch(text);
+    const tokens = getHintTokens(text);
 
     // Prefer longer/more-specific tokens first, then short abbreviations.
-    if (s.includes("EMER")) return "Emerald";
+    if (s.includes("EMERALD") || hasHintToken(tokens, "EMER")) return "Emerald";
 
-    if (s.includes("FIRERED") || s.includes("FR")) return "FireRed";
-    if (s.includes("LEAFGREEN") || s.includes("LG")) return "LeafGreen";
+    if (s.includes("FIRERED") || hasHintToken(tokens, "FR")) return "FireRed";
+    if (s.includes("LEAFGREEN") || hasHintToken(tokens, "LG")) return "LeafGreen";
 
-    if (s.includes("RUBY") || s.includes("RB")) return "Ruby";
-    if (s.includes("SAPPHIRE") || s.includes("SP")) return "Sapphire";
+    if (s.includes("RUBY") || hasHintToken(tokens, "RB")) return "Ruby";
+    if (s.includes("SAPPHIRE") || hasHintToken(tokens, "SP")) return "Sapphire";
 
     return undefined;
 };
@@ -472,6 +473,8 @@ const detectGen5SaveFormat = (
     const detected = detectGen5Layout(buf);
     if (detected) return detected;
 
+    if (buf.length === SAVE_SIZE_GEN5_RAW) return undefined;
+
     return fileName ? detectGen5SaveFormatFromString(fileName) : undefined;
 };
 
@@ -601,7 +604,7 @@ const createParseContext = ({
             : undefined;
     const gen5SaveFormatHint = detectGen5SaveFormat(buf, fileName);
     const gen4SaveFormatHint =
-        buf.length >= SAVE_SIZE_GEN4 && !gen5SaveFormatHint
+        buf.length >= SAVE_SIZE_GEN4
             ? detectGen4SaveFormat(buf, fileName)
             : undefined;
 
