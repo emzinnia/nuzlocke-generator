@@ -3,7 +3,7 @@ import { State } from "state";
 import { createDefaultState } from "store";
 import { NuzlockeSaveBase, NuzlockeSaveControlsProps } from "../NuzlockeSave";
 
-type CopyableNuzlockeSave = NuzlockeSaveBase & {
+type CopyableNuzlockeSave = {
     copyNuzlocke: (data: string, isCurrent: boolean) => void;
 };
 
@@ -46,7 +46,7 @@ const createProps = (
 });
 
 const createComponent = (props: NuzlockeSaveControlsProps) =>
-    new NuzlockeSaveBase(props) as CopyableNuzlockeSave;
+    new NuzlockeSaveBase(props) as unknown as CopyableNuzlockeSave;
 
 describe("<NuzlockeSave />", () => {
     it("copies the live state when copying the current nuzlocke", () => {
