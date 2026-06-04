@@ -96,6 +96,24 @@ export class NuzlockeSaveBase extends React.Component<
         this.setState((state) => ({ isHofOpen: !state.isHofOpen }));
     };
 
+    private copyNuzlocke = (data: string, isCurrent: boolean) => {
+        const { currentId } = this.props.nuzlockes;
+        const { newNuzlocke, replaceState, state, updateNuzlocke } = this.props;
+        const copyData = isCurrent ? state : data;
+
+        if (typeof copyData !== "string") {
+            throw new Error("Data is not in correct format.");
+        }
+
+        const parsedCopyData = JSON.parse(copyData) as State;
+
+        updateNuzlocke(currentId, state);
+        newNuzlocke(copyData, {
+            isCopy: true,
+        });
+        replaceState(parsedCopyData);
+    };
+
     public renderMenu() {
         const {
             state,
@@ -240,16 +258,10 @@ export class NuzlockeSaveBase extends React.Component<
                                             icon="clipboard"
                                             onClick={() => {
                                                 try {
-                                                    if (
-                                                        typeof data !== "string"
-                                                    ) {
-                                                        throw new Error(
-                                                            "Data is not in correct format.",
-                                                        );
-                                                    }
-                                                    newNuzlocke(data, {
-                                                        isCopy: true,
-                                                    });
+                                                    this.copyNuzlocke(
+                                                        data,
+                                                        isCurrent,
+                                                    );
                                                 } catch (e) {
                                                     showToast({
                                                         message: `Failed to copy nuzlocke. ${e}`,
