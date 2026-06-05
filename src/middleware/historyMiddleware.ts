@@ -122,8 +122,17 @@ export const historyMiddleware: Middleware = (store) => {
                 debouncedCommit.cancel();
             }
             
-            // Update lastCommittedState ONLY after SYNC_STATE_FROM_HISTORY
-            // This is when all reducers have been updated to the undo/redo state
+            // Full-state replacements are new load points. Any pending commit
+            // still references the pre-replacement baseline and must not run.
+            if (action.type === REPLACE_STATE) {
+                debouncedCommit.cancel();
+                initialized = true;
+                lastCommittedState = newState;
+                store.dispatch(initEditorHistory(newState) as AnyAction);
+            }
+
+            // Update lastCommittedState after SYNC_STATE_FROM_HISTORY.
+            // This is when all reducers have been updated to the undo/redo state.
             if (action.type === SYNC_STATE_FROM_HISTORY) {
                 debouncedCommit.cancel();
                 lastCommittedState = newState;
