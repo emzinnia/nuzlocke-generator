@@ -124,10 +124,17 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
 
     private handleKeyUp = (e: KeyboardEvent) => {
         if (this.isTextInput(e)) return;
-        const actions = this.keyUpActions.get(e.key);
+        const actions = this.keyUpActions.get(this.getEventKey(e));
         if (!actions?.length) return;
         actions.forEach((fn) => fn());
     };
+
+    private getEventKey(e: KeyboardEvent) {
+        if (e.shiftKey && e.key.length === 1) {
+            return e.key.toUpperCase();
+        }
+        return e.key;
+    }
 
     private rebuildHotkeyMaps() {
         const next = new Map<string, Array<() => void>>();

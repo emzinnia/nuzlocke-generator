@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { HotkeysBase, HotkeysProps } from "../Hotkeys";
 
 describe("HotkeysBase", () => {
-    it("saves the current run before creating a new nuzlocke from the hotkey", () => {
+    const createProps = () => {
         const updateNuzlocke = vi.fn();
         const newNuzlocke = vi.fn();
         const replaceState = vi.fn();
@@ -27,6 +27,24 @@ describe("HotkeysBase", () => {
             toggleDialog: vi.fn(),
             updateNuzlocke,
         } as unknown as HotkeysProps;
+
+        return {
+            newNuzlocke,
+            props,
+            replaceState,
+            serializedCurrentState,
+            updateNuzlocke,
+        };
+    };
+
+    it("saves the current run before creating a new nuzlocke from the hotkey", () => {
+        const {
+            newNuzlocke,
+            props,
+            replaceState,
+            serializedCurrentState,
+            updateNuzlocke,
+        } = createProps();
         const instance = new HotkeysBase(props);
 
         (instance as unknown as { newNuzlocke: () => void }).newNuzlocke();
@@ -47,5 +65,26 @@ describe("HotkeysBase", () => {
         expect(storedNewRun.style.editorDarkMode).toBeUndefined();
         expect(storedNewRun.game).toEqual(liveNewRun.game);
         expect(storedNewRun.trainer).toEqual(liveNewRun.trainer);
+    });
+
+    it("treats shift+n as the new-nuzlocke hotkey, not add-pokemon", () => {
+        const { newNuzlocke, props } = createProps();
+        const instance = new HotkeysBase(props);
+
+        (
+            instance as unknown as { rebuildHotkeyMaps: () => void }
+        ).rebuildHotkeyMaps();
+        (
+            instance as unknown as {
+                handleKeyUp: (event: Partial<KeyboardEvent>) => void;
+            }
+        ).handleKeyUp({
+            key: "n",
+            shiftKey: true,
+            target: document.body,
+        });
+
+        expect(props.addPokemon).not.toHaveBeenCalled();
+        expect(newNuzlocke).toHaveBeenCalledTimes(1);
     });
 });
