@@ -917,29 +917,7 @@ const selectLayoutAndBlocks = (file: Buffer, preferred?: Gen4Game): ActiveBlocks
     }
 
     if (!best) {
-        const fallbackLayout =
-            layouts.find(
-                (l) =>
-                    file.length >= l.storageStart + l.storageSize &&
-                    file.length >= l.generalStart + l.generalSize,
-            ) || layouts[0];
-        const general = validateBlock(
-            file.slice(
-                fallbackLayout.generalStart,
-                fallbackLayout.generalStart + fallbackLayout.generalSize,
-            ),
-            fallbackLayout.generalSize,
-            fallbackLayout.checksumFooterSize,
-        );
-        const storage = validateBlock(
-            file.slice(
-                fallbackLayout.storageStart,
-                fallbackLayout.storageStart + fallbackLayout.storageSize,
-            ),
-            fallbackLayout.storageSize,
-            fallbackLayout.checksumFooterSize,
-        );
-        best = { layout: fallbackLayout, general, storage };
+        throw new Error("Unable to validate Gen 4 save data.");
     }
     return best;
 };

@@ -5,6 +5,8 @@ import {
     deletePokemon,
     addPokemon,
     newNuzlocke,
+    updateNuzlocke,
+    replaceState,
     changeEditorSize,
     toggleDialog,
     editPokemon,
@@ -19,23 +21,42 @@ import { Editor } from "models";
 import { HotkeyBindings } from "reducers/hotkeys";
 import { Intent } from "@blueprintjs/core";
 import { showToast } from "components/Common/Shared/appToaster";
+import { omit } from "ramda";
 
 export interface HotkeysProps {
     selectPokemon: selectPokemon;
     deletePokemon: deletePokemon;
     addPokemon: addPokemon;
     newNuzlocke: newNuzlocke;
+    updateNuzlocke: updateNuzlocke;
+    replaceState: replaceState;
     changeEditorSize: changeEditorSize;
     toggleDialog: toggleDialog;
     editPokemon: typeof editPokemon;
     pokemon: Pokemon[];
     boxes: Boxes;
     selectedId: string;
+    currentId: string;
+    state: string;
     editor: Editor;
     style: State["style"];
     customHotkeys: HotkeyBindings;
     editStyle: editStyle;
 }
+
+const stripEditorDarkModeFromState = (state: State) => {
+    const baseState = omit(["nuzlockes", "editorHistory"], state) as {
+        style?: State["style"];
+        [key: string]: unknown;
+    };
+    const { editorDarkMode: _omit, ...styleWithoutDarkMode } =
+        baseState.style || {};
+
+    return {
+        ...baseState,
+        style: styleWithoutDarkMode,
+    };
+};
 
 interface GlobalHotkeysEvents {
     handleKeyDown: (event: KeyboardEvent) => void;
@@ -261,8 +282,11 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
     }
 
     private newNuzlocke() {
+        this.props.updateNuzlocke(this.props.currentId, this.props.state);
         const data = createDefaultState();
-        this.props.newNuzlocke(JSON.stringify(data), { isCopy: false });
+        const preparedData = stripEditorDarkModeFromState(data);
+        this.props.newNuzlocke(JSON.stringify(preparedData), { isCopy: false });
+        this.props.replaceState(data);
     }
 
     private toggleEditor() {
@@ -446,6 +470,8 @@ export const Hotkeys = connect(
         pokemon: state.pokemon,
         boxes: state.box,
         selectedId: state.selectedId,
+        currentId: state.nuzlockes.currentId,
+        state: JSON.stringify(stripEditorDarkModeFromState(state as State)),
         editor: state.editor,
         style: state.style,
         customHotkeys: state.hotkeys,
@@ -455,6 +481,8 @@ export const Hotkeys = connect(
         deletePokemon,
         addPokemon,
         newNuzlocke,
+        updateNuzlocke,
+        replaceState,
         changeEditorSize,
         toggleDialog,
         editPokemon,

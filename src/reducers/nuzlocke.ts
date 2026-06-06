@@ -49,11 +49,17 @@ export function nuzlockes(
             };
         }
 
-        case DELETE_NUZLOCKE:
+        case DELETE_NUZLOCKE: {
+            const saves = state.saves.filter((s) => s.id !== action.id);
             return {
                 ...state,
-                saves: state.saves.filter((s) => s.id !== action.id),
+                currentId:
+                    state.currentId === action.id
+                        ? saves[0]?.id ?? ""
+                        : state.currentId,
+                saves,
             };
+        }
         case SWITCH_NUZLOCKE:
             return {
                 ...state,
