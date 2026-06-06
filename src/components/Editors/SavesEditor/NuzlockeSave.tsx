@@ -55,6 +55,11 @@ const sort = (
     b: State["nuzlockes"]["saves"][number],
 ) => a.id.localeCompare(b.id);
 
+export const getFallbackNuzlockeAfterDelete = (
+    saves: State["nuzlockes"]["saves"],
+    deletedId: string,
+) => [...saves].sort(sort).find((save) => save.id !== deletedId);
+
 const stripEditorDarkModeFromState = (state: State) => {
     const baseState = omit(["nuzlockes", "editorHistory"], state) as {
         style?: Styles;
@@ -110,7 +115,7 @@ export class NuzlockeSaveBase extends React.Component<
         const { nuzlockes } = this.props;
         const { currentId } = this.props.nuzlockes;
         const { isHofOpen, isDeletingNuzlocke, deletionFunction } = this.state;
-        const saves = nuzlockes.saves.sort(sort);
+        const saves = [...nuzlockes.saves].sort(sort);
 
         return (
             <div
@@ -275,14 +280,22 @@ export class NuzlockeSaveBase extends React.Component<
                                             onClick={() => {
                                                 const deletionFunction = () => {
                                                     try {
+                                                        const fallbackSave =
+                                                            getFallbackNuzlockeAfterDelete(
+                                                                saves,
+                                                                id,
+                                                            );
                                                         deleteNuzlocke(id);
-                                                        if (isCurrent) {
+                                                        if (
+                                                            isCurrent &&
+                                                            fallbackSave
+                                                        ) {
                                                             switchNuzlocke(
-                                                                saves[0].id,
+                                                                fallbackSave.id,
                                                             );
                                                             replaceState(
                                                                 JSON.parse(
-                                                                    saves[0]
+                                                                    fallbackSave
                                                                         .data,
                                                                 ),
                                                             );

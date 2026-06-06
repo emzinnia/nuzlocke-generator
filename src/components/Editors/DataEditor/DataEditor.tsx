@@ -438,6 +438,7 @@ export class DataEditorBase extends React.Component<
 
             worker.onmessage = (
                 e: MessageEvent<{
+                    error?: string;
                     pokemon: Pokemon[];
                     isYellow?: boolean;
                     trainer: Trainer;
@@ -446,6 +447,14 @@ export class DataEditorBase extends React.Component<
                 }>,
             ) => {
                 const result = e.data;
+                if (result.error) {
+                    showToast({
+                        message: `Failed to parse save file. ${result.error}`,
+                        intent: Intent.DANGER,
+                    });
+                    console.error(result.error);
+                    return;
+                }
                 const mergedPokemon = mergeDataMode
                     ? DataEditorBase.pokeMerge(
                           state.pokemon,

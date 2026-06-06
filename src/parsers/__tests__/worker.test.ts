@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { Buffer } from "node:buffer";
 
 type WorkerSelf = {
     postMessage: (data: unknown) => void;
@@ -15,6 +16,7 @@ type PostMessageMock = ReturnType<typeof vi.fn>;
 type WorkerResult = {
     detectedGame?: { name: string };
     detectedSaveFormat?: string;
+    error?: string;
     trainer?: { name?: string; money?: string };
     pokemon?: { species?: string; status?: string }[];
 };
@@ -161,6 +163,40 @@ describe("parsers worker", () => {
         const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
         expect(call.detectedGame?.name).toBe("SoulSilver");
         expect(call.detectedSaveFormat).toBe("HGSS");
+    });
+
+    it("posts an error when an explicit parser rejects the save", async () => {
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+
+        await selfRef.onmessage?.({
+            data: {
+                save: Buffer.alloc(1),
+                selectedGame: "Emerald",
+                boxMappings: [],
+                fileName: "corrupt-emerald.sav",
+            },
+        });
+
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.error).toContain("Unexpected Gen 3 save size");
+        expect(call.detectedGame).toBeUndefined();
+    });
+
+    it("rejects unvalidated 512 KiB saves instead of importing Gen 4 garbage", async () => {
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+
+        await selfRef.onmessage?.({
+            data: {
+                save: Buffer.alloc(0x80000),
+                selectedGame: "Auto",
+                boxMappings: [],
+                fileName: "unknown.sav",
+            },
+        });
+
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.error).toBe("Unable to validate Gen 4 save data.");
+        expect(call.detectedSaveFormat).toBeUndefined();
     });
 
     it.each([
