@@ -87,4 +87,45 @@ describe("HotkeysBase", () => {
         expect(props.addPokemon).not.toHaveBeenCalled();
         expect(newNuzlocke).toHaveBeenCalledTimes(1);
     });
+
+    it("keeps shift+n when shift is released before n", () => {
+        const { newNuzlocke, props } = createProps();
+        const instance = new HotkeysBase(props);
+
+        (
+            instance as unknown as { rebuildHotkeyMaps: () => void }
+        ).rebuildHotkeyMaps();
+        const hotkeys = instance as unknown as {
+            handleKeyDown: (event: Partial<KeyboardEvent>) => void;
+            handleKeyUp: (event: Partial<KeyboardEvent>) => void;
+        };
+
+        hotkeys.handleKeyDown({
+            code: "ShiftLeft",
+            key: "Shift",
+            shiftKey: true,
+            target: document.body,
+        });
+        hotkeys.handleKeyDown({
+            code: "KeyN",
+            key: "n",
+            shiftKey: true,
+            target: document.body,
+        });
+        hotkeys.handleKeyUp({
+            code: "ShiftLeft",
+            key: "Shift",
+            shiftKey: false,
+            target: document.body,
+        });
+        hotkeys.handleKeyUp({
+            code: "KeyN",
+            key: "n",
+            shiftKey: false,
+            target: document.body,
+        });
+
+        expect(props.addPokemon).not.toHaveBeenCalled();
+        expect(newNuzlocke).toHaveBeenCalledTimes(1);
+    });
 });
