@@ -63,7 +63,7 @@ describe("<EditorControls />", () => {
     it("redoes on Ctrl+Shift+Z", () => {
         const store = renderWithHistory();
 
-        fireEvent.keyDown(window, { key: "z", ctrlKey: true, shiftKey: true });
+        fireEvent.keyDown(window, { key: "Z", ctrlKey: true, shiftKey: true });
 
         expect(store.getState().trainer.name).toBe("After redo");
     });
