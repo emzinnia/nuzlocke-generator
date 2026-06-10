@@ -13,6 +13,7 @@ const loadSav = (name: string) =>
 
 type PostMessageMock = ReturnType<typeof vi.fn>;
 type WorkerResult = {
+    error?: string;
     detectedGame?: { name: string };
     detectedSaveFormat?: string;
     trainer?: { name?: string; money?: string };
@@ -208,4 +209,21 @@ describe("parsers worker", () => {
             expect(call.pokemon).toEqual([]);
         },
     );
+
+    it("posts a structured error when parsing fails", async () => {
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+
+        await selfRef.onmessage?.({
+            data: {
+                save: new Uint8Array([0]),
+                selectedGame: "BW",
+                boxMappings: [],
+                fileName: "broken.sav",
+            },
+        });
+
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.error).toBeTruthy();
+        expect(call.pokemon).toBeUndefined();
+    });
 });

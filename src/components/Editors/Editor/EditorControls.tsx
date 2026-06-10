@@ -57,7 +57,10 @@ export function EditorControls({ editorDarkMode, minimized }) {
 
     const handleRedo = React.useCallback((event: KeyboardEvent) => {
         // Support both Ctrl+Y and Ctrl+Shift+Z for redo
-        if ((event.ctrlKey || event.metaKey) && (event.key === "y" || (event.key === "z"))) {
+        if (
+            (event.ctrlKey || event.metaKey) &&
+            (event.key === "y" || (event.shiftKey && event.key === "z"))
+        ) {
             event.preventDefault();
             dispatchRedo();
         }

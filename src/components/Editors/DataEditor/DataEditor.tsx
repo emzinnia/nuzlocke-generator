@@ -62,6 +62,20 @@ export interface DataEditorState {
     overrideImport: boolean;
 }
 
+type SaveFileWorkerSuccess = {
+    pokemon: Pokemon[];
+    isYellow?: boolean;
+    trainer: Trainer;
+    detectedGame?: Game;
+    detectedSaveFormat?: GameSaveFormat;
+};
+
+type SaveFileWorkerFailure = {
+    error: string;
+};
+
+type SaveFileWorkerResult = SaveFileWorkerSuccess | SaveFileWorkerFailure;
+
 const isValidJSON = (data: string): boolean => {
     try {
         JSON.parse(data);
@@ -254,6 +268,7 @@ export class DataEditorBase extends React.Component<
     public textarea: HTMLTextAreaElement | null;
     public nuzlockeJsonFileInput: HTMLInputElement | null;
     public advancedImportRef = React.createRef<import("./AdvancedImportOptions").AdvancedImportOptionsHandle>();
+    private saveFileImportRequest = 0;
 
     public constructor(props: DataEditorProps) {
         super(props);
@@ -419,7 +434,11 @@ export class DataEditorBase extends React.Component<
         const t0 = performance.now();
         const worker = new SaveFileWorker();
         const reader = new FileReader();
-        const { replaceState, state } = this.props;
+        const requestId = this.saveFileImportRequest + 1;
+        this.saveFileImportRequest = requestId;
+        const isLatestImport = () => requestId === this.saveFileImportRequest;
+        const getCurrentState = () => this.props.state;
+        const { replaceState } = this.props;
         const { selectedGame, boxMappings, mergeDataMode } = settings;
 
         console.log(file, reader, settings, worker);
@@ -436,19 +455,23 @@ export class DataEditorBase extends React.Component<
                 fileName: file.name,
             });
 
-            worker.onmessage = (
-                e: MessageEvent<{
-                    pokemon: Pokemon[];
-                    isYellow?: boolean;
-                    trainer: Trainer;
-                    detectedGame?: Game;
-                    detectedSaveFormat?: GameSaveFormat;
-                }>,
-            ) => {
+            worker.onmessage = (e: MessageEvent<SaveFileWorkerResult>) => {
+                worker.terminate();
+                if (!isLatestImport()) return;
+
                 const result = e.data;
+                if ("error" in result) {
+                    showToast({
+                        message: `Failed to parse save file. ${result.error}`,
+                        intent: Intent.DANGER,
+                    });
+                    return;
+                }
+
+                const currentState = getCurrentState();
                 const mergedPokemon = mergeDataMode
                     ? DataEditorBase.pokeMerge(
-                          state.pokemon,
+                          currentState.pokemon,
                           result.pokemon as Pokemon[],
                       )
                     : result.pokemon;
@@ -476,19 +499,19 @@ export class DataEditorBase extends React.Component<
                 console.log("data", data);
                 const nextStyle: Styles = bgColor
                     ? {
-                          ...state.style,
+                          ...currentState.style,
                           bgColor,
                       }
-                    : state.style;
+                    : currentState.style;
 
                 // Back-compat for older saves that may have used `style.backgroundColor`.
                 // `Styles` doesn't include it, but we can preserve/overwrite it if present.
                 type LegacyStyle = Styles & { backgroundColor?: string };
-                if (bgColor && "backgroundColor" in (state.style as LegacyStyle)) {
+                if (bgColor && "backgroundColor" in (currentState.style as LegacyStyle)) {
                     (nextStyle as LegacyStyle).backgroundColor = bgColor;
                 }
 
-                const newState = { ...state, ...data, style: nextStyle };
+                const newState = { ...currentState, ...data, style: nextStyle };
                 replaceState(newState);
                 if (result.detectedGame) {
                     showToast({
@@ -499,8 +522,20 @@ export class DataEditorBase extends React.Component<
             };
 
             worker.onmessageerror = (err) => {
+                worker.terminate();
+                if (!isLatestImport()) return;
                 showToast({
                     message: `Failed to parse save file. ${err}`,
+                    intent: Intent.DANGER,
+                });
+                console.error(err);
+            };
+
+            worker.onerror = (err) => {
+                worker.terminate();
+                if (!isLatestImport()) return;
+                showToast({
+                    message: `Failed to parse save file. ${err.message}`,
                     intent: Intent.DANGER,
                 });
                 console.error(err);
