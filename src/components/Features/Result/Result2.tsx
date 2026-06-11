@@ -23,6 +23,7 @@ import { TrainerResult } from "./TrainerResult";
 import { getContrastColor } from "utils";
 import { useEvent } from "utils/hooks";
 import { TrainerNotes } from "./TrainerNotes";
+import { downloadImageDataUrl } from "utils/downloadImage";
 
 import { v4 as uuid } from "uuid";
 
@@ -92,10 +93,7 @@ const toImage =
             const dataUrl = await domToImage.toPng(resultNode, {
                 corsImage: true,
             });
-            const link = document.createElement("a");
-            link.download = `nuzlocke-${uuid()}.png`;
-            link.href = dataUrl;
-            link.click();
+            await downloadImageDataUrl(dataUrl, `nuzlocke-${uuid()}.png`);
             setDS(DownloadStatus.done);
         } catch (e) {
             setDS(DownloadStatus.error);
