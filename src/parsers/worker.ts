@@ -100,6 +100,9 @@ const hasHintToken = (tokens: string[], ...values: string[]) =>
 
 const asSaveParseResult = (result: unknown) => result as SaveParseResult;
 
+const getErrorMessage = (err: unknown) =>
+    err instanceof Error ? err.message : String(err);
+
 const isExplicitGameChoice = (
     selectedGame?: GameSaveFormat,
 ): selectedGame is NonAutoGameSaveFormat =>
@@ -472,6 +475,10 @@ const detectGen5SaveFormat = (
     const detected = detectGen5Layout(buf);
     if (detected) return detected;
 
+    // Raw 512 KiB DS saves overlap with Gen 4. Do not let filename hints
+    // override structural Gen 4 detection unless the Gen 5 footer confirms it.
+    if (buf.length === SAVE_SIZE_GEN5_RAW) return undefined;
+
     return fileName ? detectGen5SaveFormatFromString(fileName) : undefined;
 };
 
@@ -834,20 +841,27 @@ const getParserHandler = (gameChoice: NonAutoGameSaveFormat) => {
 };
 
 self.onmessage = async ({ data }: MessageData) => {
-    const context = createParseContext(data);
-    const gameChoice = selectGameChoice(context);
-    const handler = getParserHandler(gameChoice);
-    const result = await handler.parse(context, gameChoice);
-    const pokemon = result.pokemon.filter((poke) => poke.species);
-    const detectedGame = handler.detectGame(context, gameChoice, {
-        ...result,
-        pokemon,
-    });
+    try {
+        const context = createParseContext(data);
+        const gameChoice = selectGameChoice(context);
+        const handler = getParserHandler(gameChoice);
+        const result = await handler.parse(context, gameChoice);
+        const pokemon = result.pokemon.filter((poke) => poke.species);
+        const detectedGame = handler.detectGame(context, gameChoice, {
+            ...result,
+            pokemon,
+        });
 
-    self.postMessage({
-        ...result,
-        pokemon,
-        detectedGame,
-        detectedSaveFormat: gameChoice,
-    });
+        self.postMessage({
+            ...result,
+            pokemon,
+            detectedGame,
+            detectedSaveFormat: gameChoice,
+        });
+    } catch (err) {
+        console.error("save worker parse error", err);
+        self.postMessage({
+            error: getErrorMessage(err),
+        });
+    }
 };
