@@ -62,6 +62,16 @@ export interface DataEditorState {
     overrideImport: boolean;
 }
 
+type SaveWorkerSuccess = {
+    pokemon: Pokemon[];
+    isYellow?: boolean;
+    trainer: Trainer;
+    detectedGame?: Game;
+    detectedSaveFormat?: GameSaveFormat;
+};
+
+type SaveWorkerResponse = SaveWorkerSuccess | { error: string };
+
 const isValidJSON = (data: string): boolean => {
     try {
         JSON.parse(data);
@@ -424,6 +434,84 @@ export class DataEditorBase extends React.Component<
 
         console.log(file, reader, settings, worker);
 
+        worker.onmessage = (e: MessageEvent<SaveWorkerResponse>) => {
+            const result = e.data;
+            if ("error" in result) {
+                showToast({
+                    message: `Failed to parse save file. ${result.error}`,
+                    intent: Intent.DANGER,
+                });
+                return;
+            }
+
+            const mergedPokemon = mergeDataMode
+                ? DataEditorBase.pokeMerge(
+                      state.pokemon,
+                      result.pokemon as Pokemon[],
+                  )
+                : result.pokemon;
+            const game =
+                result.detectedGame ??
+                DataEditorBase.determineGame({
+                    isYellow: result.isYellow,
+                    selectedGame,
+                });
+            const gameName = game.name as GameName;
+            const checkpoints = getBadges(gameName);
+            const bgColor = gameOfOriginToColor(game.name as GameName);
+            const data = {
+                game,
+                pokemon: ensurePokemonCheckpoints(mergedPokemon),
+                checkpoints,
+                trainer: {
+                    ...result.trainer,
+                    badges: normalizeImportedBadges(
+                        result.trainer.badges as unknown[] | undefined,
+                        gameName,
+                    ),
+                },
+            };
+            console.log("data", data);
+            const nextStyle: Styles = bgColor
+                ? {
+                      ...state.style,
+                      bgColor,
+                  }
+                : state.style;
+
+            // Back-compat for older saves that may have used `style.backgroundColor`.
+            // `Styles` doesn't include it, but we can preserve/overwrite it if present.
+            type LegacyStyle = Styles & { backgroundColor?: string };
+            if (bgColor && "backgroundColor" in (state.style as LegacyStyle)) {
+                (nextStyle as LegacyStyle).backgroundColor = bgColor;
+            }
+
+            const newState = { ...state, ...data, style: nextStyle };
+            replaceState(newState);
+            if (result.detectedGame) {
+                showToast({
+                    message: `Detected game: ${result.detectedGame.name}`,
+                    intent: Intent.PRIMARY,
+                });
+            }
+        };
+
+        worker.onmessageerror = (err) => {
+            showToast({
+                message: `Failed to parse save file. ${err}`,
+                intent: Intent.DANGER,
+            });
+            console.error(err);
+        };
+
+        worker.onerror = (err) => {
+            showToast({
+                message: `Failed to parse save file. ${err.message}`,
+                intent: Intent.DANGER,
+            });
+            console.error(err);
+        };
+
         reader.readAsArrayBuffer(file);
 
         reader.addEventListener("load", async function () {
@@ -435,76 +523,6 @@ export class DataEditorBase extends React.Component<
                 boxMappings,
                 fileName: file.name,
             });
-
-            worker.onmessage = (
-                e: MessageEvent<{
-                    pokemon: Pokemon[];
-                    isYellow?: boolean;
-                    trainer: Trainer;
-                    detectedGame?: Game;
-                    detectedSaveFormat?: GameSaveFormat;
-                }>,
-            ) => {
-                const result = e.data;
-                const mergedPokemon = mergeDataMode
-                    ? DataEditorBase.pokeMerge(
-                          state.pokemon,
-                          result.pokemon as Pokemon[],
-                      )
-                    : result.pokemon;
-                const game =
-                    result.detectedGame ??
-                    DataEditorBase.determineGame({
-                        isYellow: result.isYellow,
-                        selectedGame,
-                    });
-                const gameName = game.name as GameName;
-                const checkpoints = getBadges(gameName);
-                const bgColor = gameOfOriginToColor(game.name as GameName);
-                const data = {
-                    game,
-                    pokemon: ensurePokemonCheckpoints(mergedPokemon),
-                    checkpoints,
-                    trainer: {
-                        ...result.trainer,
-                        badges: normalizeImportedBadges(
-                            result.trainer.badges as unknown[] | undefined,
-                            gameName,
-                        ),
-                    },
-                };
-                console.log("data", data);
-                const nextStyle: Styles = bgColor
-                    ? {
-                          ...state.style,
-                          bgColor,
-                      }
-                    : state.style;
-
-                // Back-compat for older saves that may have used `style.backgroundColor`.
-                // `Styles` doesn't include it, but we can preserve/overwrite it if present.
-                type LegacyStyle = Styles & { backgroundColor?: string };
-                if (bgColor && "backgroundColor" in (state.style as LegacyStyle)) {
-                    (nextStyle as LegacyStyle).backgroundColor = bgColor;
-                }
-
-                const newState = { ...state, ...data, style: nextStyle };
-                replaceState(newState);
-                if (result.detectedGame) {
-                    showToast({
-                        message: `Detected game: ${result.detectedGame.name}`,
-                        intent: Intent.PRIMARY,
-                    });
-                }
-            };
-
-            worker.onmessageerror = (err) => {
-                showToast({
-                    message: `Failed to parse save file. ${err}`,
-                    intent: Intent.DANGER,
-                });
-                console.error(err);
-            };
 
             const t1 = performance.now();
             console.info(
