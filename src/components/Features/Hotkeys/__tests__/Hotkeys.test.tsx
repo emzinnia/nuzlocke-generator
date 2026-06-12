@@ -4,10 +4,6 @@ import { HotkeysBase, HotkeysProps } from "../Hotkeys";
 import { State } from "state";
 import { serializeNuzlockeSaveData } from "utils/nuzlockeJson";
 
-type HotkeysBasePrivate = HotkeysBase & {
-    newNuzlocke: () => void;
-};
-
 describe("HotkeysBase", () => {
     it("creates a new nuzlocke with the same state transition as the save menu", () => {
         const currentState: State = {
@@ -46,7 +42,9 @@ describe("HotkeysBase", () => {
             serializedState,
         } as unknown as HotkeysProps;
 
-        (new HotkeysBase(props) as unknown as HotkeysBasePrivate).newNuzlocke();
+        (
+            new HotkeysBase(props) as unknown as { newNuzlocke: () => void }
+        ).newNuzlocke();
 
         expect(updateNuzlocke).toHaveBeenCalledWith(
             "current-save",
