@@ -5,6 +5,8 @@ import {
     deletePokemon,
     addPokemon,
     newNuzlocke,
+    updateNuzlocke,
+    replaceState,
     changeEditorSize,
     toggleDialog,
     editPokemon,
@@ -19,12 +21,15 @@ import { Editor } from "models";
 import { HotkeyBindings } from "reducers/hotkeys";
 import { Intent } from "@blueprintjs/core";
 import { showToast } from "components/Common/Shared/appToaster";
+import { serializeNuzlockeSaveData } from "utils/nuzlockeJson";
 
 export interface HotkeysProps {
     selectPokemon: selectPokemon;
     deletePokemon: deletePokemon;
     addPokemon: addPokemon;
     newNuzlocke: newNuzlocke;
+    updateNuzlocke: updateNuzlocke;
+    replaceState: replaceState;
     changeEditorSize: changeEditorSize;
     toggleDialog: toggleDialog;
     editPokemon: typeof editPokemon;
@@ -35,6 +40,8 @@ export interface HotkeysProps {
     style: State["style"];
     customHotkeys: HotkeyBindings;
     editStyle: editStyle;
+    currentNuzlockeId: State["nuzlockes"]["currentId"];
+    serializedState: string;
 }
 
 interface GlobalHotkeysEvents {
@@ -45,6 +52,7 @@ interface GlobalHotkeysEvents {
 export class HotkeysBase extends React.PureComponent<HotkeysProps> {
     public globalHotkeysEvents: GlobalHotkeysEvents;
     private keyUpActions: Map<string, Array<() => void>> = new Map();
+    private keyDownKeysByCode: Map<string, string> = new Map();
     private firstPokemonId: string | null = null;
     private lastPokemonId: string | null = null;
 
@@ -90,7 +98,8 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
     }
 
     private handleKeyDown = (event: KeyboardEvent) => {
-        return;
+        if (this.isTextInput(event) || !event.code) return;
+        this.keyDownKeysByCode.set(event.code, event.key);
     };
 
     private getEffectiveKey(hotkey: HotkeyList): string {
@@ -103,7 +112,13 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
 
     private handleKeyUp = (e: KeyboardEvent) => {
         if (this.isTextInput(e)) return;
-        const actions = this.keyUpActions.get(e.key);
+        const key = e.code
+            ? this.keyDownKeysByCode.get(e.code) ?? e.key
+            : e.key;
+        if (e.code) {
+            this.keyDownKeysByCode.delete(e.code);
+        }
+        const actions = this.keyUpActions.get(key);
         if (!actions?.length) return;
         actions.forEach((fn) => fn());
     };
@@ -262,7 +277,14 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
 
     private newNuzlocke() {
         const data = createDefaultState();
-        this.props.newNuzlocke(JSON.stringify(data), { isCopy: false });
+        this.props.updateNuzlocke(
+            this.props.currentNuzlockeId,
+            this.props.serializedState,
+        );
+        this.props.newNuzlocke(serializeNuzlockeSaveData(data), {
+            isCopy: false,
+        });
+        this.props.replaceState(data);
     }
 
     private toggleEditor() {
@@ -449,12 +471,16 @@ export const Hotkeys = connect(
         editor: state.editor,
         style: state.style,
         customHotkeys: state.hotkeys,
+        currentNuzlockeId: state.nuzlockes.currentId,
+        serializedState: serializeNuzlockeSaveData(state),
     }),
     {
         selectPokemon,
         deletePokemon,
         addPokemon,
         newNuzlocke,
+        updateNuzlocke,
+        replaceState,
         changeEditorSize,
         toggleDialog,
         editPokemon,

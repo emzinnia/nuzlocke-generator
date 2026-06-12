@@ -5,8 +5,11 @@ import { State } from "state";
 import { createDefaultState } from "store";
 import { TeamFixture } from "utils/fixtures";
 import {
+    getReplacementNuzlockeSave,
     serializeNuzlockeJson,
+    serializeNuzlockeSaveData,
     stripEditorDarkModeForExport,
+    stripVolatileSavedNuzlockeFields,
 } from "../nuzlockeJson";
 
 const createDownloadedJsonFixture = (): State => ({
@@ -64,5 +67,28 @@ describe("nuzlocke.json export compatibility", () => {
         expect(nextState.style.editorDarkMode).toBe(
             defaultState.style.editorDarkMode,
         );
+    });
+});
+
+describe("saved nuzlocke payloads", () => {
+    it("omits nested save metadata while preserving run data", () => {
+        const state = createDownloadedJsonFixture();
+        const saved = stripVolatileSavedNuzlockeFields(state) as Partial<State>;
+
+        expect(saved.nuzlockes).toBeUndefined();
+        expect(saved.editorHistory).toBeUndefined();
+        expect(saved.pokemon).toEqual(state.pokemon);
+        expect(saved.trainer).toEqual(state.trainer);
+        expect(saved.style).not.toHaveProperty("editorDarkMode");
+        expect(JSON.parse(serializeNuzlockeSaveData(state))).toEqual(saved);
+    });
+
+    it("selects a surviving save when deleting the active entry", () => {
+        const saves = [
+            { id: "a-current", data: "{}" },
+            { id: "b-next", data: "{\"game\":{\"name\":\"Emerald\"}}" },
+        ];
+
+        expect(getReplacementNuzlockeSave(saves, "a-current")).toBe(saves[1]);
     });
 });
