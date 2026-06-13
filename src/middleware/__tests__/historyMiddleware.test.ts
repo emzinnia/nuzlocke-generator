@@ -74,6 +74,6 @@ describe("historyMiddleware", () => {
 
         expect(editorHistory.past).toHaveLength(1);
         expect(editorHistory.present?.style.bgColor).toBe("#333333");
-        expect(previousState.style.bgColor).toBe("#222222");
+        expect(previousState?.style.bgColor).toBe("#222222");
     });
 });
