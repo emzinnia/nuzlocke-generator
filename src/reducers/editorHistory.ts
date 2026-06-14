@@ -7,8 +7,7 @@ import {
     INIT_EDITOR_HISTORY,
     JUMP_TO_HISTORY_STATE,
 } from "actions";
-import { Diff, applyChange, revertChange } from "deep-diff";
-import { take } from "ramda";
+import { Diff, applyChange } from "deep-diff";
 
 // A single diff entry represents the changes between two states
 export type DiffEntry = Diff<unknown, unknown>[];
@@ -183,8 +182,8 @@ export function editorHistory<T = unknown>(
             };
 
             return {
-                // Store the entry - limit to MAX_HISTORY_LENGTH
-                past: [...take(MAX_HISTORY_LENGTH - 1, past), entry],
+                // Keep the most recent contiguous diff chain for undo/redo.
+                past: [...past.slice(-(MAX_HISTORY_LENGTH - 1)), entry],
                 // Update present to the new state (no deep clone needed - immutable by convention)
                 present: action.newState as T,
                 // Clear future on new changes (can't redo after new edits)
