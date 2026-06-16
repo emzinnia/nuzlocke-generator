@@ -63,6 +63,7 @@ vi.mock("utils", () => ({
     getForme: mocks.getForme,
     addForme: mocks.addForme,
     wrapImageInCORS: mocks.wrapImageInCORS,
+    isRemoteImageUrl: (url: string) => /^https?:\/\//i.test(url),
     normalizeSpeciesName: mocks.normalizeSpeciesName,
     capitalize: mocks.capitalize,
 }));
@@ -408,4 +409,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-

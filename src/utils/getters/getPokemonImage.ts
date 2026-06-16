@@ -7,6 +7,7 @@ import {
     significantGenderDifferenceList,
     wrapImageInCORS,
     normalizeSpeciesName,
+    isRemoteImageUrl,
 } from "utils";
 import { getIconFormeSuffix } from "./getIconFormeSuffix";
 import { Editor, Pokemon } from "models";
@@ -164,7 +165,7 @@ export async function getPokemonImage({
         if (selectedImage) {
             return `url(${selectedImage})`;
         }
-        if (customImage.startsWith("http")) {
+        if (isRemoteImageUrl(customImage)) {
             return await wrapImageInCORS(customImage);
         }
         return `url(${customImage})`;

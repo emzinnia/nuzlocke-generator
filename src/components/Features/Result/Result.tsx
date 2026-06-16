@@ -29,6 +29,7 @@ import {
     getIconFormeSuffix,
     Species,
     Forme,
+    getDomToImageOptions,
 } from "utils";
 
 import * as Styles from "./styles";
@@ -206,9 +207,10 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
         this.setState({ isDownloading: true });
         try {
             const domToImage = await load();
-            const dataUrl = await domToImage.toPng(resultNode, {
-                corsImage: true,
-            });
+            const dataUrl = await domToImage.toPng(
+                resultNode,
+                getDomToImageOptions(),
+            );
             console.log(dataUrl, resultNode);
             const link = document.createElement("a");
             link.download = `nuzlocke-${uuid()}.png`;
