@@ -3,35 +3,43 @@ import * as React from "react";
 import { Dialog, Classes, Button, DialogProps } from "@blueprintjs/core";
 import { css, cx } from "emotion";
 import * as styles from "components/Features/Result/styles";
-import { Styles, classWithDarkTheme, getPatchlessVersion } from "utils";
+import {
+    Styles,
+    classWithDarkTheme,
+    getAssetUrl,
+    getPatchlessVersion,
+} from "utils";
 import ReactMarkdown from "react-markdown";
 import useSwr from "swr";
 
-const calyrex = "icons/pokemon/regular/calyrex.png";
-const croagunk = "./assets/img/croagunk.gif";
-const dugtrio = "icons/pokemon/regular/dugtrio.png";
-const kubfu = "icons/pokemon/regular/kubfu.png";
-const lapras = "icons/pokemon/regular/lapras.png";
-const magneton = "icons/pokemon/regular/magneton.png";
-const mew = "icons/pokemon/regular/mew.png";
-const noctowl = "icons/pokemon/regular/noctowl.png";
-const porygon = "icons/pokemon/regular/porygon.png";
-const porygon2 = "icons/pokemon/regular/porygon2.png";
-const togepi = "icons/pokemon/regular/togepi.png";
-const arceus = "icons/pokemon/regular/arceus.png";
-const sprigatito = "icons/pokemon/regular/sprigatito.png";
-const fuecoco = "icons/pokemon/regular/fuecoco.png";
-const quaxly = "icons/pokemon/regular/quaxly.png";
-const miraidon = "icons/pokemon/regular/miraidon.png";
-const koraidon = "icons/pokemon/regular/koraidon.png";
-const terapagos = "icons/pokemon/regular/terapagos.png";
-const ogerpon = "icons/pokemon/regular/ogerpon.png";
-const zygarde = "icons/pokemon/regular/zygarde.png";
-const floette = "icons/pokemon/regular/floette-eternal.png";
-const hoopa = "icons/pokemon/regular/hoopa.png";
-const rayquaza = "icons/pokemon/regular/rayquaza.png";
-const darkrai = "icons/pokemon/regular/darkrai.png";
-const keldeo = "icons/pokemon/regular/keldeo.png";
+const pokemonIcon = (name: string) =>
+    getAssetUrl(`icons/pokemon/regular/${name}.png`);
+
+const calyrex = pokemonIcon("calyrex");
+const croagunk = getAssetUrl("assets/img/croagunk.gif");
+const dugtrio = pokemonIcon("dugtrio");
+const kubfu = pokemonIcon("kubfu");
+const lapras = pokemonIcon("lapras");
+const magneton = pokemonIcon("magneton");
+const mew = pokemonIcon("mew");
+const noctowl = pokemonIcon("noctowl");
+const porygon = pokemonIcon("porygon");
+const porygon2 = pokemonIcon("porygon2");
+const togepi = pokemonIcon("togepi");
+const arceus = pokemonIcon("arceus");
+const sprigatito = pokemonIcon("sprigatito");
+const fuecoco = pokemonIcon("fuecoco");
+const quaxly = pokemonIcon("quaxly");
+const miraidon = pokemonIcon("miraidon");
+const koraidon = pokemonIcon("koraidon");
+const terapagos = pokemonIcon("terapagos");
+const ogerpon = pokemonIcon("ogerpon");
+const zygarde = pokemonIcon("zygarde");
+const floette = pokemonIcon("floette-eternal");
+const hoopa = pokemonIcon("hoopa");
+const rayquaza = pokemonIcon("rayquaza");
+const darkrai = pokemonIcon("darkrai");
+const keldeo = pokemonIcon("keldeo");
 
 export const getMascot = (v) => {
     switch (v) {

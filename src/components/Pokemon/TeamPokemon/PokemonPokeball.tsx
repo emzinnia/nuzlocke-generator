@@ -4,6 +4,7 @@ import { Pokemon } from "models";
 import { State } from "state";
 import {
     formatBallText,
+    getAssetUrl,
     getBackgroundGradient,
     normalizePokeballName,
     typeToColor,
@@ -84,7 +85,9 @@ export function PokemonPokeball({
         >
             <img
                 alt={normalizePokeballName(pokemon.pokeball)}
-                src={`icons/pokeball/${formatBallText(pokemon.pokeball)}.png`}
+                src={getAssetUrl(
+                    `icons/pokeball/${formatBallText(pokemon.pokeball)}.png`,
+                )}
             />
         </div>
     ) : null;

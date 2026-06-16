@@ -11,6 +11,31 @@ import path from "path";
 dotenv.config();
 
 const isProduction = process.env.NODE_ENV === "production";
+const staticAssetsBaseUrl = (
+    process.env.VITE_STATIC_ASSETS_BASE_URL ??
+    process.env.VITE_ASSET_BASE_URL ??
+    ""
+).trim();
+const shouldCopyLocalImageAssets =
+    process.env.COPY_LOCAL_IMAGE_ASSETS !== "false" &&
+    process.env.VITE_COPY_LOCAL_IMAGE_ASSETS !== "false" &&
+    staticAssetsBaseUrl.length === 0;
+
+const staticCopyTargets = [
+    // App shell assets that are small and still served with the app.
+    { src: "src/assets/img/*", dest: "assets/img" },
+    { src: "src/assets/*.png", dest: "assets" },
+    { src: "src/assets/*.jpg", dest: "assets" },
+    { src: "src/assets/*.woff", dest: "assets" },
+    { src: "src/assets/*.ttf", dest: "assets" },
+    { src: "src/assets/*.css", dest: "assets" },
+    ...(shouldCopyLocalImageAssets
+        ? [
+              { src: "src/img/*", dest: "img" },
+              { src: "src/assets/icons/*", dest: "icons" },
+          ]
+        : []),
+];
 
 export default defineConfig({
     root: "./",
@@ -20,19 +45,7 @@ export default defineConfig({
         tsconfigPaths(),
         // Copy static assets
         viteStaticCopy({
-            targets: [
-                { src: "src/img/*", dest: "img" },
-                { src: "src/assets/*", dest: "assets" },
-                { src: "src/assets/icons/*", dest: "icons" },
-                // Copy assets/img subdirectory (box backgrounds, etc.)
-                { src: "src/assets/img/*", dest: "assets/img" },
-                // Copy only non-icon assets to avoid duplicating icons folder (~13MB savings)
-                { src: "src/assets/*.png", dest: "assets" },
-                { src: "src/assets/*.jpg", dest: "assets" },
-                { src: "src/assets/*.woff", dest: "assets" },
-                { src: "src/assets/*.ttf", dest: "assets" },
-                { src: "src/assets/*.css", dest: "assets" },
-            ],
+            targets: staticCopyTargets,
         }),
         // Plugin to mock CSS and static files in tests only
         {

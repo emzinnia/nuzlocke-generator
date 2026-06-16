@@ -14,6 +14,7 @@ import {
     TemplateName,
     Types,
     Forme,
+    getAssetUrl,
 } from "utils";
 import { GenderElement, ErrorBoundary } from "components/Common/Shared";
 import { selectPokemon } from "actions";
@@ -203,7 +204,7 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                                     <img
                                         alt={"alpha"}
                                         style={{ height: "1rem" }}
-                                        src={"icons/alpha-icon.png"}
+                                        src={getAssetUrl("icons/alpha-icon.png")}
                                     />
                                 </span>
                             )}
@@ -215,7 +216,9 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                                     <img
                                         alt={`Tera: ${pokemon.teraType}`}
                                         style={{ height: "1rem" }}
-                                        src={`icons/tera/${pokemon.teraType?.toLowerCase()}.png`}
+                                        src={getAssetUrl(
+                                            `icons/tera/${pokemon.teraType?.toLowerCase()}.png`,
+                                        )}
                                     />
                                 </span>
                             )}
@@ -712,7 +715,7 @@ export class TeamPokemonBase extends React.Component<
                             style={{ height: "1rem" }}
                             alt=""
                             role="presentation"
-                            src="./assets/mvp-crown.png"
+                            src={getAssetUrl("assets/mvp-crown.png")}
                         />
                     </div>
                 )}

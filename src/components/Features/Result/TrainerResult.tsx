@@ -8,6 +8,7 @@ import {
     getBadges,
     isEmpty,
     feature,
+    getAssetUrl,
 } from "utils";
 import { connect, useSelector } from "store/reactZustand";
 import { Trainer, Badge } from "models";
@@ -122,7 +123,9 @@ export function CheckpointsDisplay({
                                 badge.image.startsWith("http") ||
                                 badge.image.startsWith("data")
                                     ? badge.image
-                                    : `./img/checkpoints/${badge.image}.png`
+                                    : getAssetUrl(
+                                          `img/checkpoints/${badge.image}.png`,
+                                      )
                             }
                         />
                         {badge.name === "Rising Badge" ? <br /> : null}

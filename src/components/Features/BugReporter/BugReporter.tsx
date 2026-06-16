@@ -12,6 +12,7 @@ import { connect } from "store/reactZustand";
 import { css } from "emotion";
 import { showToast } from "components/Common/Shared/appToaster";
 import { State } from "state";
+import { getAssetUrl } from "utils";
 
 export interface BugReporterProps {
     reportingUrl?: string;
@@ -115,7 +116,9 @@ export class BugReporterBase extends React.Component<
                                     }}
                                     alt=""
                                     role="presentation"
-                                    src={`./icons/pokemon/regular/${this.getButtonPokemon(stage)}.png`}
+                                    src={getAssetUrl(
+                                        `icons/pokemon/regular/${this.getButtonPokemon(stage)}.png`,
+                                    )}
                                 />
                             )}
                         </Button>

@@ -2,6 +2,7 @@ import * as React from "react";
 import { useSelector } from "store/reactZustand";
 import { Alert, Intent, AlertProps, Classes } from "@blueprintjs/core";
 import { State } from "state";
+import { getAssetUrl } from "utils";
 
 // @TODO add back trubbish
 export type WarningText = { warningText?: string };
@@ -23,7 +24,7 @@ export function DeleteAlert({
             <div style={{ display: "flex" }}>
                 <img
                     style={{ height: "10rem" }}
-                    src={"./assets/img/trash.png"}
+                    src={getAssetUrl("assets/img/trash.png")}
                     alt="Sad Trubbish"
                 />
                 <p style={{ fontSize: "1.2rem", padding: "1rem" }}>

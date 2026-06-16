@@ -15,6 +15,7 @@ import {
     listOfPokemon,
     matchSpeciesToTypes,
     Species,
+    getAssetUrl,
 } from "utils";
 import { Pokemon, Editor } from "models";
 import { Boxes } from "models";
@@ -48,7 +49,7 @@ import { getImages, Image } from "components/Common/Shared/ImagesDrawer";
 import { DexieImagePickerPopover } from "components/Common/Shared/DexieImagePickerPopover";
 import { normalizePokeballName } from "utils";
 
-const pokeball = "./assets/pokeball.png";
+const pokeball = getAssetUrl("assets/pokeball.png");
 
 export interface CopyPokemonButtonProps {
     onClick: (event: React.MouseEvent<HTMLElement>) => void;

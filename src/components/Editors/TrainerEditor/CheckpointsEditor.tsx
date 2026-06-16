@@ -8,7 +8,7 @@ import {
     Popover,
     PopoverInteractionKind,
 } from "@blueprintjs/core";
-import { classWithDarkTheme, feature, Styles } from "utils";
+import { classWithDarkTheme, feature, getAssetUrl, Styles } from "utils";
 import * as styles from "./style";
 import { connect } from "store/reactZustand";
 import { Badge } from "models";
@@ -35,7 +35,7 @@ export interface CheckpointsSelectState {
 const checkpointImageURL = (name) =>
     name.startsWith("http") || name.startsWith("data")
         ? name
-        : `./img/checkpoints/${name}.png`;
+        : getAssetUrl(`img/checkpoints/${name}.png`);
 
 export class CheckpointsSelect extends React.Component<
     CheckpointsSelectProps,

@@ -79,11 +79,19 @@ IMAGE_UPLOADS=true
 TCG_IMAGES=true
 # Required for cross-origin images (i.e. sprites mode)
 CORS_ANYWHERE_URL=<URL>
+# Optional: serve large Pokémon images/sprites from separate storage/CDN
+VITE_STATIC_ASSETS_BASE_URL=<URL>
+# Optional: skip copying src/img and src/assets/icons without rewriting URLs
+VITE_COPY_LOCAL_IMAGE_ASSETS=false
 ```
 
 ## Enabling Sprites Mode in Local Instances
 
 Unfortunately, [due to changes in cors-anywhere](https://github.com/Rob--W/cors-anywhere/issues/301), you will need to stand up your own instance of cors-anywhere in order to access cross-origin images (anything that comes from a non-nuzlocke-generator URL). After standing up your own server and whitelisting your localhost (you can run this locally as well), you can add `CORS_ANYWHERE_URL=<YOUR_URL>` to your `.env` file.
+
+## Serving Images/Sprites from Separate Storage
+
+Set `VITE_STATIC_ASSETS_BASE_URL` to a bucket/CDN that mirrors `src/img/**` as `img/**` and `src/assets/icons/**` as `icons/**`. Production builds with that variable set skip copying those folders into `dist`, which keeps the app slug smaller. See [docs/ASSET_STORAGE.md](docs/ASSET_STORAGE.md) for the expected layout and CORS requirements.
 
 ## Legal
 

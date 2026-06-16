@@ -88,6 +88,9 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
     let consoleLogSpy: ReturnType<typeof vi.spyOn> | undefined;
 
     beforeEach(() => {
+        vi.stubEnv("VITE_STATIC_ASSETS_BASE_URL", "");
+        vi.stubEnv("VITE_ASSET_BASE_URL", "");
+
         // `getIconFormeSuffix` currently logs; silence for deterministic tests.
         consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
@@ -101,6 +104,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
     });
 
     afterEach(() => {
+        vi.unstubAllEnvs();
         consoleLogSpy?.mockRestore();
     });
 
@@ -296,6 +300,21 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
     });
 
     describe("teamImages modes (local assets)", () => {
+        it("prefixes local team image assets when external asset storage is configured", async () => {
+            vi.stubEnv(
+                "VITE_STATIC_ASSETS_BASE_URL",
+                "https://assets.example.com/nuzlocke",
+            );
+
+            const result = await getPokemonImage({
+                species: "Pikachu",
+            });
+
+            expect(result).toBe(
+                "url(https://assets.example.com/nuzlocke/img/pikachu.jpg)",
+            );
+        });
+
         it("returns sugimori female folder for known gender-dimorphic species", async () => {
             const result = await getPokemonImage({
                 species: "Unfezant",
@@ -408,4 +427,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-
