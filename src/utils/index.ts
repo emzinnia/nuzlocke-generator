@@ -22,6 +22,7 @@ export * from "./handleMovesGenerationExceptions";
 export * from "./dragAndDrop";
 export * from "./debounce";
 export * from "./DeepSet";
+export * from "./domToImageDownloadOptions";
 export * from "./isEmpty";
 export * from "./Forme";
 export * from "./isLocal";

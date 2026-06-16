@@ -1,3 +1,5 @@
+import { getCorsProxyBaseUrl } from "./domToImageDownloadOptions";
+
 function fileToBase64(file: Blob) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -18,10 +20,7 @@ export async function wrapImageInCORS(url: string) {
     // In production, the proxy may be unavailable/rate-limited/blocked; in that case we
     // fall back to the direct URL so the image still renders in the browser.
     try {
-        const proxyBase =
-            import.meta.env.VITE_CORS_ANYWHERE_URL ??
-            "https://cors-anywhere-nuzgen.herokuapp.com";
-        const response = await fetch(`${proxyBase}/${url}`, {
+        const response = await fetch(`${getCorsProxyBaseUrl()}/${url}`, {
             mode: "cors",
             // origin: location.origin,
             // @ts-expect-error valid for cors-anywhere
@@ -49,10 +48,7 @@ export async function wrapImageInCORS(url: string) {
 export async function wrapImageInCORSPlain(url: string) {
     // Same as wrapImageInCORS(), but returns a plain src string for <img src="..."/>.
     try {
-        const proxyBase =
-            import.meta.env.VITE_CORS_ANYWHERE_URL ??
-            "https://cors-anywhere-nuzgen.herokuapp.com";
-        const response = await fetch(`${proxyBase}/${url}`, {
+        const response = await fetch(`${getCorsProxyBaseUrl()}/${url}`, {
             mode: "cors",
             // @ts-expect-error valid for cors-anywhere
             "X-Requested-With": "XMLHttpRequest",

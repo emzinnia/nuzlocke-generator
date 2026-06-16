@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import { ResultBase, BackspriteMontage } from "../Result";
 import { styleDefaults, generateEmptyPokemon } from "utils";
@@ -9,6 +9,14 @@ type ResultBaseProps = React.ComponentProps<typeof ResultBase>;
 type PokemonSpeciesProps = { species: string };
 type PokemonProp = { pokemon: Pokemon };
 type ChildrenProps = { children?: React.ReactNode };
+
+const domToImageMock = vi.hoisted(() => ({
+    toPng: vi.fn(),
+}));
+
+vi.mock("@emmaramirez/dom-to-image", () => ({
+    domToImage: domToImageMock,
+}));
 
 vi.mock("components/Pokemon/TeamPokemon/TeamPokemon", () => ({
     TeamPokemon: ({ pokemon }: PokemonProp) => (
@@ -39,8 +47,19 @@ vi.mock("components/Features/Result/TrainerResult", () => ({
 }));
 
 vi.mock("components/Layout/TopBar/TopBar", () => ({
-    TopBar: ({ children }: { children?: React.ReactNode }) => (
-        <div data-testid="top-bar">{children}</div>
+    TopBar: ({
+        children,
+        onClickDownload,
+    }: {
+        children?: React.ReactNode;
+        onClickDownload?: () => void;
+    }) => (
+        <div data-testid="top-bar">
+            <button onClick={onClickDownload} type="button">
+                Download
+            </button>
+            {children}
+        </div>
     ),
 }));
 
@@ -94,6 +113,13 @@ const createPokemon = () => [
 ];
 
 describe("<ResultBase />", () => {
+    beforeEach(() => {
+        domToImageMock.toPng.mockReset();
+        domToImageMock.toPng.mockResolvedValue(
+            "data:image/png;base64,result",
+        );
+    });
+
     it("renders team and status sections with rules", () => {
         render(
             <ResultBase
@@ -123,6 +149,58 @@ describe("<ResultBase />", () => {
         expect(screen.getByText("Boxed")).toBeTruthy();
         expect(screen.getByText(/Dead/)).toBeTruthy();
         expect(screen.getByText(/Champs/)).toBeTruthy();
+    });
+
+    it("uses dom-to-image CORS proxy options for result downloads", async () => {
+        const clickSpy = vi
+            .spyOn(HTMLAnchorElement.prototype, "click")
+            .mockImplementation(() => undefined);
+
+        render(
+            <ResultBase
+                pokemon={createPokemon()}
+                game={{ name: "Red", customName: "" }}
+                trainer={{ notes: "Remember to heal", badges: [] }}
+                box={boxes}
+                editor={baseEditor}
+                selectPokemon={vi.fn() as unknown as ResultBaseProps["selectPokemon"]}
+                toggleMobileResultView={
+                    vi.fn() as unknown as ResultBaseProps["toggleMobileResultView"]
+                }
+                toggleDialog={vi.fn() as unknown as ResultBaseProps["toggleDialog"]}
+                style={{
+                    ...styleDefaults,
+                    displayRules: true,
+                    displayRulesLocation: "top",
+                    trainerSectionOrientation: "horizontal",
+                    useSpritesForChampsPokemon: true,
+                }}
+                rules={["Rule 1", "Rule 2"]}
+                customTypes={[]}
+            />,
+        );
+
+        fireEvent.click(screen.getByRole("button", { name: "Download" }));
+
+        await waitFor(() => {
+            expect(domToImageMock.toPng).toHaveBeenCalled();
+        });
+
+        expect(domToImageMock.toPng).toHaveBeenCalledWith(
+            expect.any(HTMLDivElement),
+            {
+                corsImg: {
+                    method: "GET",
+                    url: "https://cors-anywhere-nuzgen.herokuapp.com/#{cors}",
+                    data: {},
+                },
+                imagePlaceholder:
+                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg==",
+            },
+        );
+        expect(clickSpy).toHaveBeenCalled();
+
+        clickSpy.mockRestore();
     });
 });
 
