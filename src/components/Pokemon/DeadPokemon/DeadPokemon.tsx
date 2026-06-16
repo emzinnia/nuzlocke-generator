@@ -164,7 +164,8 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                         }}
                     >
                         <div>
-                            {poke.nickname} {GenderElement(poke.gender)} Levels{" "}
+                            {poke.nickname} {GenderElement(poke.gender)}{" "}
+                            Levels&nbsp;
                             {poke.metLevel}
                             &mdash;
                             {poke.level}
@@ -237,7 +238,8 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                     }}
                 >
                     <div>
-                        {poke.nickname} {GenderElement(poke.gender)} Levels{" "}
+                        {poke.nickname} {GenderElement(poke.gender)}{" "}
+                        Levels&nbsp;
                         {poke.metLevel}&mdash;
                         {poke.level}
                     </div>
@@ -319,7 +321,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                     {poke.nickname} {GenderElement(poke.gender)}
                 </div>
                 <div className="pokemon-levels">
-                    Levels {poke.metLevel}&mdash;{poke.level}
+                    Levels&nbsp;{poke.metLevel}&mdash;{poke.level}
                 </div>
                 <br />
                 <div
