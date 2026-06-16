@@ -7,15 +7,96 @@ import dotenv from "dotenv";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import tsconfigPaths from "vite-tsconfig-paths";
 import path from "path";
+import { fetchImageForProxy, ImageProxyError } from "./imageProxy.js";
 
 dotenv.config();
 
 const isProduction = process.env.NODE_ENV === "production";
 
+const readJsonBody = (req) =>
+    new Promise((resolve, reject) => {
+        const chunks = [];
+
+        req.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+        req.on("error", reject);
+        req.on("end", () => {
+            if (chunks.length === 0) {
+                resolve({});
+                return;
+            }
+
+            try {
+                resolve(JSON.parse(Buffer.concat(chunks).toString("utf8")));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    });
+
+const sendImageProxyError = (res, statusCode, message) => {
+    res.statusCode = statusCode;
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify({ error: message }));
+};
+
+const imageProxyDevServer = () => ({
+    name: "image-proxy-dev-server",
+    configureServer(server) {
+        server.middlewares.use("/image-proxy", async (req, res) => {
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+            res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+            if (req.method === "OPTIONS") {
+                res.statusCode = 204;
+                res.end();
+                return;
+            }
+
+            if (req.method !== "GET" && req.method !== "POST") {
+                sendImageProxyError(res, 405, "Method not allowed.");
+                return;
+            }
+
+            try {
+                const queryUrl = new URL(
+                    req.url ?? "",
+                    "http://localhost",
+                ).searchParams.get("url");
+                const body =
+                    req.method === "POST" ? await readJsonBody(req) : {};
+                const bodyUrl =
+                    body && typeof body === "object" ? body.url : undefined;
+                const imageUrl =
+                    req.method === "POST" && typeof bodyUrl === "string"
+                        ? bodyUrl
+                        : queryUrl;
+                const image = await fetchImageForProxy(imageUrl);
+
+                res.statusCode = 200;
+                res.setHeader("Cache-Control", image.cacheControl);
+                res.setHeader("Content-Type", image.contentType);
+                res.end(image.body);
+            } catch (error) {
+                const statusCode =
+                    error instanceof ImageProxyError ? error.statusCode : 502;
+                const message =
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to proxy image.";
+
+                sendImageProxyError(res, statusCode, message);
+            }
+        });
+    },
+});
+
 export default defineConfig({
     root: "./",
     base: "/",
     plugins: [
+        imageProxyDevServer(),
         react(),
         tsconfigPaths(),
         // Copy static assets

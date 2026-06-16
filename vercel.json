@@ -11,6 +11,10 @@
             "destination": "/api/server"
         },
         {
+            "source": "/image-proxy",
+            "destination": "/api/server"
+        },
+        {
             "source": "/nuzlocke",
             "destination": "/api/server"
         },

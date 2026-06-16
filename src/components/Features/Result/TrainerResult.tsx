@@ -15,6 +15,7 @@ import { State } from "state";
 import { Checkpoints } from "reducers/checkpoints";
 import { Stats } from "./Stats";
 import { cx } from "emotion";
+import { PokemonImage } from "components/Common/Shared/PokemonImage";
 
 export interface TrainerResultProps {
     orientation: OrientationType;
@@ -100,31 +101,39 @@ export function CheckpointsDisplay({
                 const obtained = cleared.some(
                     (b) => getClearedCheckpointName(b) === badge.name,
                 );
+                const badgeSrc =
+                    badge.image.startsWith("http") ||
+                    badge.image.startsWith("data")
+                        ? badge.image
+                        : `./img/checkpoints/${badge.image}.png`;
+                const renderBadgeImage = (image: string) => (
+                    <img
+                        className={cx(
+                            className ?? "",
+                            obtained ? "obtained" : "not-obtained",
+                        )}
+                        style={
+                            isSWSH(name) && !trainer?.hasEditedCheckpoints
+                                ? {
+                                      position: "absolute",
+                                      ...swshPositions[index],
+                                  }
+                                : {}
+                        }
+                        alt={badge.name}
+                        data-badge={badge.name}
+                        src={image}
+                    />
+                );
                 return (
                     <React.Fragment key={badge.name}>
-                        <img
-                            className={cx(
-                                className ?? "",
-                                obtained ? "obtained" : "not-obtained",
-                            )}
-                            style={
-                                isSWSH(name) && !trainer?.hasEditedCheckpoints
-                                    ? {
-                                          position: "absolute",
-                                          ...swshPositions[index],
-                                      }
-                                    : {}
-                            }
-                            key={badge.name}
-                            alt={badge.name}
-                            data-badge={badge.name}
-                            src={
-                                badge.image.startsWith("http") ||
-                                badge.image.startsWith("data")
-                                    ? badge.image
-                                    : `./img/checkpoints/${badge.image}.png`
-                            }
-                        />
+                        {badgeSrc.startsWith("http") ? (
+                            <PokemonImage url={badgeSrc}>
+                                {renderBadgeImage}
+                            </PokemonImage>
+                        ) : (
+                            renderBadgeImage(badgeSrc)
+                        )}
                         {badge.name === "Rising Badge" ? <br /> : null}
                     </React.Fragment>
                 );
@@ -169,6 +178,12 @@ export class TrainerResultBase extends React.Component<TrainerResultProps> {
         const tciProps = { trainer, orientation };
         const enableStats = style.displayStats;
         const emmaMode = feature.emmaMode;
+        const trainerImage = trainer.image
+            ? mapTrainerImage(trainer.image)
+            : undefined;
+        const renderTrainerImage = (image: string) => (
+            <img className="trainer-image" src={image} alt="Trainer" />
+        );
 
         return (
             <div
@@ -201,12 +216,14 @@ export class TrainerResultBase extends React.Component<TrainerResultProps> {
                 >
                     {game.customName || game.name}
                 </div>
-                {trainer.image ? (
-                    <img
-                        className="trainer-image"
-                        src={mapTrainerImage(trainer.image)}
-                        alt="Trainer"
-                    />
+                {trainerImage ? (
+                    trainerImage.startsWith("http") ? (
+                        <PokemonImage url={trainerImage}>
+                            {renderTrainerImage}
+                        </PokemonImage>
+                    ) : (
+                        renderTrainerImage(trainerImage)
+                    )
                 ) : null}
                 {trainer.title ? (
                     <div style={baseDivStyle} className="nuzlocke-title">
