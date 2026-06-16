@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => {
                 Dugtrio: 51,
                 Indeedee: 876,
                 Basculegion: 902,
+                Darumaka: 554,
                 "Mime Jr.": 439,
                 "Mr. Mime": 122,
             };
@@ -88,7 +89,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
     let consoleLogSpy: ReturnType<typeof vi.spyOn> | undefined;
 
     beforeEach(() => {
-        // `getIconFormeSuffix` currently logs; silence for deterministic tests.
+        // Keep the test output deterministic if a helper logs while formatting paths.
         consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
         mocks.getImages.mockReset();
@@ -335,6 +336,25 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             expect(result).toBe("url(img/shuffle/mime-jr.png)");
         });
 
+        it("returns shuffle assets with Mr. Mime special-cased", async () => {
+            const result = await getPokemonImage({
+                species: "Mr. Mime",
+                style: imageStyle({ teamImages: "shuffle" }),
+            });
+
+            expect(result).toBe("url(img/shuffle/mr-mime.png)");
+        });
+
+        it("returns the Galarian Darumaka Sugimori override", async () => {
+            const result = await getPokemonImage({
+                species: "Darumaka",
+                forme: imageForme("Galarian"),
+                style: imageStyle({ teamImages: "sugimori" }),
+            });
+
+            expect(result).toBe("url(img/sugimori/554-galar.jpg)");
+        });
+
         it("returns tcg assets, adding -f for significant gender differences", async () => {
             const result = await getPokemonImage({
                 species: "Pikachu",
@@ -393,12 +413,17 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 forme: imageForme("Galarian"),
             });
 
-            // The base normalizer in getPokemonImage keeps '.' but lowercases the final string.
-            expect(mocks.addForme).toHaveBeenCalledWith(
-                "Mr.-Mime",
-                "Galarian",
-            );
-            expect(result).toBe("url(img/mr.-mime-galarian.jpg)");
+            expect(mocks.addForme).not.toHaveBeenCalled();
+            expect(result).toBe("url(img/galarian-mr.mime.jpg)");
+        });
+
+        it("returns standard artwork overrides for legacy Toxtricity Amped data", async () => {
+            const result = await getPokemonImage({
+                species: "Toxtricity",
+                forme: imageForme("Amped" as ImageForme),
+            });
+
+            expect(result).toBe("url(img/toxtricity-amped-up.jpg)");
         });
     });
 
@@ -408,4 +433,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-
