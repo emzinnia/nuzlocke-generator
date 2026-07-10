@@ -11,11 +11,30 @@ type PersistedEnvelope = Record<string, unknown>;
 
 type Migration = (state: PersistedState) => PersistedState;
 
+const resetPersistedBox = (state: PersistedState): PersistedState => {
+    const nextState = { ...state };
+    delete nextState.box;
+    return nextState;
+};
+
+const preserveArray = <T>(value: unknown): T[] => {
+    return Array.isArray(value) ? (value as T[]) : [];
+};
+
+const removeUndefinedValues = (state: PersistedState): Partial<State> => {
+    const nextState: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(state)) {
+        if (typeof value !== "undefined") {
+            nextState[key] = value;
+        }
+    }
+
+    return nextState as Partial<State>;
+};
+
 const migrations: Record<string, Migration> = {
-    "0.0.6-beta": (state) => ({
-        ...state,
-        box: undefined,
-    }),
+    "0.0.6-beta": resetPersistedBox,
     "0.0.11-beta": (state) => ({
         ...state,
         trainer: {
@@ -25,23 +44,33 @@ const migrations: Record<string, Migration> = {
     }),
     "1.1.0": (state) => ({
         ...state,
-        customMoveMap: [],
+        customMoveMap: preserveArray<State["customMoveMap"][number]>(
+            state.customMoveMap,
+        ),
     }),
     "1.1.1": (state) => ({
         ...state,
-        customMoveMap: [],
+        customMoveMap: preserveArray<State["customMoveMap"][number]>(
+            state.customMoveMap,
+        ),
     }),
     "1.1.2": (state) => ({
         ...state,
-        customMoveMap: [],
+        customMoveMap: preserveArray<State["customMoveMap"][number]>(
+            state.customMoveMap,
+        ),
     }),
     "1.1.3": (state) => ({
         ...state,
-        customMoveMap: [],
+        customMoveMap: preserveArray<State["customMoveMap"][number]>(
+            state.customMoveMap,
+        ),
     }),
     "1.1.4": (state) => ({
         ...state,
-        customMoveMap: [],
+        customMoveMap: preserveArray<State["customMoveMap"][number]>(
+            state.customMoveMap,
+        ),
     }),
     "1.6.0": (state) => ({
         ...state,
@@ -73,11 +102,11 @@ const migrations: Record<string, Migration> = {
     }),
     "1.15.1": (state) => ({
         ...state,
-        excludedAreas: [],
+        excludedAreas: preserveArray<string>(state.excludedAreas),
     }),
     "1.16.0": (state) => ({
         ...state,
-        customAreas: [],
+        customAreas: preserveArray<string>(state.customAreas),
     }),
 };
 
@@ -107,7 +136,10 @@ const getPersistedVersion = (envelope: PersistedEnvelope) => {
 
     try {
         const parsed = JSON.parse(persistedMeta);
-        return typeof parsed?.version === "string" ? parsed.version : undefined;
+        const persistedVersion = parsed?.version;
+        if (typeof persistedVersion === "string") return persistedVersion;
+        if (typeof persistedVersion === "number") return String(persistedVersion);
+        return undefined;
     } catch {
         return undefined;
     }
@@ -117,7 +149,7 @@ export const migratePersistedState = (
     state: Partial<State>,
     persistedVersion?: string,
 ): Partial<State> => {
-    return Object.entries(migrations)
+    const migratedState = Object.entries(migrations)
         .filter(([migrationVersion]) => {
             if (compareVersions(migrationVersion, version) > 0) return false;
             if (!persistedVersion) return true;
@@ -127,6 +159,8 @@ export const migratePersistedState = (
             (nextState, [, migrate]) => migrate(nextState),
             state as PersistedState,
         );
+
+    return removeUndefinedValues(migratedState);
 };
 
 export const deserializePersistedState = (
