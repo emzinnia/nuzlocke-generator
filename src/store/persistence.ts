@@ -22,15 +22,15 @@ const preserveArray = <T>(value: unknown): T[] => {
 };
 
 const removeUndefinedValues = (state: PersistedState): Partial<State> => {
-    const nextState: Partial<State> = {};
+    const nextState: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(state)) {
         if (typeof value !== "undefined") {
-            nextState[key as keyof State] = value as never;
+            nextState[key] = value;
         }
     }
 
-    return nextState;
+    return nextState as Partial<State>;
 };
 
 const migrations: Record<string, Migration> = {
