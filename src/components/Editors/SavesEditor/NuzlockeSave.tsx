@@ -22,9 +22,8 @@ import {
     feature,
     gameOfOriginToColor,
     getContrastColor,
-    Styles,
+    serializeNuzlockeSaveData,
 } from "utils";
-import { omit } from "ramda";
 import { createDefaultState } from "store";
 import { NuzlockeGameTags } from "./NuzlockeGameTags";
 import { DeleteAlert } from "components/Editors/DataEditor/DeleteAlert";
@@ -54,20 +53,6 @@ const sort = (
     a: State["nuzlockes"]["saves"][number],
     b: State["nuzlockes"]["saves"][number],
 ) => a.id.localeCompare(b.id);
-
-const stripEditorDarkModeFromState = (state: State) => {
-    const baseState = omit(["nuzlockes", "editorHistory"], state) as {
-        style?: Styles;
-        [key: string]: unknown;
-    };
-    const { editorDarkMode: _omit, ...styleWithoutDarkMode } =
-        baseState.style || {};
-
-    return {
-        ...baseState,
-        style: styleWithoutDarkMode,
-    };
-};
 
 export class NuzlockeSaveBase extends React.Component<
     NuzlockeSaveControlsProps,
@@ -125,10 +110,7 @@ export class NuzlockeSaveBase extends React.Component<
                     onClick={() => {
                         updateNuzlocke(currentId, state);
                         const data = createDefaultState();
-                        const preparedData = stripEditorDarkModeFromState(
-                            data,
-                        );
-                        newNuzlocke(JSON.stringify(preparedData), {
+                        newNuzlocke(serializeNuzlockeSaveData(data), {
                             isCopy: false,
                         });
                         replaceState(data);
@@ -329,7 +311,7 @@ export class NuzlockeSaveBase extends React.Component<
 export const NuzlockeSave = connect(
     (state: State) => ({
         nuzlockes: state.nuzlockes,
-        state: JSON.stringify(stripEditorDarkModeFromState(state)),
+        state: serializeNuzlockeSaveData(state),
         darkMode: state.style.editorDarkMode,
     }),
     {

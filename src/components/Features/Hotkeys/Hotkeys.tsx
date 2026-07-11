@@ -5,13 +5,21 @@ import {
     deletePokemon,
     addPokemon,
     newNuzlocke,
+    updateNuzlocke,
+    replaceState,
     changeEditorSize,
     toggleDialog,
     editPokemon,
     editStyle,
 } from "actions";
 import { Pokemon, Boxes } from "models";
-import { sortPokes, sortPokesReverse, noop, generateEmptyPokemon } from "utils";
+import {
+    sortPokes,
+    sortPokesReverse,
+    noop,
+    generateEmptyPokemon,
+    serializeNuzlockeSaveData,
+} from "utils";
 import { listOfHotkeys, HotkeyList } from "utils";
 import { createDefaultState, persistor } from "store";
 import { State } from "state";
@@ -35,6 +43,10 @@ export interface HotkeysProps {
     style: State["style"];
     customHotkeys: HotkeyBindings;
     editStyle: editStyle;
+    updateNuzlocke: updateNuzlocke;
+    replaceState: replaceState;
+    currentState: State;
+    nuzlockes: State["nuzlockes"];
 }
 
 interface GlobalHotkeysEvents {
@@ -261,8 +273,19 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
     }
 
     private newNuzlocke() {
+        const currentId = this.props.nuzlockes.currentId;
+        if (currentId) {
+            this.props.updateNuzlocke(
+                currentId,
+                serializeNuzlockeSaveData(this.props.currentState),
+            );
+        }
+
         const data = createDefaultState();
-        this.props.newNuzlocke(JSON.stringify(data), { isCopy: false });
+        this.props.newNuzlocke(serializeNuzlockeSaveData(data), {
+            isCopy: false,
+        });
+        this.props.replaceState(data);
     }
 
     private toggleEditor() {
@@ -449,6 +472,8 @@ export const Hotkeys = connect(
         editor: state.editor,
         style: state.style,
         customHotkeys: state.hotkeys,
+        currentState: state,
+        nuzlockes: state.nuzlockes,
     }),
     {
         selectPokemon,
@@ -459,5 +484,7 @@ export const Hotkeys = connect(
         toggleDialog,
         editPokemon,
         editStyle,
+        updateNuzlocke,
+        replaceState,
     },
 )(HotkeysBase);
