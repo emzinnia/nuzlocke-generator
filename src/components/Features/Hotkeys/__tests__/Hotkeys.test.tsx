@@ -77,4 +77,38 @@ describe("<Hotkeys />", () => {
         expect(newSave.editorHistory).toBeUndefined();
         expect(newSave.style.editorDarkMode).toBeUndefined();
     });
+
+    it("uses the keydown key when a shifted keyup reports lowercase", () => {
+        const props = createProps();
+        const hotkeys = new HotkeysBase(props);
+        const target = document.createElement("div");
+        document.body.appendChild(target);
+
+        try {
+            hotkeys.componentDidMount();
+            target.dispatchEvent(
+                new KeyboardEvent("keydown", {
+                    key: "N",
+                    code: "KeyN",
+                    shiftKey: true,
+                    bubbles: true,
+                }),
+            );
+            target.dispatchEvent(
+                new KeyboardEvent("keyup", {
+                    key: "n",
+                    code: "KeyN",
+                    shiftKey: false,
+                    bubbles: true,
+                }),
+            );
+        } finally {
+            hotkeys.componentWillUnmount();
+            target.remove();
+        }
+
+        expect(props.newNuzlocke).toHaveBeenCalledOnce();
+        expect(props.replaceState).toHaveBeenCalledOnce();
+        expect(props.addPokemon).not.toHaveBeenCalled();
+    });
 });

@@ -57,6 +57,7 @@ interface GlobalHotkeysEvents {
 export class HotkeysBase extends React.PureComponent<HotkeysProps> {
     public globalHotkeysEvents: GlobalHotkeysEvents;
     private keyUpActions: Map<string, Array<() => void>> = new Map();
+    private keyDownKeys: Map<string, string> = new Map();
     private firstPokemonId: string | null = null;
     private lastPokemonId: string | null = null;
 
@@ -102,7 +103,10 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
     }
 
     private handleKeyDown = (event: KeyboardEvent) => {
-        return;
+        if (this.isTextInput(event)) return;
+        if (event.code) {
+            this.keyDownKeys.set(event.code, event.key);
+        }
     };
 
     private getEffectiveKey(hotkey: HotkeyList): string {
@@ -115,10 +119,19 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
 
     private handleKeyUp = (e: KeyboardEvent) => {
         if (this.isTextInput(e)) return;
-        const actions = this.keyUpActions.get(e.key);
+        const key = this.getKeyUpDispatchKey(e);
+        const actions = this.keyUpActions.get(key);
         if (!actions?.length) return;
         actions.forEach((fn) => fn());
     };
+
+    private getKeyUpDispatchKey(e: KeyboardEvent) {
+        if (!e.code) return e.key;
+
+        const keyDownKey = this.keyDownKeys.get(e.code);
+        this.keyDownKeys.delete(e.code);
+        return keyDownKey ?? e.key;
+    }
 
     private rebuildHotkeyMaps() {
         const next = new Map<string, Array<() => void>>();
