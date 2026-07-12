@@ -6,6 +6,7 @@ import { createDefaultState } from "store";
 import { TeamFixture } from "utils/fixtures";
 import {
     serializeNuzlockeJson,
+    serializeNuzlockeSaveData,
     stripEditorDarkModeForExport,
 } from "../nuzlockeJson";
 
@@ -64,5 +65,15 @@ describe("nuzlocke.json export compatibility", () => {
         expect(nextState.style.editorDarkMode).toBe(
             defaultState.style.editorDarkMode,
         );
+    });
+
+    it("serializes internal save slots without nested save metadata", () => {
+        const state = createDownloadedJsonFixture();
+        const saved = JSON.parse(serializeNuzlockeSaveData(state));
+
+        expect(saved.nuzlockes).toBeUndefined();
+        expect(saved.editorHistory).toBeUndefined();
+        expect(saved.pokemon).toEqual(state.pokemon);
+        expect(saved.style).not.toHaveProperty("editorDarkMode");
     });
 });
