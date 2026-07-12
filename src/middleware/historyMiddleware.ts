@@ -122,6 +122,12 @@ export const historyMiddleware: Middleware = (store) => {
                 debouncedCommit.cancel();
             }
             
+            if (action.type === REPLACE_STATE) {
+                debouncedCommit.cancel();
+                lastCommittedState = newState;
+                store.dispatch(initEditorHistory(newState) as AnyAction);
+            }
+
             // Update lastCommittedState ONLY after SYNC_STATE_FROM_HISTORY
             // This is when all reducers have been updated to the undo/redo state
             if (action.type === SYNC_STATE_FROM_HISTORY) {
