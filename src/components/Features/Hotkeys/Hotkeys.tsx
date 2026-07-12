@@ -9,9 +9,17 @@ import {
     toggleDialog,
     editPokemon,
     editStyle,
+    updateNuzlocke,
+    replaceState,
 } from "actions";
 import { Pokemon, Boxes } from "models";
-import { sortPokes, sortPokesReverse, noop, generateEmptyPokemon } from "utils";
+import {
+    sortPokes,
+    sortPokesReverse,
+    noop,
+    generateEmptyPokemon,
+    serializeNuzlockeSaveData,
+} from "utils";
 import { listOfHotkeys, HotkeyList } from "utils";
 import { createDefaultState, persistor } from "store";
 import { State } from "state";
@@ -28,8 +36,12 @@ export interface HotkeysProps {
     changeEditorSize: changeEditorSize;
     toggleDialog: toggleDialog;
     editPokemon: typeof editPokemon;
+    updateNuzlocke: updateNuzlocke;
+    replaceState: replaceState;
     pokemon: Pokemon[];
     boxes: Boxes;
+    nuzlockes: State["nuzlockes"];
+    state: string;
     selectedId: string;
     editor: Editor;
     style: State["style"];
@@ -262,7 +274,11 @@ export class HotkeysBase extends React.PureComponent<HotkeysProps> {
 
     private newNuzlocke() {
         const data = createDefaultState();
-        this.props.newNuzlocke(JSON.stringify(data), { isCopy: false });
+        this.props.updateNuzlocke(this.props.nuzlockes.currentId, this.props.state);
+        this.props.newNuzlocke(serializeNuzlockeSaveData(data), {
+            isCopy: false,
+        });
+        this.props.replaceState(data);
     }
 
     private toggleEditor() {
@@ -445,6 +461,8 @@ export const Hotkeys = connect(
     (state: Pick<State, keyof State>) => ({
         pokemon: state.pokemon,
         boxes: state.box,
+        nuzlockes: state.nuzlockes,
+        state: serializeNuzlockeSaveData(state as State),
         selectedId: state.selectedId,
         editor: state.editor,
         style: state.style,
@@ -459,5 +477,7 @@ export const Hotkeys = connect(
         toggleDialog,
         editPokemon,
         editStyle,
+        updateNuzlocke,
+        replaceState,
     },
 )(HotkeysBase);

@@ -22,9 +22,8 @@ import {
     feature,
     gameOfOriginToColor,
     getContrastColor,
-    Styles,
+    serializeNuzlockeSaveData,
 } from "utils";
-import { omit } from "ramda";
 import { createDefaultState } from "store";
 import { NuzlockeGameTags } from "./NuzlockeGameTags";
 import { DeleteAlert } from "components/Editors/DataEditor/DeleteAlert";
@@ -55,19 +54,10 @@ const sort = (
     b: State["nuzlockes"]["saves"][number],
 ) => a.id.localeCompare(b.id);
 
-const stripEditorDarkModeFromState = (state: State) => {
-    const baseState = omit(["nuzlockes", "editorHistory"], state) as {
-        style?: Styles;
-        [key: string]: unknown;
-    };
-    const { editorDarkMode: _omit, ...styleWithoutDarkMode } =
-        baseState.style || {};
-
-    return {
-        ...baseState,
-        style: styleWithoutDarkMode,
-    };
-};
+export const getNextSaveAfterDelete = (
+    saves: State["nuzlockes"]["saves"],
+    deletedId: string,
+) => [...saves].filter((save) => save.id !== deletedId).sort(sort)[0];
 
 export class NuzlockeSaveBase extends React.Component<
     NuzlockeSaveControlsProps,
@@ -110,7 +100,7 @@ export class NuzlockeSaveBase extends React.Component<
         const { nuzlockes } = this.props;
         const { currentId } = this.props.nuzlockes;
         const { isHofOpen, isDeletingNuzlocke, deletionFunction } = this.state;
-        const saves = nuzlockes.saves.sort(sort);
+        const saves = [...nuzlockes.saves].sort(sort);
 
         return (
             <div
@@ -125,10 +115,7 @@ export class NuzlockeSaveBase extends React.Component<
                     onClick={() => {
                         updateNuzlocke(currentId, state);
                         const data = createDefaultState();
-                        const preparedData = stripEditorDarkModeFromState(
-                            data,
-                        );
-                        newNuzlocke(JSON.stringify(preparedData), {
+                        newNuzlocke(serializeNuzlockeSaveData(data), {
                             isCopy: false,
                         });
                         replaceState(data);
@@ -275,14 +262,22 @@ export class NuzlockeSaveBase extends React.Component<
                                             onClick={() => {
                                                 const deletionFunction = () => {
                                                     try {
+                                                        const nextSave =
+                                                            getNextSaveAfterDelete(
+                                                                saves,
+                                                                id,
+                                                            );
                                                         deleteNuzlocke(id);
-                                                        if (isCurrent) {
+                                                        if (
+                                                            isCurrent &&
+                                                            nextSave
+                                                        ) {
                                                             switchNuzlocke(
-                                                                saves[0].id,
+                                                                nextSave.id,
                                                             );
                                                             replaceState(
                                                                 JSON.parse(
-                                                                    saves[0]
+                                                                    nextSave
                                                                         .data,
                                                                 ),
                                                             );
@@ -329,7 +324,7 @@ export class NuzlockeSaveBase extends React.Component<
 export const NuzlockeSave = connect(
     (state: State) => ({
         nuzlockes: state.nuzlockes,
-        state: JSON.stringify(stripEditorDarkModeFromState(state)),
+        state: serializeNuzlockeSaveData(state),
         darkMode: state.style.editorDarkMode,
     }),
     {
