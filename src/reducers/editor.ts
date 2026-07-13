@@ -22,6 +22,7 @@ export function editor(
     switch (action.type) {
         case CHANGE_EDITOR_SIZE:
             return {
+                ...state,
                 minimized: action.mode,
             };
         case TOGGLE_TEMTEM_MODE:
