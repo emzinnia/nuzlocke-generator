@@ -139,15 +139,22 @@ describe("Gen 4 Save Parser", () => {
         it("selects the active general block using PKHeX footer counter order", async () => {
             const modified = Buffer.from(saveData);
             const generalSize = 0x0c100;
+            const storageSize = 0x121e0;
             const primary = 0x00000;
             const backup = 0x40000;
+            const primaryStorage = primary + generalSize;
+            const backupStorage = backup + generalSize;
 
             writeGen4AsciiString(modified, backup + 0x64, "BACKUP", 8);
 
             setFooterCounters(modified, primary, generalSize, 1, 100);
             setFooterCounters(modified, backup, generalSize, 2, 1);
+            setFooterCounters(modified, primaryStorage, storageSize, 1, 100);
+            setFooterCounters(modified, backupStorage, storageSize, 2, 1);
             refreshBlockChecksum(modified, primary, generalSize, 0x14);
             refreshBlockChecksum(modified, backup, generalSize, 0x14);
+            refreshBlockChecksum(modified, primaryStorage, storageSize, 0x14);
+            refreshBlockChecksum(modified, backupStorage, storageSize, 0x14);
 
             const result = await parseGen4Save(modified, {
                 boxMappings: [],
@@ -192,7 +199,7 @@ describe("Gen 4 Save Parser", () => {
                 (pokemon) => pokemon.status === "Boxed",
             );
 
-            expect(boxedPokemon).toHaveLength(462);
+            expect(boxedPokemon).toHaveLength(461);
             expect(result.debug).toMatchObject({
                 generalSave: 589,
                 storageSave: 377,
