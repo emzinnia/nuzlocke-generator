@@ -157,6 +157,50 @@ describe("Gen 4 Save Parser", () => {
             expect(result.trainer.name).toBe("Backup");
         });
 
+        it("uses the intact linked backup when the newest general block is corrupt", async () => {
+            const modified = Buffer.from(saveData);
+
+            modified[0x64] ^= 0xff;
+
+            const result = await parseGen4Save(modified, {
+                boxMappings: [],
+                selectedGame: "DP",
+                debug: true,
+            });
+
+            expect(result.trainer.name).toBe("Roy");
+            expect(result.debug).toMatchObject({
+                generalSave: 589,
+                storageSave: 377,
+                generalChecksumValid: true,
+                storageChecksumValid: true,
+            });
+        });
+
+        it("uses the intact linked backup when the newest storage block is corrupt", async () => {
+            const modified = Buffer.from(saveData);
+            const activeStorageStart = 0x40000 + 0x0c100;
+
+            modified[activeStorageStart + 0x100] ^= 0xff;
+
+            const result = await parseGen4Save(modified, {
+                boxMappings: [],
+                selectedGame: "DP",
+                debug: true,
+            });
+            const boxedPokemon = result.pokemon.filter(
+                (pokemon) => pokemon.status === "Boxed",
+            );
+
+            expect(boxedPokemon).toHaveLength(462);
+            expect(result.debug).toMatchObject({
+                generalSave: 589,
+                storageSave: 377,
+                generalChecksumValid: true,
+                storageChecksumValid: true,
+            });
+        });
+
         it("decodes international and Korean Gen 4 trainer text", async () => {
             const modified = Buffer.from(saveData);
             const generalSize = 0x0c100;
