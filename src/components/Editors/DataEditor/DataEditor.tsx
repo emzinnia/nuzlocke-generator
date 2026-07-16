@@ -15,7 +15,7 @@ import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { ErrorBoundary, HotkeyIndicator } from "components/Common/Shared";
 import { v4 as uuid } from "uuid";
 import { persistor } from "store";
-import { newNuzlocke, replaceState } from "actions";
+import { newNuzlocke, replaceState, updateNuzlocke } from "actions";
 import { Badge, Game, Pokemon, Trainer } from "models";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { State } from "state";
@@ -43,11 +43,13 @@ import SaveFileWorker from "parsers/worker?worker";
 import { cx } from "emotion";
 import { StatusDropZone } from "./StatusDropZone";
 import { serializeNuzlockeJson } from "utils/nuzlockeJson";
+import { syncCurrentNuzlocke } from "./syncCurrentNuzlocke";
 
 export interface DataEditorProps {
     state: State;
     replaceState: replaceState;
     newNuzlocke: newNuzlocke;
+    updateNuzlocke: updateNuzlocke;
 }
 
 export interface DataEditorState {
@@ -316,6 +318,7 @@ export class DataEditorBase extends React.Component<
         } else {
             cmm = { customMoveMap: data.customMoveMap };
         }
+        syncCurrentNuzlocke(this.props.state, this.props.updateNuzlocke);
         this.props.replaceState({
             ...safeguards,
             ...(override ? data : nuz),
@@ -961,4 +964,5 @@ export class DataEditorBase extends React.Component<
 export const DataEditor = connect((state: State) => ({ state: state }), {
     replaceState,
     newNuzlocke,
+    updateNuzlocke,
 })(DataEditorBase);
