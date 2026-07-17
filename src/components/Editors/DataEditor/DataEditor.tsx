@@ -47,6 +47,7 @@ import {
     serializeNuzlockeSaveData,
 } from "utils/nuzlockeJson";
 import { syncCurrentNuzlocke } from "./syncCurrentNuzlocke";
+import { getCheckpointsForSaveImport } from "./importCheckpoints";
 
 export interface DataEditorProps {
     state: State;
@@ -481,7 +482,11 @@ export class DataEditorBase extends React.Component<
                         selectedGame,
                     });
                 const gameName = game.name as GameName;
-                const checkpoints = getBadges(gameName);
+                const checkpoints = getCheckpointsForSaveImport(
+                    state.checkpoints,
+                    state.game.name,
+                    gameName,
+                );
                 const bgColor = gameOfOriginToColor(game.name as GameName);
                 const data = {
                     game,
