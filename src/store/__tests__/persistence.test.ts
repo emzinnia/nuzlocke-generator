@@ -143,8 +143,8 @@ describe("Zustand persistence compatibility", () => {
         const recoveredState = deserializePersistedState(
             window.localStorage.getItem(PERSIST_KEY),
         );
-        expect(recoveredState?.pokemon[0].id).toBe("recoverable-pikachu");
-        expect(recoveredState?.trainer.name).toBe("Recoverable Trainer");
+        expect(recoveredState?.pokemon?.[0]?.id).toBe("recoverable-pikachu");
+        expect(recoveredState?.trainer?.name).toBe("Recoverable Trainer");
         expect(recoveredState?.style).toEqual(defaultState.style);
 
         unsubscribePersistence();
