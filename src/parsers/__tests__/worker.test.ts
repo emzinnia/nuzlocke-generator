@@ -69,6 +69,40 @@ describe("parsers worker", () => {
         expect(call.detectedSaveFormat).toBe("FRLG");
     });
 
+    it.each([
+        {
+            fixture: "emerald.sav",
+            fileName: "FRIDAY.sav",
+            team: ["Salamence", "Magcargo", "Smeargle"],
+        },
+        {
+            fixture: "firered.sav",
+            fileName: "sparkle.sav",
+            team: [
+                "Charizard",
+                "Venusaur",
+                "Blastoise",
+                "Nidoking",
+                "Pidgeot",
+                "Pikachu",
+            ],
+        },
+    ])(
+        "ignores incidental Gen 3 abbreviation substrings in $fileName",
+        async ({ fixture, fileName, team }) => {
+            const save = loadSav(fixture);
+            const selfRef = globalThis.self as unknown as WorkerSelf;
+
+            await selfRef.onmessage?.({
+                data: { save, selectedGame: "Auto", boxMappings: [], fileName },
+            });
+            const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+            const importedTeam = call.pokemon?.filter((p) => p.status === "Team") ?? [];
+
+            expect(importedTeam.map((p) => p.species)).toEqual(team);
+        },
+    );
+
     it("detects Diamond from diamond.sav", async () => {
         const save = loadSav("diamond.sav");
         const selfRef = globalThis.self as unknown as WorkerSelf;
