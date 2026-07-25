@@ -183,39 +183,53 @@ describe("Zustand persistence compatibility", () => {
         const failureListener = vi.fn();
         const unsubscribeFailure = onPersistFailure(failureListener);
 
+        const memory = new Map<string, string>();
+        let failWrites = false;
+        const storage: Storage = {
+            get length() {
+                return memory.size;
+            },
+            clear: () => memory.clear(),
+            getItem: (key) => memory.get(key) ?? null,
+            key: (index) => Array.from(memory.keys())[index] ?? null,
+            removeItem: (key) => {
+                memory.delete(key);
+            },
+            setItem: (key, value) => {
+                if (failWrites) {
+                    throw new DOMException(
+                        "Failed to execute 'setItem' on 'Storage': Setting the value exceeded the quota.",
+                        "QuotaExceededError",
+                    );
+                }
+                memory.set(key, value);
+            },
+        };
+
         const { persistor, store, unsubscribePersistence } = createNuzlockeStore({
             enableLogger: false,
-            storage: window.localStorage,
+            storage,
         });
 
         store.dispatch(editStyle({ bgColor: "#111111" }));
         await persistor.flush();
-        const lastGood = window.localStorage.getItem(PERSIST_KEY);
+        const lastGood = storage.getItem(PERSIST_KEY);
         expect(lastGood).toBeTruthy();
 
-        const originalSetItem = window.localStorage.setItem.bind(
-            window.localStorage,
-        );
-        window.localStorage.setItem = () => {
-            throw new DOMException(
-                "Failed to execute 'setItem' on 'Storage': Setting the value exceeded the quota.",
-                "QuotaExceededError",
-            );
-        };
+        failWrites = true;
 
         await expect(persistor.flush()).rejects.toThrow(
             "Failed to persist state to localStorage",
         );
-        expect(window.localStorage.getItem(PERSIST_KEY)).toBe(lastGood);
+        expect(storage.getItem(PERSIST_KEY)).toBe(lastGood);
 
         store.dispatch(editStyle({ bgColor: "#222222" }));
         await vi.waitFor(() => {
             expect(failureListener).toHaveBeenCalled();
         });
-        expect(window.localStorage.getItem(PERSIST_KEY)).toBe(lastGood);
+        expect(storage.getItem(PERSIST_KEY)).toBe(lastGood);
         expect(store.getState().style.bgColor).toBe("#222222");
 
-        window.localStorage.setItem = originalSetItem;
         unsubscribeFailure();
         unsubscribePersistence();
     });
