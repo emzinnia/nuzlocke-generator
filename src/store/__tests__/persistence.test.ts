@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { version } from "../../../package.json";
 import { editStyle, newNuzlocke } from "actions";
 import { PokemonFixtures, TeamFixture } from "utils/fixtures";
@@ -10,7 +10,9 @@ import {
     deserializePersistedState,
     PERSIST_KEY,
     serializePersistedState,
+    writePersistedState,
 } from "../persistence";
+import { onPersistFailure } from "../persistFailure";
 import { State } from "state";
 import { serializeNuzlockeJson } from "utils/nuzlockeJson";
 
@@ -144,6 +146,77 @@ describe("Zustand persistence compatibility", () => {
             JSON.parse(exportedNuzlockeJson),
         );
 
+        unsubscribePersistence();
+    });
+
+    it("returns false from writePersistedState when localStorage is full", () => {
+        const state = createFixtureState();
+        const prior = serializePersistedState(state);
+        window.localStorage.setItem(PERSIST_KEY, prior);
+
+        const storage: Storage = {
+            get length() {
+                return window.localStorage.length;
+            },
+            clear: () => window.localStorage.clear(),
+            getItem: (key) => window.localStorage.getItem(key),
+            key: (index) => window.localStorage.key(index),
+            removeItem: (key) => window.localStorage.removeItem(key),
+            setItem: () => {
+                throw new DOMException(
+                    "Failed to execute 'setItem' on 'Storage': Setting the value exceeded the quota.",
+                    "QuotaExceededError",
+                );
+            },
+        };
+
+        expect(
+            writePersistedState(
+                { ...state, trainer: { ...state.trainer, name: "Lost" } },
+                storage,
+            ),
+        ).toBe(false);
+        expect(window.localStorage.getItem(PERSIST_KEY)).toBe(prior);
+    });
+
+    it("rejects flush and reports auto-persist failures without losing the last good snapshot", async () => {
+        const failureListener = vi.fn();
+        const unsubscribeFailure = onPersistFailure(failureListener);
+
+        const { persistor, store, unsubscribePersistence } = createNuzlockeStore({
+            enableLogger: false,
+            storage: window.localStorage,
+        });
+
+        store.dispatch(editStyle({ bgColor: "#111111" }));
+        await persistor.flush();
+        const lastGood = window.localStorage.getItem(PERSIST_KEY);
+        expect(lastGood).toBeTruthy();
+
+        const originalSetItem = window.localStorage.setItem.bind(
+            window.localStorage,
+        );
+        window.localStorage.setItem = () => {
+            throw new DOMException(
+                "Failed to execute 'setItem' on 'Storage': Setting the value exceeded the quota.",
+                "QuotaExceededError",
+            );
+        };
+
+        await expect(persistor.flush()).rejects.toThrow(
+            "Failed to persist state to localStorage",
+        );
+        expect(window.localStorage.getItem(PERSIST_KEY)).toBe(lastGood);
+
+        store.dispatch(editStyle({ bgColor: "#222222" }));
+        await vi.waitFor(() => {
+            expect(failureListener).toHaveBeenCalled();
+        });
+        expect(window.localStorage.getItem(PERSIST_KEY)).toBe(lastGood);
+        expect(store.getState().style.bgColor).toBe("#222222");
+
+        window.localStorage.setItem = originalSetItem;
+        unsubscribeFailure();
         unsubscribePersistence();
     });
 });
