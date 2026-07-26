@@ -35,10 +35,19 @@ describe("rules reducer", () => {
         expect(result).toEqual(["rule a", "updated"]);
     });
 
-    it("deletes using the existing 1-based index behavior", () => {
-        const result = rules(["first", "second", "third"], deleteRule(2));
-        // current reducer deletes where index + 1 matches target
-        expect(result).toEqual(["first", "third"]);
+    it("deletes a rule by 0-based index", () => {
+        expect(rules(["first", "second", "third"], deleteRule(0))).toEqual([
+            "second",
+            "third",
+        ]);
+        expect(rules(["first", "second", "third"], deleteRule(1))).toEqual([
+            "first",
+            "third",
+        ]);
+        expect(rules(["first", "second", "third"], deleteRule(2))).toEqual([
+            "first",
+            "second",
+        ]);
     });
 
     it("resets to the default ruleset", () => {
@@ -64,6 +73,14 @@ describe("rules reducer", () => {
         expect(result).toEqual(replacement);
     });
 
+    it("falls back to default rules when replace payload omits rules", () => {
+        const result = rules(
+            ["custom"],
+            replaceState({}) as unknown as Parameters<typeof rules>[1],
+        );
+        expect(result).toEqual(initialRules);
+    });
+
     it("syncs rules when syncing from history", () => {
         const synced = ["history rule"];
         const result = rules(
@@ -73,5 +90,13 @@ describe("rules reducer", () => {
             >[1],
         );
         expect(result).toEqual(synced);
+    });
+
+    it("falls back to default rules when history sync omits rules", () => {
+        const result = rules(
+            ["custom"],
+            syncStateFromHistory({}) as unknown as Parameters<typeof rules>[1],
+        );
+        expect(result).toEqual(initialRules);
     });
 });

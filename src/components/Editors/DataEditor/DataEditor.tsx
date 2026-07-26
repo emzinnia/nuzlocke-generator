@@ -310,6 +310,7 @@ export class DataEditorBase extends React.Component<
             stats: [],
             excludedAreas: [],
             customAreas: [],
+            rules: [],
         };
         if (!Array.isArray(data.customMoveMap)) {
             noop();

@@ -32,11 +32,16 @@ export function rules(
                 return action.rule;
             });
         case DELETE_RULE:
-            return state.filter((_, index) => index + 1 !== action.target);
+            // Targets are 0-based indexes from RulesEditor (same as EDIT_RULE).
+            return state.filter((_, index) => index !== action.target);
         case REPLACE_STATE:
-            return action.replaceWith.rules;
+            return Array.isArray(action.replaceWith.rules)
+                ? action.replaceWith.rules
+                : initialState;
         case SYNC_STATE_FROM_HISTORY:
-            return action.syncWith.rules;
+            return Array.isArray(action.syncWith.rules)
+                ? action.syncWith.rules
+                : initialState;
         case RESET_RULES:
             return initialState;
         case SET_RULES:
