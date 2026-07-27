@@ -42,7 +42,10 @@ import { BoxMappings } from "parsers/utils/boxMappings";
 import SaveFileWorker from "parsers/worker?worker";
 import { cx } from "emotion";
 import { StatusDropZone } from "./StatusDropZone";
-import { serializeNuzlockeJson } from "utils/nuzlockeJson";
+import {
+    formatNuzlockeJson,
+    serializeNuzlockeJson,
+} from "utils/nuzlockeJson";
 
 export interface DataEditorProps {
     state: State;
@@ -316,12 +319,16 @@ export class DataEditorBase extends React.Component<
         } else {
             cmm = { customMoveMap: data.customMoveMap };
         }
-        this.props.replaceState({
+        const newState = {
             ...safeguards,
             ...(override ? data : nuz),
             ...cmm,
+        } as State;
+        this.props.replaceState(newState);
+        // Persist a sanitized snapshot so copy/import cannot re-embed nested saves.
+        this.props.newNuzlocke(serializeNuzlockeJson(newState), {
+            isCopy: false,
         });
-        this.props.newNuzlocke(this.state.data, { isCopy: false });
         this.writeAllData();
         this.setState({ isOpen: false });
     };
@@ -708,7 +715,7 @@ export class DataEditorBase extends React.Component<
                                     suppressContentEditableWarning={true}
                                     contentEditable={true}
                                 >
-                                    {JSON.stringify(this.props.state, null, 2)}
+                                    {formatNuzlockeJson(this.props.state)}
                                 </span>
                             </div>
                             <div className={Classes.DIALOG_FOOTER}>

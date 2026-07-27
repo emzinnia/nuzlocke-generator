@@ -5,6 +5,7 @@ import { State } from "state";
 import { createDefaultState } from "store";
 import { TeamFixture } from "utils/fixtures";
 import {
+    formatNuzlockeJson,
     serializeNuzlockeJson,
     stripEditorDarkModeForExport,
 } from "../nuzlockeJson";
@@ -39,6 +40,7 @@ describe("nuzlocke.json export compatibility", () => {
         const exported = stripEditorDarkModeForExport(state) as Partial<State>;
 
         expect(exported.editorHistory).toBeUndefined();
+        expect(exported.nuzlockes).toBeUndefined();
         expect(exported.pokemon).toEqual(state.pokemon);
         expect(exported.trainer).toEqual(state.trainer);
         expect(exported.style).toMatchObject({
@@ -46,6 +48,7 @@ describe("nuzlocke.json export compatibility", () => {
         });
         expect(exported.style).not.toHaveProperty("editorDarkMode");
         expect(JSON.parse(serializeNuzlockeJson(state))).toEqual(exported);
+        expect(JSON.parse(formatNuzlockeJson(state))).toEqual(exported);
     });
 
     it("imports the downloaded nuzlocke.json payload through the existing state reducers", () => {
@@ -63,6 +66,37 @@ describe("nuzlocke.json export compatibility", () => {
         expect(nextState.style.bgColor).toBe("#0f766e");
         expect(nextState.style.editorDarkMode).toBe(
             defaultState.style.editorDarkMode,
+        );
+    });
+
+    it("does not re-embed nested save slots across export/import cycles", () => {
+        const state = createDownloadedJsonFixture();
+        state.nuzlockes = {
+            currentId: "slot-1",
+            saves: [
+                {
+                    id: "slot-1",
+                    data: serializeNuzlockeJson(state),
+                },
+            ],
+        };
+
+        // Mimic the export dialog's copyable text, then the import path that
+        // stores a sanitized snapshot for the new save slot.
+        const copiedFromExportDialog = formatNuzlockeJson(state);
+        const imported = JSON.parse(copiedFromExportDialog) as State;
+        const storedSaveData = serializeNuzlockeJson({
+            ...imported,
+            // Legacy/buggy copies may still contain nested nuzlockes.
+            nuzlockes: state.nuzlockes,
+        } as State);
+        const stored = JSON.parse(storedSaveData);
+
+        expect(JSON.parse(copiedFromExportDialog).nuzlockes).toBeUndefined();
+        expect(stored.nuzlockes).toBeUndefined();
+        expect(storedSaveData).not.toContain('"nuzlockes"');
+        expect(storedSaveData.length).toBeLessThan(
+            JSON.stringify(state).length,
         );
     });
 });
