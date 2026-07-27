@@ -4,7 +4,7 @@ import { omit } from "ramda";
 
 export const stripEditorDarkModeForExport = (state: State) => {
     const baseState = omit(
-        ["router", "._persist", "_persist", "editorHistory"],
+        ["router", "._persist", "_persist", "editorHistory", "nuzlockes"],
         state,
     ) as {
         style?: Styles;
@@ -21,3 +21,6 @@ export const stripEditorDarkModeForExport = (state: State) => {
 
 export const serializeNuzlockeJson = (state: State) =>
     JSON.stringify(stripEditorDarkModeForExport(state));
+
+export const formatNuzlockeJson = (state: State) =>
+    JSON.stringify(stripEditorDarkModeForExport(state), null, 2);
