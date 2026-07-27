@@ -5,6 +5,7 @@ import { State } from "state";
 import { createDefaultState } from "store";
 import { TeamFixture } from "utils/fixtures";
 import {
+    formatNuzlockeSaveData,
     serializeNuzlockeSaveData,
     serializeNuzlockeJson,
     stripNuzlockeSaveData,
@@ -76,5 +77,6 @@ describe("nuzlocke.json export compatibility", () => {
         expect(saved.editorHistory).toBeUndefined();
         expect(saved.style).not.toHaveProperty("editorDarkMode");
         expect(JSON.parse(serializeNuzlockeSaveData(state))).toEqual(saved);
+        expect(JSON.parse(formatNuzlockeSaveData(state))).toEqual(saved);
     });
 });

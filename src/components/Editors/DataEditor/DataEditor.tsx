@@ -1,5 +1,5 @@
 import * as React from "react";
-import { connect } from "store/reactZustand";
+import { connect, useStore } from "store/reactZustand";
 import {
     Button,
     ButtonGroup,
@@ -41,11 +41,16 @@ import { BoxMappings } from "parsers/utils/boxMappings";
 import SaveFileWorker from "parsers/worker?worker";
 import { cx } from "emotion";
 import { StatusDropZone } from "./StatusDropZone";
-import { serializeNuzlockeJson } from "utils/nuzlockeJson";
+import {
+    formatNuzlockeSaveData,
+    serializeNuzlockeJson,
+    serializeNuzlockeSaveData,
+} from "utils/nuzlockeJson";
 import { syncCurrentNuzlocke } from "./syncCurrentNuzlocke";
 
 export interface DataEditorProps {
     state: State;
+    getState: () => State;
     replaceState: replaceState;
     newNuzlocke: newNuzlocke;
     updateNuzlocke: updateNuzlocke;
@@ -314,7 +319,10 @@ export class DataEditorBase extends React.Component<
         }
         syncCurrentNuzlocke(nuz, this.props.updateNuzlocke);
         this.props.replaceState(nextState);
-        this.props.newNuzlocke(this.state.data, { isCopy: false });
+        this.props.newNuzlocke(
+            serializeNuzlockeSaveData(this.props.getState()),
+            { isCopy: false },
+        );
         this.writeAllData();
         this.setState({ isOpen: false });
     };
@@ -701,7 +709,7 @@ export class DataEditorBase extends React.Component<
                                     suppressContentEditableWarning={true}
                                     contentEditable={true}
                                 >
-                                    {JSON.stringify(this.props.state, null, 2)}
+                                    {formatNuzlockeSaveData(this.props.state)}
                                 </span>
                             </div>
                             <div className={Classes.DIALOG_FOOTER}>
@@ -951,8 +959,13 @@ export class DataEditorBase extends React.Component<
     }
 }
 
-export const DataEditor = connect((state: State) => ({ state: state }), {
+const ConnectedDataEditor = connect((state: State) => ({ state }), {
     replaceState,
     newNuzlocke,
     updateNuzlocke,
 })(DataEditorBase);
+
+export function DataEditor() {
+    const { getState } = useStore();
+    return <ConnectedDataEditor getState={getState} />;
+}
