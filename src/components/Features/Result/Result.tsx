@@ -169,7 +169,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
     }
 
     private renderTeamPokemon(teamPokemon: Pokemon[]) {
-        return teamPokemon.sort(sortPokes).map((poke) => {
+        return [...teamPokemon].sort(sortPokes).map((poke) => {
             return <TeamPokemon key={poke.id} pokemon={poke} />;
         });
     }
