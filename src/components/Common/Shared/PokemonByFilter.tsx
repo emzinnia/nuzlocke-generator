@@ -37,7 +37,7 @@ export class PokemonByFilterBase extends React.PureComponent<PokemonByFilterProp
         const searchHighlightColor = isDarkMode ? HIGHLIGHT_COLOR_DARK : HIGHLIGHT_COLOR_LIGHT;
         const selectionColor = isDarkMode ? SELECTION_COLOR_DARK : SELECTION_COLOR_LIGHT;
 
-        return team
+        return [...team]
             .sort(sortPokes)
             .filter((poke) => poke.status === status)
             // Filter by search results when there's an active query
