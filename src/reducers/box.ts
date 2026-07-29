@@ -118,11 +118,13 @@ export function box(
             return [...state.filter((box) => box.id !== action.id), newBox];
         }
         case REPLACE_STATE:
-            return Array.isArray(action.replaceWith.box)
+            return Array.isArray(action.replaceWith?.box)
                 ? withUniqueBoxIds(action.replaceWith.box)
-                : action.replaceWith.box;
+                : state;
         case SYNC_STATE_FROM_HISTORY:
-            return action.syncWith.box;
+            return Array.isArray(action.syncWith?.box)
+                ? action.syncWith.box
+                : state;
         case ADD_BOX: {
             const { name, background = "grass-meadow", inheritFrom } = action;
             const normalized = withUniqueBoxIds(state);
