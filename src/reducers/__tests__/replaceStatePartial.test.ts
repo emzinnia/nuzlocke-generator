@@ -6,6 +6,8 @@ import { history } from "../history";
 import { game } from "../game";
 import { trainer } from "../trainer";
 import { generateEmptyPokemon } from "utils";
+import { HistoryEntry, Trainer } from "models";
+import { State } from "state";
 
 describe("partial REPLACE_STATE / SYNC_STATE_FROM_HISTORY", () => {
     const existingPokemon = [
@@ -15,9 +17,20 @@ describe("partial REPLACE_STATE / SYNC_STATE_FROM_HISTORY", () => {
         { id: 0, position: 0, name: "Team" },
         { id: 1, position: 1, name: "Boxed" },
     ];
-    const existingHistory = [{ id: "h1", type: "note", contents: "kept" }];
+    const existingHistory: HistoryEntry[] = [
+        {
+            id: "h1",
+            timestamp: new Date(0),
+            type: "Meta",
+            original: null,
+            new: "kept",
+        },
+    ];
     const existingGame = { name: "Emerald" as const, customName: "My Run" };
-    const existingTrainer = { name: "Ash", badges: ["Stone"] };
+    const existingTrainer = {
+        name: "Ash",
+        badges: [{ name: "Stone", image: "stone" }],
+    } as Trainer;
 
     it("pokemon keeps prior state when replace payload omits pokemon", () => {
         expect(
@@ -33,7 +46,7 @@ describe("partial REPLACE_STATE / SYNC_STATE_FROM_HISTORY", () => {
 
     it("history keeps prior state when replace payload omits history", () => {
         expect(
-            history(existingHistory as never, replaceState({ game: existingGame })),
+            history(existingHistory, replaceState({ game: existingGame })),
         ).toEqual(existingHistory);
     });
 
@@ -45,7 +58,10 @@ describe("partial REPLACE_STATE / SYNC_STATE_FROM_HISTORY", () => {
 
     it("trainer keeps prior state when replace payload omits trainer", () => {
         expect(
-            trainer(existingTrainer, replaceState({ game: existingGame })),
+            trainer(
+                existingTrainer as Parameters<typeof trainer>[0],
+                replaceState({ game: existingGame }),
+            ),
         ).toEqual(existingTrainer);
     });
 
@@ -55,7 +71,13 @@ describe("partial REPLACE_STATE / SYNC_STATE_FROM_HISTORY", () => {
         );
         expect(box(existingBoxes, replaceState({ box: [] }))).toEqual([]);
         expect(
-            history(existingHistory as never, replaceState({ history: [] })),
+            history(
+                existingHistory,
+                {
+                    type: "REPLACE_STATE",
+                    replaceWith: { history: [] },
+                } as never,
+            ),
         ).toEqual([]);
     });
 
@@ -68,7 +90,7 @@ describe("partial REPLACE_STATE / SYNC_STATE_FROM_HISTORY", () => {
         ).toEqual(existingBoxes);
         expect(
             history(
-                existingHistory as never,
+                existingHistory,
                 syncStateFromHistory({ game: existingGame }),
             ),
         ).toEqual(existingHistory);
@@ -77,7 +99,7 @@ describe("partial REPLACE_STATE / SYNC_STATE_FROM_HISTORY", () => {
         ).toEqual(existingGame);
         expect(
             trainer(
-                existingTrainer,
+                existingTrainer as Parameters<typeof trainer>[0],
                 syncStateFromHistory({ game: existingGame }),
             ),
         ).toEqual(existingTrainer);
@@ -89,16 +111,16 @@ describe("partial REPLACE_STATE / SYNC_STATE_FROM_HISTORY", () => {
             ...previous,
             pokemon: existingPokemon,
             box: existingBoxes,
-            history: existingHistory as never,
+            history: existingHistory,
             game: existingGame,
             trainer: existingTrainer,
-        };
+        } as State & { history: HistoryEntry[] };
 
         expect(() =>
             appReducers(
                 withData,
                 replaceState({
-                    game: { name: "Firered", customName: "" },
+                    game: { name: "FireRed", customName: "" },
                 }),
             ),
         ).not.toThrow();
@@ -106,11 +128,11 @@ describe("partial REPLACE_STATE / SYNC_STATE_FROM_HISTORY", () => {
         const next = appReducers(
             withData,
             replaceState({
-                game: { name: "Firered", customName: "" },
+                game: { name: "FireRed", customName: "" },
             }),
-        );
+        ) as State & { history: HistoryEntry[] };
 
-        expect(next.game).toEqual({ name: "Firered", customName: "" });
+        expect(next.game).toEqual({ name: "FireRed", customName: "" });
         expect(next.pokemon).toEqual(existingPokemon);
         expect(next.box).toEqual(existingBoxes);
         expect(next.history).toEqual(existingHistory);
