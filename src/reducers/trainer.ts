@@ -8,7 +8,7 @@ export function trainer(
         case EDIT_TRAINER:
             return { ...state, ...action.edits };
         case REPLACE_STATE:
-            return action.replaceWith.trainer;
+            return action.replaceWith?.trainer ?? state;
         case SYNC_STATE_FROM_HISTORY:
             return action.syncWith?.trainer ?? state;
         default:

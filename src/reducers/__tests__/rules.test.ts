@@ -64,6 +64,16 @@ describe("rules reducer", () => {
         expect(result).toEqual(replacement);
     });
 
+    it("keeps prior rules when replace payload omits rules", () => {
+        const result = rules(
+            ["keep me"],
+            replaceState({ game: { name: "Emerald", customName: "" } }) as unknown as Parameters<
+                typeof rules
+            >[1],
+        );
+        expect(result).toEqual(["keep me"]);
+    });
+
     it("syncs rules when syncing from history", () => {
         const synced = ["history rule"];
         const result = rules(
@@ -73,5 +83,15 @@ describe("rules reducer", () => {
             >[1],
         );
         expect(result).toEqual(synced);
+    });
+
+    it("keeps prior rules when history sync omits rules", () => {
+        const result = rules(
+            ["keep me"],
+            syncStateFromHistory({
+                game: { name: "Emerald", customName: "" },
+            }) as unknown as Parameters<typeof rules>[1],
+        );
+        expect(result).toEqual(["keep me"]);
     });
 });

@@ -34,9 +34,13 @@ export function rules(
         case DELETE_RULE:
             return state.filter((_, index) => index + 1 !== action.target);
         case REPLACE_STATE:
-            return action.replaceWith.rules;
+            return Array.isArray(action.replaceWith?.rules)
+                ? action.replaceWith.rules
+                : state;
         case SYNC_STATE_FROM_HISTORY:
-            return action.syncWith.rules;
+            return Array.isArray(action.syncWith?.rules)
+                ? action.syncWith.rules
+                : state;
         case RESET_RULES:
             return initialState;
         case SET_RULES:
