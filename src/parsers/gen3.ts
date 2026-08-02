@@ -1043,7 +1043,10 @@ const parseBoxes = (
             const slice = pokemonArea.slice(offset, offset + BOX_POKEMON_SIZE);
             const context: PokemonContext = {
                 status: getBoxStatus(boxIndex, options),
-                position: (slot + 1) * (boxIndex + 1),
+                // Linear slot index matches Gen 4/5 and keeps boxed positions unique
+                // across boxes. The old (slot+1)*(boxIndex+1) formula collided
+                // (e.g. box0 slot1 and box1 slot0 both became position 2).
+                position: boxIndex * BOX_CAPACITY + slot + 1,
                 isParty: false,
                 boxIndex,
                 slotIndex: slot,
