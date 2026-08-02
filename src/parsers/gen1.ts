@@ -38,6 +38,8 @@ const BOX_OFFSETS = [
     0x6d26, 0x7188, 0x75ea,
 ];
 
+const BOX_CAPACITY = 20;
+
 const checksum = (data: Uint8Array) => {
     let checksumN = 255;
     for (let i = 0x2598; i < OFFSETS.CHECKSUM; ++i) {
@@ -240,12 +242,16 @@ const parseBoxedPokemon = (buf: Buffer): Gen1PokemonObject => {
 const transformPokemon = (
     pokemonObject: Gen1PokemonObject,
     status: string,
+    // 1-based box ordinal: party defaults to 1; PC boxes pass boxIndex+1.
     boxIndex = 1,
 ) => {
     return pokemonObject.pokemonList
         .map((poke, index) => {
             return {
-                position: (index + 1) * boxIndex,
+                // Linear positions keep entries unique across boxes. The old
+                // (index+1)*boxIndex formula collided heavily (e.g. box0 slot1
+                // and box1 slot0 both became position 2).
+                position: (boxIndex - 1) * BOX_CAPACITY + (index + 1),
                 species: poke.species,
                 status: status,
                 level: poke.level,
