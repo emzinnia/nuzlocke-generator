@@ -9,6 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const boxMappings = Array.from({ length: 12 }, (_, i) => ({
+    key: i + 1,
     name: `Box ${i + 1}`,
     status: "Boxed",
 }));
