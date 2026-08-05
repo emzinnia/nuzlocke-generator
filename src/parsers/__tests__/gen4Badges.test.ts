@@ -48,15 +48,16 @@ describe("Gen 4 badge bitfield parsing", () => {
     });
 
     it("imports HGSS Kanto badges from 0x83 in addition to Johto at 0x7E", async () => {
-        const result = await parseGen4Save(
-            readSave("../fixtures/gen4/projectpokemon-base-soulsilver-boy.sav"),
-            {
-                boxMappings: [],
-                selectedGame: "HGSS",
-            },
-        );
+        const save = Buffer.from(readSave("../heartgold.sav"));
+        // Boulder + Thunder (bits 0 and 2). Write both general mirrors.
+        save.writeUInt8(0x05, 0x83);
+        save.writeUInt8(0x05, 0x40000 + 0x83);
 
-        expect(result.trainer.badges).toHaveLength(16);
+        const result = await parseGen4Save(save, {
+            boxMappings: [],
+            selectedGame: "HGSS",
+        });
+
         expect(result.trainer.badges?.map((badge) => badge.name)).toEqual([
             "Zephyr Badge",
             "Hive Badge",
@@ -67,13 +68,7 @@ describe("Gen 4 badge bitfield parsing", () => {
             "Glacier Badge",
             "Rising Badge",
             "Boulder Badge",
-            "Cascade Badge",
             "Thunder Badge",
-            "Rainbow Badge",
-            "Soul Badge",
-            "Marsh Badge",
-            "Volcano Badge",
-            "Earth Badge",
         ]);
     });
 
