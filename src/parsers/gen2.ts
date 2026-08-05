@@ -355,18 +355,50 @@ const getPokemonNames = (buf: Buffer, entries: number = 6) => {
     return pokes;
 };
 
-const parseJohtoBadges = (buf: Buffer) => {
-    const bits =
-        buf[0].toString(2).padStart(8, "0") +
-        buf[1].toString(2).padStart(8, "0");
-    const badges = getBadges("Gold"); // Doesn't matter as long as it's gen 2
-    const badgesObtainedMap = bits.split("").map((badge) => {
-        return badge === "1" ? true : false;
-    });
-    const badgesFiltered = badges.filter((badge, idx) => {
-        return badgesObtainedMap[idx];
-    });
-    return badgesFiltered;
+/**
+ * Gen 2 Johto/Kanto badge flags are LSB-first (pret/Data Crystal):
+ * Johto bit0=Zephyr … bit4=Mineral, bit5=Storm … bit7=Rising;
+ * Kanto bit0=Boulder … bit7=Earth.
+ * Mapping MSB-first binary strings reversed Zephyr↔Rising (and peers).
+ * Mineral/Storm must follow engine flag order, not getBadges("Gold") UI order
+ * (which lists Storm before Mineral).
+ */
+const GEN2_BADGE_BIT_NAMES = [
+    // Johto (buf[0])
+    "Zephyr Badge",
+    "Hive Badge",
+    "Plain Badge",
+    "Fog Badge",
+    "Mineral Badge",
+    "Storm Badge",
+    "Glacier Badge",
+    "Rising Badge",
+    // Kanto (buf[1])
+    "Boulder Badge",
+    "Cascade Badge",
+    "Thunder Badge",
+    "Rainbow Badge",
+    "Soul Badge",
+    "Marsh Badge",
+    "Volcano Badge",
+    "Earth Badge",
+] as const;
+
+export const parseJohtoBadges = (buf: Buffer) => {
+    const badgesByName = new Map(
+        getBadges("Gold").map((badge) => [badge.name, badge]),
+    );
+    const obtained: ReturnType<typeof getBadges> = [];
+
+    for (let index = 0; index < GEN2_BADGE_BIT_NAMES.length; index++) {
+        const byte = buf[index < 8 ? 0 : 1] ?? 0;
+        const bit = index % 8;
+        if ((byte & (1 << bit)) === 0) continue;
+        const badge = badgesByName.get(GEN2_BADGE_BIT_NAMES[index]);
+        if (badge) obtained.push(badge);
+    }
+
+    return obtained;
 };
 
 const transformPokemon = (
