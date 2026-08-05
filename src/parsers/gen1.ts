@@ -43,6 +43,28 @@ const BOX_CAPACITY = 20;
 const BOX_POKEMON_SIZE = 33;
 const POKEMON_NAME_SIZE = 11;
 
+/** Gen 1 badge flags are LSB-first: bit 0 = Boulder … bit 7 = Earth. */
+const GEN1_BADGES = [
+    { name: "Boulder Badge", image: "boulder-badge" },
+    { name: "Cascade Badge", image: "cascade-badge" },
+    { name: "Thunder Badge", image: "thunder-badge" },
+    { name: "Rainbow Badge", image: "rainbow-badge" },
+    { name: "Soul Badge", image: "soul-badge" },
+    { name: "Marsh Badge", image: "marsh-badge" },
+    { name: "Volcano Badge", image: "volcano-badge" },
+    { name: "Earth Badge", image: "earth-badge" },
+] as const;
+
+/**
+ * Decode the Gen 1 obtained-badges bitfield.
+ * Must use bit tests (not an unpadded binary string): `2.toString(2)` is `"10"`,
+ * which previously mapped Cascade-only saves to Boulder.
+ */
+export const parseGen1Badges = (badgesByte: number) =>
+    GEN1_BADGES.filter((_, index) => (badgesByte & (1 << index)) !== 0).map(
+        (badge) => ({ ...badge }),
+    );
+
 const checksum = (data: Uint8Array) => {
     let checksumN = 255;
     for (let i = 0x2598; i < OFFSETS.CHECKSUM; ++i) {
@@ -354,23 +376,7 @@ export const parseGen1Save = async (file: Buffer, options: ParserOptions) => {
         );
     }).flat();
 
-    const badgesPossible = [
-        { name: "Boulder Badge", image: "boulder-badge" },
-        { name: "Cascade Badge", image: "cascade-badge" },
-        { name: "Thunder Badge", image: "thunder-badge" },
-        { name: "Rainbow Badge", image: "rainbow-badge" },
-        { name: "Soul Badge", image: "soul-badge" },
-        { name: "Marsh Badge", image: "marsh-badge" },
-        { name: "Volcano Badge", image: "volcano-badge" },
-        { name: "Earth Badge", image: "earth-badge" },
-    ];
-    const badgesBinary = (badgesByte >>> 0).toString(2);
-    const badges = badgesBinary
-        .split("")
-        .map((bit, index) => {
-            return parseInt(bit) ? badgesPossible[index] : null;
-        })
-        .filter((badge) => badge);
+    const badges = parseGen1Badges(badgesByte);
 
     const save = {
         isYellow: yellow,
