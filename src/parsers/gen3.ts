@@ -86,25 +86,30 @@ const COMMON_OFFSETS = {
     TIME_PLAYED: [0x000e, 0x0013],
 };
 
+// Money lives in section 1 (Team/Items). Emerald/FRLG store it XOR'd with the
+// security key from section 0 (Trainer Info). Ruby/Sapphire store it in the clear.
 const RS_OFFSETS = {
     ...COMMON_OFFSETS,
     TEAM_SIZE: 0x0234,
     TEAM_POKEMON_LIST: 0x0238,
-    MONEY: [0x0490, 0x0494],
+    MONEY: 0x0490,
+    SECURITY_KEY: null as number | null,
 };
 
 const EMERALD_OFFSETS = {
     ...COMMON_OFFSETS,
     TEAM_SIZE: 0x0234,
     TEAM_POKEMON_LIST: 0x0238,
-    MONEY: [0x0490, 0x0494],
+    MONEY: 0x0490,
+    SECURITY_KEY: 0x00ac,
 };
 
 const FRLG_OFFSETS = {
     ...COMMON_OFFSETS,
     TEAM_SIZE: 0x0034,
     TEAM_POKEMON_LIST: 0x0038,
-    MONEY: [0x0490, 0x0494],
+    MONEY: 0x0290,
+    SECURITY_KEY: 0x0af8,
 };
 
 const ORIGIN_GAME_MAP: Record<number, string> = {
@@ -637,7 +642,23 @@ const getSpeciesName = (
     return undefined;
 };
 
-const formatMoney = (bytes: Buffer) => bytes.readUInt32LE(0);
+/**
+ * Decode Gen 3 money from the Team/Items section.
+ * Emerald and FRLG XOR the stored u32 with the trainer-info security key;
+ * Ruby/Sapphire store the value unencrypted.
+ */
+export const parseGen3Money = (
+    teamSection: Buffer,
+    trainerSection: Buffer,
+    offsets: ReturnType<typeof getOffsets>,
+): number => {
+    const rawMoney = teamSection.readUInt32LE(offsets.MONEY);
+    if (offsets.SECURITY_KEY == null) {
+        return rawMoney >>> 0;
+    }
+    const securityKey = trainerSection.readUInt32LE(offsets.SECURITY_KEY);
+    return (rawMoney ^ securityKey) >>> 0;
+};
 
 const getGameFromOrigin = (value: number) =>
     ORIGIN_GAME_MAP[value] || undefined;
@@ -1073,22 +1094,22 @@ const parseBoxes = (
 };
 
 const parseTrainer = (
-    section: Buffer,
+    trainerSection: Buffer,
+    teamSection: Buffer,
     offsets: ReturnType<typeof getOffsets>,
     options: ParserOptions,
 ) => {
     const name = decodeGameText(
-        section.slice(offsets.PLAYER_NAME[0], offsets.PLAYER_NAME[1]),
+        trainerSection.slice(offsets.PLAYER_NAME[0], offsets.PLAYER_NAME[1]),
     );
     // Gen 3 stores Trainer ID (TID) + Secret ID (SID) together as a u32.
     // The app/test suite expects the visible in-game Trainer ID (low 16 bits).
-    const trainerIdCombined = section.readUInt32LE(offsets.PLAYER_ID[0]);
+    const trainerIdCombined = trainerSection.readUInt32LE(offsets.PLAYER_ID[0]);
     const trainerId = trainerIdCombined & 0xffff;
     const time = parseGen3Time(
-        section.slice(offsets.TIME_PLAYED[0], offsets.TIME_PLAYED[1]),
+        trainerSection.slice(offsets.TIME_PLAYED[0], offsets.TIME_PLAYED[1]),
     );
-    const moneyBytes = section.slice(offsets.MONEY[0], offsets.MONEY[1]);
-    const money = formatMoney(moneyBytes);
+    const money = parseGen3Money(teamSection, trainerSection, offsets);
 
     if (DEBUG) {
         log("parseTrainer", `Trainer: ${name} (ID: ${trainerId})`, {
@@ -1102,7 +1123,7 @@ const parseTrainer = (
         name,
         id: `${trainerId}`,
         time,
-        money,
+        money: `${money}`,
         badges: [],
         game: options.selectedGame,
     };
@@ -1173,7 +1194,12 @@ export const parseGen3Save = async (file: Buffer, options: ParserOptions) => {
     // Create a PID tracker to ensure unique IDs across all Pokemon
     const pidTracker = new Map<string, number>();
 
-    const trainer = parseTrainer(trainerSection.data, offsets, options);
+    const trainer = parseTrainer(
+        trainerSection.data,
+        teamSection.data,
+        offsets,
+        options,
+    );
     const party = parseParty(teamSection.data, offsets, pidTracker);
     const boxed = parseBoxes(sectionMap, options, pidTracker);
 
