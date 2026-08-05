@@ -185,6 +185,16 @@ describe("Gen 4 Save Parser", () => {
 
             expect(result.trainer.badges).toBeDefined();
             expect(result.trainer.badges.length).toBe(8);
+            expect(result.trainer.badges.map((badge) => badge.name)).toEqual([
+                "Coal Badge",
+                "Forest Badge",
+                "Cobble Badge",
+                "Fen Badge",
+                "Relic Badge",
+                "Mine Badge",
+                "Icicle Badge",
+                "Beacon Badge",
+            ]);
         });
 
         it("should parse the party Pokemon correctly", async () => {

@@ -1,9 +1,10 @@
 import { Buffer } from "buffer";
-import { Pokemon } from "models";
+import { Badge, Pokemon } from "models";
 import { matchSpeciesToTypes } from "utils/formatters/matchSpeciesToTypes";
 import { Forme } from "utils/Forme";
 import { Types } from "utils/Types";
 import { Game as GameName } from "utils";
+import { getBadges } from "utils/getters/getBadges";
 import { Species } from "utils/data/listOfPokemon";
 import { MOVES_ARRAY } from "./utils";
 import { ParserOptions } from "./utils/parserOptions";
@@ -25,6 +26,8 @@ type Layout = {
     moneyOffset: number;
     timeOffset: number;
     badgesOffset: number;
+    /** HGSS Kanto gym badges (Project Pokemon / PKHeX Badges16 at Trainer1+0x1F). */
+    kantoBadgesOffset?: number;
     partyCountOffset: number;
     partyOffset: number;
 };
@@ -119,6 +122,9 @@ const GEN4_LAYOUTS: Layout[] = [
         storageKind: "hgss",
         checksumFooterSize: FOOTER_CHECKSUM_SIZE_HGSS,
         ...DP_HGSS_GENERAL_OFFSETS,
+        // Kanto badges are a separate bitfield from Johto (not contiguous at 0x7F,
+        // which is the multiplayer avatar). See Project Pokemon HGSS save structure.
+        kantoBadgesOffset: 0x83,
     },
 ];
 
@@ -1044,6 +1050,38 @@ const normalizeTrainerName = (str: string): string => {
     return str;
 };
 
+const layoutToBadgeGame = (layoutName: Gen4Game): GameName => {
+    if (layoutName === "HGSS") return "HeartGold";
+    if (layoutName === "Platinum") return "Platinum";
+    return "Diamond";
+};
+
+const badgesFromBitfield = (badgeByte: number, badges: Badge[]): Badge[] =>
+    badges.filter((_badge, index) => (badgeByte & (1 << index)) !== 0);
+
+/**
+ * Gen 4 gym badges are LSB bitfields. Counting set bits and emitting
+ * "Badge 1..N" silently remaps sparse sets (e.g. only Forest → Coal) and drops
+ * HGSS Kanto badges stored at a separate offset from Johto.
+ */
+export const parseGen4Badges = (general: Buffer, layout: Layout): Badge[] => {
+    const gameBadges = getBadges(layoutToBadgeGame(layout.name));
+    const johtoBadges = badgesFromBitfield(
+        general.readUInt8(layout.badgesOffset),
+        gameBadges.slice(0, 8),
+    );
+
+    if (layout.kantoBadgesOffset == null) {
+        return johtoBadges;
+    }
+
+    const kantoBadges = badgesFromBitfield(
+        general.readUInt8(layout.kantoBadgesOffset),
+        gameBadges.slice(8, 16),
+    );
+    return [...johtoBadges, ...kantoBadges];
+};
+
 const parseTrainer = (general: Buffer, layout: Layout) => {
     const rawName = decodeGen4String(
         general.slice(layout.trainerNameOffset, layout.trainerNameOffset + 16),
@@ -1056,9 +1094,7 @@ const parseTrainer = (general: Buffer, layout: Layout) => {
     const minutes = general.readUInt8(layout.timeOffset + 2);
     const seconds = general.readUInt8(layout.timeOffset + 3);
     const time = `${hours}:${minutes}:${seconds}`;
-    const badgeByte = general.readUInt8(layout.badgesOffset);
-    const badgeCount = countBits(badgeByte);
-    const badges = Array.from({ length: badgeCount }, (_, i) => `Badge ${i + 1}`);
+    const badges = parseGen4Badges(general, layout);
 
     return {
         name,
@@ -1067,15 +1103,6 @@ const parseTrainer = (general: Buffer, layout: Layout) => {
         time,
         badges,
     };
-};
-
-const countBits = (n: number): number => {
-    let count = 0;
-    while (n) {
-        count += n & 1;
-        n >>= 1;
-    }
-    return count;
 };
 
 export const parseGen4Save = async (
