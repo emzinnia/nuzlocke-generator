@@ -41,9 +41,13 @@ export function customTypes(
                 };
             });
         case REPLACE_STATE:
-            return action.replaceWith.customTypes || [];
+            return Array.isArray(action.replaceWith?.customTypes)
+                ? action.replaceWith.customTypes
+                : state;
         case SYNC_STATE_FROM_HISTORY:
-            return action.syncWith.customTypes || [];
+            return Array.isArray(action.syncWith?.customTypes)
+                ? action.syncWith.customTypes
+                : state;
         default:
             return state;
     }

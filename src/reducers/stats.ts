@@ -33,9 +33,13 @@ export function stats(
                 },
             ];
         case REPLACE_STATE:
-            return action.replaceWith.stats || [];
+            return Array.isArray(action.replaceWith?.stats)
+                ? action.replaceWith.stats
+                : initState;
         case SYNC_STATE_FROM_HISTORY:
-            return action.syncWith.stats || [];
+            return Array.isArray(action.syncWith?.stats)
+                ? action.syncWith.stats
+                : initState;
         default:
             return initState;
     }

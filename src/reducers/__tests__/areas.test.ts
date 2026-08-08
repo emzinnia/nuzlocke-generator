@@ -22,4 +22,19 @@ describe("customAreas", () => {
             ),
         ).toEqual(["Victory Road"]);
     });
+
+    it("keeps prior custom areas when replace/sync payloads omit them", () => {
+        expect(
+            customAreas(
+                ["Safari Zone"],
+                replaceState({ game: { name: "Emerald", customName: "" } }),
+            ),
+        ).toEqual(["Safari Zone"]);
+        expect(
+            customAreas(
+                ["Safari Zone"],
+                syncStateFromHistory({ game: { name: "Emerald", customName: "" } }),
+            ),
+        ).toEqual(["Safari Zone"]);
+    });
 });

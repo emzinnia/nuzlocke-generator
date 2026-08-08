@@ -11,6 +11,9 @@ export type HotkeyBindings = Record<string, string>;
 
 const defaultHotkeys: HotkeyBindings = {};
 
+const isHotkeyBindings = (value: unknown): value is HotkeyBindings =>
+    typeof value === "object" && value !== null && !Array.isArray(value);
+
 export function hotkeys(
     state: HotkeyBindings = defaultHotkeys,
     action: Action<
@@ -35,9 +38,13 @@ export function hotkeys(
         case RESET_ALL_HOTKEYS:
             return defaultHotkeys;
         case REPLACE_STATE:
-            return action.replaceWith?.hotkeys ?? defaultHotkeys;
+            return isHotkeyBindings(action.replaceWith?.hotkeys)
+                ? action.replaceWith.hotkeys
+                : state;
         case SYNC_STATE_FROM_HISTORY:
-            return action.syncWith?.hotkeys ?? defaultHotkeys;
+            return isHotkeyBindings(action.syncWith?.hotkeys)
+                ? action.syncWith.hotkeys
+                : state;
         default:
             return state;
     }

@@ -14,9 +14,13 @@ export function excludedAreas(
         case UPDATE_EXCLUDED_AREAS:
             return action.excludedAreas;
         case REPLACE_STATE:
-            return action.replaceWith.excludedAreas ?? [];
+            return Array.isArray(action.replaceWith?.excludedAreas)
+                ? action.replaceWith.excludedAreas
+                : state;
         case SYNC_STATE_FROM_HISTORY:
-            return action.syncWith.excludedAreas ?? [];
+            return Array.isArray(action.syncWith?.excludedAreas)
+                ? action.syncWith.excludedAreas
+                : state;
         default:
             return state;
     }
@@ -30,9 +34,13 @@ export function customAreas(
         case UPDATE_CUSTOM_AREAS:
             return action.areas;
         case REPLACE_STATE:
-            return action.replaceWith.customAreas ?? [];
+            return Array.isArray(action.replaceWith?.customAreas)
+                ? action.replaceWith.customAreas
+                : state;
         case SYNC_STATE_FROM_HISTORY:
-            return action.syncWith.customAreas ?? [];
+            return Array.isArray(action.syncWith?.customAreas)
+                ? action.syncWith.customAreas
+                : state;
         default:
             return state;
     }

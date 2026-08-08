@@ -37,9 +37,13 @@ export function customMoveMap(
         case DELETE_CUSTOM_MOVE:
             return state.filter((move) => move.id !== action.id);
         case REPLACE_STATE:
-            return action.replaceWith.customMoveMap || [];
+            return Array.isArray(action.replaceWith?.customMoveMap)
+                ? action.replaceWith.customMoveMap
+                : state;
         case SYNC_STATE_FROM_HISTORY:
-            return action.syncWith.customMoveMap || [];
+            return Array.isArray(action.syncWith?.customMoveMap)
+                ? action.syncWith.customMoveMap
+                : state;
         case VERSION_1116:
             return [];
         default:
