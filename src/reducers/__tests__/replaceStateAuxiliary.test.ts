@@ -93,11 +93,19 @@ describe("REPLACE_STATE auxiliary slice preservation", () => {
             hotkeys: { "nuzlocke.save": "n" },
         };
 
+        // Include core slices that still crash when omitted on master (#1374),
+        // while omitting auxiliaries to assert they are no longer wiped.
         const next = appReducers(
             current as unknown as Parameters<typeof appReducers>[0],
             replaceState({
+                pokemon: current.pokemon,
+                box: current.box,
                 game: { name: "Emerald", customName: "" },
-            }),
+                trainer: current.trainer,
+                rules: current.rules,
+                // history lives in the store but is omitted from the State type
+                history: (current as { history?: unknown }).history ?? [],
+            } as Parameters<typeof replaceState>[0]),
         );
 
         expect(next.customAreas).toEqual(["Custom Route"]);
