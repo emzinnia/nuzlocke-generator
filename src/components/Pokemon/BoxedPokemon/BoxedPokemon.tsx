@@ -61,6 +61,7 @@ export const BoxedPokemonBase = (poke: BoxedPokemonProps) => {
                 gender={poke?.gender}
                 egg={poke?.egg}
                 customIcon={poke?.customIcon}
+                status={poke?.status}
                 className={"boxed-pokemon-icon"}
             />
             {isMinimal ? null : (
