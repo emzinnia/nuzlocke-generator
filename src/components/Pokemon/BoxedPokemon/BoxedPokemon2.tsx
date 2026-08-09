@@ -14,6 +14,7 @@ export function BoxedPokemon({ pokemon }: { pokemon: Pokemon }) {
                 gender={pokemon?.gender}
                 egg={pokemon?.egg}
                 customIcon={pokemon?.customIcon}
+                status={pokemon?.status}
             />
         </div>
     );
