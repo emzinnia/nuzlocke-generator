@@ -303,10 +303,18 @@ export const parseGen1Save = async (file: Buffer, options: ParserOptions) => {
             .join(""),
     );
 
+    // Deposits/withdrawals update the Current Box cache at 0x30C0. The matching
+    // banked box in BOX_OFFSETS stays stale until the player switches boxes, so
+    // imports must read the cache for the active box index.
+    const currentBoxIndex = file[OFFSETS.CURRENT_POKEMON_BOX_NUM] & 0x0f;
     const pokemonFromBoxes = BOX_OFFSETS.map((box, boxIndex) => {
+        const boxData =
+            boxIndex === currentBoxIndex
+                ? file.slice(OFFSETS.CURRENT_BOX, OFFSETS.CURRENT_BOX + 0x462)
+                : file.slice(box, box + 0x462);
         return transformPokemon(
-            parseBoxedPokemon(file.slice(box, box + 0x462)),
-            options.boxMappings[boxIndex]["status"],
+            parseBoxedPokemon(boxData),
+            options.boxMappings[boxIndex]?.["status"] ?? "Boxed",
             boxIndex + 1,
         );
     }).flat();
