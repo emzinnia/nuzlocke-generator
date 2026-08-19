@@ -43,6 +43,7 @@ import { resultSelector } from "selectors";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { normalizeSpeciesName } from "utils/getters/normalizeSpeciesName";
 import { Select } from "@blueprintjs/select";
+import { getResultImageDownloadOptions } from "./downloadImage";
 
 async function load() {
     const resource = await import("@emmaramirez/dom-to-image");
@@ -205,10 +206,15 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
         const resultNode = this.resultRef.current;
         this.setState({ isDownloading: true });
         try {
+            if (!resultNode) {
+                throw new Error("Result node is not available for download.");
+            }
+
             const domToImage = await load();
-            const dataUrl = await domToImage.toPng(resultNode, {
-                corsImage: true,
-            });
+            const dataUrl = await domToImage.toPng(
+                resultNode,
+                getResultImageDownloadOptions(resultNode),
+            );
             console.log(dataUrl, resultNode);
             const link = document.createElement("a");
             link.download = `nuzlocke-${uuid()}.png`;
