@@ -5,6 +5,7 @@ import {
     parseGen3Save,
     parseGen4Save,
     parseGen5Save,
+    SAVE_SIZE_GEN5_RAW_MAX_WITH_PADDING,
 } from ".";
 import { BoxMappings } from "./utils/boxMappings";
 import { Buffer } from "buffer";
@@ -457,12 +458,16 @@ const detectGen5GameNameFromString = (text: string): GameName | undefined => {
     return undefined;
 };
 
+const isGen5RawSizedSave = (buf: Buffer) =>
+    buf.length >= SAVE_SIZE_GEN5_RAW &&
+    buf.length <= SAVE_SIZE_GEN5_RAW_MAX_WITH_PADDING;
+
 const detectGen5SaveFormat = (
     buf: Buffer,
     fileName?: string,
 ): Gen5Game | undefined => {
     if (
-        buf.length !== SAVE_SIZE_GEN5_RAW &&
+        !isGen5RawSizedSave(buf) &&
         buf.length !== SAVE_SIZE_GEN5_BW &&
         buf.length !== SAVE_SIZE_GEN5_B2W2
     ) {
@@ -471,6 +476,12 @@ const detectGen5SaveFormat = (
 
     const detected = detectGen5Layout(buf);
     if (detected) return detected;
+
+    // Filename hints are only safe for exact-size saves. Padded emulator
+    // dumps (e.g. DeSmuME .dsv) must match Gen 5 structure in the raw prefix.
+    if (buf.length !== SAVE_SIZE_GEN5_RAW && buf.length !== SAVE_SIZE_GEN5_BW && buf.length !== SAVE_SIZE_GEN5_B2W2) {
+        return undefined;
+    }
 
     return fileName ? detectGen5SaveFormatFromString(fileName) : undefined;
 };

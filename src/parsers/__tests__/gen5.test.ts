@@ -184,6 +184,23 @@ describe("Gen 5 Save Parser", () => {
         });
     });
 
+    it("detects and parses DeSmuME-padded Gen 5 raw saves", async () => {
+        const raw = Buffer.from(readParserFile("black.sav"));
+        const padded = Buffer.concat([
+            raw,
+            Buffer.from("|-DESMUME SAVE-|\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
+        ]);
+
+        expect(detectGen5Layout(padded)).toBe("BW");
+
+        const rawResult = await parseGen5Save(raw, { boxMappings: [] });
+        const paddedResult = await parseGen5Save(padded, { boxMappings: [] });
+
+        expect(paddedResult.game).toBe(rawResult.game);
+        expect(paddedResult.trainer).toEqual(rawResult.trainer);
+        expect(paddedResult.pokemon).toHaveLength(rawResult.pokemon.length);
+    });
+
     it("decrypts PK5 party data from a Gen 5 save", async () => {
         const saveData = buildBlack2PartySave([0]);
 

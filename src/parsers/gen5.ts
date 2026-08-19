@@ -51,6 +51,13 @@ type PokemonContext = {
 const SAVE_SIZE_GEN5_RAW = 0x80000;
 const SAVE_SIZE_BW = 0x24000;
 const SAVE_SIZE_B2W2 = 0x26000;
+// Emulators (e.g. DeSmuME .dsv) append small footers after the 512 KiB raw save.
+export const SAVE_SIZE_GEN5_RAW_MAX_WITH_PADDING = SAVE_SIZE_GEN5_RAW + 0x2000;
+
+const normalizeGen5RawBuffer = (buffer: Buffer) =>
+    buffer.length > SAVE_SIZE_GEN5_RAW
+        ? buffer.subarray(0, SAVE_SIZE_GEN5_RAW)
+        : buffer;
 const BOX_COUNT = 24;
 const BOX_CAPACITY = 30;
 const PC_POKEMON_SIZE = 136;
@@ -762,12 +769,13 @@ const validateChecksumFooter = (save: Buffer, layout: Layout) => {
 };
 
 const hasValidChecksumFooter = (buffer: Buffer, layout: Layout) => {
+    const raw = normalizeGen5RawBuffer(buffer);
     const baseOffsets =
-        buffer.length === SAVE_SIZE_GEN5_RAW ? [0, layout.mainSize] : [0];
+        raw.length === SAVE_SIZE_GEN5_RAW ? [0, layout.mainSize] : [0];
     return baseOffsets.some((baseOffset) => {
-        if (baseOffset + layout.mainSize > buffer.length) return false;
+        if (baseOffset + layout.mainSize > raw.length) return false;
         return validateChecksumFooter(
-            buffer.slice(baseOffset, baseOffset + layout.mainSize),
+            raw.slice(baseOffset, baseOffset + layout.mainSize),
             layout,
         );
     });
@@ -809,10 +817,16 @@ export const detectGen5Layout = (
     if (preferred) return preferred;
     if (buffer.length === SAVE_SIZE_BW) return "BW";
     if (buffer.length === SAVE_SIZE_B2W2) return "B2W2";
-    if (buffer.length !== SAVE_SIZE_GEN5_RAW) return undefined;
+    if (
+        buffer.length < SAVE_SIZE_GEN5_RAW ||
+        buffer.length > SAVE_SIZE_GEN5_RAW_MAX_WITH_PADDING
+    ) {
+        return undefined;
+    }
 
-    const bw = hasValidChecksumFooter(buffer, GEN5_LAYOUTS[0]);
-    const b2w2 = hasValidChecksumFooter(buffer, GEN5_LAYOUTS[1]);
+    const raw = normalizeGen5RawBuffer(buffer);
+    const bw = hasValidChecksumFooter(raw, GEN5_LAYOUTS[0]);
+    const b2w2 = hasValidChecksumFooter(raw, GEN5_LAYOUTS[1]);
     if (b2w2 && !bw) return "B2W2";
     if (bw && !b2w2) return "BW";
     return undefined;
@@ -830,12 +844,14 @@ const selectActiveSave = (buffer: Buffer, preferred?: Gen5Game): ActiveSave => {
         throw new Error("Unable to detect Gen 5 save format.");
     }
 
+    // Prefer the raw 512 KiB dual-slot layout even when emulators append a footer.
+    const raw = normalizeGen5RawBuffer(buffer);
     const baseOffsets =
-        buffer.length === SAVE_SIZE_GEN5_RAW ? [0, layout.mainSize] : [0];
+        raw.length === SAVE_SIZE_GEN5_RAW ? [0, layout.mainSize] : [0];
     const candidates = baseOffsets
-        .filter((baseOffset) => baseOffset + layout.mainSize <= buffer.length)
+        .filter((baseOffset) => baseOffset + layout.mainSize <= raw.length)
         .map((baseOffset) => {
-            const data = buffer.slice(baseOffset, baseOffset + layout.mainSize);
+            const data = raw.slice(baseOffset, baseOffset + layout.mainSize);
             const score = scoreSave(data, layout);
             return { layout, baseOffset, data, ...score };
         })

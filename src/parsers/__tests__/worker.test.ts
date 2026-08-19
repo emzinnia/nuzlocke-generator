@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { Buffer } from "buffer";
 
 type WorkerSelf = {
     postMessage: (data: unknown) => void;
@@ -9,7 +10,13 @@ type WorkerSelf = {
 };
 
 const loadSav = (name: string) =>
-    readFileSync(join(process.cwd(), "src", "parsers", name));
+    Buffer.from(readFileSync(join(process.cwd(), "src", "parsers", name)));
+
+const withDesmumeFooter = (save: Buffer) =>
+    Buffer.concat([
+        save,
+        Buffer.from("|-DESMUME SAVE-|\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
+    ]);
 
 type PostMessageMock = ReturnType<typeof vi.fn>;
 type WorkerResult = {
@@ -208,4 +215,69 @@ describe("parsers worker", () => {
             expect(call.pokemon).toEqual([]);
         },
     );
+
+    it("detects padded Gen 5 DeSmuME dumps as Gen 5 instead of Gen 4", async () => {
+        const raw = loadSav("black.sav");
+        const save = withDesmumeFooter(raw);
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+
+        await selfRef.onmessage?.({
+            data: {
+                save: raw,
+                selectedGame: "Auto",
+                boxMappings: [],
+                fileName: "black.sav",
+            },
+        });
+        const rawCall = (selfRef.postMessage as PostMessageMock).mock.calls.at(
+            -1,
+        )?.[0] as WorkerResult;
+
+        (selfRef.postMessage as PostMessageMock).mockClear();
+        await selfRef.onmessage?.({
+            data: {
+                save,
+                selectedGame: "Auto",
+                boxMappings: [],
+                fileName: "black.dsv",
+            },
+        });
+        const paddedCall = (selfRef.postMessage as PostMessageMock).mock.calls.at(
+            -1,
+        )?.[0] as WorkerResult;
+
+        expect(rawCall.detectedGame?.name).toBe("Black");
+        expect(rawCall.detectedSaveFormat).toBe("BW");
+        expect(paddedCall.detectedGame?.name).toBe("Black");
+        expect(paddedCall.detectedSaveFormat).toBe("BW");
+        expect(paddedCall.pokemon?.length).toBe(rawCall.pokemon?.length);
+        expect(paddedCall.trainer?.money).toBe(rawCall.trainer?.money);
+    });
+
+    it("keeps padded Gen 4 DeSmuME dumps on Gen 4 Auto routing", async () => {
+        const save = withDesmumeFooter(loadSav("diamond.sav"));
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: {
+                save,
+                selectedGame: "Auto",
+                boxMappings: [],
+                fileName: "diamond.dsv",
+            },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(
+            -1,
+        )?.[0] as WorkerResult;
+        const team = call.pokemon?.filter((p) => p.status === "Team") ?? [];
+        expect(call.detectedGame?.name).toBe("Diamond");
+        expect(call.detectedSaveFormat).toBe("DP");
+        expect(team.map((p) => p.species)).toEqual([
+            "Gengar",
+            "Lapras",
+            "Dragonite",
+            "Rayquaza",
+            "Bibarel",
+            "Darkrai",
+        ]);
+    });
 });
