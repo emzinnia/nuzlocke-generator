@@ -52,7 +52,7 @@ vi.mock("components/Common/Shared/ImagesDrawer", () => ({
 }));
 
 vi.mock("utils", () => ({
-    // `getIconFormeSuffix` imports `Forme` at runtime, so provide a minimal mapping.
+    // Runtime placeholders and shared helpers used by getPokemonImage.
     Forme: {
         Normal: "normal",
         Alolan: "alolan",
@@ -88,7 +88,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
     let consoleLogSpy: ReturnType<typeof vi.spyOn> | undefined;
 
     beforeEach(() => {
-        // `getIconFormeSuffix` currently logs; silence for deterministic tests.
+        // Some utility imports still log feature flags; silence for deterministic tests.
         consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
         mocks.getImages.mockReset();
@@ -304,7 +304,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 style: imageStyle({ teamImages: "sugimori" }),
             });
 
-            expect(result).toBe("url(img/sugimori/female/521-galarian.png)");
+            expect(result).toBe("url(img/sugimori/female/521-galar.png)");
         });
 
         it("returns sugimori base folder for other species", async () => {
@@ -314,7 +314,7 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 style: imageStyle({ teamImages: "sugimori" }),
             });
 
-            expect(result).toBe("url(img/sugimori/25-galarian.png)");
+            expect(result).toBe("url(img/sugimori/25-galar.png)");
         });
 
         it("returns dream world SVGs (falls back to 1 when no number)", async () => {
@@ -408,4 +408,3 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
         });
     });
 });
-

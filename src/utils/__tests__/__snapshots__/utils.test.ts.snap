@@ -234,7 +234,9 @@ exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
     ],
   },
   {
-    "Arcanine": [],
+    "Arcanine": [
+      "Hisuian",
+    ],
   },
   {
     "Poliwag": [],
