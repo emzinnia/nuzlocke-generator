@@ -36,7 +36,11 @@ describe("<GameEditor />", () => {
         const props = createProps();
         render(<GameEditorBase {...props} />);
 
-        const input = screen.getByPlaceholderText(props.game.name);
+        expect(screen.getByText("Custom Version")).toBeDefined();
+
+        const input = screen.getByPlaceholderText(
+            `Custom ${props.game.name} name`,
+        );
         fireEvent.change(input, { target: { value: "My Run" } });
 
         expect(props.editGame).toHaveBeenCalledWith({ customName: "My Run" });
