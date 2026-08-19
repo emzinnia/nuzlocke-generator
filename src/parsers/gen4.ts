@@ -138,6 +138,15 @@ const compareBlocks = (a: ValidatedBlock, b: ValidatedBlock) => {
     return minor;
 };
 
+// DP/Pt share a non-zero footer link between a general block and its storage
+// mirror. HGSS leaves that field at 0 and pairs blocks by save count instead.
+const areLinkedBlocks = (general: ValidatedBlock, storage: ValidatedBlock) => {
+    if (general.linkValue !== 0) {
+        return storage.linkValue === general.linkValue;
+    }
+    return storage.saveCount === general.saveCount;
+};
+
 // 24-entry shuffle table (Bulbapedia) for Gen 4 PKM block order.
 const BLOCK_PERMUTATIONS = [
     "ABCD",
@@ -906,8 +915,7 @@ const selectLayoutAndBlocks = (file: Buffer, preferred?: Gen4Game): ActiveBlocks
                     (v) =>
                         v.storage.ok &&
                         v.storage.checksumValid &&
-                        v.storage.linkValue ===
-                            selectedGeneral.general.linkValue,
+                        areLinkedBlocks(selectedGeneral.general, v.storage),
                 )
                 .sort((a, b) => -compareBlocks(a.storage, b.storage));
 
