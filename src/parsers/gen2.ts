@@ -471,9 +471,15 @@ export const parseGen2Save = async (file, options: ParserOptions) => {
             ? fileSlice(CRYSTAL_OFFSETS.JOHTO_BADGES)
             : fileSlice(OFFSETS.JOHTO_BADGES),
     );
-    const currentPCId = options.isCrystal
+    const currentPCIdBuf = options.isCrystal
         ? fileSlice(CRYSTAL_OFFSETS.CURRENT_PC_BOX_NUMBER)
         : fileSlice(OFFSETS.CURRENT_PC_BOX_NUMBER);
+    // Low nibble is the active box (0-13). Deposits update CURRENT_BOX_POKEMON_LIST;
+    // the banked copy for that box is stale until a box switch.
+    const currentBoxIndex = (currentPCIdBuf[0] ?? 0) & 0x0f;
+    const currentBoxCache = options.isCrystal
+        ? fileSlice(CRYSTAL_OFFSETS.CURRENT_BOX_POKEMON_LIST)
+        : fileSlice(OFFSETS.CURRENT_BOX_POKEMON_LIST);
     const partyPokemonData = options.isCrystal
         ? fileSlice(CRYSTAL_OFFSETS.TEAM_POKEMON_LIST)
         : fileSlice(OFFSETS.TEAM_POKEMON_LIST);
@@ -483,9 +489,11 @@ export const parseGen2Save = async (file, options: ParserOptions) => {
     );
     const boxedPokemon = sliceBoxes(file)
         .map((boxData, boxIndex) => {
+            const data =
+                boxIndex === currentBoxIndex ? currentBoxCache : boxData;
             return transformPokemon(
-                parsePokemonList(boxData, 20),
-                options.boxMappings[boxIndex]["status"],
+                parsePokemonList(data, 20),
+                options.boxMappings[boxIndex]?.["status"] ?? "Boxed",
                 boxIndex + 1,
             );
         })
