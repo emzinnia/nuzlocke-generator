@@ -79,7 +79,7 @@
         "deep-equal": "^1.0.1",
         "dexie": "^3.2.2",
         "dotenv": "^16.4.5",
-        "express": "^4.21.2",
+        "express": "^4.22.2",
         "fake-indexeddb": "^3.1.7",
         "is-mobile": "^2.2.1",
         "lodash.debounce": "^4.0.8",
