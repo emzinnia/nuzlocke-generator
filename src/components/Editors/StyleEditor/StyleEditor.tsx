@@ -137,9 +137,9 @@ export const TextAreaDebounced = ({
     );
 
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        e.persist();
-        setValue(e.target.value);
-        delayedValue(e);
+        const value = e.currentTarget.value;
+        setValue(value);
+        delayedValue({ target: { value } });
     };
 
     React.useEffect(() => {
