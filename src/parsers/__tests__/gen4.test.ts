@@ -139,15 +139,22 @@ describe("Gen 4 Save Parser", () => {
         it("selects the active general block using PKHeX footer counter order", async () => {
             const modified = Buffer.from(saveData);
             const generalSize = 0x0c100;
+            const storageSize = 0x121e0;
             const primary = 0x00000;
             const backup = 0x40000;
+            const primaryStorage = primary + generalSize;
+            const backupStorage = backup + generalSize;
 
             writeGen4AsciiString(modified, backup + 0x64, "BACKUP", 8);
 
             setFooterCounters(modified, primary, generalSize, 1, 100);
             setFooterCounters(modified, backup, generalSize, 2, 1);
+            setFooterCounters(modified, primaryStorage, storageSize, 1, 100);
+            setFooterCounters(modified, backupStorage, storageSize, 2, 1);
             refreshBlockChecksum(modified, primary, generalSize, 0x14);
             refreshBlockChecksum(modified, backup, generalSize, 0x14);
+            refreshBlockChecksum(modified, primaryStorage, storageSize, 0x14);
+            refreshBlockChecksum(modified, backupStorage, storageSize, 0x14);
 
             const result = await parseGen4Save(modified, {
                 boxMappings: [],
@@ -155,6 +162,50 @@ describe("Gen 4 Save Parser", () => {
             });
 
             expect(result.trainer.name).toBe("Backup");
+        });
+
+        it("uses the intact linked backup when the newest general block is corrupt", async () => {
+            const modified = Buffer.from(saveData);
+
+            modified[0x64] ^= 0xff;
+
+            const result = await parseGen4Save(modified, {
+                boxMappings: [],
+                selectedGame: "DP",
+                debug: true,
+            });
+
+            expect(result.trainer.name).toBe("Roy");
+            expect(result.debug).toMatchObject({
+                generalSave: 589,
+                storageSave: 377,
+                generalChecksumValid: true,
+                storageChecksumValid: true,
+            });
+        });
+
+        it("uses the intact linked backup when the newest storage block is corrupt", async () => {
+            const modified = Buffer.from(saveData);
+            const activeStorageStart = 0x40000 + 0x0c100;
+
+            modified[activeStorageStart + 0x100] ^= 0xff;
+
+            const result = await parseGen4Save(modified, {
+                boxMappings: [],
+                selectedGame: "DP",
+                debug: true,
+            });
+            const boxedPokemon = result.pokemon.filter(
+                (pokemon) => pokemon.status === "Boxed",
+            );
+
+            expect(boxedPokemon).toHaveLength(461);
+            expect(result.debug).toMatchObject({
+                generalSave: 589,
+                storageSave: 377,
+                generalChecksumValid: true,
+                storageChecksumValid: true,
+            });
         });
 
         it("decodes international and Korean Gen 4 trainer text", async () => {

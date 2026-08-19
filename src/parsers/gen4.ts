@@ -895,24 +895,34 @@ const selectLayoutAndBlocks = (file: Buffer, preferred?: Gen4Game): ActiveBlocks
             validated.push({ base, general, storage });
         }
 
-        const validGenerals = validated.filter((v) => v.general.ok);
+        const validGenerals = validated
+            .filter((v) => v.general.ok && v.general.checksumValid)
+            .sort((a, b) => -compareBlocks(a.general, b.general));
         if (!validGenerals.length) continue;
-        const selectedGeneral = validGenerals.reduce((a, b) =>
-            compareBlocks(a.general, b.general) < 0 ? b : a,
-        );
 
-        const candidateStorage = validated
-            .filter((v) => v.storage.ok)
-            .sort((a, b) => -compareBlocks(a.storage, b.storage));
+        for (const selectedGeneral of validGenerals) {
+            const candidateStorage = validated
+                .filter(
+                    (v) =>
+                        v.storage.ok &&
+                        v.storage.checksumValid &&
+                        v.storage.linkValue ===
+                            selectedGeneral.general.linkValue,
+                )
+                .sort((a, b) => -compareBlocks(a.storage, b.storage));
 
-        const chosenStorage = candidateStorage[0];
-        if (!chosenStorage) continue;
+            const chosenStorage = candidateStorage[0];
+            if (!chosenStorage) continue;
 
-        best = {
-            layout,
-            general: selectedGeneral.general,
-            storage: chosenStorage.storage,
-        };
+            best = {
+                layout,
+                general: selectedGeneral.general,
+                storage: chosenStorage.storage,
+            };
+            break;
+        }
+
+        if (!best) continue;
         break;
     }
 
