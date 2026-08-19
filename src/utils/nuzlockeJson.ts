@@ -21,3 +21,20 @@ export const stripEditorDarkModeForExport = (state: State) => {
 
 export const serializeNuzlockeJson = (state: State) =>
     JSON.stringify(stripEditorDarkModeForExport(state));
+
+export const stripNuzlockeSaveData = (state: State) => {
+    const baseState = omit(["nuzlockes", "editorHistory"], state) as {
+        style?: Styles;
+        [key: string]: unknown;
+    };
+    const { editorDarkMode: _omit, ...styleWithoutDarkMode } =
+        baseState.style || {};
+
+    return {
+        ...baseState,
+        style: styleWithoutDarkMode,
+    };
+};
+
+export const serializeNuzlockeSaveData = (state: State) =>
+    JSON.stringify(stripNuzlockeSaveData(state));

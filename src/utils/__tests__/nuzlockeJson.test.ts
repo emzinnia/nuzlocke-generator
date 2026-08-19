@@ -5,7 +5,9 @@ import { State } from "state";
 import { createDefaultState } from "store";
 import { TeamFixture } from "utils/fixtures";
 import {
+    serializeNuzlockeSaveData,
     serializeNuzlockeJson,
+    stripNuzlockeSaveData,
     stripEditorDarkModeForExport,
 } from "../nuzlockeJson";
 
@@ -64,5 +66,15 @@ describe("nuzlocke.json export compatibility", () => {
         expect(nextState.style.editorDarkMode).toBe(
             defaultState.style.editorDarkMode,
         );
+    });
+
+    it("serializes internal save slots without nested save metadata or editor-only fields", () => {
+        const state = createDownloadedJsonFixture();
+        const saved = stripNuzlockeSaveData(state) as Partial<State>;
+
+        expect(saved.nuzlockes).toBeUndefined();
+        expect(saved.editorHistory).toBeUndefined();
+        expect(saved.style).not.toHaveProperty("editorDarkMode");
+        expect(JSON.parse(serializeNuzlockeSaveData(state))).toEqual(saved);
     });
 });
