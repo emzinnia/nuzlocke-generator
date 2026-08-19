@@ -19,7 +19,6 @@ import { newNuzlocke, replaceState } from "actions";
 import { Badge, Game, Pokemon, Trainer } from "models";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { State } from "state";
-import { noop } from "redux-saga/utils";
 import {
     gameOfOriginToColor,
     GameSaveFormat,
@@ -297,30 +296,21 @@ export class DataEditorBase extends React.Component<
     };
 
     private confirmImport = () => {
-        let cmm: { customMoveMap: State["customMoveMap"] } = {
-            customMoveMap: [],
-        };
         const override = this.state.overrideImport;
         const data = handleExceptions(JSON.parse(this.state.data));
         const nuz = this.props.state;
-        // @NOTE this prevents previously undefined states from blowing up the app
-        const safeguards = {
-            customTypes: [],
-            customMoveMap: [],
-            stats: [],
-            excludedAreas: [],
-            customAreas: [],
-        };
-        if (!Array.isArray(data.customMoveMap)) {
-            noop();
-        } else {
-            cmm = { customMoveMap: data.customMoveMap };
-        }
-        this.props.replaceState({
-            ...safeguards,
+        // Omit auxiliary slices when the import does not include them so
+        // REPLACE_STATE reducers keep the current run's values instead of
+        // wiping custom types/moves/stats/areas (and hotkeys) to defaults.
+        const nextState: Partial<State> = {
             ...(override ? data : nuz),
-            ...cmm,
-        });
+        };
+        if (Array.isArray(data.customMoveMap)) {
+            nextState.customMoveMap = data.customMoveMap;
+        } else {
+            delete nextState.customMoveMap;
+        }
+        this.props.replaceState(nextState);
         this.props.newNuzlocke(this.state.data, { isCopy: false });
         this.writeAllData();
         this.setState({ isOpen: false });
