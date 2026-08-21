@@ -16,6 +16,21 @@ import { cx } from "emotion";
 import { useDispatch } from "store/reactZustand";
 import { updateExcludedAreas, updateCustomAreas } from "actions";
 
+export type LocationChecklistSort = "map-order" | "alphabetical";
+
+export const sortEncounterAreas = (
+    areas: string[],
+    sortMode: LocationChecklistSort,
+) => {
+    if (sortMode === "alphabetical") {
+        return [...areas].sort((left, right) =>
+            left.localeCompare(right, undefined, { numeric: true }),
+        );
+    }
+
+    return areas;
+};
+
 const EncounterMap = ({
     encounterMap,
     style,
@@ -142,6 +157,8 @@ export const PokemonLocationChecklist = ({
 
     const [excludeGifts, setExcludeGifts] = React.useState(false);
     const [currentGame, setCurrentGame] = React.useState<GameName>("None");
+    const [sortMode, setSortMode] =
+        React.useState<LocationChecklistSort>("map-order");
     const dispatch = useDispatch();
     const locationLookup = React.useMemo(() => {
         const map = new Map<string, Pokemon>();
@@ -161,6 +178,10 @@ export const PokemonLocationChecklist = ({
                 .concat(customAreas)
                 .filter((area) => !excludedAreas.includes(area)),
         [game.name, excludedAreas, customAreas],
+    );
+    const sortedEncounterMap = React.useMemo(
+        () => sortEncounterAreas(encounterMap, sortMode),
+        [encounterMap, sortMode],
     );
     const totals = React.useMemo(
         () => calcTotals(boxes, pokemon, encounterMap, currentGame),
@@ -277,12 +298,30 @@ export const PokemonLocationChecklist = ({
                         ))}
                     </HTMLSelect>
                 </label>
+                <label
+                    className={cx(Classes.CONTROL)}
+                    style={{ margin: ".25rem 0" }}
+                >
+                    <span className={Classes.LABEL}>Sort</span>
+                    <HTMLSelect
+                        value={sortMode}
+                        style={{ marginLeft: "0.25rem" }}
+                        onChange={(e) =>
+                            setSortMode(
+                                e?.target.value as LocationChecklistSort,
+                            )
+                        }
+                    >
+                        <option value="map-order">Map Order</option>
+                        <option value="alphabetical">Alphabetical</option>
+                    </HTMLSelect>
+                </label>
             </div>
             <div className="flex" style={{ justifyContent: "center" }}>
                 {buildTotals(totals)}
             </div>
             <EncounterMap
-                encounterMap={encounterMap}
+                encounterMap={sortedEncounterMap}
                 pokemon={pokemon}
                 style={style}
                 currentGame={currentGame}
