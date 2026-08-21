@@ -16,6 +16,12 @@ import { cx } from "emotion";
 import { useDispatch } from "store/reactZustand";
 import { updateExcludedAreas, updateCustomAreas } from "actions";
 
+export const normalizeAreaLines = (value: string) =>
+    value
+        .split("\n")
+        .map((area) => area.trim())
+        .filter(Boolean);
+
 const EncounterMap = ({
     encounterMap,
     style,
@@ -171,14 +177,12 @@ export const PokemonLocationChecklist = ({
 
     const updateExcludedAreasFromText = (event) => {
         const value = event.currentTarget.value;
-        const areas = value.split("\n");
-        dispatch(updateExcludedAreas(areas));
+        dispatch(updateExcludedAreas(normalizeAreaLines(value)));
     };
 
     const updateCustomAreasFromText = (event) => {
         const value = event.currentTarget.value;
-        const areas = value.split("\n");
-        dispatch(updateCustomAreas(areas));
+        dispatch(updateCustomAreas(normalizeAreaLines(value)));
     };
 
     const colors = [
@@ -299,10 +303,11 @@ export const PokemonLocationChecklist = ({
                     onChange={updateExcludedAreasFromText}
                     value={excludedAreas.join("\n")}
                 />
-                <div>Custom Areas</div>
+                <div>Custom Routes / Areas</div>
                 <TextArea
                     fill
                     name="customAreas"
+                    placeholder={"Route 1\nGale Forest\nOld Graveyard"}
                     onChange={updateCustomAreasFromText}
                     value={customAreas.join("\n")}
                 />
