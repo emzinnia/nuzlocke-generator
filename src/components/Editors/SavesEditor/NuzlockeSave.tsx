@@ -17,6 +17,7 @@ import {
     switchNuzlocke,
     replaceState,
     updateSwitchNuzlocke,
+    selectPokemon,
 } from "actions";
 import {
     feature,
@@ -30,6 +31,7 @@ import { DeleteAlert } from "components/Editors/DataEditor/DeleteAlert";
 import { HallOfFameDialog } from "./HallOfFameDialog";
 import { showToast } from "components/Common/Shared/appToaster";
 import { HotkeyIndicator } from "components/Common/Shared";
+import { copyNuzlockeData, CopyNuzlockeDataMode } from "./copyNuzlockeData";
 
 export interface NuzlockeSaveControlsProps {
     nuzlockes: State["nuzlockes"];
@@ -41,6 +43,7 @@ export interface NuzlockeSaveControlsProps {
     switchNuzlocke: switchNuzlocke;
     replaceState: replaceState;
     updateSwitchNuzlocke: updateSwitchNuzlocke;
+    selectPokemon: selectPokemon;
 }
 
 export interface NuzlockeSaveControlsState {
@@ -79,6 +82,35 @@ export class NuzlockeSaveBase extends React.Component<
 
     private toggleIsHofOpen = () => {
         this.setState((state) => ({ isHofOpen: !state.isHofOpen }));
+    };
+
+    private copyFromNuzlocke = (
+        sourceData: State,
+        mode: CopyNuzlockeDataMode,
+        successLabel: string,
+    ) => {
+        const { nuzlockes, state, replaceState, updateNuzlocke, selectPokemon } =
+            this.props;
+        const { currentId } = nuzlockes;
+
+        try {
+            const targetData = JSON.parse(state) as State;
+            const nextData = copyNuzlockeData(targetData, sourceData, mode);
+            const nextDataString = JSON.stringify(nextData);
+
+            replaceState(nextData);
+            selectPokemon(nextData.selectedId);
+            updateNuzlocke(currentId, nextDataString);
+            showToast({
+                message: `${successLabel} copied to the current Nuzlocke.`,
+                intent: Intent.SUCCESS,
+            });
+        } catch (e) {
+            showToast({
+                message: `Failed to copy data to the current Nuzlocke. ${e}`,
+                intent: Intent.DANGER,
+            });
+        }
     };
 
     public renderMenu() {
@@ -241,6 +273,45 @@ export class NuzlockeSaveBase extends React.Component<
                                             }}
                                             text="Copy this Nuzlocke"
                                         ></MenuItem>
+                                        <MenuItem
+                                            shouldDismissPopover={false}
+                                            disabled={isCurrent}
+                                            icon="duplicate"
+                                            onClick={() =>
+                                                this.copyFromNuzlocke(
+                                                    parsedData,
+                                                    "pokemon",
+                                                    "Pokémon",
+                                                )
+                                            }
+                                            text="Copy Pokémon to Current Nuzlocke"
+                                        />
+                                        <MenuItem
+                                            shouldDismissPopover={false}
+                                            disabled={isCurrent}
+                                            icon="box"
+                                            onClick={() =>
+                                                this.copyFromNuzlocke(
+                                                    parsedData,
+                                                    "boxes",
+                                                    "Boxes",
+                                                )
+                                            }
+                                            text="Copy Boxes to Current Nuzlocke"
+                                        />
+                                        <MenuItem
+                                            shouldDismissPopover={false}
+                                            disabled={isCurrent}
+                                            icon="inbox"
+                                            onClick={() =>
+                                                this.copyFromNuzlocke(
+                                                    parsedData,
+                                                    "boxes-and-pokemon",
+                                                    "Boxes and Pokémon",
+                                                )
+                                            }
+                                            text="Copy Boxes and Pokémon to Current Nuzlocke"
+                                        />
                                         {feature.hallOfFame && (
                                             <MenuItem
                                                 shouldDismissPopover={false}
@@ -321,5 +392,6 @@ export const NuzlockeSave = connect(
         switchNuzlocke,
         replaceState,
         updateSwitchNuzlocke,
+        selectPokemon,
     },
 )(NuzlockeSaveBase);
