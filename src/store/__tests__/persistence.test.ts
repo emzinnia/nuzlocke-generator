@@ -104,6 +104,49 @@ describe("Zustand persistence compatibility", () => {
         unsubscribePersistence();
     });
 
+    it("preserves user lists when replaying migrations from numeric legacy metadata", async () => {
+        const customAreas = ["Crystal Cave", "Trainer Hill"];
+        const excludedAreas = ["Route 1"];
+        const customMoveMap = [
+            {
+                id: "custom-move-1",
+                move: "Thunder Punch",
+                type: "Electric",
+            },
+        ];
+        const legacyEnvelope = JSON.stringify({
+            customAreas: JSON.stringify(customAreas),
+            customMoveMap: JSON.stringify(customMoveMap),
+            excludedAreas: JSON.stringify(excludedAreas),
+            _persist: JSON.stringify({
+                version: -1,
+                rehydrated: true,
+            }),
+        });
+
+        window.localStorage.setItem(PERSIST_KEY, legacyEnvelope);
+
+        const { persistor, store, unsubscribePersistence } = createNuzlockeStore({
+            enableLogger: false,
+            storage: window.localStorage,
+        });
+
+        expect(store.getState().customAreas).toEqual(customAreas);
+        expect(store.getState().customMoveMap).toEqual(customMoveMap);
+        expect(store.getState().excludedAreas).toEqual(excludedAreas);
+
+        await persistor.flush();
+
+        const savedState = deserializePersistedState(
+            window.localStorage.getItem(PERSIST_KEY),
+        );
+        expect(savedState?.customAreas).toEqual(customAreas);
+        expect(savedState?.customMoveMap).toEqual(customMoveMap);
+        expect(savedState?.excludedAreas).toEqual(excludedAreas);
+
+        unsubscribePersistence();
+    });
+
     it("dispatches through Zustand and flushes the current state back to localStorage", async () => {
         const { persistor, store, unsubscribePersistence, zustandStore } =
             createNuzlockeStore({
