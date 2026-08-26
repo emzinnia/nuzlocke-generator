@@ -17,9 +17,13 @@ export function history(
         case REMOVE_HISTORY_ENTRY:
             return state.filter((h) => h.id !== action.id);
         case REPLACE_STATE:
-            return action.replaceWith.history;
+            return Array.isArray(action.replaceWith?.history)
+                ? action.replaceWith.history
+                : state;
         case SYNC_STATE_FROM_HISTORY:
-            return action.syncWith.history;
+            return Array.isArray(action.syncWith?.history)
+                ? action.syncWith.history
+                : state;
         default:
             return state;
     }
