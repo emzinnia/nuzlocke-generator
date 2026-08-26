@@ -127,30 +127,25 @@ export class StatsBase extends React.Component<
     }
 
     private getAverageLevel() {
-        const pokes = this.props.pokemon.filter((p) => !p.hidden);
-        return (
-            pokes.reduce((prev, poke, arr) => {
-                if (Number.isNaN(poke.level) || !poke.level) {
-                    return prev;
-                }
-                return prev + Number.parseInt(poke.level as unknown as string);
-            }, 0) / pokes.length
+        return this.getAverageLevelForPokemon(
+            this.props.pokemon.filter((p) => !p.hidden),
         );
     }
 
     private getAverageLevelByStatus(status: string) {
-        const pokes = this.props.pokemon.filter(
-            (p) => !p.hidden && p.status === status,
+        return this.getAverageLevelForPokemon(
+            this.props.pokemon.filter((p) => !p.hidden && p.status === status),
         );
-        if (!pokes.length) return 0;
-        return (
-            pokes.reduce((prev, poke, arr) => {
-                if (Number.isNaN(poke.level) || !poke.level) {
-                    return prev;
-                }
-                return prev + Number.parseInt(poke.level as unknown as string);
-            }, 0) / pokes.length
-        );
+    }
+
+    private getAverageLevelForPokemon(pokemon: State["pokemon"]) {
+        const levels = pokemon
+            .map((poke) => Number.parseInt(String(poke.level), 10))
+            .filter((level) => Number.isFinite(level));
+
+        if (!levels.length) return 0;
+
+        return levels.reduce((total, level) => total + level, 0) / levels.length;
     }
 
     private getShinies() {
@@ -181,12 +176,12 @@ export class StatsBase extends React.Component<
                 Average Level:{" "}
                 {this.props.box.map((b, idx, arr) => {
                     return (
-                        <>
+                        <React.Fragment key={b.id}>
                             {" "}
                             {b.name} (
                             {this.getAverageLevelByStatus(b.name)?.toFixed(0)})
                             {idx < arr.length - 1 ? "," : ""}
-                        </>
+                        </React.Fragment>
                     );
                 })}
             </div>
