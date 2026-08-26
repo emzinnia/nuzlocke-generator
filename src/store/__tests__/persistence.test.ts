@@ -104,6 +104,51 @@ describe("Zustand persistence compatibility", () => {
         unsubscribePersistence();
     });
 
+    it("rehydrates saves without metadata without overriding default boxes", () => {
+        const legacyEnvelope = JSON.stringify({
+            trainer: JSON.stringify({
+                badges: [],
+                name: "Metadata Missing",
+                title: "Recovered Save",
+            }),
+            customAreas: JSON.stringify(["Viridian outskirts"]),
+            excludedAreas: JSON.stringify(["Route 1"]),
+        });
+
+        window.localStorage.setItem(PERSIST_KEY, legacyEnvelope);
+
+        const { store, unsubscribePersistence } = createNuzlockeStore({
+            enableLogger: false,
+            storage: window.localStorage,
+        });
+
+        expect(store.getState().trainer.name).toBe("Metadata Missing");
+        expect(store.getState().box).toEqual(createDefaultState().box);
+        expect(store.getState().customAreas).toEqual(["Viridian outskirts"]);
+        expect(store.getState().excludedAreas).toEqual(["Route 1"]);
+
+        unsubscribePersistence();
+    });
+
+    it("normalizes numeric persisted versions before choosing migrations", () => {
+        const defaultState = createDefaultState();
+        const numericVersionEnvelope = JSON.stringify({
+            box: JSON.stringify(defaultState.box),
+            customAreas: JSON.stringify(["Numeric custom area"]),
+            excludedAreas: JSON.stringify(["Numeric excluded area"]),
+            _persist: JSON.stringify({
+                version: 1.16,
+                rehydrated: true,
+            }),
+        });
+
+        const persistedState = deserializePersistedState(numericVersionEnvelope);
+
+        expect(persistedState?.box).toEqual(defaultState.box);
+        expect(persistedState?.customAreas).toEqual(["Numeric custom area"]);
+        expect(persistedState?.excludedAreas).toEqual(["Numeric excluded area"]);
+    });
+
     it("dispatches through Zustand and flushes the current state back to localStorage", async () => {
         const { persistor, store, unsubscribePersistence, zustandStore } =
             createNuzlockeStore({
