@@ -57,6 +57,61 @@ type IconURLArgs = Pick<
     "id" | "species" | "forme" | "shiny" | "gender" | "customIcon" | "egg"
 >;
 
+type PokemonIconDragItem = {
+    id?: string | null;
+    position?: number | null;
+    status?: string | null;
+};
+
+export type PokemonIconSwapEdits = {
+    targetId: string;
+    targetEdits: { position: number; status: string };
+    sourceId: string;
+    sourceEdits: { position: number; status: string };
+};
+
+/**
+ * Build the position/status swap for icon-to-icon drops.
+ * Returns null when either side is missing id/position/status so we never
+ * write `undefined` into persisted Pokémon (which orphans them from boxes).
+ */
+export function buildPokemonIconSwapEdits(
+    dropTarget: PokemonIconDragItem,
+    dragItem: PokemonIconDragItem,
+): PokemonIconSwapEdits | null {
+    const targetId = dropTarget?.id;
+    const targetPosition = dropTarget?.position;
+    const targetStatus = dropTarget?.status;
+    const sourceId = dragItem?.id;
+    const sourcePosition = dragItem?.position;
+    const sourceStatus = dragItem?.status;
+
+    if (
+        targetId == null ||
+        sourceId == null ||
+        targetId === sourceId ||
+        targetPosition == null ||
+        sourcePosition == null ||
+        targetStatus == null ||
+        sourceStatus == null
+    ) {
+        return null;
+    }
+
+    return {
+        targetId,
+        targetEdits: {
+            position: sourcePosition,
+            status: sourceStatus,
+        },
+        sourceId,
+        sourceEdits: {
+            position: targetPosition,
+            status: targetStatus,
+        },
+    };
+}
+
 const usePokemonDrag = (props: BasePokemonIconProps) => {
     const [, dragRef] = useDrag({
         type: "POKEMON_ICON",
@@ -80,41 +135,21 @@ const usePokemonDrag = (props: BasePokemonIconProps) => {
 const usePokemonDrop = (props: BasePokemonIconProps) => {
     const [, dropRef] = useDrop({
         accept: "POKEMON_ICON",
-        drop: (item: { id: string; position: number; status: string }) => {
-            const newPosition = props.position;
-            const newId = props.id;
-            const newStatus = props.status;
-            const oldId = item?.id;
-            const oldPosition = item?.position;
-            const oldStatus = item?.status;
-
-            if (
-                newId == null ||
-                oldId == null ||
-                oldPosition == null ||
-                oldStatus == null
-            ) {
+        drop: (item: PokemonIconDragItem) => {
+            const swap = buildPokemonIconSwapEdits(
+                {
+                    id: props.id,
+                    position: props.position,
+                    status: props.status,
+                },
+                item,
+            );
+            if (!swap) {
                 return;
             }
 
-            store.dispatch(
-                editPokemon(
-                    {
-                        position: oldPosition,
-                        status: oldStatus,
-                    },
-                    newId,
-                ),
-            );
-            store.dispatch(
-                editPokemon(
-                    {
-                        position: newPosition,
-                        status: newStatus,
-                    },
-                    oldId,
-                ),
-            );
+            store.dispatch(editPokemon(swap.targetEdits, swap.targetId));
+            store.dispatch(editPokemon(swap.sourceEdits, swap.sourceId));
         },
     });
 
