@@ -117,6 +117,7 @@ export const PokemonLocationChecklist = ({
         pokemon,
         encounterMap,
         currentGame: GameName,
+        excludeGifts: boolean,
     ) => {
         const encounterTotal = encounterMap.length || 1;
         const encounterSet = new Set(encounterMap);
@@ -125,6 +126,7 @@ export const PokemonLocationChecklist = ({
         const counts = new Map<string, number>();
         for (const poke of pokemon) {
             if (!poke || poke.hidden) continue;
+            if (excludeGifts && poke.gift) continue;
             if (currentGame !== "None" && poke.gameOfOrigin !== currentGame)
                 continue;
             if (!encounterSet.has(poke.met)) continue;
@@ -148,13 +150,14 @@ export const PokemonLocationChecklist = ({
         for (const poke of pokemon) {
             const met = poke?.met?.trim();
             if (!met) continue;
+            if (excludeGifts && poke.gift) continue;
             if (currentGame !== "None" && poke.gameOfOrigin !== currentGame)
                 continue;
             const key = met.toLocaleLowerCase();
             if (!map.has(key)) map.set(key, poke);
         }
         return map;
-    }, [pokemon, currentGame]);
+    }, [pokemon, currentGame, excludeGifts]);
     const encounterMap = React.useMemo(
         () =>
             getEncounterMap(game.name)
@@ -163,8 +166,8 @@ export const PokemonLocationChecklist = ({
         [game.name, excludedAreas, customAreas],
     );
     const totals = React.useMemo(
-        () => calcTotals(boxes, pokemon, encounterMap, currentGame),
-        [boxes, pokemon, encounterMap, currentGame],
+        () => calcTotals(boxes, pokemon, encounterMap, currentGame, excludeGifts),
+        [boxes, pokemon, encounterMap, currentGame, excludeGifts],
     );
     const hideArea = (area: string) => () =>
         dispatch(updateExcludedAreas([...excludedAreas, area]));
