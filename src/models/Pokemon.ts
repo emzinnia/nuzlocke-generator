@@ -16,7 +16,7 @@ export interface Pokemon {
     moves?: string[];
     causeOfDeath?: string;
     deathTimestamp?: string;
-    forme?: Forme;
+    forme?: Forme | string;
     item?: string;
     types?: [Types, Types];
     teraType?: Types;
