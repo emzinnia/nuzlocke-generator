@@ -23,6 +23,7 @@ export interface Pokemon {
     customImage?: string;
     customIcon?: string;
     customItemImage?: string;
+    customItemImageScale?: number | string;
     shiny?: boolean;
     badges?: string[];
     num?: string;
@@ -65,6 +66,7 @@ export const PokemonKeys: Pokemon = {
     customImage: "",
     customIcon: "",
     customItemImage: "",
+    customItemImageScale: 100,
     shiny: false,
     champion: false,
     badges: [],

@@ -47,6 +47,9 @@ interface CurrentPokemonInputProps {
         | "rich-text";
     value: PokemonInputValue;
     placeholder?: string;
+    min?: string | number;
+    max?: string | number;
+    step?: string | number;
     transform?: (v: PokemonInputValue) => string;
     disabled?: boolean;
     options?: SelectOption[];
@@ -236,9 +239,11 @@ export function PokemonTextAreaInput({
 export function PokemonNumberInput({
     inputName,
     type,
-    value,
     placeholder,
     disabled,
+    min,
+    max,
+    step,
     onChange,
     setEdit,
     edit,
@@ -252,6 +257,9 @@ export function PokemonNumberInput({
             value={String(edit[inputName] ?? "")}
             placeholder={placeholder}
             disabled={disabled}
+            min={min}
+            max={max}
+            step={step}
         />
     );
 }
