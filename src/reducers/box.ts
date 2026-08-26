@@ -60,8 +60,16 @@ export function box(
             return action.syncWith.box;
         case ADD_BOX: {
             const { name, background = "grass-meadow", inheritFrom } = action;
-            const id = state.length;
-            const position = state.length;
+            // Use max+1 so deleting a non-last custom box does not reuse an
+            // existing id/position (state.length collides after gaps).
+            const id =
+                state.reduce((max, current) => Math.max(max, current.id), -1) +
+                1;
+            const position =
+                state.reduce(
+                    (max, current) => Math.max(max, current.position ?? 0),
+                    -1,
+                ) + 1;
             if (state.map((b) => b.name).includes(name)) {
                 throw new Error("Cannot name a box the same as a current one.");
             }
