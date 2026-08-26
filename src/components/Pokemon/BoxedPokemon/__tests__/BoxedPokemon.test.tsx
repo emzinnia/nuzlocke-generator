@@ -18,4 +18,21 @@ describe(BoxedPokemonBase.name, () => {
             PokemonFixtures.Pikachu.nickname,
         );
     });
+
+    it("uses auto width for compact boxed Pokemon without hiding details", async () => {
+        // @ts-expect-error - Test props may not match full interface
+        const props: BoxedPokemonProps = {
+            ...PokemonFixtures.Pikachu,
+            style: { ...styleDefaults, template: "Compact" },
+        };
+
+        const { container } = render(<BoxedPokemonBase {...props} />);
+        const boxedPokemon = container.firstElementChild as HTMLElement;
+
+        expect(boxedPokemon.style.width).toBe("auto");
+        await waitFor(() => screen.getByTestId("boxed-pokemon-name"));
+        expect(screen.getByTestId("boxed-pokemon-name").textContent).toContain(
+            PokemonFixtures.Pikachu.nickname,
+        );
+    });
 });
