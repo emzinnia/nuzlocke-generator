@@ -101,7 +101,11 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
     const useGameOfOriginColor =
         poke.gameOfOrigin &&
         poke.style.displayGameOriginForBoxedAndDead &&
+        poke.style.displayGameOriginForDeadPokemon !== false &&
         poke.style.displayBackgroundInsteadOfBadge;
+    const displayGameOrigin =
+        poke.style.displayGameOriginForBoxedAndDead &&
+        poke.style.displayGameOriginForDeadPokemon !== false;
     const EMMA_MODE = feature.emmaMode;
 
     if (isMinimal && isCompactWithIcons) {
@@ -172,7 +176,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                         <div data-testid="cause-of-death">
                             {poke.causeOfDeath}
                         </div>
-                        {style.displayGameOriginForBoxedAndDead &&
+                        {displayGameOrigin &&
                             !poke.style.displayBackgroundInsteadOfBadge &&
                             poke.gameOfOrigin && (
                                 <span
@@ -242,7 +246,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                         {poke.level}
                     </div>
                     <div data-testid="cause-of-death">{poke.causeOfDeath}</div>
-                    {style.displayGameOriginForBoxedAndDead &&
+                    {displayGameOrigin &&
                         !poke.style.displayBackgroundInsteadOfBadge &&
                         poke.gameOfOrigin && (
                             <span
@@ -328,7 +332,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                 >
                     {poke.causeOfDeath}
                 </div>
-                {style.displayGameOriginForBoxedAndDead &&
+                {displayGameOrigin &&
                     !poke.style.displayBackgroundInsteadOfBadge &&
                     poke.gameOfOrigin && (
                         <span

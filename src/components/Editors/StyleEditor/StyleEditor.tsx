@@ -817,6 +817,60 @@ export class StyleEditorBase extends React.Component<
                     }
                 >
                     <Checkbox
+                        checked={
+                            props.style.displayGameOriginForBoxedPokemon !==
+                            false
+                        }
+                        name="displayGameOriginForBoxedPokemon"
+                        label="Display Game Origin for Boxed Pokémon"
+                        onChange={(e) => editCheckboxEvent(e, props, "displayGameOriginForBoxedPokemon")}
+                    />
+                </div>
+
+                <div
+                    className={styleEdit}
+                    style={
+                        {
+                            marginLeft: "1rem",
+                            opacity: props.style
+                                .displayGameOriginForBoxedAndDead
+                                ? "1"
+                                : "0.3",
+                            pointerEvents: props.style
+                                .displayGameOriginForBoxedAndDead
+                                ? undefined
+                                : "none",
+                        } as React.CSSProperties
+                    }
+                >
+                    <Checkbox
+                        checked={
+                            props.style.displayGameOriginForDeadPokemon !==
+                            false
+                        }
+                        name="displayGameOriginForDeadPokemon"
+                        label="Display Game Origin for Dead Pokémon"
+                        onChange={(e) => editCheckboxEvent(e, props, "displayGameOriginForDeadPokemon")}
+                    />
+                </div>
+
+                <div
+                    className={styleEdit}
+                    style={
+                        {
+                            marginLeft: "1rem",
+                            opacity: props.style
+                                .displayGameOriginForBoxedAndDead
+                                ? "1"
+                                : "0.3",
+                            pointerEvents: props.style
+                                .displayGameOriginForBoxedAndDead
+                                ? undefined
+                                : "none",
+                        } as React.CSSProperties
+                    }
+                >
+                    <Checkbox
                         checked={props.style.displayBackgroundInsteadOfBadge}
                         name="displayBackgroundInsteadOfBadge"
                         label="Display Background Color Instead of Badge"

@@ -23,9 +23,12 @@ const determineWidth = (isMinimal, numerator): string => {
 // @TODO: fix this messy prop soup
 export const BoxedPokemonBase = (poke: BoxedPokemonProps) => {
     const isMinimal = poke?.style?.minimalBoxedLayout;
+    const displayGameOrigin =
+        poke?.style?.displayGameOriginForBoxedAndDead &&
+        poke?.style?.displayGameOriginForBoxedPokemon !== false;
     const useGameOfOriginColor =
         poke?.gameOfOrigin &&
-        poke?.style?.displayGameOriginForBoxedAndDead &&
+        displayGameOrigin &&
         poke?.style?.displayBackgroundInsteadOfBadge;
     return (
         <div
@@ -81,7 +84,7 @@ export const BoxedPokemonBase = (poke: BoxedPokemonProps) => {
                     >
                         {poke?.nickname} {GenderElement(poke?.gender)}{" "}
                         {poke?.level ? <span>lv. {poke?.level}</span> : null}
-                        {poke?.style?.displayGameOriginForBoxedAndDead &&
+                        {displayGameOrigin &&
                             !poke?.style?.displayBackgroundInsteadOfBadge &&
                             poke?.gameOfOrigin && (
                                 <span
