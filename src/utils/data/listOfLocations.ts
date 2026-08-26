@@ -116,6 +116,7 @@ export const locations = {
         "Ice Path",
         "Ilex Forest",
         "Lake of Rage",
+        "Mahogany Town",
         "Mt. Mortar",
         "Mt. Silver",
         "National Park",
