@@ -694,6 +694,23 @@ export class StyleEditorBase extends React.Component<
 
                 <div className={styleEdit}>
                     <Checkbox
+                        checked={Boolean(
+                            props.style.sortDeadPokemonByDeathTimestamp,
+                        )}
+                        name="sortDeadPokemonByDeathTimestamp"
+                        label="Sort Dead Pokémon by Death Order"
+                        onChange={(e) =>
+                            editCheckboxEvent(
+                                e,
+                                props,
+                                "sortDeadPokemonByDeathTimestamp",
+                            )
+                        }
+                    />
+                </div>
+
+                <div className={styleEdit}>
+                    <Checkbox
                         checked={props.style.minimalChampsLayout}
                         name="minimalChampsLayout"
                         label="Minimal Champs Layout"

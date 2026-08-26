@@ -37,6 +37,7 @@ export interface Styles {
     minimalBoxedLayout: boolean;
     minimalTeamLayout: boolean;
     minimalDeadLayout: boolean;
+    sortDeadPokemonByDeathTimestamp: boolean;
     minimalChampsLayout: boolean;
     movesPosition: OrientationType;
     oldMetLocationFormat: boolean;
@@ -88,6 +89,7 @@ export const styleDefaults: Styles = {
     minimalBoxedLayout: false,
     minimalTeamLayout: false,
     minimalDeadLayout: false,
+    sortDeadPokemonByDeathTimestamp: false,
     minimalChampsLayout: true,
     movesPosition: "horizontal" as OrientationType,
     oldMetLocationFormat: false,
