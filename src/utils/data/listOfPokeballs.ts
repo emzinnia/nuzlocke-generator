@@ -24,6 +24,7 @@ export const listOfPokeballs = [
     "repeat",
     "safari",
     "sport",
+    "strange",
     "timer",
     "ultra",
 ];
