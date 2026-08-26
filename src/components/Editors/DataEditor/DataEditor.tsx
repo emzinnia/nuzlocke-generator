@@ -35,6 +35,7 @@ import {
     isValidShowdownFormat,
 } from "utils/parseShowdownFormat";
 import { Generation, getGameGeneration } from "utils/getters/getGameGeneration";
+import { getNextPokemonPosition } from "utils/generateEmptyPokemon";
 // @TODO: fix codegen imports
 // import codegen from 'codegen.macro';
 import { BoxMappings } from "parsers/utils/boxMappings";
@@ -594,19 +595,32 @@ export class DataEditorBase extends React.Component<
             this.isEmptyPokemonSlot(state.pokemon[0]);
 
         const existingPokemon = hasSingleEmptySlot ? [] : state.pokemon;
-        const startPosition = existingPokemon.length;
-        const newPokemon = parseShowdownFormat(showdownData, {
+        // Use max(position)+1 — array length collides after deletions leave gaps.
+        const startPosition = getNextPokemonPosition(existingPokemon);
+        const parsedPokemon = parseShowdownFormat(showdownData, {
             startPosition,
             generation: showdownGeneration,
         });
 
-        if (newPokemon.length === 0) {
+        if (parsedPokemon.length === 0) {
             showToast({
                 message: "No Pokemon found in the input.",
                 intent: Intent.WARNING,
             });
             return;
         }
+
+        // Overflow past 6 Team members into Boxed (same rule as generateEmptyPokemon).
+        let teamCount = existingPokemon.filter(
+            (poke) => poke.status === "Team",
+        ).length;
+        const newPokemon = parsedPokemon.map((poke) => {
+            const status = teamCount >= 6 ? "Boxed" : "Team";
+            if (status === "Team") {
+                teamCount += 1;
+            }
+            return { ...poke, status };
+        });
 
         // Merge new Pokemon with existing
         const mergedPokemon = [...existingPokemon, ...newPokemon];
