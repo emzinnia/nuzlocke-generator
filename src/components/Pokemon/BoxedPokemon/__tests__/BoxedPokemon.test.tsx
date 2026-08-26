@@ -18,4 +18,20 @@ describe(BoxedPokemonBase.name, () => {
             PokemonFixtures.Pikachu.nickname,
         );
     });
+
+    it("hides the pokemon name when configured", async () => {
+        // @ts-expect-error - Test props may not match full interface
+        const props: BoxedPokemonProps = {
+            ...PokemonFixtures.Pikachu,
+            level: 25,
+            style: { ...styleDefaults, hidePokemonNames: true },
+        };
+
+        render(<BoxedPokemonBase {...props} />);
+
+        await waitFor(() => screen.getByTestId("boxed-pokemon-name"));
+        const text = screen.getByTestId("boxed-pokemon-name").textContent;
+        expect(text).not.toContain(PokemonFixtures.Pikachu.nickname);
+        expect(text).toContain("lv. 25");
+    });
 });

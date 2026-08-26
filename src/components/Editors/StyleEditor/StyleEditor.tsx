@@ -667,6 +667,15 @@ export class StyleEditorBase extends React.Component<
 
                 <div className={styleEdit}>
                     <Checkbox
+                        checked={props.style.hidePokemonNames}
+                        name="hidePokemonNames"
+                        label="Hide Pokémon Names"
+                        onChange={(e) => editCheckboxEvent(e, props, "hidePokemonNames")}
+                    />
+                </div>
+
+                <div className={styleEdit}>
+                    <Checkbox
                         checked={props.style.minimalTeamLayout}
                         name="minimalTeamLayout"
                         label="Minimal Team Layout"
