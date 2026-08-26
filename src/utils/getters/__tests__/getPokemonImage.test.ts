@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => {
             const map: Record<string, number> = {
                 Ditto: 132,
                 Pikachu: 25,
+                Shaymin: 492,
                 Unfezant: 521,
                 Gyarados: 130,
                 Dugtrio: 51,
@@ -278,6 +279,19 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             );
             expect(shiny).toBe(
                 "cors(https://www.serebii.net/Shiny/SWSH/025.png)",
+            );
+        });
+
+        it("uses SWSH shiny assets for shiny Pokemon in Sword sprite mode", async () => {
+            const result = await getPokemonImage({
+                species: "Shaymin",
+                name: imageGame("Sword"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: true,
+            });
+
+            expect(result).toBe(
+                "cors(https://www.serebii.net/Shiny/SWSH/492.png)",
             );
         });
 
