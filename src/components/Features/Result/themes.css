@@ -354,6 +354,10 @@
 .hexagons.team-size-5 .pokemon-container:nth-of-type(5) {
     transform: translate(-248px, -62px);
 }
+.hexagons.team-size-5.vertical-trainer .pokemon-container:nth-of-type(4),
+.hexagons.team-size-5.vertical-trainer .pokemon-container:nth-of-type(5) {
+    transform: translate(0, -62px);
+}
 .hexagons.team-size-4 .team-container,
 .hexagons.team-size-3 .team-container,
 .hexagons.team-size-2 .team-container,
