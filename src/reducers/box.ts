@@ -7,8 +7,9 @@ import {
     ADD_BOX,
     DELETE_BOX,
     UPDATE_BOXES,
+    REORDER_BOXES,
 } from "actions";
-import { Boxes } from "models";
+import { Box, Boxes } from "models";
 
 const defaultBoxes: Boxes = [
     {
@@ -33,6 +34,24 @@ const defaultBoxes: Boxes = [
     },
 ];
 
+const getBoxPosition = (box: Box, index: number) => box.position ?? index;
+
+const sortBoxesByPosition = (boxes: Boxes) =>
+    boxes
+        .map((box, index) => ({ box, index }))
+        .sort((a, b) => {
+            const positionA = getBoxPosition(a.box, a.index);
+            const positionB = getBoxPosition(b.box, b.index);
+            return positionA - positionB || a.index - b.index;
+        })
+        .map(({ box }) => box);
+
+const normalizeBoxPositions = (boxes: Boxes) =>
+    sortBoxesByPosition(boxes).map((box, position) => ({
+        ...box,
+        position,
+    }));
+
 export function box(
     state = defaultBoxes,
     action: Action<
@@ -43,6 +62,7 @@ export function box(
         | ADD_BOX
         | DELETE_BOX
         | UPDATE_BOXES
+        | REORDER_BOXES
     >,
 ) {
     switch (action.type) {
@@ -52,7 +72,7 @@ export function box(
                 return state;
             }
             const newBox = { ...box, ...action.edits };
-            return [...state.filter((box) => box.id !== action.id), newBox];
+            return state.map((box) => (box.id === action.id ? newBox : box));
         }
         case REPLACE_STATE:
             return action.replaceWith.box;
@@ -69,6 +89,31 @@ export function box(
         }
         case DELETE_BOX:
             return state.filter((box) => box.id !== action.id);
+        case REORDER_BOXES: {
+            const orderedBoxes = normalizeBoxPositions(state);
+            const draggedIndex = orderedBoxes.findIndex(
+                (box) => box.id === action.draggedId,
+            );
+            const targetIndex = orderedBoxes.findIndex(
+                (box) => box.id === action.targetId,
+            );
+            if (
+                draggedIndex === -1 ||
+                targetIndex === -1 ||
+                draggedIndex === targetIndex
+            ) {
+                return state;
+            }
+
+            const reorderedBoxes = [...orderedBoxes];
+            const [draggedBox] = reorderedBoxes.splice(draggedIndex, 1);
+            reorderedBoxes.splice(targetIndex, 0, draggedBox);
+
+            return reorderedBoxes.map((box, position) => ({
+                ...box,
+                position,
+            }));
+        }
         case UPDATE_BOXES:
             if (state[0].position == null) {
                 return state.map((box, index) => ({

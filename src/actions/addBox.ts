@@ -36,3 +36,21 @@ export function updateBoxes(): Action<UPDATE_BOXES> {
         type: UPDATE_BOXES,
     };
 }
+
+export type REORDER_BOXES = "REORDER_BOXES";
+export const REORDER_BOXES: REORDER_BOXES = "REORDER_BOXES";
+
+export type reorderBoxes = (
+    draggedId: number,
+    targetId: number,
+) => Action<REORDER_BOXES>;
+export function reorderBoxes(
+    draggedId: number,
+    targetId: number,
+): Action<REORDER_BOXES> {
+    return {
+        type: REORDER_BOXES,
+        draggedId,
+        targetId,
+    };
+}
