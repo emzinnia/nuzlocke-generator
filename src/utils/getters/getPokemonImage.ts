@@ -14,9 +14,15 @@ import { State } from "state";
 import { GenderElementProps } from "components";
 import { getImages } from "components/Common/Shared/ImagesDrawer";
 
+const speciesWithFemaleTcgAsset = ["Meowstic", "Pyroar", "Unfezant"];
+
 const handleTcgTransforms = (species?: string, gender?: GenderElementProps) => {
     if (gender === "Female") {
-        if (species && significantGenderDifferenceList.includes(species))
+        if (
+            species &&
+            significantGenderDifferenceList.includes(species) &&
+            speciesWithFemaleTcgAsset.includes(species)
+        )
             return `${species}-f`;
     }
     return species;
