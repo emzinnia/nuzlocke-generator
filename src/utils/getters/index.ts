@@ -13,4 +13,5 @@ export * from "./getIconFormeSuffix";
 export * from "./getMoveType";
 export * from "./getPatchlessVersion";
 export * from "./getPokemonImage";
+export * from "./getPokemonBackgroundStyle";
 export * from "./getSpriteIcon";
