@@ -18,4 +18,18 @@ describe(BoxedPokemonBase.name, () => {
             PokemonFixtures.Pikachu.nickname,
         );
     });
+
+    it("renders a shiny indicator for shiny boxed pokemon", async () => {
+        // @ts-expect-error - Test props may not match full interface
+        const props: BoxedPokemonProps = {
+            ...PokemonFixtures.Pikachu,
+            shiny: true,
+            style: styleDefaults,
+        };
+
+        render(<BoxedPokemonBase {...props} />);
+
+        await waitFor(() => screen.getByTestId("boxed-pokemon-name"));
+        expect(screen.getByAltText("Shiny")).toBeTruthy();
+    });
 });

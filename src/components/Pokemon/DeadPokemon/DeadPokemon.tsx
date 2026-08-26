@@ -23,6 +23,7 @@ import {
 import { selectPokemon } from "actions";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { State } from "state";
+import { PokemonShinyIndicator } from "components/Pokemon/PokemonShinyIndicator";
 
 const spriteStyle = (style: Styles) => {
     if (style.spritesMode) {
@@ -164,7 +165,9 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                         }}
                     >
                         <div>
-                            {poke.nickname} {GenderElement(poke.gender)} Levels{" "}
+                            {poke.nickname}
+                            <PokemonShinyIndicator shiny={poke.shiny} />{" "}
+                            {GenderElement(poke.gender)} Levels{" "}
                             {poke.metLevel}
                             &mdash;
                             {poke.level}
@@ -237,7 +240,9 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                     }}
                 >
                     <div>
-                        {poke.nickname} {GenderElement(poke.gender)} Levels{" "}
+                        {poke.nickname}
+                        <PokemonShinyIndicator shiny={poke.shiny} />{" "}
+                        {GenderElement(poke.gender)} Levels{" "}
                         {poke.metLevel}&mdash;
                         {poke.level}
                     </div>
@@ -316,7 +321,9 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
             )}
             <div className="dead-pokemon-info">
                 <div className="pokemon-d-nickname">
-                    {poke.nickname} {GenderElement(poke.gender)}
+                    {poke.nickname}
+                    <PokemonShinyIndicator shiny={poke.shiny} />{" "}
+                    {GenderElement(poke.gender)}
                 </div>
                 <div className="pokemon-levels">
                     Levels {poke.metLevel}&mdash;{poke.level}

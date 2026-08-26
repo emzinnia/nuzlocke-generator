@@ -27,4 +27,19 @@ describe("<DeadPokemon />", () => {
             poke.causeOfDeath,
         );
     });
+
+    it("renders a shiny indicator for shiny dead pokemon", () => {
+        render(
+            <DeadPokemonBase
+                game={{ name: "Red", customName: "" }}
+                style={styleDefaults}
+                selectPokemon={vi.fn()}
+                minimal={false}
+                {...poke}
+                shiny
+            />,
+        );
+
+        expect(screen.getByAltText("Shiny")).toBeTruthy();
+    });
 });
