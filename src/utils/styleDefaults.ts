@@ -58,6 +58,7 @@ export interface Styles {
     boxedPokemonPerLine: number;
     displayGameOriginForBoxedAndDead: boolean;
     displayBackgroundInsteadOfBadge: boolean;
+    displayTeamBackgroundInsteadOfBadge: boolean;
     displayExtraData: boolean;
     useAutoHeight: boolean;
     displayItemAsText: boolean;
@@ -106,6 +107,7 @@ export const styleDefaults: Styles = {
     boxedPokemonPerLine: 6,
     displayGameOriginForBoxedAndDead: false,
     displayBackgroundInsteadOfBadge: false,
+    displayTeamBackgroundInsteadOfBadge: false,
     displayExtraData: true,
     useAutoHeight: true,
     usePokemonGBAFont: false,

@@ -334,4 +334,88 @@ describe("TeamPokemonInfo", () => {
             "White 2",
         );
     });
+
+    it("keeps team game origin as a badge when only boxed background is enabled", () => {
+        const styleWithBoxedBackground = {
+            ...baseStyle,
+            displayGameOriginForBoxedAndDead: true,
+            displayBackgroundInsteadOfBadge: true,
+        };
+
+        render(
+            <TeamPokemonInfo
+                generation={Generation.Gen5}
+                style={styleWithBoxedBackground}
+                pokemon={{
+                    ...basePokemon,
+                    status: "Team",
+                    gameOfOrigin: "White 2",
+                }}
+                customTypes={[]}
+                linkedPokemon={undefined}
+                game={baseGame}
+            />,
+        );
+
+        expect(screen.getByTestId("pokemon-gameoforigin").textContent).toBe(
+            "White 2",
+        );
+    });
+
+    it("uses game origin background for boxed pokemon when boxed background is enabled", () => {
+        const styleWithBoxedBackground = {
+            ...baseStyle,
+            displayGameOriginForBoxedAndDead: true,
+            displayBackgroundInsteadOfBadge: true,
+        };
+        const { container } = render(
+            <TeamPokemonInfo
+                generation={Generation.Gen5}
+                style={styleWithBoxedBackground}
+                pokemon={{
+                    ...basePokemon,
+                    status: "Boxed",
+                    gameOfOrigin: "White 2",
+                }}
+                customTypes={[]}
+                linkedPokemon={undefined}
+                game={baseGame}
+            />,
+        );
+
+        expect(screen.queryByTestId("pokemon-gameoforigin")).toBeNull();
+        expect(
+            (container.querySelector(".pokemon-info") as HTMLElement).style
+                .backgroundColor,
+        ).toBe("rgb(242, 232, 232)");
+    });
+
+    it("uses game origin background for team pokemon only when team background is enabled", () => {
+        const styleWithTeamBackground = {
+            ...baseStyle,
+            displayGameOriginForBoxedAndDead: true,
+            displayBackgroundInsteadOfBadge: true,
+            displayTeamBackgroundInsteadOfBadge: true,
+        };
+        const { container } = render(
+            <TeamPokemonInfo
+                generation={Generation.Gen5}
+                style={styleWithTeamBackground}
+                pokemon={{
+                    ...basePokemon,
+                    status: "Team",
+                    gameOfOrigin: "White 2",
+                }}
+                customTypes={[]}
+                linkedPokemon={undefined}
+                game={baseGame}
+            />,
+        );
+
+        expect(screen.queryByTestId("pokemon-gameoforigin")).toBeNull();
+        expect(
+            (container.querySelector(".pokemon-info") as HTMLElement).style
+                .backgroundColor,
+        ).toBe("rgb(242, 232, 232)");
+    });
 });
