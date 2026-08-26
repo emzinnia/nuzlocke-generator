@@ -34,6 +34,10 @@
 .default-light .result-notes {
     color: #111;
 }
+.default-light .highlight-moment {
+    background: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.16);
+}
 .default-light .ng-container {
     background-color: #eee;
 }

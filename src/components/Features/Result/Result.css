@@ -35,6 +35,35 @@
     font-size: 1.25rem;
     font-weight: bold;
 }
+.highlight-moments-container {
+    margin: 0.75rem auto;
+    max-width: 80%;
+}
+.highlight-moments-list {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    list-style-position: inside;
+    margin: 0;
+    padding: 0;
+}
+.highlight-moment {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+}
+.highlight-moment-pokemon,
+.highlight-moment-mvp {
+    font-weight: bold;
+}
+.highlight-moment-mvp {
+    color: #f4d35e;
+}
+.highlight-moment-note {
+    margin: 0.25rem 0 0;
+    white-space: pre-wrap;
+}
 .ng-container {
     padding-bottom: 1rem;
     background-color: #383840;
@@ -462,4 +491,3 @@
 .pokemon-checkpoint.obtained {
     display: flex;
 }
-

@@ -721,6 +721,15 @@ export class StyleEditorBase extends React.Component<
 
                 <div className={styleEdit}>
                     <Checkbox
+                        checked={props.style.displayHighlightMoments}
+                        name="displayHighlightMoments"
+                        label="Display Highlight Moments"
+                        onChange={(e) => editCheckboxEvent(e, props, "displayHighlightMoments")}
+                    />
+                </div>
+
+                <div className={styleEdit}>
+                    <Checkbox
                         checked={props.style.displayStats}
                         name="displayStats"
                         label="Display Stats"
