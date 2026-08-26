@@ -20,6 +20,18 @@ import { getBadges, Game } from "utils";
 
 export type Checkpoints = Badge[];
 
+const getCheckpointIndex = (
+    state: Checkpoints,
+    name: Badge["name"],
+    index?: number,
+) => {
+    if (typeof index === "number" && state[index]?.name === name) {
+        return index;
+    }
+
+    return state.map((n) => n.name).indexOf(name);
+};
+
 export function checkpoints(
     state: Checkpoints = getBadges("None"),
     action: ReturnType<
@@ -45,9 +57,11 @@ export function checkpoints(
         case SYNC_STATE_FROM_HISTORY:
             return action.syncWith.checkpoints ?? state;
         case EDIT_CHECKPOINT: {
-            const checkpointIndex = state
-                .map((n) => n.name)
-                .indexOf(action.name);
+            const checkpointIndex = getCheckpointIndex(
+                state,
+                action.name,
+                action.index,
+            );
             const checkpoint = state[checkpointIndex];
             if (checkpointIndex < 0 || !checkpoint) {
                 return state;
@@ -65,6 +79,13 @@ export function checkpoints(
             return newState;
         }
         case DELETE_CHECKPOINT:
+            if (
+                typeof action.index === "number" &&
+                state[action.index]?.name === action.name
+            ) {
+                return state.filter((_, index) => index !== action.index);
+            }
+
             return state.filter((c) => c.name !== action.name);
         default:
             return state;
