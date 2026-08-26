@@ -7,6 +7,7 @@ import {
     formatBallText,
     typeToColor,
     getContrastColor,
+    movesByType,
     matchNatureToToxtricityForme,
     Species,
     normalizePokeballName,
@@ -413,12 +414,27 @@ export function PokemonMoveInput({
         () => (v: string) => customMoveMap?.find((m) => m?.move === v)?.type,
         [customMoveMap],
     );
+    const moveSuggestionListId = `move-suggestions-${selectedId || "pokemon"}`;
+    const moveSuggestions = useMemo(() => {
+        const standardMoves = Object.values(movesByType).flat();
+        const customMoves =
+            customMoveMap
+                ?.map((move) => move?.move)
+                .filter((move): move is string => Boolean(move)) ?? [];
+
+        return Array.from(new Set([...standardMoves, ...customMoves])).sort(
+            (a, b) => a.localeCompare(b),
+        );
+    }, [customMoveMap]);
 
     return (
         <ErrorBoundary>
             <TagInput
                 fill
                 leftIcon="ninja"
+                inputProps={{
+                    list: moveSuggestionListId,
+                }}
                 tagProps={(v, _i) => {
                     // @TODO: Fix inconsitencies with bad parameter types
                     const background =
@@ -445,7 +461,13 @@ export function PokemonMoveInput({
                     }
                 }}
                 values={Array.isArray(value) ? value.map(String) : []}
-            />
+            >
+                <datalist id={moveSuggestionListId}>
+                    {moveSuggestions.map((move) => (
+                        <option key={move} value={move} />
+                    ))}
+                </datalist>
+            </TagInput>
         </ErrorBoundary>
     );
 }
