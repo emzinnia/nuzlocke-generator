@@ -1,7 +1,7 @@
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
 
-import { ResultBase, BackspriteMontage } from "../Result";
+import { ResultBase, BackspriteMontage, TopBarItems } from "../Result";
 import { styleDefaults, generateEmptyPokemon } from "utils";
 import { Editor, Box, Pokemon } from "models";
 
@@ -9,6 +9,17 @@ type ResultBaseProps = React.ComponentProps<typeof ResultBase>;
 type PokemonSpeciesProps = { species: string };
 type PokemonProp = { pokemon: Pokemon };
 type ChildrenProps = { children?: React.ReactNode };
+type SelectProps = {
+    children?: React.ReactNode;
+    className?: string;
+    popoverProps?: {
+        popoverClassName?: string;
+    };
+};
+
+const selectMockState = vi.hoisted(() => ({
+    latestProps: undefined as SelectProps | undefined,
+}));
 
 vi.mock("components/Pokemon/TeamPokemon/TeamPokemon", () => ({
     TeamPokemon: ({ pokemon }: PokemonProp) => (
@@ -60,6 +71,13 @@ vi.mock("components/Common/Shared/PokemonImage", () => ({
     }) => <>{children("https://img.test")}</>,
 }));
 
+vi.mock("@blueprintjs/select", () => ({
+    Select: (props: SelectProps) => {
+        selectMockState.latestProps = props;
+        return <div data-testid="zoom-select">{props.children}</div>;
+    },
+}));
+
 vi.mock("components/ui/shims", () => ({
     Select: ({ children }: ChildrenProps) => <div data-testid="zoom-select">{children}</div>,
     Button: ({ children }: ChildrenProps) => <button>{children}</button>,
@@ -94,6 +112,21 @@ const createPokemon = () => [
 ];
 
 describe("<ResultBase />", () => {
+    it("applies dark mode to the zoom select popover", () => {
+        render(
+            <TopBarItems
+                editorDarkMode={true}
+                setZoomLevel={vi.fn()}
+                currentZoomLevel={1}
+            />,
+        );
+
+        expect(selectMockState.latestProps?.className).toContain("dark");
+        expect(
+            selectMockState.latestProps?.popoverProps?.popoverClassName,
+        ).toContain("dark");
+    });
+
     it("renders team and status sections with rules", () => {
         render(
             <ResultBase
