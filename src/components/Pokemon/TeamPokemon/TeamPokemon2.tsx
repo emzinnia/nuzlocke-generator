@@ -57,7 +57,10 @@ const LinkedPokemon = ({ linkedPokemon, style }) => {
 const TeamCheckpointsDisplay = ({ game, pokemon, style }) => {
     return (
         <ErrorBoundary>
-            <div className="flex flex-wrap" style={{ maxWidth: "14rem" }}>
+            <div
+                className="flex flex-wrap pokemon-checkpoints"
+                style={{ maxWidth: "14rem" }}
+            >
                 <CheckpointsDisplay
                     className="pokemon-checkpoint"
                     game={game}

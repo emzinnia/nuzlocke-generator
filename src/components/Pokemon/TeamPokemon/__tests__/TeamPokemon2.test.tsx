@@ -34,4 +34,27 @@ describe(TeamPokemon.name, () => {
             "Pikachu",
         );
     });
+
+    it("renders custom HTML checkpoints with the wrapping checkpoint class", () => {
+        const { container } = render(
+            <TeamPokemon
+                {...baseProps}
+                customHTML='<div data-testid="checkpoint-html">{{checkpoints}}</div>'
+                pokemon={{
+                    ...Pikachu,
+                    checkpoints: [
+                        { name: "Boulder Badge", image: "boulder-badge" },
+                    ],
+                }}
+            />,
+        );
+
+        const checkpointWrapper = container.querySelector(
+            ".pokemon-checkpoints",
+        );
+
+        expect(screen.getByTestId("checkpoint-html")).toBeTruthy();
+        expect(checkpointWrapper).toBeTruthy();
+        expect(checkpointWrapper?.className).toContain("flex");
+    });
 });
