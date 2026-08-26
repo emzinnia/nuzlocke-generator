@@ -57,6 +57,20 @@ type IconURLArgs = Pick<
     "id" | "species" | "forme" | "shiny" | "gender" | "customIcon" | "egg"
 >;
 
+export const getCustomIconImageStyle = (
+    imageStyle?: React.CSSProperties,
+): React.CSSProperties => {
+    const iconSize = imageStyle?.width ?? imageStyle?.height ?? "32px";
+
+    return {
+        ...imageStyle,
+        height: imageStyle?.height ?? iconSize,
+        maxWidth: iconSize,
+        objectFit: "contain",
+        width: iconSize,
+    };
+};
+
 const usePokemonDrag = (props: BasePokemonIconProps) => {
     const [, dragRef] = useDrag({
         type: "POKEMON_ICON",
@@ -188,11 +202,11 @@ export function PokemonIconPlain({
                 <PokemonImage url={customIcon}>
                     {(image) => (
                         <ResizedImage
-                            // Keep layout consistent with default icons, but cap custom icon data at 64x64.
+                            // Resize custom data, then render it inside the same box as default icons.
                             src={image}
                             width={64}
                             height={64}
-                            style={imageStyle}
+                            style={getCustomIconImageStyle(imageStyle)}
                             alt={species}
                         />
                     )}
