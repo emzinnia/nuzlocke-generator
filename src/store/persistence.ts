@@ -113,6 +113,16 @@ const getPersistedVersion = (envelope: PersistedEnvelope) => {
     }
 };
 
+const deserializePersistedSlice = (value: unknown) => {
+    if (typeof value !== "string") return value;
+
+    try {
+        return JSON.parse(value);
+    } catch {
+        return undefined;
+    }
+};
+
 export const migratePersistedState = (
     state: Partial<State>,
     persistedVersion?: string,
@@ -141,7 +151,9 @@ export const deserializePersistedState = (
         const state: Record<string, unknown> = {};
         for (const [key, value] of Object.entries(envelope)) {
             if (key === "_persist" || PERSIST_BLACKLIST.has(key)) continue;
-            state[key] = typeof value === "string" ? JSON.parse(value) : value;
+            const deserialized = deserializePersistedSlice(value);
+            if (typeof deserialized === "undefined") continue;
+            state[key] = deserialized;
         }
 
         return migratePersistedState(

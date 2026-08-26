@@ -104,6 +104,51 @@ describe("Zustand persistence compatibility", () => {
         unsubscribePersistence();
     });
 
+    it("preserves valid persisted slices when one slice is malformed", async () => {
+        const defaultState = createDefaultState();
+        const legacyEnvelope = JSON.stringify({
+            pokemon: JSON.stringify([
+                {
+                    ...PokemonFixtures.Pikachu,
+                    id: "recoverable-pikachu",
+                    status: "Team",
+                },
+            ]),
+            trainer: "{bad json",
+            style: JSON.stringify({
+                ...defaultState.style,
+                bgColor: "#fedcba",
+                editorDarkMode: true,
+            }),
+            _persist: JSON.stringify({
+                version,
+                rehydrated: true,
+            }),
+        });
+
+        window.localStorage.setItem(PERSIST_KEY, legacyEnvelope);
+
+        const { persistor, store, unsubscribePersistence } = createNuzlockeStore({
+            enableLogger: false,
+            storage: window.localStorage,
+        });
+
+        expect(store.getState().pokemon).toHaveLength(1);
+        expect(store.getState().pokemon[0].id).toBe("recoverable-pikachu");
+        expect(store.getState().style.bgColor).toBe("#fedcba");
+        expect(store.getState().trainer).toEqual(defaultState.trainer);
+
+        await persistor.flush();
+
+        const savedState = deserializePersistedState(
+            window.localStorage.getItem(PERSIST_KEY),
+        );
+        expect(savedState?.pokemon?.[0].id).toBe("recoverable-pikachu");
+        expect(savedState?.style?.bgColor).toBe("#fedcba");
+
+        unsubscribePersistence();
+    });
+
     it("dispatches through Zustand and flushes the current state back to localStorage", async () => {
         const { persistor, store, unsubscribePersistence, zustandStore } =
             createNuzlockeStore({
