@@ -9,10 +9,12 @@ const mocks = vi.hoisted(() => {
             const map: Record<string, number> = {
                 Ditto: 132,
                 Pikachu: 25,
+                Turtwig: 387,
                 Unfezant: 521,
                 Gyarados: 130,
                 Dugtrio: 51,
                 Indeedee: 876,
+                Kleavor: 900,
                 Basculegion: 902,
                 "Mime Jr.": 439,
                 "Mr. Mime": 122,
@@ -278,6 +280,28 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             );
             expect(shiny).toBe(
                 "cors(https://www.serebii.net/Shiny/SWSH/025.png)",
+            );
+        });
+
+        it("uses the SWSH sprite table for BDSP and Legends: Arceus sprite mode", async () => {
+            const bdsp = await getPokemonImage({
+                species: "Turtwig",
+                name: imageGame("Shining Pearl"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: false,
+            });
+            const legendsArceus = await getPokemonImage({
+                species: "Kleavor",
+                name: imageGame("Legends: Arceus"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: true,
+            });
+
+            expect(bdsp).toBe(
+                "cors(https://www.serebii.net/swordshield/pokemon/387.png)",
+            );
+            expect(legendsArceus).toBe(
+                "cors(https://www.serebii.net/Shiny/SWSH/900.png)",
             );
         });
 

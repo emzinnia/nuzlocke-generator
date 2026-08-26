@@ -73,7 +73,8 @@ const getGameName = (name: Game) => {
         name === "Sword" ||
         name === "Shield" ||
         name === "Brilliant Diamond" ||
-        name === "Shining Pearl"
+        name === "Shining Pearl" ||
+        name === "Legends: Arceus"
     ) {
         return "swordshield";
     }
@@ -118,7 +119,8 @@ const getGameNameSerebii = (name: Game) => {
         case "Shield":
         case "Brilliant Diamond":
         case "Shining Pearl":
-            return "swordshield";
+        case "Legends: Arceus":
+            return "SWSH";
         case "Legends: Z-A":
             return "legendsz-a";
         default:
@@ -255,7 +257,14 @@ export async function getPokemonImage({
         }
     }
 
-    if (style?.spritesMode && (name === "Sword" || name === "Shield")) {
+    if (
+        style?.spritesMode &&
+        (name === "Sword" ||
+            name === "Shield" ||
+            name === "Brilliant Diamond" ||
+            name === "Shining Pearl" ||
+            name === "Legends: Arceus")
+    ) {
         if (!shiny) {
             const url = `https://www.serebii.net/${getGameName(
                 name,
