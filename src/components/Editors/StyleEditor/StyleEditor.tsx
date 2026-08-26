@@ -266,6 +266,21 @@ export class StyleEditorBase extends React.Component<
 
                 <div className={styleEdit}>
                     <label
+                        htmlFor="font"
+                        className={cx(Classes.LABEL, Classes.INLINE)}
+                    >
+                        Font Family
+                    </label>
+                    <input
+                        value={props.style.font || ""}
+                        name="font"
+                        onChange={(e) => editEvent(e, props)}
+                        className={Classes.INPUT}
+                    />
+                </div>
+
+                <div className={styleEdit}>
+                    <label
                         htmlFor="itemStyle"
                         className={cx(Classes.LABEL, Classes.INLINE)}
                     >
