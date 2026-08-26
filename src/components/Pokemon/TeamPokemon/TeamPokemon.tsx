@@ -29,6 +29,7 @@ import { PokemonPokeball } from "./PokemonPokeball";
 import { PokemonFriendship } from "./PokemonFriendship";
 import { normalizePokeballName } from "utils";
 import { PokemonExtraDataStats } from "./PokemonExtraDataStats";
+import { getPokemonImageBackgroundStyle } from "../getPokemonImageBackgroundStyle";
 
 export interface TeamPokemonInfoProps {
     generation: Generation;
@@ -76,33 +77,6 @@ const GameOfOriginBadge = ({
         </span>
     );
 };
-
-function getSpriteStyle({ spritesMode, scaleSprites, teamImages }) {
-    if (spritesMode) {
-        if (scaleSprites) {
-            return {
-                backgroundSize: "auto",
-                backgroundRepeat: "no-repeat",
-            };
-        } else {
-            return {
-                backgroundSize: "cover",
-                backgroundRepeat: "no-repeat",
-            };
-        }
-    }
-    if (teamImages === "dream world") {
-        return {
-            backgroundSize: "contain",
-            backgroundRepeat: "no-repeat",
-        };
-    } else {
-        return {
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-        };
-    }
-}
 
 export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
     public render() {
@@ -456,7 +430,7 @@ export class TeamPokemonBase extends React.Component<
         const getFirstType = poke.types ? poke.types[0] : "Normal";
         const getSecondType = poke.types ? poke.types[1] : "Normal";
         const { spritesMode, scaleSprites, teamImages } = style;
-        const spriteStyle = getSpriteStyle({
+        const spriteStyle = getPokemonImageBackgroundStyle({
             spritesMode,
             scaleSprites,
             teamImages,

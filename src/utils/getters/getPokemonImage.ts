@@ -209,7 +209,7 @@ export async function getPokemonImage({
         } else {
             const url = `https://www.serebii.net/Shiny/${capitalize(
                 getGameNameSerebii(name as Game),
-            )}/${leadingZerosNumber}.png`;
+            )}/${leadingZerosNumber}${getForme(forme)}.png`;
 
             return await wrapImageInCORS(url);
         }
@@ -263,7 +263,7 @@ export async function getPokemonImage({
 
             return await wrapImageInCORS(url);
         }
-        const url = `https://www.serebii.net/Shiny/SWSH/${leadingZerosNumber}.png`;
+        const url = `https://www.serebii.net/Shiny/SWSH/${leadingZerosNumber}${getForme(forme)}.png`;
         return await wrapImageInCORS(url);
     }
 
@@ -271,7 +271,7 @@ export async function getPokemonImage({
         const url = shiny
             ? `https://www.serebii.net/Shiny/${getGameNameSerebii(
                   name as Game,
-              )}/${leadingZerosNumber}.png`
+              )}/${leadingZerosNumber}${getForme(forme)}.png`
             : `https://www.serebii.net/${getGameName(name as Game)}/pokemon/${leadingZerosNumber}.png`;
 
         return await wrapImageInCORS(url);
