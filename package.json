@@ -112,7 +112,7 @@
         "zustand": "^5.0.13"
     },
     "devDependencies": {
-        "@babel/core": "^7.10.1",
+        "@babel/core": "^7.29.6",
         "@babel/plugin-syntax-import-meta": "^7.10.4",
         "@blueprintjs/core": "^5.19.0",
         "@blueprintjs/icons": "^5.22.0",
