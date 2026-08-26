@@ -228,6 +228,15 @@ describe("compileQuery", () => {
             expect(match('move:"ice beam"', testTeam[6])).toBe(true);
             expect(match("move:shadow", testTeam[6])).toBe(true); // has "Shadow Ball"
         });
+
+        it("matches extra notes field", () => {
+            const pokemon = createPokemon({
+                extraNotes: "EV spread: 252 HP / 252 Defense",
+            });
+
+            expect(match("extranotes:defense", pokemon)).toBe(true);
+            expect(match("extranotes:speed", pokemon)).toBe(false);
+        });
     });
 
     describe("numeric filters", () => {

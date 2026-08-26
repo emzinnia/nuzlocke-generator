@@ -35,6 +35,7 @@ export interface Pokemon {
     extraData?: object;
     pokeball?: string;
     notes?: string;
+    extraNotes?: string;
     linkedTo?: Pokemon["id"] | null;
     checkpoints?: Checkpoints;
     gift?: boolean;
@@ -78,6 +79,7 @@ export const PokemonKeys: Pokemon = {
     extraData: {},
     pokeball: "None",
     notes: "",
+    extraNotes: "",
     checkpoints: [],
     gift: false,
     linkedTo: null,

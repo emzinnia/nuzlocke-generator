@@ -219,6 +219,30 @@ describe("TeamPokemonInfo", () => {
         expect(screen.queryByTestId("moves")).toBeNull();
     });
 
+    it("renders primary and extra notes as separate multiline blocks", () => {
+        const { container } = render(
+            <TeamPokemonInfo
+                generation={Generation.Gen3}
+                style={baseStyle}
+                pokemon={{
+                    ...basePokemon,
+                    notes: "EVs: 252 HP\n252 Defense",
+                    extraNotes: "Keep for Rival",
+                }}
+                customTypes={[]}
+                linkedPokemon={undefined}
+                game={baseGame}
+            />,
+        );
+
+        const noteBlocks = container.querySelectorAll(".pokemon-notes");
+        expect(noteBlocks).toHaveLength(2);
+        expect(noteBlocks[0].textContent).toBe("EVs: 252 HP\n252 Defense");
+        expect((noteBlocks[0] as HTMLElement).style.whiteSpace).toBe("pre-wrap");
+        expect(noteBlocks[1].textContent).toBe("Keep for Rival");
+        expect(noteBlocks[1].className).toContain("pokemon-extra-notes");
+    });
+
     it("shows Gen 1 special stat label", () => {
         const pokemonWithStats: Pokemon = {
             ...basePokemon,
