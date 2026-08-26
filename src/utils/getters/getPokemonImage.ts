@@ -22,6 +22,20 @@ const handleTcgTransforms = (species?: string, gender?: GenderElementProps) => {
     return species;
 };
 
+const isFemaleGender = (gender?: GenderElementProps) =>
+    gender === "Female" || gender === "f";
+
+const getSwordShieldSpriteSuffix = (
+    forme?: Pokemon["forme"] | keyof typeof Forme,
+    species?: string,
+    gender?: GenderElementProps,
+) => {
+    const formeSuffix = getForme(forme);
+    if (formeSuffix) return formeSuffix;
+    if (species === "Indeedee" && isFemaleGender(gender)) return "-f";
+    return "";
+};
+
 const getGameName = (name: Game) => {
     if (name === "Red" || name === "Blue") return "rb";
     if (
@@ -256,14 +270,15 @@ export async function getPokemonImage({
     }
 
     if (style?.spritesMode && (name === "Sword" || name === "Shield")) {
+        const spriteSuffix = getSwordShieldSpriteSuffix(forme, species, gender);
         if (!shiny) {
             const url = `https://www.serebii.net/${getGameName(
                 name,
-            )}/pokemon/${leadingZerosNumber}${getForme(forme)}.png`;
+            )}/pokemon/${leadingZerosNumber}${spriteSuffix}.png`;
 
             return await wrapImageInCORS(url);
         }
-        const url = `https://www.serebii.net/Shiny/SWSH/${leadingZerosNumber}.png`;
+        const url = `https://www.serebii.net/Shiny/SWSH/${leadingZerosNumber}${spriteSuffix}.png`;
         return await wrapImageInCORS(url);
     }
 
