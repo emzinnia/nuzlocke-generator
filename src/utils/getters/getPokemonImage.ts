@@ -180,6 +180,17 @@ export async function getPokemonImage({
 
     if (
         style?.spritesMode &&
+        (name === "Red" || name === "Blue" || name === "Yellow")
+    ) {
+        const version = name === "Yellow" ? "yellow" : "red-blue";
+        const url =
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-i/${version}/transparent/${regularNumber}.png`;
+
+        return await wrapImageInCORS(url);
+    }
+
+    if (
+        style?.spritesMode &&
         (name === "Black" ||
             name === "Emerald" ||
             name === "Ruby" ||
