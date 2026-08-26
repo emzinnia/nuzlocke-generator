@@ -126,6 +126,8 @@ const getGameNameSerebii = (name: Game) => {
     }
 };
 
+const remoteSpriteUrl = (url: string) => `url(${url})`;
+
 export interface GetPokemonImage {
     customImage?: string;
     forme?: Pokemon["forme"] | keyof typeof Forme;
@@ -205,13 +207,13 @@ export async function getPokemonImage({
                 name,
             )}/pokemon/${leadingZerosNumber}${getForme(forme)}.png`;
 
-            return await wrapImageInCORS(url);
+            return remoteSpriteUrl(url);
         } else {
             const url = `https://www.serebii.net/Shiny/${capitalize(
                 getGameNameSerebii(name as Game),
             )}/${leadingZerosNumber}.png`;
 
-            return await wrapImageInCORS(url);
+            return remoteSpriteUrl(url);
         }
     }
 
@@ -219,11 +221,11 @@ export async function getPokemonImage({
         if (!shiny) {
             const url = `https://serebii.net/scarletviolet/pokemon/new/${leadingZerosNumber}.png`;
 
-            return await wrapImageInCORS(url);
+            return remoteSpriteUrl(url);
         } else {
             const url = `https://serebii.net/Shiny/SV/new/${leadingZerosNumber}.png`;
 
-            return await wrapImageInCORS(url);
+            return remoteSpriteUrl(url);
         }
     }
 
@@ -231,11 +233,11 @@ export async function getPokemonImage({
         if (!shiny) {
             const url = `https://www.serebii.net/pokearth/sprites/dp/${leadingZerosNumber}.png`;
 
-            return await wrapImageInCORS(url);
+            return remoteSpriteUrl(url);
         } else {
             const url = `https://www.serebii.net/Shiny/DP/${leadingZerosNumber}.png`;
 
-            return await wrapImageInCORS(url);
+            return remoteSpriteUrl(url);
         }
     }
 
@@ -245,13 +247,13 @@ export async function getPokemonImage({
                 species as Species,
             )}.png`;
 
-            return await wrapImageInCORS(url);
+            return remoteSpriteUrl(url);
         } else {
             const url = `https://img.pokemondb.net/sprites/firered-leafgreen/shiny/${normalizeSpeciesName(
                 species as Species,
             )}.png`;
 
-            return await wrapImageInCORS(url);
+            return remoteSpriteUrl(url);
         }
     }
 
@@ -261,10 +263,10 @@ export async function getPokemonImage({
                 name,
             )}/pokemon/${leadingZerosNumber}${getForme(forme)}.png`;
 
-            return await wrapImageInCORS(url);
+            return remoteSpriteUrl(url);
         }
         const url = `https://www.serebii.net/Shiny/SWSH/${leadingZerosNumber}.png`;
-        return await wrapImageInCORS(url);
+        return remoteSpriteUrl(url);
     }
 
     if (style?.spritesMode) {
@@ -274,7 +276,7 @@ export async function getPokemonImage({
               )}/${leadingZerosNumber}.png`
             : `https://www.serebii.net/${getGameName(name as Game)}/pokemon/${leadingZerosNumber}.png`;
 
-        return await wrapImageInCORS(url);
+        return remoteSpriteUrl(url);
     }
 
     if (style?.teamImages === "sugimori") {
