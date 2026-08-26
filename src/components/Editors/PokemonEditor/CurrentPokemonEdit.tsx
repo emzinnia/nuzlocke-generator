@@ -713,8 +713,8 @@ export class CurrentPokemonEditBase extends React.Component<
                         inputName="nature"
                         placeholder="Sassy"
                         value={currentPokemon.nature}
-                        type="select"
-                        options={listOfNatures}
+                        type="text"
+                        items={listOfNatures}
                         pokemon={currentPokemon}
                         key={this.state.selectedId + "nature"}
                     />

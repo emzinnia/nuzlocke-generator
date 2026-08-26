@@ -190,20 +190,31 @@ export function PokemonTextInput({
     edit,
     setEdit,
     onChange,
+    items,
 }: PokemonInputProps) {
+    const listId = items?.length ? `${inputName}-options` : undefined;
+
     return (
-        <input
-            onChange={onChange}
-            onInput={(e) => setEdit({ [inputName]: e.currentTarget.value })}
-            type={type}
-            name={inputName}
-            value={String(edit[inputName] ?? "")}
-            placeholder={placeholder}
-            disabled={disabled}
-            className={
-                disabled ? `${Classes.DISABLED} ${Classes.TEXT_MUTED}` : ""
-            }
-        />
+        <>
+            <input
+                onChange={onChange}
+                onInput={(e) => setEdit({ [inputName]: e.currentTarget.value })}
+                type={type}
+                name={inputName}
+                value={String(edit[inputName] ?? "")}
+                placeholder={placeholder}
+                disabled={disabled}
+                list={listId}
+                className={
+                    disabled ? `${Classes.DISABLED} ${Classes.TEXT_MUTED}` : ""
+                }
+            />
+            {listId ? (
+                <datalist id={listId}>
+                    {items?.map((item) => <option key={item} value={item} />)}
+                </datalist>
+            ) : null}
+        </>
     );
 }
 
