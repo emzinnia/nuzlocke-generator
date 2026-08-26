@@ -220,6 +220,23 @@ describe("Gen 3 Save Parser", () => {
             expect(uniqueIds.size).toBe(boxedPokemon.length);
         });
 
+        it("should assign unique positions across boxed Pokemon", async () => {
+            const result = await parseGen3Save(saveData, {
+                boxMappings: [],
+                selectedGame: "Emerald",
+            });
+
+            const boxedPokemon = result.pokemon.filter(
+                (p) => p.status === "Boxed",
+            );
+            const positions = boxedPokemon.map((p) => p.position);
+            expect(boxedPokemon.length).toBeGreaterThan(30);
+            expect(new Set(positions).size).toBe(positions.length);
+            // First box is linear 1..n; second box continues at 31 (BOX_CAPACITY).
+            expect(boxedPokemon[0].position).toBe(1);
+            expect(boxedPokemon[30]?.position).toBe(31);
+        });
+
         it("should parse the first boxed Pokemon moveset correctly", async () => {
             const result = await parseGen3Save(saveData, {
                 boxMappings: [],

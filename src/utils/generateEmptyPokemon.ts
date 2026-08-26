@@ -3,6 +3,23 @@ import { Pokemon } from "models";
 import { sortPokes } from ".";
 import { Types } from "./Types";
 
+/** Next free position without requiring a contiguous 0..n position list. */
+export function getNextPokemonPosition(pokemon?: Pokemon[]): number {
+    if (!pokemon?.length) {
+        return 0;
+    }
+
+    let maxPosition = -1;
+    for (const poke of pokemon) {
+        const position = Number(poke.position);
+        if (Number.isFinite(position) && position > maxPosition) {
+            maxPosition = position;
+        }
+    }
+
+    return maxPosition + 1;
+}
+
 export function generateEmptyPokemon(
     pokemon?: Pokemon[],
     overrides?: Partial<Pokemon>,

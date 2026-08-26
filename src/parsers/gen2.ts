@@ -16,6 +16,8 @@ import { Pokemon } from "models";
 import { parseTime } from "./utils/parseTime";
 import { ParserOptions } from "./utils/parserOptions";
 
+const BOX_CAPACITY = 20;
+
 // Offset	Contents	Size
 // 0x00	Index number of the species	1 byte
 // 0x01	Index number of held item	1 byte
@@ -372,12 +374,16 @@ const parseJohtoBadges = (buf: Buffer) => {
 const transformPokemon = (
     pokemonObject: Gen2PokemonObject,
     status: string,
+    // 1-based box ordinal: party defaults to 1; PC boxes pass boxIndex+1.
     boxIndex: number = 1,
 ) => {
     return pokemonObject.pokemonList
         .map((poke, index) => {
             return {
-                position: (index + 1) * boxIndex,
+                // Linear positions keep entries unique across boxes. The old
+                // (index+1)*boxIndex formula collided heavily (e.g. box0 slot1
+                // and box1 slot0 both became position 2).
+                position: (boxIndex - 1) * BOX_CAPACITY + (index + 1),
                 species: poke.species,
                 status: status,
                 level: poke.level,

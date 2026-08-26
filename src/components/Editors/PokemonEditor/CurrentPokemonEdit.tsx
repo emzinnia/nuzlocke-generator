@@ -7,6 +7,7 @@ import {
     getAdditionalFormes,
     getGameGeneration,
     getListOfTypes,
+    getNextPokemonPosition,
     listOfAbilities,
     listOfItems,
     listOfLocations,
@@ -206,7 +207,9 @@ export class CurrentPokemonEditBase extends React.Component<
             const newPokemon = {
                 ...currentPokemon,
                 id: uuid(),
-                position: currentPokemon.position! + 1,
+                // Allocate past the current max so copies never collide with an
+                // existing mon at position+1 (breaks hotkey nav and ordering).
+                position: getNextPokemonPosition(this.props.pokemon),
             };
             this.props.addPokemon(newPokemon);
         }
