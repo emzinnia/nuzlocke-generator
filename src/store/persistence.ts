@@ -25,23 +25,33 @@ const migrations: Record<string, Migration> = {
     }),
     "1.1.0": (state) => ({
         ...state,
-        customMoveMap: [],
+        customMoveMap: Array.isArray(state.customMoveMap)
+            ? state.customMoveMap
+            : [],
     }),
     "1.1.1": (state) => ({
         ...state,
-        customMoveMap: [],
+        customMoveMap: Array.isArray(state.customMoveMap)
+            ? state.customMoveMap
+            : [],
     }),
     "1.1.2": (state) => ({
         ...state,
-        customMoveMap: [],
+        customMoveMap: Array.isArray(state.customMoveMap)
+            ? state.customMoveMap
+            : [],
     }),
     "1.1.3": (state) => ({
         ...state,
-        customMoveMap: [],
+        customMoveMap: Array.isArray(state.customMoveMap)
+            ? state.customMoveMap
+            : [],
     }),
     "1.1.4": (state) => ({
         ...state,
-        customMoveMap: [],
+        customMoveMap: Array.isArray(state.customMoveMap)
+            ? state.customMoveMap
+            : [],
     }),
     "1.6.0": (state) => ({
         ...state,
@@ -73,11 +83,13 @@ const migrations: Record<string, Migration> = {
     }),
     "1.15.1": (state) => ({
         ...state,
-        excludedAreas: [],
+        excludedAreas: Array.isArray(state.excludedAreas)
+            ? state.excludedAreas
+            : [],
     }),
     "1.16.0": (state) => ({
         ...state,
-        customAreas: [],
+        customAreas: Array.isArray(state.customAreas) ? state.customAreas : [],
     }),
 };
 
@@ -107,7 +119,9 @@ const getPersistedVersion = (envelope: PersistedEnvelope) => {
 
     try {
         const parsed = JSON.parse(persistedMeta);
-        return typeof parsed?.version === "string" ? parsed.version : undefined;
+        if (typeof parsed?.version === "string") return parsed.version;
+        if (typeof parsed?.version === "number") return String(parsed.version);
+        return undefined;
     } catch {
         return undefined;
     }
