@@ -229,11 +229,11 @@ export async function getPokemonImage({
 
     if (style?.spritesMode && (name === "Diamond" || name === "Pearl" || name === "Platinum" || name === "HeartGold" || name === "SoulSilver")) {
         if (!shiny) {
-            const url = `https://www.serebii.net/pokearth/sprites/dp/${leadingZerosNumber}.png`;
+            const url = `https://www.serebii.net/pokearth/sprites/dp/${leadingZerosNumber}${getForme(forme)}.png`;
 
             return await wrapImageInCORS(url);
         } else {
-            const url = `https://www.serebii.net/Shiny/DP/${leadingZerosNumber}.png`;
+            const url = `https://www.serebii.net/Shiny/DP/${leadingZerosNumber}${getForme(forme)}.png`;
 
             return await wrapImageInCORS(url);
         }
