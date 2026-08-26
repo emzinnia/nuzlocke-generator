@@ -50,7 +50,7 @@ export const AdvancedImportOptions = React.forwardRef<
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     const gen3Enabled = import.meta.env.VITE_GEN3_SAVES === "true";
-    const gen4Enabled = import.meta.env.VITE_GEN4_SAVES === "true";
+    const gen4Enabled = import.meta.env.VITE_GEN4_SAVES !== "false";
     const gen5Enabled = import.meta.env.VITE_GEN5_SAVES !== "false";
     
     const gen1And2Games: GameSaveFormat[] = ["RBY", "GS", "Crystal"];
