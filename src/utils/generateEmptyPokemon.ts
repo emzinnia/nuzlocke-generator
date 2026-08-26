@@ -41,6 +41,7 @@ export function generateEmptyPokemon(
         types: [Types.Normal, Types.Normal],
         egg: false,
         gift: false,
+        staticEncounter: false,
         ...(overrides ?? {}),
     };
 }

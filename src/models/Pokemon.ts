@@ -32,6 +32,7 @@ export interface Pokemon {
     gameOfOrigin?: Game;
     egg?: boolean;
     hidden?: boolean;
+    staticEncounter?: boolean;
     extraData?: object;
     pokeball?: string;
     notes?: string;
@@ -75,6 +76,7 @@ export const PokemonKeys: Pokemon = {
     gameOfOrigin: "Red",
     egg: false,
     hidden: false,
+    staticEncounter: false,
     extraData: {},
     pokeball: "None",
     notes: "",

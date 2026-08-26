@@ -131,6 +131,7 @@ export interface NormalizedPokemon {
     shiny: boolean;
     egg: boolean;
     hidden: boolean;
+    staticEncounter: boolean;
     alpha: boolean;
     mvp: boolean;
     gift: boolean;
@@ -179,6 +180,8 @@ export const FIELD_ALIASES: Record<string, keyof NormalizedPokemon> = {
     shiny: "shiny",
     egg: "egg",
     hidden: "hidden",
+    static: "staticEncounter",
+    staticencounter: "staticEncounter",
     alpha: "alpha",
     mvp: "mvp",
     gift: "gift",
@@ -200,6 +203,7 @@ export const BOOLEAN_FIELDS = new Set<string>([
     "shiny",
     "egg",
     "hidden",
+    "staticEncounter",
     "alpha",
     "mvp",
     "gift",
@@ -207,5 +211,4 @@ export const BOOLEAN_FIELDS = new Set<string>([
 
 /** Fields that are numeric */
 export const NUMERIC_FIELDS = new Set<string>(["level", "metLevel"]);
-
 

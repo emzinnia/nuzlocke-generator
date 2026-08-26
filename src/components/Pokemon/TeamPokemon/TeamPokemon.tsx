@@ -494,6 +494,7 @@ export class TeamPokemonBase extends React.Component<
             "causeOfDeath",
             "shiny",
             "champion",
+            "staticEncounter",
             "num",
             "wonderTradedFor",
             "mvp",

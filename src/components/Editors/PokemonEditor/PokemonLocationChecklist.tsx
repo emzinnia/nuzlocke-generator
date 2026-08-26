@@ -78,7 +78,12 @@ const LocationIcon = ({
     pokemon: Pokemon[];
     poke?: Pokemon;
 }) => {
-    if (poke && !poke.hidden && (!poke.gift || !excludeGifts)) {
+    if (
+        poke &&
+        !poke.hidden &&
+        !poke.staticEncounter &&
+        (!poke.gift || !excludeGifts)
+    ) {
         return (
             <>
                 <Icon icon="tick" />
@@ -125,6 +130,7 @@ export const PokemonLocationChecklist = ({
         const counts = new Map<string, number>();
         for (const poke of pokemon) {
             if (!poke || poke.hidden) continue;
+            if (poke.staticEncounter) continue;
             if (currentGame !== "None" && poke.gameOfOrigin !== currentGame)
                 continue;
             if (!encounterSet.has(poke.met)) continue;
@@ -148,6 +154,7 @@ export const PokemonLocationChecklist = ({
         for (const poke of pokemon) {
             const met = poke?.met?.trim();
             if (!met) continue;
+            if (poke.staticEncounter) continue;
             if (currentGame !== "None" && poke.gameOfOrigin !== currentGame)
                 continue;
             const key = met.toLocaleLowerCase();
@@ -312,7 +319,8 @@ export const PokemonLocationChecklist = ({
                 style={{ fontSize: "80%", marginTop: "0.5rem" }}
             >
                 Tip: Pokémon with the &quot;hidden&quot; attribute are a great
-                option for including Pokemon that got away on a certain route!
+                option for including Pokemon that got away on a certain route.
+                Mark static encounters to keep them out of route counts.
             </Callout>
         </div>
     );
