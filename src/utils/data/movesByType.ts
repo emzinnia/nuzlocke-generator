@@ -91,6 +91,7 @@ export const movesByType: MovesByType = {
         "Ruination",
         "Comeuppance",
         "Wicked Torque",
+        "Ceaseless Edge",
     ],
     Dragon: [
         "Dragon Claw",
@@ -174,6 +175,7 @@ export const movesByType: MovesByType = {
         "Electro Shot",
         "Thunderclap",
         "Supercell Slam",
+        "Wildbolt Storm",
     ],
     Fairy: [
         "Dazzling Gleam",
@@ -206,6 +208,7 @@ export const movesByType: MovesByType = {
         "Sparkly Swirl",
         "Magical Torque",
         "Alluring Voice",
+        "Springtide Storm",
     ],
     Fighting: [
         "Seismic Toss",
@@ -265,6 +268,8 @@ export const movesByType: MovesByType = {
         "Collision Course",
         "Combat Torque",
         "Upper Hand",
+        "Triple Arrows",
+        "Victory Dance",
     ],
     Fire: [
         "Fire Blast",
@@ -311,6 +316,7 @@ export const movesByType: MovesByType = {
         "Armor Cannon",
         "Blazing Torque",
         "Burning Bulwark",
+        "Raging Fury",
     ],
     Flying: [
         "FeatherDance",
@@ -343,6 +349,7 @@ export const movesByType: MovesByType = {
         "Pluck",
         "HP Flying",
         "Dual Wingbeat",
+        "Bleakwind Storm",
     ],
     Ghost: [
         "Nightmare",
@@ -376,6 +383,8 @@ export const movesByType: MovesByType = {
         "Astral Barrage",
         "Last Respects",
         "Rage Fist",
+        "Bitter Malice",
+        "Infernal Parade",
     ],
     Grass: [
         "Frenzy Plant",
@@ -434,6 +443,7 @@ export const movesByType: MovesByType = {
         "Spicy Extract",
         "Flower Trick",
         "Trailblaze",
+        "Chloroblast",
     ],
     Ground: [
         "Sand-Attack",
@@ -465,6 +475,8 @@ export const movesByType: MovesByType = {
         "Stomping Tantrum",
         "HP Ground",
         "Scorching Sands",
+        "Headlong Rush",
+        "Sandsear Storm",
     ],
     Ice: [
         "Hail",
@@ -498,6 +510,7 @@ export const movesByType: MovesByType = {
         "Ice Spinner",
         "Chilly Reception",
         "Snowscape",
+        "Mountain Gale",
     ],
     Normal: [
         "Bide",
@@ -704,6 +717,7 @@ export const movesByType: MovesByType = {
         "Tidy Up",
         "Hyper Drill",
         "Tera Sandstorm",
+        "Power Shift",
     ],
     Poison: [
         "Acid",
@@ -740,6 +754,8 @@ export const movesByType: MovesByType = {
         "Mortal Spin",
         "Noxious Torque",
         "Malignant Chain",
+        "Barb Barrage",
+        "Dire Claw",
     ],
     Psychic: [
         "Barrier",
@@ -814,6 +830,11 @@ export const movesByType: MovesByType = {
         "Lumina Crash",
         "Twin Beam",
         "Psychic Noise",
+        "Esper Wing",
+        "Lunar Blessing",
+        "Mystical Power",
+        "Psyshield Bash",
+        "Take Heart",
     ],
     Rock: [
         "Rock Throw",
@@ -839,6 +860,7 @@ export const movesByType: MovesByType = {
         "Meteor Beam",
         "Salt Cure",
         "Mighty Cleave",
+        "Stone Axe",
     ],
     Steel: [
         "Anchor Shot",
@@ -876,6 +898,7 @@ export const movesByType: MovesByType = {
         "Gigaton Hammer",
         "Hard Press",
         "Tachyon Cutter",
+        "Shelter",
     ],
     Water: [
         "Brine",
@@ -925,6 +948,7 @@ export const movesByType: MovesByType = {
         "Chilling Water",
         "Aqua Cutter",
         "Triple Dive",
+        "Wave Crash",
     ],
 
     Shadow: [
