@@ -41,4 +41,13 @@ describe("<GameEditor />", () => {
 
         expect(props.editGame).toHaveBeenCalledWith({ customName: "My Run" });
     });
+
+    it("updates randomized mode when toggled", () => {
+        const props = createProps();
+        render(<GameEditorBase {...props} />);
+
+        fireEvent.click(screen.getByLabelText("Randomized"));
+
+        expect(props.editGame).toHaveBeenCalledWith({ randomized: true });
+    });
 });
