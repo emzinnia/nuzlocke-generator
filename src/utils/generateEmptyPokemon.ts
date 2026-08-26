@@ -37,6 +37,7 @@ export function generateEmptyPokemon(
         met: "",
         metLevel: undefined,
         nature: "None",
+        characteristic: "",
         ability: "",
         types: [Types.Normal, Types.Normal],
         egg: false,

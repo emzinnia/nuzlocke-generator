@@ -12,6 +12,7 @@ export interface Pokemon {
     met?: string;
     metLevel?: number;
     nature?: string;
+    characteristic?: string;
     ability?: string;
     moves?: string[];
     causeOfDeath?: string;
@@ -54,6 +55,7 @@ export const PokemonKeys: Pokemon = {
     met: "",
     metLevel: 0,
     nature: "",
+    characteristic: "",
     ability: "",
     moves: [],
     causeOfDeath: "",

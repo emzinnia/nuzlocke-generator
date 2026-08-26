@@ -343,6 +343,23 @@ describe("searchPokemon", () => {
         expect(matchedIds.size).toBe(4);
     });
 
+    it("filters by characteristic", () => {
+        const { matchedIds } = searchPokemon(
+            [
+                ...testTeam,
+                createPokemon({
+                    id: "8",
+                    species: "Raichu",
+                    characteristic: "Alert to sounds",
+                }),
+            ],
+            "characteristic:sounds",
+        );
+
+        expect(matchedIds.size).toBe(1);
+        expect(matchedIds.has("8")).toBe(true);
+    });
+
     it("filters by negation", () => {
         const { matchedIds } = searchPokemon(testTeam, "!species:Bulbasaur");
         expect(matchedIds.size).toBe(6);

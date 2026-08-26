@@ -123,6 +123,7 @@ export interface NormalizedPokemon {
     item: string; // lowercase
     ability: string; // lowercase
     nature: string; // lowercase
+    characteristic: string; // lowercase
     level: number;
     metLevel: number;
     status: string; // lowercase (box name)
@@ -166,6 +167,8 @@ export const FIELD_ALIASES: Record<string, keyof NormalizedPokemon> = {
     item: "item",
     ability: "ability",
     nature: "nature",
+    characteristic: "characteristic",
+    char: "characteristic",
     level: "level",
     lvl: "level",
     lv: "level",
@@ -207,5 +210,4 @@ export const BOOLEAN_FIELDS = new Set<string>([
 
 /** Fields that are numeric */
 export const NUMERIC_FIELDS = new Set<string>(["level", "metLevel"]);
-
 
