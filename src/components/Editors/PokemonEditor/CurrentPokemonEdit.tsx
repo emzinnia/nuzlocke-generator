@@ -652,6 +652,7 @@ export class CurrentPokemonEditBase extends React.Component<
                                 );
                                 this.props.selectPokemon(this.state.selectedId);
                             }}
+                            key={this.state.selectedId + "species"}
                         />
                     </ErrorBoundary>
                     <CurrentPokemonInput
@@ -688,6 +689,7 @@ export class CurrentPokemonEditBase extends React.Component<
                             this.props.editPokemon(edit, this.state.selectedId);
                             this.props.selectPokemon(this.state.selectedId);
                         }}
+                        key={this.state.selectedId + "met"}
                     />
                     <CurrentPokemonInput
                         labelName="Met Level"
