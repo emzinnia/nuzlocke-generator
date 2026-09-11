@@ -162,6 +162,7 @@ export class TrainerResultBase extends React.Component<TrainerResultProps> {
 
     public render() {
         const { trainer, game, style, orientation, checkpoints } = this.props;
+        const displayGameName = game.customName || game.name;
         const isVertical = orientation === "vertical";
         const baseDivStyle = isVertical
             ? { padding: "2px" }
@@ -199,7 +200,7 @@ export class TrainerResultBase extends React.Component<TrainerResultProps> {
                         padding: "2px",
                     }}
                 >
-                    {game.customName || game.name}
+                    {displayGameName}
                 </div>
                 {trainer.image ? (
                     <img
@@ -214,7 +215,7 @@ export class TrainerResultBase extends React.Component<TrainerResultProps> {
                     </div>
                 ) : (
                     <div style={baseDivStyle} className="nuzlocke-title">
-                        {this.props.game.name} Nuzlocke
+                        {displayGameName} Nuzlocke
                     </div>
                 )}
                 {feature.resultv2 ? (
