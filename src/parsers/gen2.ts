@@ -97,6 +97,11 @@ const OFFSETS = {
         [0x79e0, 0x79e0 + 1102],
     ],
 };
+const PARTY_CAPACITY = 6;
+const BOX_CAPACITY = 20;
+const PARTY_POKEMON_SIZE = 48;
+const BOX_POKEMON_SIZE = 32;
+const POKEMON_NAME_SIZE = 11;
 
 const CRYSTAL_OFFSETS = {
     PLAYER_MONEY: [0x23dc, 0x23dc + 3],
@@ -341,15 +346,17 @@ const getSpeciesList = (buf: Buffer) => {
 
 const getPokemonList = (
     buf: Buffer,
-    entries: number = 6,
+    entries: number = PARTY_CAPACITY,
     boxed: boolean = false,
 ) => {
+    if (entries <= 0) return [];
     const party = splitUp(Buffer.from(buf), entries);
     const pokes = party.map((box) => parsePokemon(box, boxed));
     return pokes;
 };
 
-const getPokemonNames = (buf: Buffer, entries: number = 6) => {
+const getPokemonNames = (buf: Buffer, entries: number = PARTY_CAPACITY) => {
+    if (entries <= 0) return [];
     const names = splitUp(Buffer.from(buf), entries);
     const pokes = names.map((name) => convertWithCharMap(name, true));
     return pokes;
@@ -414,30 +421,33 @@ const makeFileSlicer = (file) => (offset: number[]) => {
 
 export const parsePokemonList = (
     buf: Buffer,
-    entries = 6,
+    entries = PARTY_CAPACITY,
 ): Gen2PokemonObject => {
     const data = Buffer.from(buf);
-    const isBoxed = entries > 6 ? true : false;
+    const isBoxed = entries > PARTY_CAPACITY ? true : false;
+    const maxEntries = isBoxed ? BOX_CAPACITY : PARTY_CAPACITY;
     const entriesUsed = data[0x00];
+    const parsedEntries = Math.min(entriesUsed, maxEntries);
     const speciesListEnd = 0x01 + entries + 1;
     const speciesList = getSpeciesList(
-        Buffer.from(data.slice(0x01, speciesListEnd)),
+        Buffer.from(data.slice(0x01, 0x01 + parsedEntries)),
     );
     const pokemonListAddress = speciesListEnd;
+    const pokemonSize = isBoxed ? BOX_POKEMON_SIZE : PARTY_POKEMON_SIZE;
     const pokemonListAddressEnd =
-        pokemonListAddress + (isBoxed ? 32 : 48) * entries;
-    const otsAddress = pokemonListAddressEnd;
-    const otsAddressEnd = otsAddress + 11 * entries;
-    const pokemonNamesAddress = otsAddressEnd;
-    const pokemonNamesAddressEnd = pokemonNamesAddress + 11 * entries;
+        pokemonListAddress + pokemonSize * parsedEntries;
+    const pokemonNamesAddress =
+        pokemonListAddress + pokemonSize * entries + POKEMON_NAME_SIZE * entries;
+    const pokemonNamesAddressEnd =
+        pokemonNamesAddress + POKEMON_NAME_SIZE * parsedEntries;
     const pokemonList = getPokemonList(
         data.slice(pokemonListAddress, pokemonListAddressEnd),
-        entries,
+        parsedEntries,
         isBoxed,
     );
     const pokemonNames = getPokemonNames(
         data.slice(pokemonNamesAddress, pokemonNamesAddressEnd),
-        entries,
+        parsedEntries,
     );
 
     return {
