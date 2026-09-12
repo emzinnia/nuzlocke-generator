@@ -153,6 +153,58 @@ export class StatsBase extends React.Component<
         );
     }
 
+    private getLevelCapValue() {
+        const value = Number.parseInt(
+            this.props.style.statsOptions.levelCapValue,
+            10,
+        );
+        return Number.isFinite(value) && value > 0 ? value : undefined;
+    }
+
+    private getPokemonOverLevelCap() {
+        const levelCap = this.getLevelCapValue();
+        if (!levelCap) return [];
+
+        return this.props.pokemon
+            .filter((poke) => !poke.hidden && poke.status !== "Dead")
+            .map((poke) => ({
+                ...poke,
+                parsedLevel: Number.parseInt(
+                    poke.level as unknown as string,
+                    10,
+                ),
+            }))
+            .filter(
+                (poke) =>
+                    Number.isFinite(poke.parsedLevel) &&
+                    poke.parsedLevel > levelCap,
+            );
+    }
+
+    private getLevelCapComponent() {
+        const levelCap = this.getLevelCapValue();
+        if (!levelCap) {
+            return <div>Level Cap: Not Set</div>;
+        }
+
+        const pokemonOverCap = this.getPokemonOverLevelCap();
+        const overCapText = pokemonOverCap.length
+            ? pokemonOverCap
+                  .map((poke) => {
+                      const name = poke.nickname?.trim() || poke.species;
+                      return `${name} (${poke.parsedLevel})`;
+                  })
+                  .join(", ")
+            : "None";
+
+        return (
+            <div>
+                <div>Level Cap: {levelCap}</div>
+                <div>Over Level Cap: {overCapText}</div>
+            </div>
+        );
+    }
+
     private getShinies() {
         if (!this.numberOfShinies) {
             return "None";
@@ -208,6 +260,9 @@ export class StatsBase extends React.Component<
                     {this.props.pokemon.length &&
                     style.statsOptions.averageLevelDetailed
                         ? this.getAverageLevelDetailedComponent()
+                        : null}
+                    {style.statsOptions.levelCap
+                        ? this.getLevelCapComponent()
                         : null}
                     {style.statsOptions.mostCommonKillers ? (
                         <div>
