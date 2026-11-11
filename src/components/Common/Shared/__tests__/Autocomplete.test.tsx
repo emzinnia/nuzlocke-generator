@@ -64,6 +64,95 @@ describe("<Autcomplete />", () => {
         });
     });
 
+    it("keeps in-progress text when the suggestion list is a new array", () => {
+        const locations = ["Route 1", "Viridian Forest"];
+
+        const Harness = () => {
+            const [nonce, setNonce] = React.useState(0);
+
+            return (
+                <>
+                    <button type="button" onClick={() => setNonce((n) => n + 1)}>
+                        rerender {nonce}
+                    </button>
+                    <Autocomplete
+                        value=""
+                        onChange={() => {}}
+                        items={[...locations]}
+                    />
+                </>
+            );
+        };
+
+        render(<Harness />);
+        const input = screen.getByTestId("autocomplete") as HTMLInputElement;
+
+        fireEvent.change(input, { target: { value: "Vi" } });
+        expect(input.value).toBe("Vi");
+
+        fireEvent.click(screen.getByRole("button", { name: /rerender/ }));
+
+        expect(input.value).toBe("Vi");
+    });
+
+    it("keeps characters typed after that refresh in the saved value", () => {
+        vi.useFakeTimers();
+        const onChange = vi.fn();
+        const locations = ["Route 1", "Viridian Forest"];
+
+        const Harness = () => {
+            const [nonce, setNonce] = React.useState(0);
+
+            return (
+                <>
+                    <button type="button" onClick={() => setNonce((n) => n + 1)}>
+                        rerender {nonce}
+                    </button>
+                    <Autocomplete
+                        value=""
+                        onChange={onChange}
+                        items={[...locations]}
+                    />
+                </>
+            );
+        };
+
+        render(<Harness />);
+        const input = screen.getByTestId("autocomplete") as HTMLInputElement;
+
+        fireEvent.change(input, { target: { value: "Vi" } });
+        fireEvent.click(screen.getByRole("button", { name: /rerender/ }));
+        fireEvent.change(input, { target: { value: `${input.value}r` } });
+
+        vi.advanceTimersByTime(300);
+
+        expect(onChange).toHaveBeenCalledWith({ target: { value: "Vir" } });
+    });
+
+    it("still replaces the field when the stored value changes", () => {
+        const locations = ["Old Route", "New Route"];
+        const { rerender } = render(
+            <Autocomplete
+                value="Old Route"
+                onChange={() => {}}
+                items={[...locations]}
+            />,
+        );
+        const input = screen.getByTestId("autocomplete") as HTMLInputElement;
+
+        expect(input.value).toBe("Old Route");
+
+        rerender(
+            <Autocomplete
+                value="New Route"
+                onChange={() => {}}
+                items={[...locations]}
+            />,
+        );
+
+        expect(input.value).toBe("New Route");
+    });
+
     it("can be reopened after closing (clears pending blur close timeout)", async () => {
         vi.useFakeTimers();
 
