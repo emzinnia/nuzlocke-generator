@@ -66,12 +66,18 @@ export function Autocomplete({
     const closeTimeoutRef = React.useRef<number | undefined>(undefined);
 
     const delayedValue = useDebounceCallback((e) => onChange(e), 300);
+    // Met location passes a freshly spread array on every editor render.
+    // History commits about 300ms after a save, so that render lands while
+    // the next characters are only in this input. Sync from `value` only;
+    // a new list identity must not throw those characters away.
+    const itemsRef = React.useRef(items);
+    itemsRef.current = items;
 
     React.useEffect(() => {
         setValue(value);
-        setVisibleItems(filter(items, value));
+        setVisibleItems(filter(itemsRef.current, value));
         // setIsOpen(false);
-    }, [value, items]);
+    }, [value]);
 
     const changeEvent =
         (innerEvent: boolean = true) =>
