@@ -797,6 +797,16 @@ const validateBlock = (save: Buffer, block: BlockInfo) => {
     );
 };
 
+// The 16-byte footer begins immediately after the checksum mirror table.
+// Its first u32 is the slot's save counter (Project Pokemon BW/B2W2 research;
+// magic 0x31053527 follows at +0x08). An erased slot is all 0xFF.
+const readSaveCount = (save: Buffer, layout: Layout) => {
+    const offset = layout.mainSize - 0x100 + layout.checksumInfoLength;
+    if (offset + 4 > save.length) return 0;
+    const count = save.readUInt32LE(offset);
+    return count === 0xffffffff ? 0 : count;
+};
+
 const scoreSave = (save: Buffer, layout: Layout) => {
     const footerChecksumValid = validateChecksumFooter(save, layout);
     const validBlockCount = layout.blocks.filter((block) =>
@@ -805,6 +815,7 @@ const scoreSave = (save: Buffer, layout: Layout) => {
     return {
         footerChecksumValid,
         validBlockCount,
+        saveCount: readSaveCount(save, layout),
         score: (footerChecksumValid ? 1000 : 0) + validBlockCount,
     };
 };
@@ -855,7 +866,12 @@ const selectActiveSave = (buffer: Buffer, preferred?: Gen5Game): ActiveSave => {
             const score = scoreSave(data, layout);
             return { layout, baseOffset, data, ...score };
         })
-        .sort((a, b) => b.score - a.score);
+        .sort((a, b) => {
+            if (a.score !== b.score) return b.score - a.score;
+            // A healthy cartridge keeps the previous save checksum-valid.
+            // The slot the game just wrote has the higher counter.
+            return b.saveCount - a.saveCount;
+        });
 
     const best = candidates[0];
     if (!best || (!best.footerChecksumValid && best.validBlockCount === 0)) {
