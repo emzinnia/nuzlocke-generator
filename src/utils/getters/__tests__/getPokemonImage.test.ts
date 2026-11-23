@@ -281,16 +281,84 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
             );
         });
 
-        it("uses generic serebii URL builder for other games when spritesMode is true", async () => {
+        it("uses pokearth sprites for Gen 1 and Gen 2 games whose old serebii paths 404", async () => {
+            const cases = [
+                ["Blue", "rb"],
+                ["Red", "rb"],
+                ["Green", "green"],
+                ["Yellow", "yellow"],
+                ["Gold", "gold"],
+                ["Silver", "silver"],
+            ] as const;
+
+            for (const [game, dir] of cases) {
+                const result = await getPokemonImage({
+                    species: "Pikachu",
+                    name: imageGame(game),
+                    style: imageStyle({ spritesMode: true }),
+                    shiny: false,
+                });
+
+                expect(result).toBe(
+                    `cors(https://www.serebii.net/pokearth/sprites/${dir}/025.png)`,
+                );
+            }
+        });
+
+        it("keeps Crystal on the working crystal/pokemon path", async () => {
             const result = await getPokemonImage({
                 species: "Pikachu",
-                name: imageGame("Green"),
+                name: imageGame("Crystal"),
                 style: imageStyle({ spritesMode: true }),
                 shiny: false,
             });
 
             expect(result).toBe(
-                "cors(https://www.serebii.net/green/pokemon/025.png)",
+                "cors(https://www.serebii.net/crystal/pokemon/025.png)",
+            );
+        });
+
+        it("keeps Gold shiny sprites on the Shiny/Gold path", async () => {
+            const result = await getPokemonImage({
+                species: "Pikachu",
+                name: imageGame("Gold"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: true,
+            });
+
+            expect(result).toBe("cors(https://www.serebii.net/Shiny/Gold/025.png)");
+        });
+
+        it("builds Let's Go sprite URLs instead of the missing sm path", async () => {
+            const nonShiny = await getPokemonImage({
+                species: "Pikachu",
+                name: imageGame("Let's Go Pikachu"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: false,
+            });
+            const shiny = await getPokemonImage({
+                species: "Pikachu",
+                name: imageGame("Let's Go Eevee"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: true,
+            });
+
+            expect(nonShiny).toBe(
+                "cors(https://www.serebii.net/letsgopikachueevee/pokemon/025.png)",
+            );
+            expect(shiny).toBe("cors(https://www.serebii.net/Shiny/LetsGo/025.png)");
+        });
+
+        it("builds Legends: Arceus sprite URLs instead of the missing sm path", async () => {
+            const result = await getPokemonImage({
+                species: "Pikachu",
+                name: imageGame("Legends: Arceus"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: false,
+            });
+
+            expect(result).toBe(
+                "cors(https://www.serebii.net/legendsarceus/pokemon/025.png)",
             );
         });
     });

@@ -80,7 +80,33 @@ const getGameName = (name: Game) => {
     if (name === "Legends: Z-A") {
         return "legendsz-a";
     }
+    if (name === "Let's Go Eevee" || name === "Let's Go Pikachu") {
+        return "letsgopikachueevee";
+    }
+    if (name === "Legends: Arceus") {
+        return "legendsarceus";
+    }
     return "sm";
+};
+
+// Serebii moved these generations off `/{game}/pokemon/` onto pokearth.
+// The old paths 404, so sprite mode renders an empty image.
+const getPokearthSpriteDir = (name?: Game) => {
+    switch (name) {
+        case "Red":
+        case "Blue":
+            return "rb";
+        case "Green":
+            return "green";
+        case "Yellow":
+            return "yellow";
+        case "Gold":
+            return "gold";
+        case "Silver":
+            return "silver";
+        default:
+            return undefined;
+    }
 };
 
 const getGameNameSerebii = (name: Game) => {
@@ -121,6 +147,9 @@ const getGameNameSerebii = (name: Game) => {
             return "swordshield";
         case "Legends: Z-A":
             return "legendsz-a";
+        case "Let's Go Eevee":
+        case "Let's Go Pikachu":
+            return "LetsGo";
         default:
             return "SM";
     }
@@ -268,6 +297,13 @@ export async function getPokemonImage({
     }
 
     if (style?.spritesMode) {
+        const pokearthDir = getPokearthSpriteDir(name);
+        if (pokearthDir && !shiny) {
+            const url = `https://www.serebii.net/pokearth/sprites/${pokearthDir}/${leadingZerosNumber}.png`;
+
+            return await wrapImageInCORS(url);
+        }
+
         const url = shiny
             ? `https://www.serebii.net/Shiny/${getGameNameSerebii(
                   name as Game,
