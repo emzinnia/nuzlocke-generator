@@ -158,7 +158,15 @@ html.bp5-dark {
     padding: 0.25rem;
 }
 .current-pokemon-number {
-    width: 6rem;
+    box-sizing: border-box;
+    min-width: 7.5rem;
+    width: 7.5rem;
+}
+.current-pokemon-number input[type="number"] {
+    box-sizing: border-box;
+    min-width: 0;
+    padding-right: 1.5rem;
+    width: 100%;
 }
 .current-pokemon-checkbox {
     display: inline-flex;
