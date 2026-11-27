@@ -14,7 +14,7 @@ export const getForme = (forme) => {
     if (forme === "Kabuki") return "-k";
     if (forme === "Pharaoh") return "-p";
     if (forme === "Mega") return "-m";
-    if (forme === "East Sea") return "e";
+    if (forme === "East Sea") return "-e";
     if (forme === "Eternal Flower") return "-eternal";
     return "";
 };
