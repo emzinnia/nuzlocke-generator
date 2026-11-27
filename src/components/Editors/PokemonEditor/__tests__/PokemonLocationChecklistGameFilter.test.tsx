@@ -67,7 +67,7 @@ describe("<PokemonLocationChecklist /> game filter", () => {
             />,
         );
 
-        fireEvent.change(screen.getByRole("combobox"), {
+        fireEvent.change(screen.getByRole("combobox", { name: /Filter by Game/ }), {
             target: { value: "SoulSilver" },
         });
 
@@ -95,7 +95,7 @@ describe("<PokemonLocationChecklist /> game filter", () => {
             />,
         );
 
-        expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe(
+        expect((screen.getByRole("combobox", { name: /Filter by Game/ }) as HTMLSelectElement).value).toBe(
             "SoulSilver",
         );
 
