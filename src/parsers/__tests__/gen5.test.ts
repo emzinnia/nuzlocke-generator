@@ -166,6 +166,65 @@ describe("Gen 5 Save Parser", () => {
         });
     });
 
+    it("prefers the newer valid Gen 5 slot over an equally valid backup", async () => {
+        const saveData = Buffer.from(
+            readFixture("projectpokemon-base-black-2-boy.sav"),
+        );
+        const slotSize = 0x26000;
+        const newer = saveData.subarray(slotSize, slotSize * 2);
+        const partyOffset = 0x18e00;
+        const partyLength = 0x0534;
+        const partyChecksumOffset = 0x19336;
+        const partyMirrorOffset = 0x25f34;
+        const footerStart = 0x25f00;
+        const footerInfoLength = 0x94;
+        const footerChecksumOffset = 0x25fa2;
+        const saveCountOffset = 0x25f94;
+        const crc16Ccitt = (buffer: Buffer) => {
+            let crc = 0xffff;
+            for (let i = 0; i < buffer.length; i++) {
+                crc ^= buffer[i] << 8;
+                for (let bit = 0; bit < 8; bit++) {
+                    const carry = crc & 0x8000;
+                    crc = (crc << 1) & 0xffff;
+                    if (carry) crc ^= 0x1021;
+                }
+            }
+            return crc & 0xffff;
+        };
+
+        newer.writeUInt8(1, 0x18e04);
+        encryptPk5(Buffer.from(readFixture("pkhex-haxorus.pk5"))).copy(
+            newer,
+            0x18e08,
+        );
+        const partyCrc = crc16Ccitt(
+            newer.subarray(partyOffset, partyOffset + partyLength),
+        );
+        newer.writeUInt16LE(partyCrc, partyChecksumOffset);
+        newer.writeUInt16LE(partyCrc, partyMirrorOffset);
+        const footerCrc = crc16Ccitt(
+            newer.subarray(footerStart, footerStart + footerInfoLength),
+        );
+        newer.writeUInt16LE(footerCrc, footerChecksumOffset);
+        newer.writeUInt32LE(newer.readUInt32LE(saveCountOffset) + 1, saveCountOffset);
+
+        const result = await parseGen5Save(saveData, {
+            boxMappings: [],
+            debug: true,
+        });
+
+        expect(result.debug).toMatchObject({
+            layout: "B2W2",
+            activeBase: "0x26000",
+            footerChecksumValid: true,
+            partyCount: 1,
+        });
+        expect(result.pokemon.map((pokemon) => pokemon.species)).toEqual([
+            "Haxorus",
+        ]);
+    });
+
     it("can select the backup save in a raw B2W2 container", async () => {
         const saveData = Buffer.from(readFixture("projectpokemon-base-black-2-boy.sav"));
         saveData.writeUInt16LE(saveData.readUInt16LE(0x25fa2) ^ 0xffff, 0x25fa2);
