@@ -46,13 +46,19 @@ export function TypeMatchupDialog() {
     );
 
     const handleRemoveFromTeam = React.useCallback((id: string) => {
-        setRemovedFromTeam((prev) => new Set(prev).add(id));
+        const originalStatus = pokemon?.find((poke) => poke.id === id)?.status;
+        // Only persist a box-out for Pokémon that were already on Team.
+        // Preview-only adds (Daycare, custom boxes, Boxed) must not be marked
+        // removed, or Confirm As Team silently rewrites their status to Boxed.
+        if (originalStatus === "Team") {
+            setRemovedFromTeam((prev) => new Set(prev).add(id));
+        }
         setAddedToTeam((prev) => {
             const next = new Set(prev);
             next.delete(id);
             return next;
         });
-    }, []);
+    }, [pokemon]);
 
     const handleAddToTeam = React.useCallback((id: string) => {
         setAddedToTeam((prev) => new Set(prev).add(id));
@@ -64,9 +70,13 @@ export function TypeMatchupDialog() {
     }, []);
 
     const handleConfirmTeam = React.useCallback(() => {
-        // Update removed pokemon to "Boxed" status
+        // Update removed pokemon to "Boxed" status. Skip anyone who was never
+        // on Team so a cancelled preview cannot wipe Daycare/custom-box status.
         removedFromTeam.forEach((id) => {
-            dispatch(editPokemon({ status: "Boxed" }, id));
+            const originalStatus = pokemon?.find((poke) => poke.id === id)?.status;
+            if (originalStatus === "Team") {
+                dispatch(editPokemon({ status: "Boxed" }, id));
+            }
         });
         // Update added pokemon to "Team" status
         addedToTeam.forEach((id) => {
@@ -75,7 +85,7 @@ export function TypeMatchupDialog() {
         // Reset local state
         setRemovedFromTeam(new Set());
         setAddedToTeam(new Set());
-    }, [dispatch, removedFromTeam, addedToTeam]);
+    }, [dispatch, removedFromTeam, addedToTeam, pokemon]);
 
     const hasChanges = removedFromTeam.size > 0 || addedToTeam.size > 0;
 
