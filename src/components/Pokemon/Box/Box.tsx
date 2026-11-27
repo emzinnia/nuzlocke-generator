@@ -187,7 +187,7 @@ export const Box: React.FC<BoxProps> = (props) => {
 
         pokemon
             .filter((p) => p.status === name)
-            .forEach((p) => deletePokemon(p.id));
+            .forEach((p) => dispatch(deletePokemon(p.id)));
 
         setDeleteConfirmationOpen(false);
     };
