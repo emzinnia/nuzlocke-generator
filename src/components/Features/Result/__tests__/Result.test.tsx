@@ -124,6 +124,58 @@ describe("<ResultBase />", () => {
         expect(screen.getByText(/Dead/)).toBeTruthy();
         expect(screen.getByText(/Champs/)).toBeTruthy();
     });
+
+    it("sorts dead Pokemon by death order when enabled", () => {
+        const pokemon = [
+            generateEmptyPokemon([], {
+                id: "team-1",
+                species: "Alpha",
+                status: "Team",
+            }),
+            generateEmptyPokemon([], {
+                id: "dead-late",
+                species: "Late",
+                status: "Dead",
+                deathTimestamp: 200,
+                position: 0,
+            }),
+            generateEmptyPokemon([], {
+                id: "dead-early",
+                species: "Early",
+                status: "Dead",
+                deathTimestamp: 100,
+                position: 1,
+            }),
+        ];
+
+        render(
+            <ResultBase
+                pokemon={pokemon}
+                game={{ name: "Red", customName: "" }}
+                trainer={{ notes: "", badges: [] }}
+                box={boxes}
+                editor={baseEditor}
+                selectPokemon={vi.fn() as unknown as ResultBaseProps["selectPokemon"]}
+                toggleMobileResultView={
+                    vi.fn() as unknown as ResultBaseProps["toggleMobileResultView"]
+                }
+                toggleDialog={vi.fn() as unknown as ResultBaseProps["toggleDialog"]}
+                style={{
+                    ...styleDefaults,
+                    sortDeadPokemonByDeathTimestamp: true,
+                    trainerSectionOrientation: "horizontal",
+                }}
+                rules={[]}
+                customTypes={[]}
+            />,
+        );
+
+        const deadPokemon = screen
+            .getAllByTestId(/^dead-/)
+            .map((node) => node.textContent);
+
+        expect(deadPokemon).toEqual(["Early", "Late"]);
+    });
 });
 
 describe("<BackspriteMontage />", () => {
