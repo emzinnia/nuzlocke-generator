@@ -10,6 +10,7 @@ import {
     matchNatureToToxtricityForme,
     Species,
     normalizePokeballName,
+    movesByType,
 } from "utils";
 import { editPokemon } from "actions";
 
@@ -21,6 +22,30 @@ import { Pokemon } from "models";
 import { cx } from "emotion";
 import { useDebounceCallback } from "@react-hook/debounce";
 import { useMemo } from "react";
+
+const MAX_MOVE_SUGGESTIONS = 8;
+
+const normalizeMoveName = (move: string) => move.trim().toLowerCase();
+
+const getKnownMoves = (customMoveMap: State["customMoveMap"] = []) => {
+    const moves = [
+        ...Object.values(movesByType).flat(),
+        ...customMoveMap.map(({ move }) => move),
+    ].filter((move): move is string => Boolean(move?.trim()));
+
+    const uniqueMoves = new Map<string, string>();
+    moves.forEach((move) => {
+        const normalizedMove = normalizeMoveName(move);
+        if (!uniqueMoves.has(normalizedMove)) {
+            uniqueMoves.set(normalizedMove, move);
+        }
+    });
+
+    return Array.from(uniqueMoves.values()).sort((a, b) => a.localeCompare(b));
+};
+
+const findKnownMove = (moves: string[], move: string) =>
+    moves.find((knownMove) => normalizeMoveName(knownMove) === normalizeMoveName(move));
 
 type PokemonInputValue =
     | Pokemon[keyof Pokemon]
@@ -409,43 +434,211 @@ export function PokemonMoveInput({
     selectedId,
 }: PokemonInputProps) {
     const dispatch = useDispatch();
-    const moves = useMemo(
-        () => (v: string) => customMoveMap?.find((m) => m?.move === v)?.type,
+    const currentMoves = useMemo(
+        () => (Array.isArray(value) ? value.map(String) : []),
+        [value],
+    );
+    const knownMoves = useMemo(
+        () => getKnownMoves(customMoveMap),
         [customMoveMap],
     );
+    const [inputValue, setInputValue] = React.useState("");
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [activeSuggestionIndex, setActiveSuggestionIndex] = React.useState(0);
+    const visibleSuggestions = useMemo(() => {
+        const normalizedInput = normalizeMoveName(inputValue);
+        const selectedMoves = new Set(currentMoves.map(normalizeMoveName));
+        const filteredMoves = knownMoves.filter((move) => {
+            const normalizedMove = normalizeMoveName(move);
+            return (
+                !selectedMoves.has(normalizedMove) &&
+                (normalizedInput === "" || normalizedMove.includes(normalizedInput))
+            );
+        });
+
+        return filteredMoves
+            .sort((a, b) => {
+                const normalizedA = normalizeMoveName(a);
+                const normalizedB = normalizeMoveName(b);
+                const aExact = normalizedA === normalizedInput;
+                const bExact = normalizedB === normalizedInput;
+                const aStartsWith = normalizedA.startsWith(normalizedInput);
+                const bStartsWith = normalizedB.startsWith(normalizedInput);
+
+                if (aExact !== bExact) {
+                    return aExact ? -1 : 1;
+                }
+                if (aStartsWith !== bStartsWith) {
+                    return aStartsWith ? -1 : 1;
+                }
+
+                return a.localeCompare(b);
+            })
+            .slice(0, MAX_MOVE_SUGGESTIONS);
+    }, [currentMoves, inputValue, knownMoves]);
+    const getCustomMoveType = useMemo(
+        () => (v: string) =>
+            customMoveMap?.find(
+                (m) => normalizeMoveName(m?.move ?? "") === normalizeMoveName(v),
+            )?.type,
+        [customMoveMap],
+    );
+    const commitMoves = React.useCallback(
+        (nextMoves: string[]) => {
+            if (selectedId) {
+                dispatch(editPokemon({ moves: nextMoves }, selectedId));
+            }
+        },
+        [dispatch, selectedId],
+    );
+    const addMoveValues = React.useCallback(
+        (values: string[], preferredMove?: string) => {
+            const selectedSuggestion =
+                preferredMove ??
+                (values.length === 1 ? visibleSuggestions[activeSuggestionIndex] : undefined);
+            const nextMoves = [...currentMoves];
+
+            values.forEach((rawValue) => {
+                const trimmedValue = rawValue.trim();
+                if (!trimmedValue) {
+                    return;
+                }
+                const move =
+                    findKnownMove(knownMoves, trimmedValue) ??
+                    selectedSuggestion ??
+                    trimmedValue;
+                const normalizedMove = normalizeMoveName(move);
+
+                if (!nextMoves.some((existingMove) => normalizeMoveName(existingMove) === normalizedMove)) {
+                    nextMoves.push(move);
+                }
+            });
+
+            commitMoves(nextMoves);
+            setInputValue("");
+            setIsOpen(false);
+            setActiveSuggestionIndex(0);
+
+            return true;
+        },
+        [
+            activeSuggestionIndex,
+            commitMoves,
+            currentMoves,
+            knownMoves,
+            visibleSuggestions,
+        ],
+    );
+    const addMoves = React.useCallback(
+        (values: string[]) => addMoveValues(values),
+        [addMoveValues],
+    );
+    const removeMove = React.useCallback(
+        (_move: React.ReactNode, index: number) => {
+            commitMoves(currentMoves.filter((_, moveIndex) => moveIndex !== index));
+        },
+        [commitMoves, currentMoves],
+    );
+    const selectSuggestion = React.useCallback(
+        (move: string) => {
+            addMoveValues([move], move);
+        },
+        [addMoveValues],
+    );
+
+    React.useEffect(() => {
+        setActiveSuggestionIndex(0);
+    }, [inputValue]);
 
     return (
         <ErrorBoundary>
-            <TagInput
-                fill
-                leftIcon="ninja"
-                tagProps={(v, _i) => {
-                    // @TODO: Fix inconsitencies with bad parameter types
-                    const background =
-                        typeToColor(
-                            // @ts-expect-error @TODO: fix mapping
-                            moves(v) ||
-                                getMoveType(v?.toString()?.trim() || ""),
-                            customTypes,
-                        ) || "transparent";
-                    const color = getContrastColor(background);
-                    return {
-                        style: {
-                            background,
-                            color,
-                        },
-                    };
-                }}
-                onChange={(values) => {
-                    const edit = {
-                        moves: values,
-                    };
-                    if (selectedId) {
-                        dispatch(editPokemon(edit, selectedId));
-                    }
-                }}
-                values={Array.isArray(value) ? value.map(String) : []}
-            />
+            <div className="autocomplete">
+                <TagInput
+                    addOnBlur
+                    fill
+                    inputProps={{
+                        "aria-autocomplete": "list",
+                        "aria-expanded": isOpen && visibleSuggestions.length > 0,
+                        list: "pokemon-move-suggestions",
+                    }}
+                    inputValue={inputValue}
+                    leftIcon="ninja"
+                    onAdd={addMoves}
+                    onInputChange={(event) => {
+                        setInputValue(event.currentTarget.value);
+                        setIsOpen(true);
+                    }}
+                    onKeyDown={(event) => {
+                        if (event.key === "Escape") {
+                            setIsOpen(false);
+                            return;
+                        }
+                        if (!visibleSuggestions.length) {
+                            return;
+                        }
+                        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                            event.preventDefault();
+                            const direction = event.key === "ArrowDown" ? 1 : -1;
+                            setIsOpen(true);
+                            setActiveSuggestionIndex((index) =>
+                                Math.min(
+                                    Math.max(index + direction, 0),
+                                    visibleSuggestions.length - 1,
+                                ),
+                            );
+                        }
+                    }}
+                    onRemove={removeMove}
+                    placeholder="Add a move"
+                    tagProps={(v, _i) => {
+                        // @TODO: Fix inconsistencies with bad parameter types
+                        const move = v?.toString()?.trim() || "";
+                        const customMoveType = getCustomMoveType(move) as
+                            | Parameters<typeof typeToColor>[0]
+                            | undefined;
+                        const background =
+                            typeToColor(
+                                customMoveType || getMoveType(move),
+                                customTypes,
+                            ) || "transparent";
+                        const color = getContrastColor(background);
+                        return {
+                            style: {
+                                background,
+                                color,
+                            },
+                        };
+                    }}
+                    values={currentMoves}
+                />
+                <datalist id="pokemon-move-suggestions">
+                    {visibleSuggestions.map((move) => (
+                        <option value={move} key={move} />
+                    ))}
+                </datalist>
+                {isOpen && inputValue && visibleSuggestions.length ? (
+                    <ul className="autocomplete-items has-nice-scrollbars" role="listbox">
+                        {visibleSuggestions.map((move, index) => (
+                            <li
+                                aria-selected={index === activeSuggestionIndex}
+                                className={
+                                    index === activeSuggestionIndex
+                                        ? "autocomplete-selected"
+                                        : undefined
+                                }
+                                key={move}
+                                onMouseDown={(event) => {
+                                    event.preventDefault();
+                                    selectSuggestion(move);
+                                }}
+                                role="option"
+                            >
+                                {move}
+                            </li>
+                        ))}
+                    </ul>
+                ) : null}
+            </div>
         </ErrorBoundary>
     );
 }
