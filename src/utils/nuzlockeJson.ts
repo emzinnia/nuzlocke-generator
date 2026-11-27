@@ -38,3 +38,6 @@ export const stripNuzlockeSaveData = (state: State) => {
 
 export const serializeNuzlockeSaveData = (state: State) =>
     JSON.stringify(stripNuzlockeSaveData(state));
+
+export const formatNuzlockeSaveData = (state: State) =>
+    JSON.stringify(stripNuzlockeSaveData(state), null, 2);

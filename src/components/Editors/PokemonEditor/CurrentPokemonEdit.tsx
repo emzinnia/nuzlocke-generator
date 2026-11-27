@@ -17,7 +17,6 @@ import {
     Species,
 } from "utils";
 import { Pokemon, Editor } from "models";
-import { Boxes } from "models";
 import { CurrentPokemonInput } from "./CurrentPokemonInput";
 import { DeletePokemonButton } from "components/Pokemon/DeletePokemonButton/DeletePokemonButton";
 import { Autocomplete, ErrorBoundary } from "components/Common/Shared";
@@ -94,7 +93,6 @@ export interface CurrentPokemonEditState {
     selectedId: string;
     expandedView: boolean;
     isMoveEditorOpen: boolean;
-    box: Boxes;
     currentPokemon?: Pokemon;
     images?: Image[];
 }
@@ -161,7 +159,6 @@ export class CurrentPokemonEditBase extends React.Component<
         super(props);
         this.state = {
             selectedId: "5",
-            box: [],
             isMoveEditorOpen: false,
             expandedView: false,
             images: [],
@@ -171,15 +168,13 @@ export class CurrentPokemonEditBase extends React.Component<
     public UNSAFE_componentWillMount() {
         this.setState({
             selectedId: this.props.selectedId,
-            box: this.props.box,
         });
     }
 
     public UNSAFE_componentWillReceiveProps(
         nextProps: CurrentPokemonEditProps,
-        prevProps: CurrentPokemonEditProps,
     ) {
-        if (nextProps.selectedId !== prevProps.selectedId) {
+        if (nextProps.selectedId !== this.props.selectedId) {
             this.setState({
                 selectedId: nextProps.selectedId,
             });
@@ -547,6 +542,9 @@ export class CurrentPokemonEditBase extends React.Component<
     public render() {
         const currentPokemon = this.getCurrentPokemon();
         const { customAreas } = this.props;
+        const boxOptions = [...this.props.box]
+            .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+            .map((box) => box.name);
 
         if (currentPokemon == null) {
             return (
@@ -581,7 +579,7 @@ export class CurrentPokemonEditBase extends React.Component<
                         inputName="status"
                         value={currentPokemon.status}
                         type="select"
-                        options={this.state.box.map((n) => n.name)}
+                        options={boxOptions}
                         key={this.state.selectedId + "status"}
                     />
 
@@ -652,6 +650,7 @@ export class CurrentPokemonEditBase extends React.Component<
                                 );
                                 this.props.selectPokemon(this.state.selectedId);
                             }}
+                            key={this.state.selectedId + "species"}
                         />
                     </ErrorBoundary>
                     <CurrentPokemonInput
@@ -679,7 +678,7 @@ export class CurrentPokemonEditBase extends React.Component<
                         placeholder="Pallet Town"
                         value={currentPokemon.met || ""}
                         onChange={(e) => {
-                            if (!e?.target?.value) {
+                            if (!e?.target) {
                                 return;
                             }
                             const edit = {
@@ -688,6 +687,7 @@ export class CurrentPokemonEditBase extends React.Component<
                             this.props.editPokemon(edit, this.state.selectedId);
                             this.props.selectPokemon(this.state.selectedId);
                         }}
+                        key={this.state.selectedId + "met"}
                     />
                     <CurrentPokemonInput
                         labelName="Met Level"
@@ -713,8 +713,8 @@ export class CurrentPokemonEditBase extends React.Component<
                         inputName="nature"
                         placeholder="Sassy"
                         value={currentPokemon.nature}
-                        type="select"
-                        options={listOfNatures}
+                        type="text"
+                        items={listOfNatures}
                         pokemon={currentPokemon}
                         key={this.state.selectedId + "nature"}
                     />

@@ -147,12 +147,50 @@ const getGameNameSerebii = (name: Game) => {
             return "swordshield";
         case "Legends: Z-A":
             return "legendsz-a";
-        case "Let's Go Eevee":
-        case "Let's Go Pikachu":
-            return "LetsGo";
         default:
+            // Let's Go stays on this Sun/Moon sheet. Shiny/LetsGo only has
+            // Pikachu, Eevee, and Krabby, so the other Let's Go shinies 404.
             return "SM";
     }
+};
+
+// legendsarceus/pokemon has no plain file for these dex numbers.
+// The Hisui Pokédex publishes them only with a forme suffix.
+const legendsArceusRequiredSuffix: Record<string, string> = {
+    "058": "-h",
+    "059": "-h",
+    "100": "-h",
+    "101": "-h",
+    "157": "-h",
+    "211": "-h",
+    "503": "-h",
+    "549": "-h",
+    "550": "-w",
+    "570": "-h",
+    "571": "-h",
+    "628": "-h",
+    "705": "-h",
+    "706": "-h",
+    "713": "-h",
+    "724": "-h",
+};
+
+const legendsArceusSpriteSuffix = (
+    forme: GetPokemonImage["forme"],
+    leadingZerosNumber: string,
+) => {
+    const required = legendsArceusRequiredSuffix[leadingZerosNumber];
+    if (required) {
+        return required;
+    }
+    // Johtonian Sneasel is 215.png. Hisuian Sneasel is 215-h.png.
+    if (
+        leadingZerosNumber === "215" &&
+        (forme === "Hisuian" || forme === "hisui")
+    ) {
+        return "-h";
+    }
+    return "";
 };
 
 export interface GetPokemonImage {
@@ -304,11 +342,15 @@ export async function getPokemonImage({
             return await wrapImageInCORS(url);
         }
 
+        const formeSuffix =
+            name === "Legends: Arceus" && !shiny
+                ? legendsArceusSpriteSuffix(forme, leadingZerosNumber)
+                : "";
         const url = shiny
             ? `https://www.serebii.net/Shiny/${getGameNameSerebii(
                   name as Game,
               )}/${leadingZerosNumber}.png`
-            : `https://www.serebii.net/${getGameName(name as Game)}/pokemon/${leadingZerosNumber}.png`;
+            : `https://www.serebii.net/${getGameName(name as Game)}/pokemon/${leadingZerosNumber}${formeSuffix}.png`;
 
         return await wrapImageInCORS(url);
     }

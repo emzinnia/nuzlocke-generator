@@ -16,6 +16,37 @@ import { cx } from "emotion";
 import { useDispatch } from "store/reactZustand";
 import { updateExcludedAreas, updateCustomAreas } from "actions";
 
+export type LocationChecklistSort = "map-order" | "alphabetical";
+
+export const sortEncounterAreas = (
+    areas: string[],
+    sortMode: LocationChecklistSort,
+) => {
+    if (sortMode === "alphabetical") {
+        return [...areas].sort((left, right) =>
+            left.localeCompare(right, undefined, { numeric: true }),
+        );
+    }
+
+    return areas;
+};
+
+const normalizeEncounterArea = (area?: string) =>
+    area?.trim().toLocaleLowerCase() ?? "";
+
+const pokemonMatchesChecklistGame = (
+    poke: Pokemon,
+    currentGame: GameName,
+    runGame: GameName,
+) => {
+    if (currentGame === "None") return true;
+    if (poke.gameOfOrigin === currentGame) return true;
+
+    const legacyCurrentRunOrigin =
+        !poke.gameOfOrigin || poke.gameOfOrigin === "None";
+    return currentGame === runGame && legacyCurrentRunOrigin;
+};
+
 const EncounterMap = ({
     encounterMap,
     style,
@@ -117,17 +148,18 @@ export const PokemonLocationChecklist = ({
         pokemon,
         encounterMap,
         currentGame: GameName,
+        runGame: GameName,
     ) => {
         const encounterTotal = encounterMap.length || 1;
-        const encounterSet = new Set(encounterMap);
+        const encounterSet = new Set(encounterMap.map(normalizeEncounterArea));
 
         // Count pokemon per status in a single pass (avoid boxes × pokemon nested loop)
         const counts = new Map<string, number>();
         for (const poke of pokemon) {
             if (!poke || poke.hidden) continue;
-            if (currentGame !== "None" && poke.gameOfOrigin !== currentGame)
+            if (!pokemonMatchesChecklistGame(poke, currentGame, runGame))
                 continue;
-            if (!encounterSet.has(poke.met)) continue;
+            if (!encounterSet.has(normalizeEncounterArea(poke.met))) continue;
 
             const key = poke.status ?? "";
             counts.set(key, (counts.get(key) ?? 0) + 1);
@@ -141,20 +173,25 @@ export const PokemonLocationChecklist = ({
     };
 
     const [excludeGifts, setExcludeGifts] = React.useState(false);
-    const [currentGame, setCurrentGame] = React.useState<GameName>("None");
+    const [currentGame, setCurrentGame] = React.useState<GameName>(game.name);
+    const [sortMode, setSortMode] =
+        React.useState<LocationChecklistSort>("map-order");
     const dispatch = useDispatch();
+    React.useEffect(() => {
+        setCurrentGame(game.name);
+    }, [game.name]);
     const locationLookup = React.useMemo(() => {
         const map = new Map<string, Pokemon>();
         for (const poke of pokemon) {
             const met = poke?.met?.trim();
             if (!met) continue;
-            if (currentGame !== "None" && poke.gameOfOrigin !== currentGame)
+            if (!pokemonMatchesChecklistGame(poke, currentGame, game.name))
                 continue;
-            const key = met.toLocaleLowerCase();
+            const key = normalizeEncounterArea(met);
             if (!map.has(key)) map.set(key, poke);
         }
         return map;
-    }, [pokemon, currentGame]);
+    }, [pokemon, currentGame, game.name]);
     const encounterMap = React.useMemo(
         () =>
             getEncounterMap(game.name)
@@ -162,9 +199,13 @@ export const PokemonLocationChecklist = ({
                 .filter((area) => !excludedAreas.includes(area)),
         [game.name, excludedAreas, customAreas],
     );
+    const sortedEncounterMap = React.useMemo(
+        () => sortEncounterAreas(encounterMap, sortMode),
+        [encounterMap, sortMode],
+    );
     const totals = React.useMemo(
-        () => calcTotals(boxes, pokemon, encounterMap, currentGame),
-        [boxes, pokemon, encounterMap, currentGame],
+        () => calcTotals(boxes, pokemon, encounterMap, currentGame, game.name),
+        [boxes, pokemon, encounterMap, currentGame, game.name],
     );
     const hideArea = (area: string) => () =>
         dispatch(updateExcludedAreas([...excludedAreas, area]));
@@ -267,6 +308,7 @@ export const PokemonLocationChecklist = ({
                 >
                     <span className={Classes.LABEL}>Filter by Game</span>
                     <HTMLSelect
+                        value={currentGame}
                         style={{ marginLeft: "0.25rem" }}
                         onChange={(e) =>
                             setCurrentGame(e?.target.value as GameName)
@@ -277,12 +319,30 @@ export const PokemonLocationChecklist = ({
                         ))}
                     </HTMLSelect>
                 </label>
+                <label
+                    className={cx(Classes.CONTROL)}
+                    style={{ margin: ".25rem 0" }}
+                >
+                    <span className={Classes.LABEL}>Sort</span>
+                    <HTMLSelect
+                        value={sortMode}
+                        style={{ marginLeft: "0.25rem" }}
+                        onChange={(e) =>
+                            setSortMode(
+                                e?.target.value as LocationChecklistSort,
+                            )
+                        }
+                    >
+                        <option value="map-order">Map Order</option>
+                        <option value="alphabetical">Alphabetical</option>
+                    </HTMLSelect>
+                </label>
             </div>
             <div className="flex" style={{ justifyContent: "center" }}>
                 {buildTotals(totals)}
             </div>
             <EncounterMap
-                encounterMap={encounterMap}
+                encounterMap={sortedEncounterMap}
                 pokemon={pokemon}
                 style={style}
                 currentGame={currentGame}

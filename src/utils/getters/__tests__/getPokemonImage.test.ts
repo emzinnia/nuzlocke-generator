@@ -9,6 +9,11 @@ const mocks = vi.hoisted(() => {
             const map: Record<string, number> = {
                 Ditto: 132,
                 Pikachu: 25,
+                Bulbasaur: 1,
+                Growlithe: 58,
+                Sneasel: 215,
+                Basculin: 550,
+                Decidueye: 724,
                 Unfezant: 521,
                 Gyarados: 130,
                 Dugtrio: 51,
@@ -343,10 +348,21 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
                 shiny: true,
             });
 
+            const shinyBulbasaur = await getPokemonImage({
+                species: "Bulbasaur",
+                name: imageGame("Let's Go Eevee"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: true,
+            });
+
             expect(nonShiny).toBe(
                 "cors(https://www.serebii.net/letsgopikachueevee/pokemon/025.png)",
             );
-            expect(shiny).toBe("cors(https://www.serebii.net/Shiny/LetsGo/025.png)");
+            // Shiny/LetsGo/025.png exists, but 001.png and most of the dex do not.
+            expect(shiny).toBe("cors(https://www.serebii.net/Shiny/SM/025.png)");
+            expect(shinyBulbasaur).toBe(
+                "cors(https://www.serebii.net/Shiny/SM/001.png)",
+            );
         });
 
         it("builds Legends: Arceus sprite URLs instead of the missing sm path", async () => {
@@ -359,6 +375,62 @@ describe("@src/utils/getters/getPokemonImage.ts", () => {
 
             expect(result).toBe(
                 "cors(https://www.serebii.net/legendsarceus/pokemon/025.png)",
+            );
+        });
+
+        it("uses the Hisui forme suffix when the plain legendsarceus file 404s", async () => {
+            const decidueye = await getPokemonImage({
+                species: "Decidueye",
+                name: imageGame("Legends: Arceus"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: false,
+            });
+            const growlithe = await getPokemonImage({
+                species: "Growlithe",
+                name: imageGame("Legends: Arceus"),
+                style: imageStyle({ spritesMode: true }),
+                forme: imageForme("Hisuian"),
+                shiny: false,
+            });
+            const basculin = await getPokemonImage({
+                species: "Basculin",
+                name: imageGame("Legends: Arceus"),
+                style: imageStyle({ spritesMode: true }),
+                shiny: false,
+            });
+
+            expect(decidueye).toBe(
+                "cors(https://www.serebii.net/legendsarceus/pokemon/724-h.png)",
+            );
+            expect(growlithe).toBe(
+                "cors(https://www.serebii.net/legendsarceus/pokemon/058-h.png)",
+            );
+            expect(basculin).toBe(
+                "cors(https://www.serebii.net/legendsarceus/pokemon/550-w.png)",
+            );
+        });
+
+        it("keeps Johtonian Sneasel on 215.png and Hisuian Sneasel on 215-h.png", async () => {
+            const normalSneasel = await getPokemonImage({
+                species: "Sneasel",
+                name: imageGame("Legends: Arceus"),
+                style: imageStyle({ spritesMode: true }),
+                forme: imageForme("Normal"),
+                shiny: false,
+            });
+            const hisuian = await getPokemonImage({
+                species: "Sneasel",
+                name: imageGame("Legends: Arceus"),
+                style: imageStyle({ spritesMode: true }),
+                forme: "hisui" as GetPokemonImage["forme"],
+                shiny: false,
+            });
+
+            expect(normalSneasel).toBe(
+                "cors(https://www.serebii.net/legendsarceus/pokemon/215.png)",
+            );
+            expect(hisuian).toBe(
+                "cors(https://www.serebii.net/legendsarceus/pokemon/215-h.png)",
             );
         });
     });

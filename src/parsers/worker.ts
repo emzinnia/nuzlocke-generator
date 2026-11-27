@@ -41,6 +41,13 @@ type SaveParseResult = {
     [key: string]: unknown;
 };
 
+const getErrorMessage = (err: unknown) =>
+    err instanceof Error
+        ? err.message
+        : typeof err === "string"
+          ? err
+          : "Unknown save parsing error.";
+
 type ParseContext = {
     buf: Buffer;
     gen1Gen2Buf: Buffer;
@@ -141,15 +148,16 @@ const isGen5SaveFormat = (
 
 const detectGen3GameNameFromString = (text: string): GameName | undefined => {
     const s = normalizeForTokenSearch(text);
+    const tokens = getHintTokens(text);
 
     // Prefer longer/more-specific tokens first, then short abbreviations.
     if (s.includes("EMER")) return "Emerald";
 
-    if (s.includes("FIRERED") || s.includes("FR")) return "FireRed";
-    if (s.includes("LEAFGREEN") || s.includes("LG")) return "LeafGreen";
+    if (s.includes("FIRERED") || hasHintToken(tokens, "FR")) return "FireRed";
+    if (s.includes("LEAFGREEN") || hasHintToken(tokens, "LG")) return "LeafGreen";
 
-    if (s.includes("RUBY") || s.includes("RB")) return "Ruby";
-    if (s.includes("SAPPHIRE") || s.includes("SP")) return "Sapphire";
+    if (s.includes("RUBY") || hasHintToken(tokens, "RB")) return "Ruby";
+    if (s.includes("SAPPHIRE") || hasHintToken(tokens, "SP")) return "Sapphire";
 
     return undefined;
 };
@@ -610,10 +618,14 @@ const createParseContext = ({
         isGen3SizedSave(buf)
             ? (fileName ? detectGen3SaveFormatFromString(fileName) : undefined)
             : undefined;
-    const gen5SaveFormatHint = detectGen5SaveFormat(buf, fileName);
+    const gen4SaveFormatFromBuffer =
+        buf.length >= SAVE_SIZE_GEN4 ? detectGen4VariantFromBuffer(buf) : undefined;
+    const gen5SaveFormatHint = gen4SaveFormatFromBuffer
+        ? detectGen5SaveFormat(buf)
+        : detectGen5SaveFormat(buf, fileName);
     const gen4SaveFormatHint =
         buf.length >= SAVE_SIZE_GEN4 && !gen5SaveFormatHint
-            ? detectGen4SaveFormat(buf, fileName)
+            ? (gen4SaveFormatFromBuffer ?? detectGen4SaveFormat(buf, fileName))
             : undefined;
 
     return {
@@ -845,20 +857,25 @@ const getParserHandler = (gameChoice: NonAutoGameSaveFormat) => {
 };
 
 self.onmessage = async ({ data }: MessageData) => {
-    const context = createParseContext(data);
-    const gameChoice = selectGameChoice(context);
-    const handler = getParserHandler(gameChoice);
-    const result = await handler.parse(context, gameChoice);
-    const pokemon = result.pokemon.filter((poke) => poke.species);
-    const detectedGame = handler.detectGame(context, gameChoice, {
-        ...result,
-        pokemon,
-    });
+    try {
+        const context = createParseContext(data);
+        const gameChoice = selectGameChoice(context);
+        const handler = getParserHandler(gameChoice);
+        const result = await handler.parse(context, gameChoice);
+        const pokemon = result.pokemon.filter((poke) => poke.species);
+        const detectedGame = handler.detectGame(context, gameChoice, {
+            ...result,
+            pokemon,
+        });
 
-    self.postMessage({
-        ...result,
-        pokemon,
-        detectedGame,
-        detectedSaveFormat: gameChoice,
-    });
+        self.postMessage({
+            ...result,
+            pokemon,
+            detectedGame,
+            detectedSaveFormat: gameChoice,
+        });
+    } catch (err) {
+        console.error("save worker parse error", err);
+        self.postMessage({ error: getErrorMessage(err) });
+    }
 };

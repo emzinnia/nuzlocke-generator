@@ -536,13 +536,41 @@ export const handleSpeciesTypeEdgeCases = ({
     }
 
     if (
-        match({ ...data, species: ["Growlithe", "Arcanine"], forme: ["Hisuian"] })
+        match({
+            ...data,
+            species: ["Lopunny"],
+            forme: ["Mega"],
+        })
+    ) {
+        return [Types.Normal, Types.Fighting];
+    }
+
+    if (
+        match({
+            ...data,
+            species: ["Growlithe", "Arcanine"],
+            forme: ["Hisuian"],
+        })
     ) {
         return [Types.Fire, Types.Rock];
     }
 
-    if (match({ ...data, species: ["Voltorb"], forme: ["Hisuian"] })) {
+    if (
+        match({
+            ...data,
+            species: ["Voltorb", "Electrode"],
+            forme: ["Hisuian"],
+        })
+    ) {
         return [Types.Electric, Types.Grass];
+    }
+
+    if (match({ ...data, species: ["Typhlosion"], forme: ["Hisuian"] })) {
+        return [Types.Fire, Types.Ghost];
+    }
+
+    if (match({ ...data, species: ["Samurott"], forme: ["Hisuian"] })) {
+        return [Types.Water, Types.Dark];
     }
 
     if (match({ ...data, species: ["Zorua", "Zoroark"], forme: ["Hisuian"] })) {
@@ -559,6 +587,22 @@ export const handleSpeciesTypeEdgeCases = ({
 
     if (match({ ...data, species: ["Qwilfish"], forme: ["Hisuian"] })) {
         return [Types.Dark, Types.Poison];
+    }
+
+    if (match({ ...data, species: ["Lilligant"], forme: ["Hisuian"] })) {
+        return [Types.Grass, Types.Fighting];
+    }
+
+    if (match({ ...data, species: ["Sliggoo", "Goodra"], forme: ["Hisuian"] })) {
+        return [Types.Steel, Types.Dragon];
+    }
+
+    if (match({ ...data, species: ["Avalugg"], forme: ["Hisuian"] })) {
+        return [Types.Ice, Types.Rock];
+    }
+
+    if (match({ ...data, species: ["Decidueye"], forme: ["Hisuian"] })) {
+        return [Types.Grass, Types.Fighting];
     }
 
     if (match({ ...data, species: ["Wooper"], forme: ["Paldean"] })) {
@@ -1652,7 +1696,7 @@ export const matchSpeciesToTypes = (
         case "Aron":
         case "Lairon":
         case "Aggron":
-            return [Types.Rock, Types.Steel];
+            return [Types.Steel, Types.Rock];
         case "Gulpin":
         case "Swalot":
             return [Types.Poison, Types.Poison];

@@ -30,6 +30,7 @@ import { matchNatureToToxtricityForme } from "utils/matchNatureToToxtricityForme
 import { Nature } from "utils/Nature";
 import { getAdditionalFormes } from "utils/getters/getAdditionalFormes";
 import { getEvolutionLine } from "utils";
+import { EvolutionTree } from "utils";
 
 const objectPropertiesWhere = (
     obj: object,
@@ -107,6 +108,84 @@ describe("styleDefaults", () => {
     });
 });
 
+describe("getAdditionalFormes", () => {
+    it("includes every Gigantamax species option", () => {
+        const gigantamaxSpecies = [
+            "Venusaur",
+            "Charizard",
+            "Blastoise",
+            "Butterfree",
+            "Pikachu",
+            "Meowth",
+            "Machamp",
+            "Gengar",
+            "Kingler",
+            "Lapras",
+            "Eevee",
+            "Snorlax",
+            "Garbodor",
+            "Melmetal",
+            "Rillaboom",
+            "Cinderace",
+            "Inteleon",
+            "Corviknight",
+            "Orbeetle",
+            "Drednaw",
+            "Coalossal",
+            "Flapple",
+            "Appletun",
+            "Sandaconda",
+            "Toxtricity",
+            "Centiskorch",
+            "Hatterene",
+            "Grimmsnarl",
+            "Alcremie",
+            "Copperajah",
+            "Duraludon",
+        ];
+
+        const missing = gigantamaxSpecies.filter(
+            (species) => !getAdditionalFormes(species).includes("Gigantamax"),
+        );
+
+        expect(missing).toEqual([]);
+
+        expect(getAdditionalFormes("Urshifu")).toEqual(
+            expect.arrayContaining([
+                "Single Strike Gigantamax",
+                "Rapid Strike Gigantamax",
+            ]),
+        );
+    });
+
+    it("includes every Hisuian regional form option", () => {
+        const hisuianSpecies = [
+            "Growlithe",
+            "Arcanine",
+            "Voltorb",
+            "Electrode",
+            "Typhlosion",
+            "Qwilfish",
+            "Sneasel",
+            "Samurott",
+            "Lilligant",
+            "Zorua",
+            "Zoroark",
+            "Braviary",
+            "Sliggoo",
+            "Goodra",
+            "Avalugg",
+            "Decidueye",
+        ];
+
+        const missing = hisuianSpecies.filter(
+            (species) => !getAdditionalFormes(species).includes("Hisuian"),
+        );
+
+        expect(missing).toEqual([]);
+    });
+});
+
 describe("matchSpeciesToType", () => {
     it("returns a type for a Pokemon", () => {
         expect(matchSpeciesToTypes("Bulbasaur")).toEqual(["Grass", "Poison"]);
@@ -135,6 +214,34 @@ describe("matchSpeciesToType", () => {
         expect(matchSpeciesToTypes("Arcanine", "Hisuian")).toEqual([
             "Fire",
             "Rock",
+        ]);
+        expect(matchSpeciesToTypes("Electrode", "Hisuian")).toEqual([
+            "Electric",
+            "Grass",
+        ]);
+        expect(matchSpeciesToTypes("Typhlosion", "Hisuian")).toEqual([
+            "Fire",
+            "Ghost",
+        ]);
+        expect(matchSpeciesToTypes("Samurott", "Hisuian")).toEqual([
+            "Water",
+            "Dark",
+        ]);
+        expect(matchSpeciesToTypes("Lilligant", "Hisuian")).toEqual([
+            "Grass",
+            "Fighting",
+        ]);
+        expect(matchSpeciesToTypes("Goodra", "Hisuian")).toEqual([
+            "Steel",
+            "Dragon",
+        ]);
+        expect(matchSpeciesToTypes("Avalugg", "Hisuian")).toEqual([
+            "Ice",
+            "Rock",
+        ]);
+        expect(matchSpeciesToTypes("Decidueye", "Hisuian")).toEqual([
+            "Grass",
+            "Fighting",
         ]);
         listOfPokemon.map((pokemon, index) => {
             expect(matchSpeciesToTypes(pokemon).length).toBeGreaterThan(0);
@@ -342,6 +449,39 @@ describe(getMoveType.name, () => {
         expect(moveA).toBe(Types.Fire);
         expect(moveB).toBe(Types.Normal);
     });
+
+    it("maps Hisui moves to their types", () => {
+        const hisuiMoves: Array<[string, Types]> = [
+            ["Barb Barrage", Types.Poison],
+            ["Bitter Malice", Types.Ghost],
+            ["Bleakwind Storm", Types.Flying],
+            ["Ceaseless Edge", Types.Dark],
+            ["Chloroblast", Types.Grass],
+            ["Dire Claw", Types.Poison],
+            ["Esper Wing", Types.Psychic],
+            ["Headlong Rush", Types.Ground],
+            ["Infernal Parade", Types.Ghost],
+            ["Lunar Blessing", Types.Psychic],
+            ["Mountain Gale", Types.Ice],
+            ["Mystical Power", Types.Psychic],
+            ["Power Shift", Types.Normal],
+            ["Psyshield Bash", Types.Psychic],
+            ["Raging Fury", Types.Fire],
+            ["Sandsear Storm", Types.Ground],
+            ["Shelter", Types.Steel],
+            ["Springtide Storm", Types.Fairy],
+            ["Stone Axe", Types.Rock],
+            ["Take Heart", Types.Psychic],
+            ["Triple Arrows", Types.Fighting],
+            ["Victory Dance", Types.Fighting],
+            ["Wave Crash", Types.Water],
+            ["Wildbolt Storm", Types.Electric],
+        ];
+
+        hisuiMoves.forEach(([move, type]) => {
+            expect(getMoveType(move)).toBe(type);
+        });
+    });
 });
 
 describe(getDisplayNameForTest.name, () => {
@@ -402,6 +542,12 @@ describe(getAdditionalFormes.name, () => {
             [species]: getAdditionalFormes(species),
         }));
         expect(subject).toMatchSnapshot();
+    });
+});
+
+describe("EvolutionTree", () => {
+    it("includes Poltchageist evolving into Sinistcha", () => {
+        expect(EvolutionTree.Poltchageist).toEqual(["Sinistcha"]);
     });
 });
 

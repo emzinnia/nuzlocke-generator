@@ -236,6 +236,16 @@ describe("Gen 4 Save Parser", () => {
 
             expect(result.trainer.badges).toBeDefined();
             expect(result.trainer.badges.length).toBe(8);
+            expect(result.trainer.badges.map((badge) => badge.name)).toEqual([
+                "Coal Badge",
+                "Forest Badge",
+                "Cobble Badge",
+                "Fen Badge",
+                "Relic Badge",
+                "Mine Badge",
+                "Icicle Badge",
+                "Beacon Badge",
+            ]);
         });
 
         it("should parse the party Pokemon correctly", async () => {
@@ -477,6 +487,56 @@ describe("Gen 4 Save Parser", () => {
 
             expect(result.debug?.generalChecksumValid).toBe(true);
             expect(result.debug?.storageChecksumValid).toBe(true);
+        });
+
+        it("uses the intact same-count backup when the newest general block is corrupt", async () => {
+            const modified = Buffer.from(saveData);
+            const newestGeneral = 0x40000;
+
+            modified[newestGeneral + 0x64] ^= 0xff;
+
+            const result = await parseGen4Save(modified, {
+                boxMappings: [],
+                selectedGame: "HGSS",
+                debug: true,
+            });
+            const boxedPokemon = result.pokemon.filter(
+                (pokemon) => pokemon.status === "Boxed",
+            );
+
+            expect(result.trainer.time).toBe("14:41:59");
+            expect(boxedPokemon).toHaveLength(6);
+            expect(result.debug).toMatchObject({
+                generalSave: 212,
+                storageSave: 212,
+                generalChecksumValid: true,
+                storageChecksumValid: true,
+            });
+        });
+
+        it("uses the intact same-count backup when the newest storage block is corrupt", async () => {
+            const modified = Buffer.from(saveData);
+            const newestStorage = 0x40000 + 0x0f700;
+
+            modified[newestStorage + 0x100] ^= 0xff;
+
+            const result = await parseGen4Save(modified, {
+                boxMappings: [],
+                selectedGame: "HGSS",
+                debug: true,
+            });
+            const boxedPokemon = result.pokemon.filter(
+                (pokemon) => pokemon.status === "Boxed",
+            );
+
+            expect(result.trainer.time).toBe("14:41:59");
+            expect(boxedPokemon).toHaveLength(6);
+            expect(result.debug).toMatchObject({
+                generalSave: 212,
+                storageSave: 212,
+                generalChecksumValid: true,
+                storageChecksumValid: true,
+            });
         });
 
         it("should parse the party Pokemon correctly", async () => {

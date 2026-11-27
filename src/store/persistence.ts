@@ -1,5 +1,6 @@
 import { version } from "../../package.json";
 import { State } from "state";
+import { withUniqueBoxIds } from "../reducers/box";
 import { styleDefaults } from "utils/styleDefaults";
 
 export const PERSIST_KEY = "persist:root";
@@ -113,6 +114,16 @@ const getPersistedVersion = (envelope: PersistedEnvelope) => {
     }
 };
 
+const deserializePersistedSlice = (value: unknown) => {
+    if (typeof value !== "string") return value;
+
+    try {
+        return JSON.parse(value);
+    } catch {
+        return undefined;
+    }
+};
+
 export const migratePersistedState = (
     state: Partial<State>,
     persistedVersion?: string,
@@ -141,13 +152,22 @@ export const deserializePersistedState = (
         const state: Record<string, unknown> = {};
         for (const [key, value] of Object.entries(envelope)) {
             if (key === "_persist" || PERSIST_BLACKLIST.has(key)) continue;
-            state[key] = typeof value === "string" ? JSON.parse(value) : value;
+            const deserialized = deserializePersistedSlice(value);
+            if (typeof deserialized === "undefined") continue;
+            state[key] = deserialized;
         }
 
-        return migratePersistedState(
+        const migrated = migratePersistedState(
             state as Partial<State>,
             getPersistedVersion(envelope),
         );
+        if (!Array.isArray(migrated.box)) {
+            return migrated;
+        }
+        return {
+            ...migrated,
+            box: withUniqueBoxIds(migrated.box),
+        };
     } catch {
         return undefined;
     }
@@ -188,8 +208,18 @@ export const readPersistedState = (
 export const writePersistedState = (
     state: Partial<State>,
     storage: Storage | undefined = getBrowserStorage(),
-) => {
-    storage?.setItem(PERSIST_KEY, serializePersistedState(state));
+): boolean => {
+    if (!storage) return true;
+
+    try {
+        storage.setItem(PERSIST_KEY, serializePersistedState(state));
+        return true;
+    } catch (error) {
+        // QuotaExceededError and other Storage failures must not escape the
+        // auto-persist subscribe path as unhandled rejections.
+        console.error("Failed to write persisted state", error);
+        return false;
+    }
 };
 
 export const purgePersistedState = (

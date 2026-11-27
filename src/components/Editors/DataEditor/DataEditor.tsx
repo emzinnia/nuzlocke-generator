@@ -1,5 +1,5 @@
 import * as React from "react";
-import { connect } from "store/reactZustand";
+import { connect, useStore } from "store/reactZustand";
 import {
     Button,
     ButtonGroup,
@@ -15,7 +15,7 @@ import { PokemonIcon } from "components/Pokemon/PokemonIcon";
 import { ErrorBoundary, HotkeyIndicator } from "components/Common/Shared";
 import { v4 as uuid } from "uuid";
 import { persistor } from "store";
-import { newNuzlocke, replaceState } from "actions";
+import { newNuzlocke, replaceState, updateNuzlocke } from "actions";
 import { Badge, Game, Pokemon, Trainer } from "models";
 import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
 import { State } from "state";
@@ -35,18 +35,27 @@ import {
     isValidShowdownFormat,
 } from "utils/parseShowdownFormat";
 import { Generation, getGameGeneration } from "utils/getters/getGameGeneration";
+import { getNextPokemonPosition } from "utils/generateEmptyPokemon";
 // @TODO: fix codegen imports
 // import codegen from 'codegen.macro';
 import { BoxMappings } from "parsers/utils/boxMappings";
 import SaveFileWorker from "parsers/worker?worker";
 import { cx } from "emotion";
 import { StatusDropZone } from "./StatusDropZone";
-import { serializeNuzlockeJson } from "utils/nuzlockeJson";
+import {
+    formatNuzlockeSaveData,
+    serializeNuzlockeJson,
+    serializeNuzlockeSaveData,
+} from "utils/nuzlockeJson";
+import { syncCurrentNuzlocke } from "./syncCurrentNuzlocke";
+import { getCheckpointsForSaveImport } from "./importCheckpoints";
 
 export interface DataEditorProps {
     state: State;
+    getState: () => State;
     replaceState: replaceState;
     newNuzlocke: newNuzlocke;
+    updateNuzlocke: updateNuzlocke;
 }
 
 export interface DataEditorState {
@@ -63,8 +72,8 @@ export interface DataEditorState {
 
 const isValidJSON = (data: string): boolean => {
     try {
-        JSON.parse(data);
-        return true;
+        const parsed: unknown = JSON.parse(data);
+        return parsed !== null && typeof parsed === "object" && !Array.isArray(parsed);
     } catch {
         return false;
     }
@@ -94,6 +103,20 @@ const handleExceptions = (data: State | Record<string, unknown>) => {
 
     return isEmpty(updated) ? data : updated;
 };
+
+type SaveWorkerSuccess = {
+    pokemon: Pokemon[];
+    isYellow?: boolean;
+    trainer: Trainer;
+    detectedGame?: Game;
+    detectedSaveFormat?: GameSaveFormat;
+};
+
+type SaveWorkerFailure = {
+    error: string;
+};
+
+type SaveWorkerMessage = SaveWorkerSuccess | SaveWorkerFailure;
 
 const getImportedBadgeName = (badge: unknown) => {
     if (typeof badge === "string") return badge;
@@ -288,15 +311,27 @@ export class DataEditorBase extends React.Component<
 
         reader.readAsText(file, "utf-8");
         reader.addEventListener("load", (event) => {
-            const file = event?.target?.result;
-            const data = file;
-            // @ts-expect-error - FileReader result type mismatch
-            this.setState({ data });
+            const fileContents = event?.target?.result;
+            if (typeof fileContents !== "string" || !isValidJSON(fileContents)) {
+                showToast({
+                    message: "Failed to parse invalid JSON",
+                    intent: Intent.DANGER,
+                });
+                return;
+            }
+            this.setState({ data: fileContents });
         });
     };
 
     private confirmImport = () => {
         const override = this.state.overrideImport;
+        if (!isValidJSON(this.state.data)) {
+            showToast({
+                message: "Failed to parse invalid JSON",
+                intent: Intent.DANGER,
+            });
+            return;
+        }
         const data = handleExceptions(JSON.parse(this.state.data));
         const nuz = this.props.state;
         // Omit auxiliary slices when the import does not include them so
@@ -310,8 +345,12 @@ export class DataEditorBase extends React.Component<
         } else {
             delete nextState.customMoveMap;
         }
+        syncCurrentNuzlocke(nuz, this.props.updateNuzlocke);
         this.props.replaceState(nextState);
-        this.props.newNuzlocke(this.state.data, { isCopy: false });
+        this.props.newNuzlocke(
+            serializeNuzlockeSaveData(this.props.getState()),
+            { isCopy: false },
+        );
         this.writeAllData();
         this.setState({ isOpen: false });
     };
@@ -419,23 +458,18 @@ export class DataEditorBase extends React.Component<
         reader.addEventListener("load", async function () {
             const save = new Uint8Array(this.result as ArrayBuffer);
 
-            worker.postMessage({
-                selectedGame,
-                save,
-                boxMappings,
-                fileName: file.name,
-            });
-
-            worker.onmessage = (
-                e: MessageEvent<{
-                    pokemon: Pokemon[];
-                    isYellow?: boolean;
-                    trainer: Trainer;
-                    detectedGame?: Game;
-                    detectedSaveFormat?: GameSaveFormat;
-                }>,
-            ) => {
+            worker.onmessage = (e: MessageEvent<SaveWorkerMessage>) => {
                 const result = e.data;
+                if ("error" in result) {
+                    showToast({
+                        message: `Failed to parse save file. ${result.error}`,
+                        intent: Intent.DANGER,
+                    });
+                    console.error(result.error);
+                    worker.terminate();
+                    return;
+                }
+
                 const mergedPokemon = mergeDataMode
                     ? DataEditorBase.pokeMerge(
                           state.pokemon,
@@ -449,7 +483,11 @@ export class DataEditorBase extends React.Component<
                         selectedGame,
                     });
                 const gameName = game.name as GameName;
-                const checkpoints = getBadges(gameName);
+                const checkpoints = getCheckpointsForSaveImport(
+                    state.checkpoints,
+                    state.game.name,
+                    gameName,
+                );
                 const bgColor = gameOfOriginToColor(game.name as GameName);
                 const data = {
                     game,
@@ -486,6 +524,7 @@ export class DataEditorBase extends React.Component<
                         intent: Intent.PRIMARY,
                     });
                 }
+                worker.terminate();
             };
 
             worker.onmessageerror = (err) => {
@@ -494,7 +533,24 @@ export class DataEditorBase extends React.Component<
                     intent: Intent.DANGER,
                 });
                 console.error(err);
+                worker.terminate();
             };
+
+            worker.onerror = (err) => {
+                showToast({
+                    message: `Failed to parse save file. ${err.message}`,
+                    intent: Intent.DANGER,
+                });
+                console.error(err);
+                worker.terminate();
+            };
+
+            worker.postMessage({
+                selectedGame,
+                save,
+                boxMappings,
+                fileName: file.name,
+            });
 
             const t1 = performance.now();
             console.info(
@@ -594,19 +650,32 @@ export class DataEditorBase extends React.Component<
             this.isEmptyPokemonSlot(state.pokemon[0]);
 
         const existingPokemon = hasSingleEmptySlot ? [] : state.pokemon;
-        const startPosition = existingPokemon.length;
-        const newPokemon = parseShowdownFormat(showdownData, {
+        // Use max(position)+1 — array length collides after deletions leave gaps.
+        const startPosition = getNextPokemonPosition(existingPokemon);
+        const parsedPokemon = parseShowdownFormat(showdownData, {
             startPosition,
             generation: showdownGeneration,
         });
 
-        if (newPokemon.length === 0) {
+        if (parsedPokemon.length === 0) {
             showToast({
                 message: "No Pokemon found in the input.",
                 intent: Intent.WARNING,
             });
             return;
         }
+
+        // Overflow past 6 Team members into Boxed (same rule as generateEmptyPokemon).
+        let teamCount = existingPokemon.filter(
+            (poke) => poke.status === "Team",
+        ).length;
+        const newPokemon = parsedPokemon.map((poke) => {
+            const status = teamCount >= 6 ? "Boxed" : "Team";
+            if (status === "Team") {
+                teamCount += 1;
+            }
+            return { ...poke, status };
+        });
 
         // Merge new Pokemon with existing
         const mergedPokemon = [...existingPokemon, ...newPokemon];
@@ -698,7 +767,7 @@ export class DataEditorBase extends React.Component<
                                     suppressContentEditableWarning={true}
                                     contentEditable={true}
                                 >
-                                    {JSON.stringify(this.props.state, null, 2)}
+                                    {formatNuzlockeSaveData(this.props.state)}
                                 </span>
                             </div>
                             <div className={Classes.DIALOG_FOOTER}>
@@ -948,7 +1017,13 @@ export class DataEditorBase extends React.Component<
     }
 }
 
-export const DataEditor = connect((state: State) => ({ state: state }), {
+const ConnectedDataEditor = connect((state: State) => ({ state }), {
     replaceState,
     newNuzlocke,
+    updateNuzlocke,
 })(DataEditorBase);
+
+export function DataEditor() {
+    const { getState } = useStore();
+    return <ConnectedDataEditor getState={getState} />;
+}

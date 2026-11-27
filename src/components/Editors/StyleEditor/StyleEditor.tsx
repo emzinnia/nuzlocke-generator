@@ -266,6 +266,21 @@ export class StyleEditorBase extends React.Component<
 
                 <div className={styleEdit}>
                     <label
+                        htmlFor="font"
+                        className={cx(Classes.LABEL, Classes.INLINE)}
+                    >
+                        Font Family
+                    </label>
+                    <input
+                        value={props.style.font || ""}
+                        name="font"
+                        onChange={(e) => editEvent(e, props)}
+                        className={Classes.INPUT}
+                    />
+                </div>
+
+                <div className={styleEdit}>
+                    <label
                         htmlFor="itemStyle"
                         className={cx(Classes.LABEL, Classes.INLINE)}
                     >
@@ -689,6 +704,23 @@ export class StyleEditorBase extends React.Component<
                         name="minimalDeadLayout"
                         label="Minimal Dead Layout"
                         onChange={(e) => editCheckboxEvent(e, props, "minimalDeadLayout")}
+                    />
+                </div>
+
+                <div className={styleEdit}>
+                    <Checkbox
+                        checked={Boolean(
+                            props.style.sortDeadPokemonByDeathTimestamp,
+                        )}
+                        name="sortDeadPokemonByDeathTimestamp"
+                        label="Sort Dead Pokémon by Death Order"
+                        onChange={(e) =>
+                            editCheckboxEvent(
+                                e,
+                                props,
+                                "sortDeadPokemonByDeathTimestamp",
+                            )
+                        }
                     />
                 </div>
 

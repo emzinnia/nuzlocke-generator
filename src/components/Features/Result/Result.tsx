@@ -170,9 +170,41 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
     }
 
     private renderTeamPokemon(teamPokemon: Pokemon[]) {
-        return teamPokemon.sort(sortPokes).map((poke) => {
+        return [...teamPokemon].sort(sortPokes).map((poke) => {
             return <TeamPokemon key={poke.id} pokemon={poke} />;
         });
+    }
+
+    private getDeathSortValue(poke: Pokemon) {
+        const timestamp = poke.deathTimestamp;
+        if (typeof timestamp === "number" && Number.isFinite(timestamp)) {
+            return timestamp;
+        }
+
+        if (typeof timestamp === "string") {
+            const numeric = Number(timestamp);
+            if (Number.isFinite(numeric)) return numeric;
+
+            const parsed = Date.parse(timestamp);
+            if (Number.isFinite(parsed)) return parsed;
+        }
+
+        return Number.POSITIVE_INFINITY;
+    }
+
+    private getOrderedBoxPokemon(pokemon: Pokemon[], box?: Box) {
+        if (
+            (box?.name === "Dead" || box?.inheritFrom === "Dead") &&
+            this.props.style.sortDeadPokemonByDeathTimestamp
+        ) {
+            return pokemon.slice().sort((a, b) => {
+                const deathSort =
+                    this.getDeathSortValue(a) - this.getDeathSortValue(b);
+                return deathSort || sortPokes(a, b);
+            });
+        }
+
+        return pokemon;
     }
 
     private getCorrectStatusWrapper(
@@ -293,7 +325,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                     className="boxed-container-inner"
                     style={this.getBoxStyle(box?.name || box?.inheritFrom)}
                 >
-                    {pokemon.map((poke) => {
+                    {this.getOrderedBoxPokemon(pokemon, box).map((poke) => {
                         if (
                             box?.name === "Boxed" ||
                             box?.inheritFrom === "Boxed"
@@ -518,7 +550,7 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                         style={{
                             fontFamily: style.usePokemonGBAFont
                                 ? "pokemon_font"
-                                : "inherit",
+                                : style.font || "inherit",
                             fontSize: style.usePokemonGBAFont ? "125%" : "100%",
                             margin: this.state.isDownloading
                                 ? "0"
