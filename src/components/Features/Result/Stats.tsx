@@ -1,7 +1,7 @@
 import * as React from "react";
 import { connect } from "store/reactZustand";
 import { State } from "state";
-import { PokemonIcon } from "components/Pokemon/PokemonIcon/PokemonIcon";
+import { PokemonIconPlain } from "components/Pokemon/PokemonIcon/PokemonIcon";
 import { Layout, LayoutDisplay } from "components/Layout/Layout/Layout";
 import { range } from "ramda";
 
@@ -160,11 +160,13 @@ export class StatsBase extends React.Component<
         return this.props.pokemon
             .filter((s) => s.shiny)
             .map((p) => (
-                <PokemonIcon
+                <PokemonIconPlain
                     key={p.id}
                     shiny={p.shiny}
                     species={p.species}
                     id={p.id}
+                    selectedId={null}
+                    onClick={() => undefined}
                 />
             ));
     }
