@@ -84,7 +84,7 @@ describe("<CurrentPokemonEdit />", () => {
             />
         );
         const { rerender } = render(renderWithBoxes(boxes), {
-            wrapper: ({ children }) => (
+            wrapper: ({ children }: { children?: React.ReactNode }) => (
                 <Provider store={store}>{children}</Provider>
             ),
         });
