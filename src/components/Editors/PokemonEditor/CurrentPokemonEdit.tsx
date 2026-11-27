@@ -99,22 +99,70 @@ export interface CurrentPokemonEditState {
     images?: Image[];
 }
 
-const getEvos = (species): string[] | undefined => {
-    return EvolutionTree?.[species];
+export interface EvolutionOption {
+    species: Species;
+    forme?: keyof typeof Forme;
+}
+
+const getFormeKey = (
+    forme?: Pokemon["forme"] | keyof typeof Forme,
+): keyof typeof Forme | undefined => {
+    if (!forme) {
+        return undefined;
+    }
+
+    if (forme in Forme) {
+        return forme as keyof typeof Forme;
+    }
+
+    return Object.entries(Forme).find(([, value]) => value === forme)?.[0] as
+        | keyof typeof Forme
+        | undefined;
+};
+
+export const getEvolutionOptions = (
+    currentPokemon?: Pick<Pokemon, "species"> & {
+        forme?: Pokemon["forme"] | keyof typeof Forme;
+    },
+): EvolutionOption[] => {
+    const species = currentPokemon?.species as Species | undefined;
+    const forme = getFormeKey(currentPokemon?.forme);
+
+    if (!species) {
+        return [];
+    }
+
+    if (species === "Meowth") {
+        if (forme === "Alolan") {
+            return [{ species: "Persian", forme: "Alolan" }];
+        }
+
+        if (forme === "Galarian") {
+            return [{ species: "Perrserker", forme: "Normal" }];
+        }
+
+        return [{ species: "Persian", forme: "Normal" }];
+    }
+
+    return (
+        EvolutionTree?.[species]?.map((evolution) => ({
+            species: evolution,
+        })) ?? []
+    );
 };
 
 export function EvolutionSelection({ currentPokemon, onEvolve }) {
-    const evos = getEvos(currentPokemon?.species);
+    const evos = getEvolutionOptions(currentPokemon);
 
     if (!evos?.length) {
         return null;
     }
 
     if (evos?.length === 1) {
-        const species = evos?.[0];
+        const { species, forme } = evos[0];
         return (
             <Button
-                onClick={onEvolve(species)}
+                onClick={onEvolve(species, forme)}
                 className={Classes.MINIMAL}
                 intent={Intent.PRIMARY}
             >
@@ -135,11 +183,11 @@ export function EvolutionSelection({ currentPokemon, onEvolve }) {
                                 role="button"
                                 tabIndex={-2}
                                 className={Styles.evoMenuItem}
-                                key={evo}
-                                onClick={onEvolve(evo)}
-                                onKeyPress={onEvolve(evo)}
+                                key={`${evo.species}-${evo.forme ?? "current"}`}
+                                onClick={onEvolve(evo.species, evo.forme)}
+                                onKeyPress={onEvolve(evo.species, evo.forme)}
                             >
-                                {evo}
+                                {evo.species}
                             </div>
                         ))}
                     </>
@@ -224,14 +272,14 @@ export class CurrentPokemonEditBase extends React.Component<
         );
     }
 
-    private evolvePokemon = (species: Species) => (_e) => {
+    private evolvePokemon =
+        (species: Species, nextForme?: keyof typeof Forme) => (_e) => {
         const pokemon = this.getCurrentPokemon();
+        const forme = nextForme || getFormeKey(pokemon?.forme) || "Normal";
         const edit = {
             species,
-            types: matchSpeciesToTypes(
-                species,
-                (pokemon?.forme || "Normal") as keyof typeof Forme,
-            ),
+            ...(nextForme ? { forme: nextForme } : {}),
+            types: matchSpeciesToTypes(species, forme as keyof typeof Forme),
         };
 
         this.props.editPokemon(edit, this.state.selectedId);
