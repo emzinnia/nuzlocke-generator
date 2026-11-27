@@ -23,10 +23,19 @@ export function TrainerInfoEditField({
     element,
 }: TrainerInfoEditFieldProps) {
     const [innerValue, setValue] = React.useState(value ?? "");
+    const onEditRef = React.useRef(onEdit);
+    onEditRef.current = onEdit;
 
+    // The editor passes a new onEdit whenever any store update re-renders it.
+    // Recreating this debounce on that identity cancelled in-progress typing and
+    // snapped the field back to the last saved value (history commits do this
+    // about 300ms after each keystroke).
     const delayedValue = React.useMemo(
-        () => debounce((e: React.ChangeEvent<HTMLInputElement>) => onEdit?.(e), 300),
-        [onEdit],
+        () =>
+            debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+                onEditRef.current?.(e);
+            }, 300),
+        [],
     );
 
     React.useEffect(() => {
