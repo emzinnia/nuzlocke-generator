@@ -25,7 +25,8 @@ import { ImageUpload } from "components/Common/Shared/ImageUpload";
 
 export interface CheckpointsSelectProps {
     checkpoint: Badge;
-    onEdit: (img, name) => void;
+    checkpointIndex: number;
+    onEdit: (img, name, index?: number) => void;
 }
 
 export interface CheckpointsSelectState {
@@ -57,7 +58,11 @@ export class CheckpointsSelect extends React.Component<
                     return (
                         <Button
                             onClick={(e) =>
-                                this.props.onEdit({ image: badge.image }, name)
+                                this.props.onEdit(
+                                    { image: badge.image },
+                                    name,
+                                    this.props.checkpointIndex,
+                                )
                             }
                             key={key}
                             name={badge.name}
@@ -169,6 +174,7 @@ export class CheckpointsEditorBase extends React.Component<
                                     this.props.editCheckpoint(
                                         { name: e.target.value },
                                         checkpoint.name,
+                                        key,
                                     )
                                 }
                                 className={Classes.INPUT}
@@ -177,8 +183,11 @@ export class CheckpointsEditorBase extends React.Component<
                             />
                         </div>
                         <CheckpointsSelect
-                            onEdit={(i, n) => this.props.editCheckpoint(i, n)}
+                            onEdit={(i, n, index) =>
+                                this.props.editCheckpoint(i, n, index)
+                            }
                             checkpoint={checkpoint}
+                            checkpointIndex={key}
                         />
                         <div className={Classes.INPUT_GROUP}>
                             <Icon icon={"link"} />
@@ -191,6 +200,7 @@ export class CheckpointsEditorBase extends React.Component<
                                     this.props.editCheckpoint(
                                         { image: e.target.value },
                                         checkpoint.name,
+                                        key,
                                     )
                                 }
                             />
@@ -208,6 +218,7 @@ export class CheckpointsEditorBase extends React.Component<
                                         this.props.editCheckpoint(
                                             { image },
                                             checkpoint.name,
+                                            key,
                                         );
                                     }}
                                 />
@@ -216,7 +227,10 @@ export class CheckpointsEditorBase extends React.Component<
                         <Icon
                             style={{ cursor: "pointer" }}
                             onClick={(e) =>
-                                this.props.deleteCheckpoint(checkpoint.name)
+                                this.props.deleteCheckpoint(
+                                    checkpoint.name,
+                                    key,
+                                )
                             }
                             className={cx(styles.checkpointDelete)}
                             icon="trash"
