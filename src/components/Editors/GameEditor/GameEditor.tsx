@@ -28,6 +28,7 @@ export interface GameEditorProps {
 const gameSubEditorStyle: React.CSSProperties = {
     display: "flex",
     justifyContent: "space-between",
+    alignItems: "center",
     paddingBottom: ".25rem",
 };
 
@@ -99,9 +100,13 @@ export class GameEditorBase extends React.Component<
                         <div style={{ fontSize: "80%" }}>
                             <label
                                 className={Classes.INLINE}
-                                style={{ marginRight: "calc(.75rem + 2px)" }}
+                                style={{
+                                    display: "inline-block",
+                                    marginRight: ".5rem",
+                                    width: "4.75rem",
+                                }}
                             >
-                                Name
+                                Custom Version
                             </label>
                             <input
                                 onChange={this.onInputName}
@@ -111,7 +116,7 @@ export class GameEditorBase extends React.Component<
                                 style={{ width: controlWidth }}
                                 className={Classes.INPUT}
                                 type="text"
-                                placeholder={game.name}
+                                placeholder={`Custom ${game.name} name`}
                             />
                         </div>
                         {feature.temTemMode && (
