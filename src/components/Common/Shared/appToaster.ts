@@ -1,7 +1,18 @@
 import * as React from "react";
-import { OverlayToaster, Position, Toaster, ToastProps } from "@blueprintjs/core";
+import {
+    Intent,
+    OverlayToaster,
+    Position,
+    Toaster,
+    ToastProps,
+} from "@blueprintjs/core";
+import {
+    onPersistFailure,
+    PERSIST_FAILURE_TOAST_COOLDOWN_MS,
+} from "store/persistFailure";
 
 let appToaster: Toaster | null = null;
+let lastPersistFailureToastAt = 0;
 
 const clearAppToaster = () => {
     appToaster = null;
@@ -33,3 +44,16 @@ export const showToast = (toast: ToastProps): string | undefined => {
     if (!toaster) return undefined;
     return toaster.show(toast);
 };
+
+onPersistFailure(() => {
+    const now = Date.now();
+    if (now - lastPersistFailureToastAt < PERSIST_FAILURE_TOAST_COOLDOWN_MS) {
+        return;
+    }
+    lastPersistFailureToastAt = now;
+    showToast({
+        message:
+            "Auto-save failed. Browser storage may be full — export your data and delete old saves.",
+        intent: Intent.DANGER,
+    });
+});

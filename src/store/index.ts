@@ -13,6 +13,7 @@ import {
     readPersistedState,
     writePersistedState,
 } from "./persistence";
+import { reportPersistFailure } from "./persistFailure";
 import {
     createReduxCompatibleZustandStore,
     ReduxCompatibleZustandStore,
@@ -55,7 +56,10 @@ const createPersistor = ({
 }: CreatePersistorOptions): Persistor => ({
     flush: () =>
         Promise.resolve().then(() => {
-            writePersistedState(store.getState(), storage);
+            const wrote = writePersistedState(store.getState(), storage);
+            if (!wrote) {
+                throw new Error("Failed to persist state to localStorage");
+            }
         }),
     purge: () =>
         Promise.resolve().then(() => {
@@ -84,7 +88,12 @@ export const createNuzlockeStore = ({
     const persistor = createPersistor({ storage, store });
 
     const unsubscribePersistence = store.subscribe(() => {
-        void persistor.flush();
+        // Auto-persist must catch Storage failures (e.g. QuotaExceededError).
+        // Without this, `void flush()` becomes an unhandled rejection and
+        // later reloads silently restore the last successful snapshot.
+        void persistor.flush().catch((error) => {
+            reportPersistFailure(error);
+        });
     });
 
     store.dispatch({ type: REHYDRATE_ACTION } as AnyAction);

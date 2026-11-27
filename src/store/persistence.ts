@@ -188,8 +188,18 @@ export const readPersistedState = (
 export const writePersistedState = (
     state: Partial<State>,
     storage: Storage | undefined = getBrowserStorage(),
-) => {
-    storage?.setItem(PERSIST_KEY, serializePersistedState(state));
+): boolean => {
+    if (!storage) return true;
+
+    try {
+        storage.setItem(PERSIST_KEY, serializePersistedState(state));
+        return true;
+    } catch (error) {
+        // QuotaExceededError and other Storage failures must not escape the
+        // auto-persist subscribe path as unhandled rejections.
+        console.error("Failed to write persisted state", error);
+        return false;
+    }
 };
 
 export const purgePersistedState = (
