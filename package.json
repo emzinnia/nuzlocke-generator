@@ -101,7 +101,7 @@
         "sass": "^1.59.3",
         "stylis-rule-sheet": "0.0.10",
         "swr": "^1.0.1",
-        "tailwindcss": "^3.4.1",
+        "tailwindcss": "^4.3.3",
         "ts-node": "^10.9.2",
         "tslib": "^2.0.0",
         "tslint": "^6.1.2",
