@@ -11,6 +11,7 @@ import {
     getGameGeneration,
     getContrastColor,
     gameOfOriginToColor,
+    getPokemonBackgroundStyle,
     TemplateName,
     Types,
     Forme,
@@ -46,9 +47,14 @@ const GameOfOriginBadge = ({
     pokemon: Pokemon;
     style: Styles;
 }) => {
+    const usesGameOriginBackground = getPokemonBackgroundStyle({
+        pokemon,
+        style,
+    }).usesGameOriginBackground;
+
     if (
         !style.displayGameOriginForBoxedAndDead ||
-        style.displayBackgroundInsteadOfBadge ||
+        usesGameOriginBackground ||
         !pokemon.gameOfOrigin ||
         pokemon.gameOfOrigin === "None"
     ) {
@@ -119,11 +125,13 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
         const gameOfOriginColor = pokemon.gameOfOrigin
             ? gameOfOriginToColor(pokemon.gameOfOrigin)
             : "";
-        const useGameOfOriginBackground = Boolean(
-            style.displayGameOriginForBoxedAndDead &&
-                style.displayBackgroundInsteadOfBadge &&
-                gameOfOriginColor,
-        );
+        const pokemonBackground = getPokemonBackgroundStyle({
+            customTypes,
+            pokemon,
+            style,
+        });
+        const useGameOfOriginBackground =
+            pokemonBackground.usesGameOriginBackground && Boolean(gameOfOriginColor);
         const isCompactTheme =
             style.template === TemplateName.Compact ||
             style.template === TemplateName.CompactWithIcons;
@@ -160,11 +168,11 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                     style={{
                         backgroundColor: isCardsTheme
                             ? undefined
-                            : useGameOfOriginBackground
-                              ? gameOfOriginColor
-                              : accentColor,
+                            : pokemonBackground.source === "type"
+                              ? undefined
+                              : pokemonBackground.background,
                         // backgroundImage: isCardsTheme ? undefined : `linear-gradient(to right, #2d2d2d 1px, transparent 1px), linear-gradient(to bottom, #2d2d2d 1px, transparent 1px)`,
-                        backgroundImage: isCompactTheme
+                        backgroundImage: isCompactTheme || pokemonBackground.source === "type"
                             ? getBackgroundGradient(
                                   pokemon.types != null && !pokemon.egg
                                       ? pokemon?.types[1]
@@ -179,9 +187,7 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                             ? getContrastColor(
                                   typeToColor(getTypeOrNone(), customTypes),
                               )
-                            : useGameOfOriginBackground
-                              ? getContrastColor(gameOfOriginColor)
-                            : getContrastColor(accentColor),
+                            : pokemonBackground.color,
                     }}
                 >
                     <div className="pokemon-info-inner">

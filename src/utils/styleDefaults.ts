@@ -9,6 +9,7 @@ export type TeamImagesType =
 export type IconRenderingType = "pixelated" | "auto";
 export type RulesLocation = "inside trainer section" | "bottom" | "top";
 export type ItemStyle = "outer glow" | "round" | "square" | "text";
+export type PokemonBackgroundSource = "accent" | "game-origin" | "type";
 
 export interface StatsOptions {
     averageLevel: boolean;
@@ -58,6 +59,7 @@ export interface Styles {
     boxedPokemonPerLine: number;
     displayGameOriginForBoxedAndDead: boolean;
     displayBackgroundInsteadOfBadge: boolean;
+    pokemonBackgroundSource: PokemonBackgroundSource;
     displayExtraData: boolean;
     useAutoHeight: boolean;
     displayItemAsText: boolean;
@@ -106,6 +108,7 @@ export const styleDefaults: Styles = {
     boxedPokemonPerLine: 6,
     displayGameOriginForBoxedAndDead: false,
     displayBackgroundInsteadOfBadge: false,
+    pokemonBackgroundSource: "accent",
     displayExtraData: true,
     useAutoHeight: true,
     usePokemonGBAFont: false,

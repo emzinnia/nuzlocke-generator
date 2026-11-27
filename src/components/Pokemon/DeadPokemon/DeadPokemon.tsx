@@ -18,6 +18,7 @@ import {
     feature,
     Forme,
     gameOfOriginToColor,
+    getPokemonBackgroundStyle,
     TemplateName,
 } from "utils";
 import { selectPokemon } from "actions";
@@ -56,6 +57,7 @@ export type DeadPokemonProps = {
     style: Styles;
     game: Game;
     minimal: boolean;
+    customTypes?: State["customTypes"];
 } & Pokemon;
 
 // TODO: Convert to Class
@@ -74,8 +76,6 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
             return species;
         }
     };
-    const getAccentColor = (prop: DeadPokemonProps) =>
-        prop.style ? prop.style.accentColor : "#111111";
     const renderPlainIcon = () => (
         <PokemonIconPlain
             onClick={() => poke.selectPokemon(poke.id)}
@@ -98,10 +98,11 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
             editorDarkMode={poke.style.editorDarkMode}
         />
     );
-    const useGameOfOriginColor =
-        poke.gameOfOrigin &&
-        poke.style.displayGameOriginForBoxedAndDead &&
-        poke.style.displayBackgroundInsteadOfBadge;
+    const backgroundStyle = getPokemonBackgroundStyle({
+        customTypes: poke.customTypes,
+        pokemon: poke,
+        style: poke.style,
+    });
     const EMMA_MODE = feature.emmaMode;
 
     if (isMinimal && isCompactWithIcons) {
@@ -111,14 +112,8 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                 data-league={poke.champion}
                 data-game={poke.gameOfOrigin}
                 style={{
-                    background: useGameOfOriginColor
-                        ? gameOfOriginToColor(poke.gameOfOrigin!)
-                        : getAccentColor(poke),
-                    color: useGameOfOriginColor
-                        ? getContrastColor(
-                              gameOfOriginToColor(poke.gameOfOrigin!),
-                          )
-                        : getContrastColor(getAccentColor(poke)),
+                    background: backgroundStyle.background,
+                    color: backgroundStyle.color,
                     height: "50px",
                     fontSize: "90%",
                     //margin: '1px',
@@ -173,7 +168,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                             {poke.causeOfDeath}
                         </div>
                         {style.displayGameOriginForBoxedAndDead &&
-                            !poke.style.displayBackgroundInsteadOfBadge &&
+                            !backgroundStyle.usesGameOriginBackground &&
                             poke.gameOfOrigin && (
                                 <span
                                     className="pokemon-gameoforigin"
@@ -210,14 +205,8 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                 className={"dead-pokemon-container"}
                 data-league={poke.champion}
                 style={{
-                    background: useGameOfOriginColor
-                        ? gameOfOriginToColor(poke.gameOfOrigin!)
-                        : getAccentColor(poke),
-                    color: useGameOfOriginColor
-                        ? getContrastColor(
-                              gameOfOriginToColor(poke.gameOfOrigin!),
-                          )
-                        : getContrastColor(getAccentColor(poke)),
+                    background: backgroundStyle.background,
+                    color: backgroundStyle.color,
                     height: "50px",
                     fontSize: "90%",
                 }}
@@ -243,7 +232,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                     </div>
                     <div data-testid="cause-of-death">{poke.causeOfDeath}</div>
                     {style.displayGameOriginForBoxedAndDead &&
-                        !poke.style.displayBackgroundInsteadOfBadge &&
+                        !backgroundStyle.usesGameOriginBackground &&
                         poke.gameOfOrigin && (
                             <span
                                 className="pokemon-gameoforigin"
@@ -276,12 +265,8 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
             className={"dead-pokemon-container"}
             data-league={poke.champion}
             style={{
-                background: useGameOfOriginColor
-                    ? gameOfOriginToColor(poke.gameOfOrigin!)
-                    : getAccentColor(poke),
-                color: useGameOfOriginColor
-                    ? getContrastColor(gameOfOriginToColor(poke.gameOfOrigin!))
-                    : getContrastColor(getAccentColor(poke)),
+                background: backgroundStyle.background,
+                color: backgroundStyle.color,
             }}
         >
             {style.template !== "Generations" ? (
@@ -329,7 +314,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                     {poke.causeOfDeath}
                 </div>
                 {style.displayGameOriginForBoxedAndDead &&
-                    !poke.style.displayBackgroundInsteadOfBadge &&
+                    !backgroundStyle.usesGameOriginBackground &&
                     poke.gameOfOrigin && (
                         <span
                             className="pokemon-gameoforigin"
@@ -358,6 +343,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
 
 export const DeadPokemon = connect(
     (state: Pick<State, keyof State>) => ({
+        customTypes: state.customTypes,
         style: state.style,
         game: state.game,
     }),

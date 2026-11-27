@@ -219,6 +219,25 @@ describe("TeamPokemonInfo", () => {
         expect(screen.queryByTestId("moves")).toBeNull();
     });
 
+    it("uses type-colored backgrounds when selected", () => {
+        const { container } = render(
+            <TeamPokemonInfo
+                generation={Generation.Gen3}
+                style={{ ...baseStyle, pokemonBackgroundSource: "type" }}
+                pokemon={basePokemon}
+                customTypes={[]}
+                linkedPokemon={undefined}
+                game={baseGame}
+            />,
+        );
+
+        const pokemonInfo = container.querySelector(
+            ".pokemon-info",
+        ) as HTMLElement;
+        expect(pokemonInfo.style.backgroundImage).toContain("#39BF3C");
+        expect(pokemonInfo.style.backgroundImage).toContain("#75226B");
+    });
+
     it("shows Gen 1 special stat label", () => {
         const pokemonWithStats: Pokemon = {
             ...basePokemon,

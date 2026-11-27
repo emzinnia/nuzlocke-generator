@@ -13,12 +13,12 @@ export const getBackgroundGradient = (
             return `linear-gradient(to right, ${typeToColor(typeA, customTypes)}, ${typeToColor(
                 typeA,
                 customTypes,
-            )}`;
+            )})`;
         }
     } else {
         return `linear-gradient(to right, ${typeToColor(typeA, customTypes)}, ${typeToColor(
             typeB,
             customTypes,
-        )}`;
+        )})`;
     }
 };

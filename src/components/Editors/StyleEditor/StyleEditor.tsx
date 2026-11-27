@@ -792,6 +792,24 @@ export class StyleEditorBase extends React.Component<
                 </div>
 
                 <div className={styleEdit}>
+                    <label
+                        htmlFor="pokemonBackgroundSource"
+                        className={cx(Classes.LABEL, Classes.INLINE)}
+                    >
+                        Pokémon Backgrounds
+                    </label>
+                    <HTMLSelect
+                        name="pokemonBackgroundSource"
+                        onChange={(e) => editEvent(e, props)}
+                        value={props.style.pokemonBackgroundSource ?? "accent"}
+                    >
+                        <option value="accent">Accent Color</option>
+                        <option value="game-origin">Game Origin</option>
+                        <option value="type">Pokémon Types</option>
+                    </HTMLSelect>
+                </div>
+
+                <div className={styleEdit}>
                     <Checkbox
                         checked={props.style.displayGameOriginForBoxedAndDead}
                         name="displayGameOriginForBoxedAndDead"
