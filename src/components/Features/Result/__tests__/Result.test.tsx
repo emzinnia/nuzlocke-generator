@@ -7,6 +7,10 @@ import { Editor, Box, Pokemon } from "models";
 
 type ResultBaseProps = React.ComponentProps<typeof ResultBase>;
 type PokemonSpeciesProps = { species: string };
+type ChampsPokemonProps = PokemonSpeciesProps & {
+    gameOfOrigin?: string;
+    useSprites?: boolean;
+};
 type PokemonProp = { pokemon: Pokemon };
 type ChildrenProps = { children?: React.ReactNode };
 
@@ -29,8 +33,14 @@ vi.mock("components/Pokemon/DeadPokemon/DeadPokemon", () => ({
 }));
 
 vi.mock("components/Pokemon/ChampsPokemon/ChampsPokemon", () => ({
-    ChampsPokemon: ({ species }: PokemonSpeciesProps) => (
-        <div data-testid={`champs-${species}`}>{species}</div>
+    ChampsPokemon: ({ species, gameOfOrigin, useSprites }: ChampsPokemonProps) => (
+        <div
+            data-testid={`champs-${species}`}
+            data-game-origin={gameOfOrigin}
+            data-use-sprites={String(useSprites)}
+        >
+            {species}
+        </div>
     ),
 }));
 
@@ -123,6 +133,39 @@ describe("<ResultBase />", () => {
         expect(screen.getByText("Boxed")).toBeTruthy();
         expect(screen.getByText(/Dead/)).toBeTruthy();
         expect(screen.getByText(/Champs/)).toBeTruthy();
+    });
+
+    it("falls back to the run game for Champs sprites without a Pokemon origin", () => {
+        render(
+            <ResultBase
+                pokemon={[
+                    generateEmptyPokemon([], {
+                        id: "champ-1",
+                        species: "Sceptile",
+                        status: "Champs",
+                    }),
+                ]}
+                game={{ name: "Emerald", customName: "" }}
+                trainer={{ badges: [] }}
+                box={boxes}
+                editor={baseEditor}
+                selectPokemon={vi.fn() as unknown as ResultBaseProps["selectPokemon"]}
+                toggleMobileResultView={
+                    vi.fn() as unknown as ResultBaseProps["toggleMobileResultView"]
+                }
+                toggleDialog={vi.fn() as unknown as ResultBaseProps["toggleDialog"]}
+                style={{
+                    ...styleDefaults,
+                    useSpritesForChampsPokemon: true,
+                }}
+                rules={[]}
+                customTypes={[]}
+            />,
+        );
+
+        const champ = screen.getByTestId("champs-Sceptile");
+        expect(champ.getAttribute("data-game-origin")).toBe("Emerald");
+        expect(champ.getAttribute("data-use-sprites")).toBe("true");
     });
 });
 
