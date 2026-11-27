@@ -49,9 +49,13 @@ export function pokemon(
             return [...state.filter((poke) => poke.id !== action.id), newPoke];
         }
         case REPLACE_STATE:
-            return action.replaceWith.pokemon;
+            return Array.isArray(action.replaceWith?.pokemon)
+                ? action.replaceWith.pokemon
+                : state;
         case SYNC_STATE_FROM_HISTORY:
-            return action.syncWith?.pokemon ?? state;
+            return Array.isArray(action.syncWith?.pokemon)
+                ? action.syncWith.pokemon
+                : state;
         default:
             return state;
     }

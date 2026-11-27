@@ -288,15 +288,27 @@ export class DataEditorBase extends React.Component<
 
         reader.readAsText(file, "utf-8");
         reader.addEventListener("load", (event) => {
-            const file = event?.target?.result;
-            const data = file;
-            // @ts-expect-error - FileReader result type mismatch
-            this.setState({ data });
+            const fileContents = event?.target?.result;
+            if (typeof fileContents !== "string" || !isValidJSON(fileContents)) {
+                showToast({
+                    message: "Failed to parse invalid JSON",
+                    intent: Intent.DANGER,
+                });
+                return;
+            }
+            this.setState({ data: fileContents });
         });
     };
 
     private confirmImport = () => {
         const override = this.state.overrideImport;
+        if (!isValidJSON(this.state.data)) {
+            showToast({
+                message: "Failed to parse invalid JSON",
+                intent: Intent.DANGER,
+            });
+            return;
+        }
         const data = handleExceptions(JSON.parse(this.state.data));
         const nuz = this.props.state;
         // Omit auxiliary slices when the import does not include them so

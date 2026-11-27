@@ -12,9 +12,9 @@ export function game(
         case EDIT_GAME:
             return { ...state, ...action.edit };
         case REPLACE_STATE:
-            return action.replaceWith.game;
+            return action.replaceWith?.game ?? state;
         case SYNC_STATE_FROM_HISTORY:
-            return action.syncWith.game;
+            return action.syncWith?.game ?? state;
         default:
             return state;
     }
