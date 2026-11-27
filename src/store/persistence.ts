@@ -1,5 +1,6 @@
 import { version } from "../../package.json";
 import { State } from "state";
+import { withUniqueBoxIds } from "../reducers/box";
 import { styleDefaults } from "utils/styleDefaults";
 
 export const PERSIST_KEY = "persist:root";
@@ -144,10 +145,17 @@ export const deserializePersistedState = (
             state[key] = typeof value === "string" ? JSON.parse(value) : value;
         }
 
-        return migratePersistedState(
+        const migrated = migratePersistedState(
             state as Partial<State>,
             getPersistedVersion(envelope),
         );
+        if (!Array.isArray(migrated.box)) {
+            return migrated;
+        }
+        return {
+            ...migrated,
+            box: withUniqueBoxIds(migrated.box),
+        };
     } catch {
         return undefined;
     }
