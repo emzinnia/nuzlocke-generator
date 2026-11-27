@@ -47,6 +47,7 @@ export interface Styles {
     trainerAuto: boolean;
     scaleSprites: boolean;
     showPokemonMoves: boolean;
+    hidePokemonNames: boolean;
     spritesMode: boolean;
     teamImages: TeamImagesType;
     teamPokemonBorder: boolean;
@@ -95,6 +96,7 @@ export const styleDefaults: Styles = {
     resultWidth: "1200",
     scaleSprites: false,
     showPokemonMoves: true,
+    hidePokemonNames: false,
     spritesMode: false,
     teamImages: "standard",
     teamPokemonBorder: true,

@@ -324,7 +324,8 @@ export class ResultBase extends React.PureComponent<ResultProps, ResultState> {
                                         !this.props.style.minimalChampsLayout
                                     }
                                     showNickname={
-                                        !this.props.style.minimalChampsLayout
+                                        !this.props.style.minimalChampsLayout &&
+                                        !this.props.style.hidePokemonNames
                                     }
                                     key={poke.id}
                                     {...poke}

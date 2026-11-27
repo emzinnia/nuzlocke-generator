@@ -127,6 +127,7 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
         const isCompactTheme =
             style.template === TemplateName.Compact ||
             style.template === TemplateName.CompactWithIcons;
+        const showPokemonNames = !style.hidePokemonNames;
         const getTypeOrNone = () => {
             if (pokemon) {
                 if (pokemon.types) {
@@ -186,18 +187,29 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                 >
                     <div className="pokemon-info-inner">
                         <div className="pokemon-main-info">
-                            <span
-                                style={{ margin: "0.25rem 0 0" }}
-                                className="pokemon-nickname"
-                            >
-                                {pokemon.nickname}
-                            </span>
-                            <span className="pokemon-name">
-                                {!pokemon.egg ? pokemon.species : "???"}
-                                {pokemon.item && style.itemStyle === "text"
-                                    ? ` @ ${pokemon.item}`
-                                    : null}
-                            </span>
+                            {showPokemonNames ? (
+                                <>
+                                    <span
+                                        style={{ margin: "0.25rem 0 0" }}
+                                        className="pokemon-nickname"
+                                    >
+                                        {pokemon.nickname}
+                                    </span>
+                                    <span className="pokemon-name">
+                                        {!pokemon.egg ? pokemon.species : "???"}
+                                        {pokemon.item && style.itemStyle === "text"
+                                            ? ` @ ${pokemon.item}`
+                                            : null}
+                                    </span>
+                                </>
+                            ) : null}
+                            {!showPokemonNames &&
+                            pokemon.item &&
+                            style.itemStyle === "text" ? (
+                                <span className="pokemon-name">
+                                    @ {pokemon.item}
+                                </span>
+                            ) : null}
                             {Boolean(pokemon.alpha) && (
                                 <span className="pokemon-alpha">
                                     <img
@@ -301,9 +313,10 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                         ) : null}
                         {linkedPokemon && (
                             <div className="pokemon-linked">
-                                {style.linkedPokemonText}{" "}
-                                {linkedPokemon.nickname ||
-                                    linkedPokemon.species}
+                                {style.linkedPokemonText}
+                                {showPokemonNames
+                                    ? ` ${linkedPokemon.nickname || linkedPokemon.species}`
+                                    : null}
                                 <PokemonIcon {...linkedPokemon} />
                             </div>
                         )}
@@ -341,6 +354,7 @@ export function TeamPokemonBaseMinimal(
     }
 
     const poke = pokemon;
+    const showPokemonNames = !style.hidePokemonNames;
 
     return (
         <div
@@ -382,10 +396,16 @@ export function TeamPokemonBaseMinimal(
             </div>
             <div className="pokemon-info">
                 <div className="pokemon-info-inner">
-                    <span className="pokemon-nickname">{pokemon.nickname}</span>
-                    <span className="pokemon-name">
-                        {!pokemon.egg ? pokemon.species : "???"}
-                    </span>
+                    {showPokemonNames ? (
+                        <>
+                            <span className="pokemon-nickname">
+                                {pokemon.nickname}
+                            </span>
+                            <span className="pokemon-name">
+                                {!pokemon.egg ? pokemon.species : "???"}
+                            </span>
+                        </>
+                    ) : null}
                     {pokemon.level ? (
                         <span className="pokemon-level">
                             lv. {pokemon.level}
