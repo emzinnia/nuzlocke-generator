@@ -38,6 +38,10 @@ vi.mock("components/Features/Result/TrainerResult", () => ({
     TrainerResult: () => <div data-testid="trainer-result" />,
 }));
 
+vi.mock("../Stats", () => ({
+    Stats: () => <div className="stats stats-container" data-testid="stats" />,
+}));
+
 vi.mock("components/Layout/TopBar/TopBar", () => ({
     TopBar: ({ children }: { children?: React.ReactNode }) => (
         <div data-testid="top-bar">{children}</div>
@@ -123,6 +127,35 @@ describe("<ResultBase />", () => {
         expect(screen.getByText("Boxed")).toBeTruthy();
         expect(screen.getByText(/Dead/)).toBeTruthy();
         expect(screen.getByText(/Champs/)).toBeTruthy();
+    });
+
+    it("offsets stats from the vertical trainer section", () => {
+        const { container } = render(
+            <ResultBase
+                pokemon={createPokemon()}
+                game={{ name: "Red", customName: "" }}
+                trainer={{ badges: [] }}
+                box={boxes}
+                editor={baseEditor}
+                selectPokemon={vi.fn() as unknown as ResultBaseProps["selectPokemon"]}
+                toggleMobileResultView={
+                    vi.fn() as unknown as ResultBaseProps["toggleMobileResultView"]
+                }
+                toggleDialog={vi.fn() as unknown as ResultBaseProps["toggleDialog"]}
+                style={{
+                    ...styleDefaults,
+                    displayStats: true,
+                    trainerSectionOrientation: "vertical",
+                    trainerWidth: "25%",
+                }}
+                rules={[]}
+                customTypes={[]}
+            />,
+        );
+
+        const statsContainer = container.querySelector(".stats-container");
+
+        expect(statsContainer?.parentElement?.style.paddingLeft).toBe("25%");
     });
 });
 
