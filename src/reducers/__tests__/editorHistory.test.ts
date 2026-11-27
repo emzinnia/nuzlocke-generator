@@ -177,6 +177,35 @@ describe("editorHistory reducer", () => {
             expect(result.past.length).toBe(50); // Still 50, not 51
             expect(result.present).toEqual(newState);
         });
+
+        it("keeps capped history entries contiguous for repeated undo", () => {
+            let history = editorHistory(initialState, {
+                type: INIT_EDITOR_HISTORY,
+                present: { count: 0 },
+            });
+
+            for (let count = 0; count < 51; count++) {
+                const oldState = { count };
+                const newState = { count: count + 1 };
+                const { forwardDiff, backwardDiff } = createDiffs(oldState, newState);
+
+                history = editorHistory(history, {
+                    type: UPDATE_EDITOR_HISTORY,
+                    forwardDiff,
+                    backwardDiff,
+                    newState,
+                });
+            }
+
+            expect(history.past.length).toBe(50);
+            expect(history.present).toEqual({ count: 51 });
+
+            history = editorHistory(history, { type: UNDO_EDITOR_HISTORY });
+            expect(history.present).toEqual({ count: 50 });
+
+            history = editorHistory(history, { type: UNDO_EDITOR_HISTORY });
+            expect(history.present).toEqual({ count: 49 });
+        });
     });
 
     describe("UNDO_EDITOR_HISTORY", () => {
