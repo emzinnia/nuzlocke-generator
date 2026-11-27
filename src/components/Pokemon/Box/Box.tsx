@@ -332,22 +332,7 @@ export const Box: React.FC<BoxProps> = (props) => {
                 }
             >
                 <span
-                    style={{
-                        alignItems: "center",
-                        background: canDrop
-                            ? "black"
-                            : "rgba(33, 33, 33, 0.33)",
-                        borderRadius: ".25rem",
-                        color: "#eee",
-                        display: "inline-flex",
-                        minHeight: "2rem",
-                        gap: "0.25rem",
-                        margin: ".25rem",
-                        padding: ".25rem .5rem",
-                        textAlign: "center",
-                        minWidth: "5rem",
-                        userSelect: "none",
-                    }}
+                    className={`box-label${canDrop ? " box-label-can-drop" : ""}`}
                 >
                     <span
                         ref={dragRef}
