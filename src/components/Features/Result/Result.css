@@ -19,6 +19,10 @@
     width: 100%;
     height: 100%;
 }
+.result.ng-container {
+    color-scheme: only light;
+    forced-color-adjust: none;
+}
 .ng-container h3 {
     text-transform: uppercase;
     margin: 0.5rem;
