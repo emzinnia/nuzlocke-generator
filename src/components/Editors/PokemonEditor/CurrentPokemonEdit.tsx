@@ -455,6 +455,17 @@ export class CurrentPokemonEditBase extends React.Component<
                     key={this.state.selectedId + "customItemImage"}
                 />
                 <CurrentPokemonInput
+                    labelName="Custom Item Image Scale (%)"
+                    inputName="customItemImageScale"
+                    placeholder="100"
+                    value={currentPokemon.customItemImageScale ?? 100}
+                    type="number"
+                    min="1"
+                    max="200"
+                    step="5"
+                    key={this.state.selectedId + "customItemImageScale"}
+                />
+                <CurrentPokemonInput
                     labelName="Poké Ball"
                     inputName="pokeball"
                     value={normalizePokeballName(currentPokemon.pokeball)}

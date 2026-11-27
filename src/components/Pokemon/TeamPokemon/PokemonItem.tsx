@@ -6,6 +6,24 @@ import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { ResizedImage } from "components/Common/Shared/ResizedImage";
 import { getBackgroundGradient, getHeldItemIconPath, typeToColor } from "utils";
 
+const DEFAULT_CUSTOM_ITEM_IMAGE_SCALE = 100;
+const MIN_CUSTOM_ITEM_IMAGE_SCALE = 1;
+const MAX_CUSTOM_ITEM_IMAGE_SCALE = 200;
+
+export function getCustomItemImageScale(
+    scale: Pokemon["customItemImageScale"],
+) {
+    if (scale == null || scale === "") return DEFAULT_CUSTOM_ITEM_IMAGE_SCALE;
+
+    const numericScale = Number(scale);
+    if (!Number.isFinite(numericScale)) return DEFAULT_CUSTOM_ITEM_IMAGE_SCALE;
+
+    return Math.min(
+        MAX_CUSTOM_ITEM_IMAGE_SCALE,
+        Math.max(MIN_CUSTOM_ITEM_IMAGE_SCALE, numericScale),
+    );
+}
+
 const itemLabelStyle = {
     base: css`
         background: #111;
@@ -50,6 +68,9 @@ export function PokemonItem({
     customTypes: State["customTypes"];
 }) {
     const getSecondType = pokemon?.types?.[1] || "Normal";
+    const customItemImageScale = `${getCustomItemImageScale(
+        pokemon.customItemImageScale,
+    )}%`;
 
     return (pokemon.item || pokemon.customItemImage) &&
         !style.displayItemAsText ? (
@@ -87,8 +108,8 @@ export function PokemonItem({
                             height={64}
                             alt={pokemon.item}
                             style={{
-                                width: "100%",
-                                height: "100%",
+                                width: customItemImageScale,
+                                height: customItemImageScale,
                                 objectFit: "contain",
                             }}
                         />
