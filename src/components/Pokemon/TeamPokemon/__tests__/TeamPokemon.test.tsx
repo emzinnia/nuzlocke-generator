@@ -165,6 +165,36 @@ describe("TeamPokemonBase", () => {
         expect(screen.getByAltText("Tera: Fire")).toBeTruthy();
     });
 
+    it("renders a shiny indicator next to the pokemon name when shiny", () => {
+        render(
+            <TeamPokemonInfo
+                generation={Generation.Gen3}
+                style={baseStyle}
+                pokemon={{ ...basePokemon, shiny: true }}
+                customTypes={[]}
+                linkedPokemon={undefined}
+                game={baseGame}
+            />,
+        );
+
+        expect(screen.getByAltText("Shiny")).toBeTruthy();
+    });
+
+    it("omits the shiny indicator for non-shiny pokemon", () => {
+        render(
+            <TeamPokemonInfo
+                generation={Generation.Gen3}
+                style={baseStyle}
+                pokemon={{ ...basePokemon, shiny: false }}
+                customTypes={[]}
+                linkedPokemon={undefined}
+                game={baseGame}
+            />,
+        );
+
+        expect(screen.queryByAltText("Shiny")).toBeNull();
+    });
+
     it("uses minimal layout when enabled", () => {
         const minimalStyle = { ...baseStyle, minimalTeamLayout: true };
 
