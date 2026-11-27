@@ -685,6 +685,21 @@ export class StyleEditorBase extends React.Component<
 
                 <div className={styleEdit}>
                     <Checkbox
+                        checked={props.style.useArtworkForBoxedPokemon}
+                        name="useArtworkForBoxedPokemon"
+                        label="Use Artwork for Boxed Pokémon"
+                        onChange={(e) =>
+                            editCheckboxEvent(
+                                e,
+                                props,
+                                "useArtworkForBoxedPokemon",
+                            )
+                        }
+                    />
+                </div>
+
+                <div className={styleEdit}>
+                    <Checkbox
                         checked={props.style.minimalDeadLayout}
                         name="minimalDeadLayout"
                         label="Minimal Dead Layout"
