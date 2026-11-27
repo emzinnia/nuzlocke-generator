@@ -45,6 +45,7 @@ export function normalizePokemon(pokemon: Pokemon): NormalizedPokemon {
         shiny: Boolean(pokemon.shiny),
         egg: Boolean(pokemon.egg),
         hidden: Boolean(pokemon.hidden),
+        staticEncounter: Boolean(pokemon.staticEncounter),
         alpha: Boolean(pokemon.alpha),
         mvp: Boolean(pokemon.mvp),
         gift: Boolean(pokemon.gift),
@@ -98,5 +99,4 @@ export function clearNormalizationCache(): void {
     // WeakMap doesn't have a clear method, so we just create a new one
     // This function exists for API consistency but the WeakMap handles cleanup automatically
 }
-
 
