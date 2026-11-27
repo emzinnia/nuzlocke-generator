@@ -39,6 +39,21 @@ export interface TeamPokemonInfoProps {
     game: State["game"];
 }
 
+const usesGameOfOriginBackground = (pokemon: Pokemon, style: Styles) => {
+    if (
+        !style.displayGameOriginForBoxedAndDead ||
+        !pokemon.gameOfOrigin ||
+        pokemon.gameOfOrigin === "None" ||
+        !gameOfOriginToColor(pokemon.gameOfOrigin)
+    ) {
+        return false;
+    }
+
+    return pokemon.status === "Team"
+        ? Boolean(style.displayTeamBackgroundInsteadOfBadge)
+        : Boolean(style.displayBackgroundInsteadOfBadge);
+};
+
 const GameOfOriginBadge = ({
     pokemon,
     style,
@@ -48,7 +63,7 @@ const GameOfOriginBadge = ({
 }) => {
     if (
         !style.displayGameOriginForBoxedAndDead ||
-        style.displayBackgroundInsteadOfBadge ||
+        usesGameOfOriginBackground(pokemon, style) ||
         !pokemon.gameOfOrigin ||
         pokemon.gameOfOrigin === "None"
     ) {
@@ -119,10 +134,9 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
         const gameOfOriginColor = pokemon.gameOfOrigin
             ? gameOfOriginToColor(pokemon.gameOfOrigin)
             : "";
-        const useGameOfOriginBackground = Boolean(
-            style.displayGameOriginForBoxedAndDead &&
-                style.displayBackgroundInsteadOfBadge &&
-                gameOfOriginColor,
+        const useGameOfOriginBackground = usesGameOfOriginBackground(
+            pokemon,
+            style,
         );
         const isCompactTheme =
             style.template === TemplateName.Compact ||

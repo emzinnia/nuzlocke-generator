@@ -819,8 +819,14 @@ export class StyleEditorBase extends React.Component<
                     <Checkbox
                         checked={props.style.displayBackgroundInsteadOfBadge}
                         name="displayBackgroundInsteadOfBadge"
-                        label="Display Background Color Instead of Badge"
+                        label="Display Boxed Background Color Instead of Badge"
                         onChange={(e) => editCheckboxEvent(e, props, "displayBackgroundInsteadOfBadge")}
+                    />
+                    <Checkbox
+                        checked={props.style.displayTeamBackgroundInsteadOfBadge}
+                        name="displayTeamBackgroundInsteadOfBadge"
+                        label="Display Team Background Color Instead of Badge"
+                        onChange={(e) => editCheckboxEvent(e, props, "displayTeamBackgroundInsteadOfBadge")}
                     />
                 </div>
 
