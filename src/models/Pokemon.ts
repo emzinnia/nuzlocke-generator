@@ -20,6 +20,7 @@ export interface Pokemon {
     item?: string;
     types?: [Types, Types];
     teraType?: Types;
+    monolockeType?: Types;
     customImage?: string;
     customIcon?: string;
     customItemImage?: string;
@@ -62,6 +63,7 @@ export const PokemonKeys: Pokemon = {
     item: "",
     types: [Types.Normal, Types.Normal],
     teraType: Types.Normal,
+    monolockeType: "None" as Types,
     customImage: "",
     customIcon: "",
     customItemImage: "",

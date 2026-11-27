@@ -499,6 +499,14 @@ export class CurrentPokemonEditBase extends React.Component<
                         options={this.getTypes(false)}
                         key={this.state.selectedId + "teraType"}
                     />
+                    <CurrentPokemonInput
+                        labelName="Monolocke Type"
+                        inputName="monolockeType"
+                        value={currentPokemon.monolockeType}
+                        type="select"
+                        options={this.getTypes(false)}
+                        key={this.state.selectedId + "monolockeType"}
+                    />
                 </CurrentPokemonLayoutItem>
                 <CurrentPokemonLayoutItem>
                     <CurrentPokemonInput
