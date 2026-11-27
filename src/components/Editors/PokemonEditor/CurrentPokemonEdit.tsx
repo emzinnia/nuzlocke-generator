@@ -718,6 +718,14 @@ export class CurrentPokemonEditBase extends React.Component<
                         pokemon={currentPokemon}
                         key={this.state.selectedId + "nature"}
                     />
+                    <CurrentPokemonInput
+                        labelName="Characteristic"
+                        inputName="characteristic"
+                        placeholder="Alert to sounds"
+                        value={currentPokemon.characteristic}
+                        type="text"
+                        key={this.state.selectedId + "characteristic"}
+                    />
                     <Autocomplete
                         items={listOfAbilities}
                         name="ability"

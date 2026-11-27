@@ -245,6 +245,11 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                                 <strong>{pokemon.nature}</strong> nature
                             </div>
                         ) : null}
+                        {pokemon.characteristic ? (
+                            <div className="pokemon-characteristic">
+                                {pokemon.characteristic}
+                            </div>
+                        ) : null}
                         {pokemon.ability ? (
                             <div className="pokemon-ability">
                                 {pokemon.ability}
@@ -486,6 +491,7 @@ export class TeamPokemonBase extends React.Component<
             "level",
             "metLevel",
             "nature",
+            "characteristic",
             "ability",
             "item",
             "types",

@@ -189,6 +189,7 @@ const SearchHelpContent: React.FC = () => (
                     "item",
                     "ability",
                     "nature",
+                    "characteristic",
                     "forme",
                     "game",
                     "shiny",
