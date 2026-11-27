@@ -23,6 +23,7 @@ import {
 import { selectPokemon } from "actions";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { State } from "state";
+import { CheckpointsDisplay } from "components/Features/Result/TrainerResult";
 
 const spriteStyle = (style: Styles) => {
     if (style.spritesMode) {
@@ -98,6 +99,17 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
             editorDarkMode={poke.style.editorDarkMode}
         />
     );
+    const renderCheckpoints = () =>
+        poke.checkpoints?.length ? (
+            <div className="flex flex-wrap pokemon-checkpoints dead-pokemon-checkpoints">
+                <CheckpointsDisplay
+                    className="pokemon-checkpoint"
+                    game={poke.game}
+                    clearedCheckpoints={poke.checkpoints}
+                    style={style}
+                />
+            </div>
+        ) : null;
     const useGameOfOriginColor =
         poke.gameOfOrigin &&
         poke.style.displayGameOriginForBoxedAndDead &&
@@ -172,6 +184,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                         <div data-testid="cause-of-death">
                             {poke.causeOfDeath}
                         </div>
+                        {renderCheckpoints()}
                         {style.displayGameOriginForBoxedAndDead &&
                             !poke.style.displayBackgroundInsteadOfBadge &&
                             poke.gameOfOrigin && (
@@ -242,6 +255,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                         {poke.level}
                     </div>
                     <div data-testid="cause-of-death">{poke.causeOfDeath}</div>
+                    {renderCheckpoints()}
                     {style.displayGameOriginForBoxedAndDead &&
                         !poke.style.displayBackgroundInsteadOfBadge &&
                         poke.gameOfOrigin && (
@@ -328,6 +342,7 @@ export const DeadPokemonBase = (poke: DeadPokemonProps) => {
                 >
                     {poke.causeOfDeath}
                 </div>
+                {renderCheckpoints()}
                 {style.displayGameOriginForBoxedAndDead &&
                     !poke.style.displayBackgroundInsteadOfBadge &&
                     poke.gameOfOrigin && (
