@@ -525,6 +525,13 @@ export class CurrentPokemonEditBase extends React.Component<
                         type="textArea"
                         key={this.state.selectedId + "notes"}
                     />
+                    <CurrentPokemonInput
+                        labelName="Extra Notes"
+                        inputName="extraNotes"
+                        value={currentPokemon.extraNotes}
+                        type="textArea"
+                        key={this.state.selectedId + "extraNotes"}
+                    />
                     {/* <PokemonNotes /> */}
                 </CurrentPokemonLayoutItem>
                 <CurrentPokemonLayoutItem fullWidth>

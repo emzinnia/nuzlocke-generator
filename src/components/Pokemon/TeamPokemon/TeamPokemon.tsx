@@ -253,8 +253,18 @@ export class TeamPokemonInfo extends React.PureComponent<TeamPokemonInfoProps> {
                         {pokemon.notes && (
                             <div
                                 className="pokemon-notes"
+                                style={{ whiteSpace: "pre-wrap" }}
                                 dangerouslySetInnerHTML={{
                                     __html: pokemon.notes,
+                                }}
+                            />
+                        )}
+                        {pokemon.extraNotes && (
+                            <div
+                                className="pokemon-notes pokemon-extra-notes"
+                                style={{ whiteSpace: "pre-wrap" }}
+                                dangerouslySetInnerHTML={{
+                                    __html: pokemon.extraNotes,
                                 }}
                             />
                         )}

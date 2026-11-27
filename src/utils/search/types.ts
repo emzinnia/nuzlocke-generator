@@ -135,6 +135,7 @@ export interface NormalizedPokemon {
     mvp: boolean;
     gift: boolean;
     notes: string; // lowercase
+    extraNotes: string; // lowercase
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -183,6 +184,7 @@ export const FIELD_ALIASES: Record<string, keyof NormalizedPokemon> = {
     mvp: "mvp",
     gift: "gift",
     notes: "notes",
+    extranotes: "extraNotes",
     name: "nickname",
 };
 
@@ -207,5 +209,4 @@ export const BOOLEAN_FIELDS = new Set<string>([
 
 /** Fields that are numeric */
 export const NUMERIC_FIELDS = new Set<string>(["level", "metLevel"]);
-
 
