@@ -13,6 +13,8 @@ export type ItemStyle = "outer glow" | "round" | "square" | "text";
 export interface StatsOptions {
     averageLevel: boolean;
     averageLevelDetailed: boolean;
+    levelCap: boolean;
+    levelCapValue: string;
     mostCommonKillers: boolean;
     mostCommonTypes: boolean;
     shiniesCaught: boolean;
@@ -119,6 +121,8 @@ export const styleDefaults: Styles = {
     statsOptions: {
         averageLevel: false,
         averageLevelDetailed: false,
+        levelCap: false,
+        levelCapValue: "",
         mostCommonKillers: false,
         mostCommonTypes: false,
         shiniesCaught: false,
