@@ -74,17 +74,34 @@ export class ColorEditBase extends React.Component<
                 <Popover
                     interactionKind={PopoverInteractionKind.CLICK}
                     content={
-                        <ChromePicker
-                            color={value}
-                            onChangeComplete={(color) => {
-                                onColorChange(color);
+                        <div
+                            style={{
+                                maxWidth: "calc(100vw - 2rem)",
+                                overflowX: "auto",
                             }}
-                        />
+                        >
+                            <ChromePicker
+                                color={value}
+                                onChangeComplete={(color) => {
+                                    onColorChange(color);
+                                }}
+                            />
+                        </div>
                     }
                 >
-                    <div style={{ display: "flex", alignItems: "center" }}>
+                    <div
+                        style={{
+                            alignItems: "center",
+                            display: "flex",
+                            maxWidth: "100%",
+                            minWidth: 0,
+                        }}
+                    >
                         <input
-                            style={{ border: "none" }}
+                            style={{
+                                border: "none",
+                                minWidth: 0,
+                            }}
                             onChange={onChange}
                             type="text"
                             className={cx(

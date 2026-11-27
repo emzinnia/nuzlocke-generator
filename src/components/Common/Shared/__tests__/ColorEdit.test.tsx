@@ -70,6 +70,12 @@ describe("ColorEditBase", () => {
         expect(input.name).toBe("test-color");
     });
 
+    it("allows the text input to shrink in narrow layouts", () => {
+        render(<ColorEditBase {...defaultProps} />);
+        const input = screen.getByRole("textbox") as HTMLInputElement;
+        expect(input.style.minWidth).toBe("0");
+    });
+
     it("displays rgba format for colors with transparency", () => {
         const propsWithAlpha = {
             ...defaultProps,
