@@ -4,7 +4,12 @@ import { Pokemon } from "models";
 import { State } from "state";
 import { PokemonImage } from "components/Common/Shared/PokemonImage";
 import { ResizedImage } from "components/Common/Shared/ResizedImage";
-import { getBackgroundGradient, getHeldItemIconPath, typeToColor } from "utils";
+import {
+    getBackgroundGradient,
+    getHeldItemIconPath,
+    TemplateName,
+    typeToColor,
+} from "utils";
 
 const itemLabelStyle = {
     base: css`
@@ -35,6 +40,9 @@ const itemLabelStyle = {
         margin: 0;
         bottom: 0.5rem;
     `,
+    ["cards with horizontal moves"]: css`
+        bottom: 3rem;
+    `,
     ["text"]: css`
         display: none !important;
     `,
@@ -50,6 +58,10 @@ export function PokemonItem({
     customTypes: State["customTypes"];
 }) {
     const getSecondType = pokemon?.types?.[1] || "Normal";
+    const liftCardsItemAboveMoves =
+        style.template === TemplateName.Cards &&
+        style.showPokemonMoves &&
+        style.movesPosition === "horizontal";
 
     return (pokemon.item || pokemon.customItemImage) &&
         !style.displayItemAsText ? (
@@ -74,6 +86,12 @@ export function PokemonItem({
             className={cx(
                 itemLabelStyle.base,
                 itemLabelStyle[style.itemStyle],
+                liftCardsItemAboveMoves
+                    ? itemLabelStyle["cards with horizontal moves"]
+                    : undefined,
+                liftCardsItemAboveMoves
+                    ? "pokemon-item--cards-with-horizontal-moves"
+                    : undefined,
                 "pokemon-item",
             )}
         >
