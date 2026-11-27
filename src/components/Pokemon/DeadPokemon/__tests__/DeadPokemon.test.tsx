@@ -27,4 +27,42 @@ describe("<DeadPokemon />", () => {
             poke.causeOfDeath,
         );
     });
+
+    it("can hide game origin for dead pokemon while the global option is enabled", () => {
+        render(
+            <DeadPokemonBase
+                game={{ name: "Red", customName: "" }}
+                style={{
+                    ...styleDefaults,
+                    displayGameOriginForBoxedAndDead: true,
+                    displayGameOriginForBoxedPokemon: true,
+                    displayGameOriginForDeadPokemon: false,
+                }}
+                selectPokemon={vi.fn()}
+                minimal={false}
+                {...poke}
+                gameOfOrigin="Red"
+            />,
+        );
+
+        expect(screen.queryByText("Red")).toBeNull();
+    });
+
+    it("shows game origin for dead pokemon by default when the global option is enabled", () => {
+        render(
+            <DeadPokemonBase
+                game={{ name: "Red", customName: "" }}
+                style={{
+                    ...styleDefaults,
+                    displayGameOriginForBoxedAndDead: true,
+                }}
+                selectPokemon={vi.fn()}
+                minimal={false}
+                {...poke}
+                gameOfOrigin="Red"
+            />,
+        );
+
+        expect(screen.getByText("Red")).toBeTruthy();
+    });
 });
