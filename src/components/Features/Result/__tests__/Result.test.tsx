@@ -1,7 +1,7 @@
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
 
-import { ResultBase, BackspriteMontage } from "../Result";
+import { ResultBase, BackspriteMontage, HighlightMoments } from "../Result";
 import { styleDefaults, generateEmptyPokemon } from "utils";
 import { Editor, Box, Pokemon } from "models";
 
@@ -123,6 +123,57 @@ describe("<ResultBase />", () => {
         expect(screen.getByText("Boxed")).toBeTruthy();
         expect(screen.getByText(/Dead/)).toBeTruthy();
         expect(screen.getByText(/Champs/)).toBeTruthy();
+    });
+});
+
+describe("<HighlightMoments />", () => {
+    it("renders MVP and note-backed Pokémon highlights", () => {
+        const pokemon = [
+            generateEmptyPokemon([], {
+                id: "1",
+                species: "Donphan",
+                nickname: "Pachy",
+                status: "Dead",
+                mvp: true,
+                notes: "Survived two league hits.",
+            }),
+            generateEmptyPokemon([], {
+                id: "2",
+                species: "Garchomp",
+                status: "Team",
+                mvp: true,
+            }),
+            generateEmptyPokemon([], {
+                id: "3",
+                species: "Starmie",
+                status: "Champs",
+            }),
+        ];
+
+        render(<HighlightMoments pokemon={pokemon} color="#eee" style={{}} />);
+
+        expect(screen.getByText("Highlight Moments")).toBeTruthy();
+        expect(screen.getByText("Pachy")).toBeTruthy();
+        expect(screen.getByText("Survived two league hits.")).toBeTruthy();
+        expect(screen.getByText("Garchomp")).toBeTruthy();
+        expect(screen.queryByText("Starmie")).toBeNull();
+        expect(screen.getAllByText(/MVP/)).toHaveLength(2);
+    });
+
+    it("does not render when there are no highlights", () => {
+        const pokemon = [
+            generateEmptyPokemon([], {
+                id: "1",
+                species: "Starmie",
+                status: "Champs",
+            }),
+        ];
+
+        const { container } = render(
+            <HighlightMoments pokemon={pokemon} color="#eee" style={{}} />,
+        );
+
+        expect(container.firstChild).toBeNull();
     });
 });
 
