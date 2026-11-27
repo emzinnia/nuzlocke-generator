@@ -20,6 +20,10 @@ https://nuzlocke-generator.com/
 
 If you have ideas for features of fixes, please tell me! I want to make this app as useful as possible.
 
+## Translations
+
+The app is currently English-only. See [docs/TRANSLATIONS.md](docs/TRANSLATIONS.md) for the current translation status and contribution path.
+
 ## Running Locally
 
 In order to run this application locally, you'll need [NodeJS](https://nodejs.org/en/) and [Git](https://git-scm.com/). After installing those, start by opening the command prompt and running the following commands:
