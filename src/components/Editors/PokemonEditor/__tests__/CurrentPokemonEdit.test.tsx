@@ -5,6 +5,12 @@ import { CurrentPokemonEditBase } from "../CurrentPokemonEdit";
 import { Pokemon } from "models";
 import { generateEmptyPokemon } from "utils";
 import type { addPokemon, editPokemon, selectPokemon } from "actions";
+import type { AnyAction, Reducer } from "redux";
+import { appReducers } from "reducers";
+import type { State } from "state";
+import { createDefaultState } from "store";
+import { Provider } from "store/reactZustand";
+import { createReduxCompatibleZustandStore } from "store/zustandReduxStore";
 
 const boxes = [
     { id: 0, position: 0, name: "Team" },
@@ -59,13 +65,14 @@ describe("<CurrentPokemonEdit />", () => {
 
     it("updates the status dropdown when custom boxes are added after mount", () => {
         const pokemon = createPokemon("poke-a", "Voltorb");
-        const { rerender } = renderEditor(pokemon.id, [pokemon], vi.fn());
-        expect(screen.queryByRole("option", { name: "Armory" })).toBeNull();
-
-        rerender(
+        const store = createReduxCompatibleZustandStore({
+            initialState: { ...createDefaultState(), selectedId: pokemon.id },
+            reducer: appReducers as unknown as Reducer<State, AnyAction>,
+        });
+        const renderWithBoxes = (box: typeof boxes) => (
             <CurrentPokemonEditBase
                 selectedId={pokemon.id}
-                box={[...boxes, { id: 3, position: 3, name: "Armory" }]}
+                box={box}
                 pokemon={[pokemon]}
                 selectPokemon={vi.fn() as unknown as selectPokemon}
                 editPokemon={vi.fn() as unknown as editPokemon}
@@ -74,9 +81,18 @@ describe("<CurrentPokemonEdit />", () => {
                 editor={editor}
                 customTypes={[]}
                 customAreas={[]}
-            />,
+            />
         );
-
+        const { rerender } = render(renderWithBoxes(boxes), {
+            wrapper: ({ children }) => (
+                <Provider store={store}>{children}</Provider>
+            ),
+        });
+        expect(screen.getByRole("option", { name: "Team" })).toBeDefined();
+        expect(screen.queryByRole("option", { name: "Armory" })).toBeNull();
+        rerender(
+            renderWithBoxes([...boxes, { id: 3, position: 3, name: "Armory" }]),
+        );
         expect(screen.getByRole("option", { name: "Armory" })).toBeDefined();
     });
 
