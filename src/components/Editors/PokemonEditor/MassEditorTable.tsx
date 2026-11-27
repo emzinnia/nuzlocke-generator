@@ -21,6 +21,67 @@ export interface MassEditorTableProps {
     editPokemon: editPokemonType;
 }
 
+const BOOLEAN_POKEMON_KEYS = new Set<keyof Pokemon>([
+    "shiny",
+    "egg",
+    "hidden",
+    "mvp",
+    "gift",
+    "alpha",
+    "champion",
+]);
+
+const NUMBER_POKEMON_KEYS = new Set<keyof Pokemon>([
+    "level",
+    "metLevel",
+    "position",
+]);
+
+/**
+ * Coerce Mass Editor cell text back into the types Pokemon fields expect.
+ * EditableCell always yields strings; without this, values like `"false"` stay
+ * truthy and break shiny/egg/hidden/etc. checks across the app.
+ */
+export function coerceMassEditorValue(
+    key: keyof Pokemon,
+    value: string,
+): Pokemon[keyof Pokemon] | string[] | undefined {
+    if (key === "moves" || key === "types") {
+        return value.split(",").map((s) => s.trim()).filter(Boolean);
+    }
+
+    if (BOOLEAN_POKEMON_KEYS.has(key)) {
+        const normalized = value.trim().toLowerCase();
+        if (
+            normalized === "true" ||
+            normalized === "yes" ||
+            normalized === "1"
+        ) {
+            return true;
+        }
+        if (
+            normalized === "false" ||
+            normalized === "no" ||
+            normalized === "0" ||
+            normalized === ""
+        ) {
+            return false;
+        }
+        return false;
+    }
+
+    if (NUMBER_POKEMON_KEYS.has(key)) {
+        const trimmed = value.trim();
+        if (trimmed === "") {
+            return undefined;
+        }
+        const parsed = Number(trimmed);
+        return Number.isFinite(parsed) ? parsed : undefined;
+    }
+
+    return value;
+}
+
 const determineCell = (
     key: keyof Pokemon,
     value: unknown,
@@ -58,11 +119,8 @@ const determineCell = (
                     : String(value);
     return (
         <EditableCell
-            onConfirm={(value) => {
-                let transformedValue: string | string[] = value;
-                if (key === "moves" || key === "types") {
-                    transformedValue = value?.split(",").map((s) => s.trim());
-                }
+            onConfirm={(rawValue) => {
+                const transformedValue = coerceMassEditorValue(key, rawValue);
                 editPokemon({ [key]: transformedValue }, id);
             }}
             value={displayValue}
