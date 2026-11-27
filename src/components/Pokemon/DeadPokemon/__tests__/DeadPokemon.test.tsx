@@ -14,7 +14,7 @@ const poke = {
 
 describe("<DeadPokemon />", () => {
     it("renders its content", () => {
-        render(
+        const { container } = render(
             <DeadPokemonBase
                 game={{ name: "Red", customName: "" }}
                 style={styleDefaults}
@@ -25,6 +25,9 @@ describe("<DeadPokemon />", () => {
         );
         expect(screen.getByTestId("cause-of-death").textContent).toContain(
             poke.causeOfDeath,
+        );
+        expect(container.querySelector(".pokemon-levels")?.textContent).toBe(
+            "Levels\u00a03—50",
         );
     });
 });

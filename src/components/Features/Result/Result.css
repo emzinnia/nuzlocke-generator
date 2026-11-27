@@ -252,6 +252,7 @@
 }
 .pokemon-levels {
     margin: 0 !important;
+    white-space: nowrap;
 }
 .trainer-container {
     background: #333;
@@ -462,4 +463,3 @@
 .pokemon-checkpoint.obtained {
     display: flex;
 }
-
