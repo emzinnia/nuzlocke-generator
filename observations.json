@@ -1,0 +1,901 @@
+{
+  "commit": "ace93f949e8d167e8cadd32ff2a3bd806c7ab826",
+  "items": {
+    "1417": {
+      "title": "Fix Gen 5 import reading the backup save slot",
+      "baseline": [
+        "baseline/1417.png"
+      ],
+      "measurements": [
+        [
+          "Game",
+          "Black 2",
+          "Black 2"
+        ],
+        [
+          "Team",
+          "None",
+          "Haxorus"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1417.png"
+    },
+    "1405": {
+      "title": "Fix Crystal save import met level and location",
+      "baseline": [
+        "baseline/1405-feraligatr.png",
+        "baseline/1405-steelix.png"
+      ],
+      "measurements": [
+        [
+          "Feraligatr",
+          "New Bark Town, 34",
+          "New Bark Town, 5"
+        ],
+        [
+          "Steelix",
+          "Route 5, 16",
+          "Victory Road, 33"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1405.png"
+    },
+    "1387": {
+      "title": "Fix HGSS Gen 4 mixed-block import after #1357",
+      "baseline": [
+        "baseline/1387.png"
+      ],
+      "measurements": [
+        [
+          "Trainer time",
+          "14:42:32",
+          "14:41:59"
+        ],
+        [
+          "Boxed Pokémon count",
+          "6",
+          "6"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1387.png"
+    },
+    "1383": {
+      "title": "Fix Gen 1/2 save import dropping Pokémon in the current PC box",
+      "baseline": [
+        "baseline/1383.png"
+      ],
+      "measurements": [
+        [
+          "Current PC box contains Charmander",
+          "No",
+          "Yes"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1383.png"
+    },
+    "1378": {
+      "title": "Fix Gen 1/2 save import badge bit-order mapping",
+      "baseline": [
+        "baseline/1378-red-badge.png",
+        "baseline/1378-gold-badge.png",
+        "baseline/1378-emerald-money.png",
+        "baseline/1378-heartgold-badges.png"
+      ],
+      "measurements": [
+        [
+          "Red earned badges",
+          "Boulder Badge",
+          "Cascade Badge"
+        ],
+        [
+          "Gold earned badges",
+          "Rising Badge",
+          "Zephyr Badge"
+        ],
+        [
+          "Emerald trainer money",
+          "16711680",
+          "999999"
+        ],
+        [
+          "HeartGold earned badges",
+          "Zephyr Badge, Hive Badge, Plain Badge, Fog Badge, Storm Badge, Mineral Badge, Glacier Badge, Rising Badge",
+          "Zephyr Badge, Hive Badge, Plain Badge, Fog Badge, Storm Badge, Mineral Badge, Glacier Badge, Rising Badge, Boulder Badge, Thunder Badge"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1378.png"
+    },
+    "1374": {
+      "title": "Fix crash on partial JSON import with Override",
+      "baseline": [
+        "baseline/1374.png"
+      ],
+      "measurements": [
+        [
+          "Import dialog open",
+          "Yes",
+          "No"
+        ],
+        [
+          "Game",
+          "None",
+          "Emerald"
+        ],
+        [
+          "Species",
+          "Bulbasaur",
+          "Bulbasaur"
+        ],
+        [
+          "Page errors",
+          "Minified Redux error #14; visit https://redux.js.org/Errors?code=14 for the full",
+          "None"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1374.png"
+    },
+    "1372": {
+      "title": "Fix nested nuzlockes growth from export copy/import",
+      "baseline": [
+        "baseline/1372-export.png"
+      ],
+      "measurements": [
+        [
+          "Imported slot contains other runs",
+          "Yes",
+          "No"
+        ],
+        [
+          "Imported slot contains editor history",
+          "No",
+          "No"
+        ],
+        [
+          "Copied export contains other runs",
+          "Yes",
+          "No"
+        ]
+      ],
+      "notes": "The exported text and imported save snapshots omit nested run and history data. The downloadable backup remains available.",
+      "source": "after-production",
+      "proof": "screenshots/1372.png"
+    },
+    "1367": {
+      "title": "Fix silent data loss when localStorage auto-persist hits quota",
+      "baseline": [
+        "baseline/1367.png"
+      ],
+      "measurements": [
+        [
+          "Alerts",
+          "None",
+          "Auto-save failed. Browser storage may be full — export your data and delete old saves."
+        ],
+        [
+          "Quota errors",
+          "2",
+          "0"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1367.png"
+    },
+    "1363": {
+      "title": "Fix Gen 3 filename abbreviation matching",
+      "baseline": [
+        "baseline/1363.png",
+        "baseline/1363-sparkle.png"
+      ],
+      "measurements": [
+        [
+          "FRIDAY.sav team",
+          "None",
+          "Salamence, Magcargo, Smeargle"
+        ],
+        [
+          "sparkle.sav team",
+          "None",
+          "Charizard, Venusaur, Blastoise, Nidoking, Pidgeot, Pikachu"
+        ],
+        [
+          "FRIDAY.sav inferred label",
+          "FireRed",
+          "FireRed"
+        ],
+        [
+          "sparkle.sav inferred label",
+          "Sapphire",
+          "LeafGreen"
+        ]
+      ],
+      "notes": "Both filenames import the correct parties. The displayed Gen 3 game label is inferred separately from Pokémon origins.",
+      "source": "after-production",
+      "proof": "screenshots/1363.png"
+    },
+    "1361": {
+      "title": "Preserve customized checkpoints when importing save files",
+      "baseline": [
+        "baseline/1361.png"
+      ],
+      "measurements": [
+        [
+          "Game",
+          "HeartGold",
+          "HeartGold"
+        ],
+        [
+          "Checkpoints",
+          "Zephyr Badge, Hive Badge, Plain Badge, Fog Badge, Storm Badge, Mineral Badge, Glacier Badge, Rising Badge, Boulder Badge, Cascade Badge, Thunder Badge, Rainbow Badge, Soul Badge, Marsh Badge, Volcano Badge, Earth Badge",
+          "Custom checkpoint"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1361.png"
+    },
+    "1360": {
+      "title": "Fix data loss when importing JSON runs",
+      "baseline": [
+        "baseline/1360-imported-run.png"
+      ],
+      "measurements": [
+        [
+          "Outgoing save trainer",
+          "(empty)",
+          "Edited current"
+        ],
+        [
+          "Incoming save trainer",
+          "Incoming",
+          "Incoming"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1360.png"
+    },
+    "1326": {
+      "title": "Fix Gen 1 and Gen 2 save box imports",
+      "baseline": [
+        "baseline/1326.png",
+        "baseline/1326-gold.png"
+      ],
+      "measurements": [
+        [
+          "Pokémon count",
+          "156",
+          "167"
+        ],
+        [
+          "Gold Pokémon count",
+          "180",
+          "175"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1326.png"
+    },
+    "1318": {
+      "title": "Deduplicate Gen 1 save import IDs",
+      "baseline": [
+        "baseline/1318.png"
+      ],
+      "measurements": [
+        [
+          "Pokémon count",
+          "156",
+          "167"
+        ],
+        [
+          "Unique Pokémon IDs",
+          "112",
+          "167"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1318.png"
+    },
+    "1244": {
+      "title": "Fix save import worker failures and Gen 4 routing",
+      "baseline": [
+        "baseline/1244.png"
+      ],
+      "measurements": [
+        [
+          "Game",
+          "None",
+          "HeartGold"
+        ],
+        [
+          "Team",
+          "",
+          "Typhlosion, Dragonite, Gyarados, Scizor, Lucario, Sceptile"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1244.png"
+    },
+    "1213": {
+      "title": "Show Gen 4 save options by default",
+      "baseline": [
+        "baseline/1213.png"
+      ],
+      "measurements": [
+        [
+          "Formats",
+          "Auto, RBY, GS, Crystal, RS, FRLG, Emerald, BW, B2W2",
+          "Auto, RBY, GS, Crystal, RS, FRLG, Emerald, DP, Platinum, HGSS, BW, B2W2"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1213.png"
+    },
+    "1207": {
+      "title": "Fix persisted state restore when one slice is corrupt",
+      "baseline": [
+        "baseline/1207.png"
+      ],
+      "measurements": [
+        [
+          "Trainer name after reload",
+          "(empty)",
+          "Tatsugiri proof"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1207.png"
+    },
+    "1418": {
+      "title": "Fix custom box edits deleting a different box",
+      "baseline": [
+        "baseline/1418.png"
+      ],
+      "measurements": [
+        [
+          "Safari boxes remaining",
+          "0",
+          "1"
+        ],
+        [
+          "Graveyard boxes remaining",
+          "0",
+          "0"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1418.png"
+    },
+    "1414": {
+      "title": "Fix met location dropping characters while typing",
+      "baseline": [
+        "baseline/1414.png"
+      ],
+      "measurements": [
+        [
+          "Location",
+          "Virian Forest",
+          "Viridian Forest"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1414.png"
+    },
+    "1411": {
+      "title": "Fix trainer fields dropping characters while typing",
+      "baseline": [
+        "baseline/1411.png"
+      ],
+      "measurements": [
+        [
+          "Trainer name",
+          "A",
+          "Ab"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1411.png"
+    },
+    "1394": {
+      "title": "Fix Type Matchups confirm boxing cancelled preview Pokémon",
+      "baseline": [
+        "baseline/1394.png"
+      ],
+      "measurements": [
+        [
+          "Pikachu",
+          "Team",
+          "Team"
+        ],
+        [
+          "Eevee",
+          "Boxed",
+          "Daycare"
+        ],
+        [
+          "Magikarp",
+          "Team",
+          "Team"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1394.png"
+    },
+    "1389": {
+      "title": "Fix species/met debounce writing edits to the newly selected Pokémon",
+      "baseline": [
+        "baseline/1389.png"
+      ],
+      "measurements": [
+        [
+          "Selected",
+          "Bulbasaur",
+          "Bulbasaur"
+        ],
+        [
+          "Met location",
+          "Charmander-only place",
+          "(empty)"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1389.png"
+    },
+    "1380": {
+      "title": "Fix badge progress loss when renaming checkpoints",
+      "baseline": [
+        "baseline/1380.png"
+      ],
+      "measurements": [
+        [
+          "Checkpoint",
+          "Stone Badge",
+          "Stone Badge"
+        ],
+        [
+          "Earned",
+          "Boulder Badge",
+          "Stone Badge"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1380.png"
+    },
+    "1373": {
+      "title": "Fix Mass Editor boolean corruption and Showdown position collisions",
+      "baseline": [
+        "baseline/1373-showdown-overflow.png"
+      ],
+      "measurements": [
+        [
+          "Team",
+          "Bulbasaur, Charmander, Squirtle, Pidgey, Caterpie, Rattata, Spearow",
+          "Bulbasaur, Charmander, Squirtle, Pidgey, Caterpie, Rattata"
+        ],
+        [
+          "Reserve",
+          "None",
+          "Spearow"
+        ],
+        [
+          "Positions",
+          "0, 1, 2, 3, 4, 5, 6",
+          "0, 1, 2, 3, 4, 5, 6"
+        ],
+        [
+          "Saved shiny type",
+          null,
+          "boolean"
+        ],
+        [
+          "Saved shiny value",
+          null,
+          "No"
+        ]
+      ],
+      "notes": "The Showdown import gives the first six Pokémon Team status and puts Spearow in Boxed.",
+      "source": "after-production",
+      "proof": "screenshots/1373.png"
+    },
+    "1371": {
+      "title": "Fix rules delete off-by-one and restore crash",
+      "baseline": [
+        "baseline/1371.png"
+      ],
+      "measurements": [
+        [
+          "Rules",
+          "Each Pokémon that faints is considered dead and must be released or permaboxed, You can only catch the first Pokemon you encounter in an area, All Pokémon must be nicknamed",
+          "You can only catch the first Pokemon you encounter in an area, All Pokémon must be nicknamed"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1371.png"
+    },
+    "1338": {
+      "title": "Fix capped undo history corruption",
+      "baseline": [
+        "baseline/1338-second-undo.png"
+      ],
+      "measurements": [
+        [
+          "Level after 53 edits",
+          "58",
+          "58"
+        ],
+        [
+          "After one undo",
+          "57",
+          "57"
+        ],
+        [
+          "After two undos",
+          "57",
+          "56"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1338.png"
+    },
+    "1327": {
+      "title": "Make custom version names explicit",
+      "baseline": [
+        "baseline/1327.png"
+      ],
+      "measurements": [
+        [
+          "Result banner and title",
+          "Radical Red, FireRed Nuzlocke",
+          "Radical Red, Radical Red Nuzlocke"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1327.png"
+    },
+    "1323": {
+      "title": "Add location checklist sorting",
+      "baseline": [
+        "baseline/1323.png"
+      ],
+      "measurements": [
+        [
+          "Sort mode",
+          "None",
+          "alphabetical"
+        ],
+        [
+          "Abandoned Ship before Route 101",
+          null,
+          "Yes"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1323.png"
+    },
+    "1319": {
+      "title": "Add level cap stats check",
+      "baseline": [],
+      "measurements": [
+        [
+          "Visible result",
+          null,
+          "Level Cap: 15, Over Level Cap: Bulbasaur (18)"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1319.png"
+    },
+    "1313": {
+      "title": "Allow custom nature text",
+      "baseline": [
+        "baseline/1313.png"
+      ],
+      "measurements": [
+        [
+          "Nature",
+          "None",
+          "Determined"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1313.png"
+    },
+    "1312": {
+      "title": "Expose custom result font setting",
+      "baseline": [
+        "baseline/1312.png"
+      ],
+      "measurements": [
+        [
+          "Font family",
+          "Arial",
+          "Georgia"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1312.png"
+    },
+    "1311": {
+      "title": "Add death order sort option",
+      "baseline": [
+        "baseline/1311.png"
+      ],
+      "measurements": [
+        [
+          "Order",
+          "Late, Early",
+          "Early, Late"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1311.png"
+    },
+    "1297": {
+      "title": "Fix location checklist game filtering",
+      "baseline": [
+        "baseline/1297.png"
+      ],
+      "measurements": [
+        [
+          "Default game",
+          "None",
+          "Emerald"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1297.png"
+    },
+    "1293": {
+      "title": "Fix custom box status options",
+      "baseline": [
+        "baseline/1293.png"
+      ],
+      "measurements": [
+        [
+          "Armory status options",
+          "0",
+          "1"
+        ],
+        [
+          "Selected",
+          "Team",
+          "Armory"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1293.png"
+    },
+    "1286": {
+      "title": "Enable Mass Editor column sorting",
+      "baseline": [
+        "baseline/1286.png"
+      ],
+      "measurements": [
+        [
+          "Sort enabled",
+          "No",
+          "Yes"
+        ],
+        [
+          "Ascending",
+          null,
+          "Yes"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1286.png"
+    },
+    "1211": {
+      "title": "Fix clearing Met Location",
+      "baseline": [
+        "baseline/1211.png"
+      ],
+      "measurements": [
+        [
+          "Saved met location",
+          "Route 1",
+          "(empty)"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1211.png"
+    },
+    "1421": {
+      "title": "Fix Let's Go shiny and Hisuian sprite 404s",
+      "baseline": [
+        "baseline/1421-hisui.png",
+        "baseline/1421-lets-go-shiny.png"
+      ],
+      "measurements": [
+        [
+          "Legends: Arceus sprite",
+          "https://www.serebii.net/legendsarceus/pokemon/724.png",
+          "https://www.serebii.net/legendsarceus/pokemon/724-h.png"
+        ],
+        [
+          "Let’s Go shiny sprite",
+          "https://www.serebii.net/Shiny/LetsGo/001.png",
+          "https://www.serebii.net/Shiny/SM/001.png"
+        ]
+      ],
+      "notes": "Both screenshot frames show the rendering from the release candidate. The public site already used the older Let’s Go fallback before the master regression.",
+      "source": "after-production",
+      "proof": "screenshots/1421.png"
+    },
+    "1324": {
+      "title": "Add missing G-Max and Hisuian form options",
+      "baseline": [
+        "baseline/1324-hisuian-decidueye.png",
+        "baseline/1324-gigantamax-corviknight.png"
+      ],
+      "measurements": [
+        [
+          "Hisuian",
+          "No",
+          "Yes"
+        ],
+        [
+          "Hisuian types",
+          null,
+          "Grass, Fighting"
+        ],
+        [
+          "Gigantamax",
+          "No",
+          "Yes"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1324.png"
+    },
+    "1254": {
+      "title": "Add Strange Ball option",
+      "baseline": [
+        "baseline/1254.png"
+      ],
+      "measurements": [
+        [
+          "Listed",
+          "No",
+          "Yes"
+        ],
+        [
+          "Stored",
+          null,
+          "Strange Ball"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1254.png"
+    },
+    "1235": {
+      "title": "Add missing Hisui form box icons",
+      "baseline": [
+        "baseline/1235.png"
+      ],
+      "measurements": [
+        [
+          "Icons",
+          "icons/pokemon/unknown.png (40 px)",
+          "icons/pokemon/regular/typhlosion-hisui.png (40 px)"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1235.png"
+    },
+    "1223": {
+      "title": "[codex] Add Tera Shard held items",
+      "baseline": [
+        "baseline/1223.png"
+      ],
+      "measurements": [
+        [
+          "Suggestion",
+          "No",
+          "Yes"
+        ],
+        [
+          "Stored",
+          "Fire Tera Shard",
+          "Fire Tera Shard"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1223.png"
+    },
+    "1217": {
+      "title": "Add Poltchageist evolution",
+      "baseline": [
+        "baseline/1217-result.png"
+      ],
+      "measurements": [
+        [
+          "Species",
+          "Poltchageist",
+          "Sinistcha"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1217.png"
+    },
+    "1216": {
+      "title": "Add missing Hisui moves",
+      "baseline": [
+        "baseline/1216.png"
+      ],
+      "measurements": [
+        [
+          "Rendered move class",
+          "move move-headlong-rush move-normal long-text-move",
+          "move move-headlong-rush move-ground long-text-move"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1216.png"
+    },
+    "1180": {
+      "title": "fix Aggron type order",
+      "baseline": [
+        "baseline/1180-aggron.png",
+        "baseline/1180-mega-lopunny.png"
+      ],
+      "measurements": [
+        [
+          "Aggron",
+          "Rock, Steel",
+          "Steel, Rock"
+        ],
+        [
+          "Mega Lopunny",
+          "Normal, Normal",
+          "Normal, Fighting"
+        ]
+      ],
+      "notes": "",
+      "source": "after-production",
+      "proof": "screenshots/1180.png"
+    }
+  },
+  "missing": []
+}
