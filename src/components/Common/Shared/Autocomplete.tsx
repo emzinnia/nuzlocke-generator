@@ -1,7 +1,6 @@
 import * as React from "react";
 import { cx } from "emotion";
 import "./Autocomplete.css";
-import { useDebounceCallback } from "@react-hook/debounce";
 import { css } from "emotion";
 
 export interface AutocompleteProps {
@@ -64,8 +63,42 @@ export function Autocomplete({
     const [visibleItems, setVisibleItems] = React.useState<string[]>(() => filter(items, value) ?? []);
     const listRef = React.useRef<HTMLUListElement>(null);
     const closeTimeoutRef = React.useRef<number | undefined>(undefined);
+    const changeTimeoutRef = React.useRef<number | undefined>(undefined);
 
-    const delayedValue = useDebounceCallback((e) => onChange(e), 300);
+    const clearPendingChange = React.useCallback(() => {
+        if (changeTimeoutRef.current) {
+            window.clearTimeout(changeTimeoutRef.current);
+            changeTimeoutRef.current = undefined;
+        }
+    }, []);
+
+    const delayedValue = React.useCallback(
+        (nextValue: string) => {
+            clearPendingChange();
+            changeTimeoutRef.current = window.setTimeout(() => {
+                onChange({ target: { value: nextValue } });
+                changeTimeoutRef.current = undefined;
+            }, 300);
+        },
+        [clearPendingChange, onChange],
+    );
+
+    const commitValue = React.useCallback(
+        (nextValue: string) => {
+            clearPendingChange();
+            setValue(nextValue);
+            setVisibleItems(filter(items, nextValue));
+            onChange({ target: { value: nextValue } });
+        },
+        [clearPendingChange, items, onChange],
+    );
+
+    React.useEffect(
+        () => () => {
+            clearPendingChange();
+        },
+        [clearPendingChange],
+    );
 
     React.useEffect(() => {
         setValue(value);
@@ -81,7 +114,7 @@ export function Autocomplete({
             }
             setValue(e.target.value);
             setVisibleItems(filter(items, e.target.value));
-            delayedValue({ target: { value: e.target.value } });
+            delayedValue(e.target.value);
         };
 
     const handleMovement = (e) => {
@@ -121,18 +154,18 @@ export function Autocomplete({
         // Keep list in sync when reopening without changing the input value.
         setVisibleItems(filter(items, innerValue) ?? []);
     };
-    const closeList = (e) => {
+    const closeList = (e, nextValue = e.target.value) => {
         if (closeTimeoutRef.current) {
             window.clearTimeout(closeTimeoutRef.current);
         }
         closeTimeoutRef.current = window.setTimeout(() => {
             setIsOpen(false);
             // Keep visible items aligned to the last typed value; reopening will re-filter anyway.
-            setVisibleItems(filter(items, e.target.value) ?? []);
+            setVisibleItems(filter(items, nextValue) ?? []);
             setSelectedValue("");
             closeTimeoutRef.current = undefined;
         }, 250);
-        setValue(e.target.value);
+        setValue(nextValue);
     };
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         e.persist();
@@ -152,17 +185,12 @@ export function Autocomplete({
         switch (true) {
             case isEnter:
                 e.preventDefault();
-                if (selectedValue) {
-                    setValue(selectedValue);
+                {
+                    const nextValue =
+                        selectedValue !== "" ? selectedValue : innerValue;
+                    commitValue(nextValue);
+                    closeList(e, nextValue);
                 }
-                closeList(e);
-                changeEvent(false)({
-                    ...e,
-                    target: {
-                        value:
-                            selectedValue !== "" ? selectedValue : innerValue,
-                    },
-                });
                 break;
             case isBackspace:
                 break;
@@ -186,7 +214,7 @@ export function Autocomplete({
         }
         setIsOpen(false);
         setSelectedValue("");
-        changeEvent(false)({ ...e, target: { value } });
+        commitValue(value);
     };
 
     React.useEffect(() => {

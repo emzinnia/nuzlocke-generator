@@ -90,4 +90,40 @@ describe("<Autcomplete />", () => {
             expect(document.querySelector(".autocomplete-items")).not.toBeNull();
         });
     });
+
+    it("commits the highlighted item immediately when pressing Enter", async () => {
+        vi.useFakeTimers();
+        const onChange = vi.fn();
+
+        render(
+            <Autocomplete
+                value=""
+                onChange={onChange}
+                items={["Pickup", "Pikachu"]}
+            />,
+        );
+
+        const input = screen.getByTestId("autocomplete");
+
+        fireEvent.focus(input);
+        fireEvent.change(input, { target: { value: "Pi" } });
+        fireEvent.keyDown(input, { key: "ArrowDown", which: 40 });
+
+        await waitFor(() => {
+            expect(
+                document.querySelector(".autocomplete-selected")?.textContent,
+            ).toBe("Pickup");
+        });
+
+        fireEvent.keyDown(input, { key: "Enter", which: 13 });
+
+        expect(onChange).toHaveBeenCalledTimes(1);
+        expect(onChange).toHaveBeenLastCalledWith({
+            target: { value: "Pickup" },
+        });
+
+        vi.runAllTimers();
+
+        expect(onChange).toHaveBeenCalledTimes(1);
+    });
 });
