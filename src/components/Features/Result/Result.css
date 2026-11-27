@@ -88,6 +88,11 @@
 .badge-wrapper img {
     height: 1.5rem;
 }
+.badge-wrapper img.custom-checkpoint {
+    flex: 0 0 1.5rem;
+    object-fit: contain;
+    width: 1.5rem;
+}
 .pokemon-shiny {
     background: #eee;
     border-radius: 50%;
@@ -454,6 +459,11 @@
     height: 24px;
     margin: 0 2px 0 0;
 }
+.pokemon-checkpoint.custom-checkpoint {
+    flex: 0 0 24px;
+    object-fit: contain;
+    width: 24px;
+}
 
 .pokemon-checkpoint.not-obtained {
     display: none;
@@ -462,4 +472,3 @@
 .pokemon-checkpoint.obtained {
     display: flex;
 }
-

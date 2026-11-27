@@ -58,6 +58,9 @@ export const TrainerColumnItem = ({
 const getClearedCheckpointName = (checkpoint: Badge | string) =>
     typeof checkpoint === "string" ? checkpoint : checkpoint.name;
 
+export const isCustomCheckpointImage = (image: string) =>
+    image.startsWith("http") || image.startsWith("data");
+
 export interface CheckpointsDisplayProps {
     style: State["style"];
     trainer?: State["trainer"];
@@ -106,6 +109,9 @@ export function CheckpointsDisplay({
                             className={cx(
                                 className ?? "",
                                 obtained ? "obtained" : "not-obtained",
+                                isCustomCheckpointImage(badge.image)
+                                    ? "custom-checkpoint"
+                                    : "",
                             )}
                             style={
                                 isSWSH(name) && !trainer?.hasEditedCheckpoints
@@ -119,8 +125,7 @@ export function CheckpointsDisplay({
                             alt={badge.name}
                             data-badge={badge.name}
                             src={
-                                badge.image.startsWith("http") ||
-                                badge.image.startsWith("data")
+                                isCustomCheckpointImage(badge.image)
                                     ? badge.image
                                     : `./img/checkpoints/${badge.image}.png`
                             }
