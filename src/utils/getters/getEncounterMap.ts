@@ -2,16 +2,19 @@ import { Game, locations } from "utils";
 import { getGameRegion, Region } from "./getGameRegion";
 import { Generation, getGameGeneration } from "./getGameGeneration";
 
+const getKantoGameLocations = () =>
+    locations.Kanto.filter((location) => location !== "Tohjo Falls");
+
 export function getEncounterMap(game: Game) {
     const region = getGameRegion(game);
     const generation = getGameGeneration(game);
 
     if (region === Region.Kanto && generation === Generation.Gen1) {
-        return locations.Kanto;
+        return getKantoGameLocations();
     }
 
     if (region === Region.Kanto && generation === Generation.Gen3) {
-        return [...locations.Kanto, ...locations.Sevii];
+        return [...getKantoGameLocations(), ...locations.Sevii];
     }
 
     if (region === Region.Johto) {
