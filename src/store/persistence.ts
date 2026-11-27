@@ -141,7 +141,18 @@ export const deserializePersistedState = (
         const state: Record<string, unknown> = {};
         for (const [key, value] of Object.entries(envelope)) {
             if (key === "_persist" || PERSIST_BLACKLIST.has(key)) continue;
-            state[key] = typeof value === "string" ? JSON.parse(value) : value;
+
+            if (typeof value !== "string") {
+                state[key] = value;
+                continue;
+            }
+
+            try {
+                state[key] = JSON.parse(value);
+            } catch {
+                // redux-persist stores each slice independently. Preserve every
+                // readable slice if one entry has become corrupt.
+            }
         }
 
         return migratePersistedState(
