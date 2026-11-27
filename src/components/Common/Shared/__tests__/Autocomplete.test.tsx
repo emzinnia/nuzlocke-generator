@@ -62,6 +62,34 @@ describe("<Autcomplete />", () => {
                 block: "nearest",
             });
         });
+
+        it("keeps broad filtered results in view when arrowing through matches", async () => {
+            const items = Array.from({ length: 20 }, (_v, i) => `area-${i}`);
+
+            render(
+                <Autocomplete
+                    value=""
+                    onChange={() => {}}
+                    items={items}
+                />,
+            );
+
+            const input = screen.getByTestId("autocomplete");
+
+            fireEvent.focus(input);
+            fireEvent.change(input, { target: { value: "a" } });
+            fireEvent.keyDown(input, { key: "ArrowDown", which: 40 });
+            fireEvent.keyDown(input, { key: "ArrowDown", which: 40 });
+            fireEvent.keyDown(input, { key: "ArrowDown", which: 40 });
+
+            await waitFor(() => {
+                expect(scrollIntoViewMock).toHaveBeenCalledTimes(3);
+            });
+
+            expect(scrollIntoViewMock).toHaveBeenLastCalledWith({
+                block: "nearest",
+            });
+        });
     });
 
     it("can be reopened after closing (clears pending blur close timeout)", async () => {
