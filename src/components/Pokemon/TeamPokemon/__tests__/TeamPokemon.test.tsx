@@ -111,6 +111,27 @@ describe("TeamPokemonBase", () => {
         expect(selectPokemon).toHaveBeenCalledWith(basePokemon.id);
     });
 
+    it("uses a neutral image backdrop in sprite mode", () => {
+        render(
+            <TeamPokemonBase
+                pokemon={{ ...basePokemon, species: "Poliwrath" }}
+                style={{
+                    ...baseStyle,
+                    spritesMode: true,
+                    teamPokemonBorder: true,
+                }}
+                game={{ name: "FireRed", customName: "" }}
+                selectPokemon={vi.fn()}
+                editor={baseEditor}
+                customTypes={[]}
+            />,
+        );
+
+        expect(screen.getByRole("presentation").style.background).toBe(
+            "rgb(255, 255, 255)",
+        );
+    });
+
     it("shows MVP label when pokemon is marked as MVP", () => {
         render(
             <TeamPokemonBase

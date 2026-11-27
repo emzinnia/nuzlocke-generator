@@ -584,6 +584,15 @@ export class TeamPokemonBase extends React.Component<
         };
 
         const EMMA_MODE = false;
+        const imageWrapperBackground = style.spritesMode
+            ? "#fff"
+            : this.props.style.teamPokemonBorder
+              ? getBackgroundGradient(
+                    poke.types != null && !poke.egg ? poke.types[0] : "Normal",
+                    poke.types != null && !poke.egg ? poke.types[1] : "Normal",
+                    customTypes,
+                )
+              : "transparent";
 
         return (
             <div className="pokemon-container" {...data}>
@@ -598,17 +607,7 @@ export class TeamPokemonBase extends React.Component<
                             className={`${this.props.style.imageStyle} pokemon-image-wrapper`}
                             style={{
                                 cursor: "pointer",
-                                background: this.props.style.teamPokemonBorder
-                                    ? getBackgroundGradient(
-                                          poke.types != null && !poke.egg
-                                              ? poke.types[0]
-                                              : "Normal",
-                                          poke.types != null && !poke.egg
-                                              ? poke.types[1]
-                                              : "Normal",
-                                          customTypes,
-                                      )
-                                    : "transparent",
+                                background: imageWrapperBackground,
                             }}
                         />
                         <PokemonImage
@@ -648,17 +647,7 @@ export class TeamPokemonBase extends React.Component<
                         className={`${this.props.style.imageStyle} pokemon-image-wrapper`}
                         style={{
                             cursor: "pointer",
-                            background: this.props.style.teamPokemonBorder
-                                ? getBackgroundGradient(
-                                      poke.types != null && !poke.egg
-                                          ? poke.types[0]
-                                          : "Normal",
-                                      poke.types != null && !poke.egg
-                                          ? poke.types[1]
-                                          : "Normal",
-                                      customTypes,
-                                  )
-                                : "transparent",
+                            background: imageWrapperBackground,
                         }}
                     >
                         <PokemonImage
