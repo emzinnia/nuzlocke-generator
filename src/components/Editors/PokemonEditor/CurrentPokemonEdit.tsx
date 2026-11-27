@@ -231,6 +231,7 @@ export class CurrentPokemonEditBase extends React.Component<
             types: matchSpeciesToTypes(
                 species,
                 (pokemon?.forme || "Normal") as keyof typeof Forme,
+                getGameGeneration(this.props.game.name as Game),
             ),
         };
 
