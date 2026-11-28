@@ -1,7 +1,7 @@
-import { Styles } from 'utils';
-import { editStyle } from 'actions';
-import { CSSProperties } from 'react';
-import { Options } from 'themes/utils';
+import { Styles } from "utils";
+import { editStyle } from "actions";
+import { CSSProperties } from "react";
+import { Options } from "themes/utils";
 
 export type Stylesheet = Options;
 

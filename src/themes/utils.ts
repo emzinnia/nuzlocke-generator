@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import { CSSProperties } from "react";
 
 export interface PropOptions {
     showNickname: boolean;
@@ -11,7 +11,7 @@ export type Option = {
     props?: Partial<PropOptions>;
 };
 
-export type OptionItems = 'ChampsPokemon';
+export type OptionItems = "ChampsPokemon";
 
 export type Options = { [O in OptionItems]?: Option };
 

@@ -1,107 +1,112 @@
-import { Forme } from './Forme';
+import { Forme, normalizeFormeKey } from "./Forme";
 
-export const addForme = (species: string | undefined, forme?: keyof typeof Forme) => {
-    if (forme) {
-        if (forme === 'Normal') {
-            if (species === 'Oricorio') {
+export const addForme = (
+    species: string | undefined,
+    forme?: keyof typeof Forme | Forme | string,
+) => {
+    const normalizedForme = normalizeFormeKey(forme) ?? forme;
+
+    if (normalizedForme) {
+        if (normalizedForme === "Normal") {
+            if (species === "Oricorio") {
                 return `${species}-baile`;
             }
             return species;
         }
-        if (forme === 'Alolan') {
+        if (normalizedForme === "Alolan") {
             return `alolan-${species}`;
         }
-        if (forme === 'Paldean') {
+        if (normalizedForme === "Paldean") {
             return `paldean-${species}`;
         }
-        if (forme === 'PaldeanAqua') {
+        if (normalizedForme === "Paldean-Aqua") {
             return `palden-aqua-${species}`;
         }
-        if (forme === 'PaldeanBlaze') {
+        if (normalizedForme === "Paldean-Blaze") {
             return `paldean-blaze-${species}`;
         }
-        if (forme === 'Galarian') {
+        if (normalizedForme === "Galarian") {
             return `galarian-${species}`;
         }
-        if (forme === 'Hisuian') {
+        if (normalizedForme === "Hisuian") {
             return `hisuian-${species}`;
         }
-        if (forme === 'Mega') {
+        if (normalizedForme === "Mega") {
             return `${species}-mega`;
         }
-        if (forme === 'Mega-X') {
+        if (normalizedForme === "Mega-X") {
             return `${species}-mega-x`;
         }
-        if (forme === 'Mega-Y') {
+        if (normalizedForme === "Mega-Y") {
             return `${species}-mega-y`;
         }
-        if (forme === 'D') {
+        if (normalizedForme === "D") {
             return `${species}-d`;
         }
-        if (forme === '10%') {
+        if (normalizedForme === "10%") {
             return `${species}-10`;
         }
-        if (forme === 'Complete') {
+        if (normalizedForme === "Complete") {
             return `${species}-complete`;
         }
-        if (forme === 'West Sea') {
+        if (normalizedForme === "West Sea") {
             return `${species}-west`;
         }
-        if (forme === 'East Sea') {
+        if (normalizedForme === "East Sea") {
             return `${species}-east`;
         }
         // Forms that don't require special formatting
         if (
             [
-                'Heat',
-                'Frost',
-                'Fan',
-                'Heat',
-                'Mow',
+                "Heat",
+                "Frost",
+                "Fan",
+                "Heat",
+                "Mow",
 
-                'Summer',
-                'Spring',
-                'Autumn',
-                'Winter',
+                "Summer",
+                "Spring",
+                "Autumn",
+                "Winter",
 
-                'Sensu',
-                'Baile',
-                'Pom-Pom',
-                'Pa\'u',
+                "Sensu",
+                "Baile",
+                "Pom-Pom",
+                "Pa'u",
 
-                'Dawn Wings',
-                'Dusk Mane',
-                'Ultra',
+                "Dawn Wings",
+                "Dusk Mane",
+                "Ultra",
 
-                'Origin',
-                'Sky',
+                "Origin",
+                "Sky",
 
-                'Attack',
-                'Defense',
-                'Speed',
+                "Attack",
+                "Defense",
+                "Speed",
 
-                'Midday',
-                'Dusk',
-                'Midnight',
+                "Midday",
+                "Dusk",
+                "Midnight",
 
-                'Amped',
-                'Lowkey',
-                'Gigantamax',
+                "Amped",
+                "Lowkey",
+                "Gigantamax",
 
-                'Black',
-                'White',
+                "Black",
+                "White",
 
-                'School',
-                'Pirouette',
+                "School",
+                "Pirouette",
 
-                'Therian',
+                "Therian",
 
-                'Wellspring',
-                'Heartflame',
-                'Cornerstone',
-            ].includes(forme)
+                "Wellspring",
+                "Heartflame",
+                "Cornerstone",
+            ].includes(normalizedForme)
         ) {
-            return `${species}-${forme.replace(/\s/g, '-').replace(/\'/g, '-').toLowerCase()}`;
+            return `${species}-${normalizedForme.replace(/\s/g, "-").replace(/\'/g, "-").toLowerCase()}`;
         }
         return species;
     } else {

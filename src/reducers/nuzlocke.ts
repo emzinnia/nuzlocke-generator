@@ -5,25 +5,35 @@ import {
     SWITCH_NUZLOCKE,
     UPDATE_NUZLOCKE,
     UPDATE_SWITCH_NUZLOCKE,
-} from 'actions';
-import { v4 as uuid } from 'uuid';
+} from "actions";
+import { v4 as uuid } from "uuid";
+
+export interface NuzlockeSaveEntry {
+    id: string;
+    data: string;
+    isCopy?: boolean;
+}
 
 export interface Nuzlockes {
     currentId: string;
-    saves: any[];
+    saves: NuzlockeSaveEntry[];
 }
 
 export function nuzlockes(
     state: Nuzlockes = {
-        currentId: '',
+        currentId: "",
         saves: [],
     },
     action: Action<
-    NEW_NUZLOCKE | DELETE_NUZLOCKE | SWITCH_NUZLOCKE | UPDATE_NUZLOCKE | UPDATE_SWITCH_NUZLOCKE
+        | NEW_NUZLOCKE
+        | DELETE_NUZLOCKE
+        | SWITCH_NUZLOCKE
+        | UPDATE_NUZLOCKE
+        | UPDATE_SWITCH_NUZLOCKE
     >,
 ) {
     switch (action.type) {
-        case NEW_NUZLOCKE:
+        case NEW_NUZLOCKE: {
             const id = uuid();
             return {
                 ...state,
@@ -37,6 +47,7 @@ export function nuzlockes(
                     },
                 ],
             };
+        }
 
         case DELETE_NUZLOCKE:
             return {

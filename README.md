@@ -1,10 +1,24 @@
-# [Nuzlocke Generator](https://nuzlocke-generator.com/) · ![Travis](https://img.shields.io/travis/EmmaRamirez/nuzlocke-generator.svg?style=flat-square)  ![Coveralls github](https://img.shields.io/coveralls/github/EmmaRamirez/nuzlocke-generator.svg?style=flat-square) ![Codacy grade](https://img.shields.io/codacy/grade/0f233d64eae448a68b540e6a519cc8df?style=flat-square) ![GitHub release](https://img.shields.io/github/release/EmmaRamirez/nuzlocke-generator.svg?style=flat-square)
+# [Nuzlocke Generator](https://nuzlocke-generator.com/) · ![GitHub release](https://img.shields.io/github/release/EmmaRamirez/nuzlocke-generator.svg?style=flat-square)
 
 https://nuzlocke-generator.com/
 
 ## A Preview
 
-![alt](./src/assets/media-six.png)
+![alt](./src/assets/media-seven.jpg)
+
+## Features
+
+- Track progress on your nuzlocke and share with others!
+- Incredibly flexible templating system capable of custom CSS, custom Pokémon data, custom types, and more!
+- Save data from your nuzlocke run as a `json` file
+- Import data from your actual Gen I & Gen II save files!
+- Manage multiple nuzlocke runs at once
+- Drag and drop box management
+- Record and track your run stats
+- Spreadsheet mode for rapid editing
+- Encounter tracking to ensure you don't miss a Pokémon
+
+If you have ideas for features of fixes, please tell me! I want to make this app as useful as possible.
 
 ## Running Locally
 
@@ -17,11 +31,11 @@ npm install
 npm run serve
 ```
 
-Node 16 is recommended.
+Node 20+ is recommended.
 
 Note: closing the command prompt will stop the server!
 
-You can also click the `Clone or Download` button and select to download it as a zip file. You'll then want to use the `cd` command to navigate to the nuzlocke-generator folder. I'm available on Discord (emma#4085) or through Github issues if you have any questions.
+You can also click the `Clone or Download` button and select to download it as a zip file. You'll then want to use the `cd` command to navigate to the nuzlocke-generator folder. I'm available through Github issues if you have any questions.
 
 You should find it at `localhost:8080`. In order to check for updates, run the following
 
@@ -66,16 +80,6 @@ TCG_IMAGES=true
 # Required for cross-origin images (i.e. sprites mode)
 CORS_ANYWHERE_URL=<URL>
 ```
-
-## Features
-
-- Record your nuzlocke with a flashy image
-- Save data on each of your Pokémon as a `json` file
-- Flexible style editing for multiple scenarios
-- Custom moves, rulesets, badges, types, and more!
-- Import from your actual save files!
-
-If you have ideas for features of fixes, please tell me! I want to make this app as useful as possible.
 
 ## Enabling Sprites Mode in Local Instances
 

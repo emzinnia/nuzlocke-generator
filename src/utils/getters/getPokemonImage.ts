@@ -1,113 +1,209 @@
-import { addForme, speciesToNumber, getForme } from 'utils';
-import { capitalize, Game, Forme, Species, significantGenderDifferenceList, wrapImageInCORS, normalizeSpeciesName } from 'utils';
-import { getIconFormeSuffix } from './getIconFormeSuffix';
-import { Editor, Pokemon } from 'models';
-import { State } from 'state';
-import { GenderElementProps } from 'components';
-import { getImages } from 'components/Shared/ImagesDrawer';
+import { addForme, speciesToNumber, getForme } from "utils";
+import {
+    capitalize,
+    Game,
+    Forme,
+    Species,
+    significantGenderDifferenceList,
+    wrapImageInCORS,
+    normalizeSpeciesName,
+} from "utils";
+import { getIconFormeSuffix } from "./getIconFormeSuffix";
+import { Editor, Pokemon } from "models";
+import { State } from "state";
+import { GenderElementProps } from "components";
+import { getImages } from "components/Common/Shared/ImagesDrawer";
 
 const handleTcgTransforms = (species?: string, gender?: GenderElementProps) => {
-    if (gender === 'Female') {
-        if (species && significantGenderDifferenceList.includes(species)) return `${species}-f`;
+    if (gender === "Female") {
+        if (species && significantGenderDifferenceList.includes(species))
+            return `${species}-f`;
     }
     return species;
 };
 
 const getGameName = (name: Game) => {
-    if (name === 'Red' || name === 'Blue') return 'rb';
+    if (name === "Red" || name === "Blue") return "rb";
     if (
-        name === 'Ruby' ||
-        name === 'Sapphire' ||
-        name === 'FireRed' ||
-        name === 'LeafGreen' ||
-        name === 'Emerald'
+        name === "Ruby" ||
+        name === "Sapphire" ||
+        name === "FireRed" ||
+        name === "LeafGreen" ||
+        name === "Emerald"
     ) {
-        return 'emerald';
+        return "emerald";
     }
-    if (name === 'Diamond' || name === 'Pearl' || name === 'Platinum') return 'dp';
-    if (name === 'HeartGold' || name === 'SoulSilver') return 'hgss';
-    if (name === 'Black' || name === 'White' || name === 'White 2' || name === 'Black 2')
-        return 'blackwhite';
-    if (name === 'X' || name === 'Y' || name === 'OmegaRuby' || name === 'AlphaSapphire')
-        return 'xy';
+    if (name === "Diamond" || name === "Pearl" || name === "Platinum")
+        return "dp";
+    if (name === "HeartGold" || name === "SoulSilver") return "hgss";
     if (
-        name === 'Sun' ||
-        name === 'Moon' ||
-        name === 'Ultra Sun' ||
-        name === 'Ultra Moon' ||
-        name === 'Colosseum' ||
-        name === 'XD Gale of Darkness'
+        name === "Black" ||
+        name === "White" ||
+        name === "White 2" ||
+        name === "Black 2"
     )
-        return 'sunmoon';
+        return "blackwhite";
     if (
-        name === 'Green' ||
-        name === 'Gold' ||
-        name === 'Silver' ||
-        name === 'Yellow' ||
-        name === 'Crystal'
+        name === "X" ||
+        name === "Y" ||
+        name === "OmegaRuby" ||
+        name === "AlphaSapphire"
+    )
+        return "xy";
+    if (
+        name === "Sun" ||
+        name === "Moon" ||
+        name === "Ultra Sun" ||
+        name === "Ultra Moon" ||
+        name === "Colosseum" ||
+        name === "XD Gale of Darkness" ||
+        name === "None"
+    )
+        return "sunmoon";
+    if (
+        name === "Green" ||
+        name === "Gold" ||
+        name === "Silver" ||
+        name === "Yellow" ||
+        name === "Crystal"
     ) {
         return name.toLowerCase();
     }
-    if (name === 'Sword' || name === 'Shield' || name === 'Brilliant Diamond' || name === 'Shining Pearl') {
-        return 'swordshield';
+    if (
+        name === "Sword" ||
+        name === "Shield" ||
+        name === "Brilliant Diamond" ||
+        name === "Shining Pearl"
+    ) {
+        return "swordshield";
     }
-    return 'sm';
+    if (name === "Legends: Z-A") {
+        return "legendsz-a";
+    }
+    if (name === "Let's Go Eevee" || name === "Let's Go Pikachu") {
+        return "letsgopikachueevee";
+    }
+    if (name === "Legends: Arceus") {
+        return "legendsarceus";
+    }
+    return "sm";
 };
 
+// Serebii moved these generations off `/{game}/pokemon/` onto pokearth.
+// The old paths 404, so sprite mode renders an empty image.
+const getPokearthSpriteDir = (name?: Game) => {
+    switch (name) {
+        case "Red":
+        case "Blue":
+            return "rb";
+        case "Green":
+            return "green";
+        case "Yellow":
+            return "yellow";
+        case "Gold":
+            return "gold";
+        case "Silver":
+            return "silver";
+        default:
+            return undefined;
+    }
+};
 
 const getGameNameSerebii = (name: Game) => {
     switch (name) {
-        case 'Black':
-        case 'Black 2':
-        case 'White':
-        case 'White 2':
-            return 'BW';
-        case 'Gold':
-            return 'Gold';
-        case 'Silver':
-            return 'Silver';
-        case 'Crystal':
-            return 'Crystal';
-        case 'Ruby':
-        case 'Sapphire':
-            return 'RuSa';
-        case 'FireRed':
-        case 'LeafGreen':
-            return 'FRLG';
-        case 'Emerald':
-            return 'Em';
-        case 'Diamond':
-        case 'Pearl':
-        case 'Platinum':
-            return 'DP';
-        case 'HeartGold':
-        case 'SoulSilver':
-            return 'HGSS';
-        case 'X':
-        case 'Y':
-            return 'XY';
-        case 'Sword':
-        case 'Shield':
-        case 'Brilliant Diamond':
-        case 'Shining Pearl':
-            return 'swordshield';
+        case "Black":
+        case "Black 2":
+        case "White":
+        case "White 2":
+            return "BW";
+        case "Gold":
+            return "Gold";
+        case "Silver":
+            return "Silver";
+        case "Crystal":
+            return "Crystal";
+        case "Ruby":
+        case "Sapphire":
+            return "RuSa";
+        case "FireRed":
+        case "LeafGreen":
+            return "FRLG";
+        case "Emerald":
+            return "Em";
+        case "Diamond":
+        case "Pearl":
+        case "Platinum":
+            return "DP";
+        case "HeartGold":
+        case "SoulSilver":
+            return "HGSS";
+        case "X":
+        case "Y":
+            return "XY";
+        case "Sword":
+        case "Shield":
+        case "Brilliant Diamond":
+        case "Shining Pearl":
+            return "swordshield";
+        case "Legends: Z-A":
+            return "legendsz-a";
         default:
-            return 'SM';
+            // Let's Go stays on this Sun/Moon sheet. Shiny/LetsGo only has
+            // Pikachu, Eevee, and Krabby, so the other Let's Go shinies 404.
+            return "SM";
     }
+};
+
+// legendsarceus/pokemon has no plain file for these dex numbers.
+// The Hisui Pokédex publishes them only with a forme suffix.
+const legendsArceusRequiredSuffix: Record<string, string> = {
+    "058": "-h",
+    "059": "-h",
+    "100": "-h",
+    "101": "-h",
+    "157": "-h",
+    "211": "-h",
+    "503": "-h",
+    "549": "-h",
+    "550": "-w",
+    "570": "-h",
+    "571": "-h",
+    "628": "-h",
+    "705": "-h",
+    "706": "-h",
+    "713": "-h",
+    "724": "-h",
+};
+
+const legendsArceusSpriteSuffix = (
+    forme: GetPokemonImage["forme"],
+    leadingZerosNumber: string,
+) => {
+    const required = legendsArceusRequiredSuffix[leadingZerosNumber];
+    if (required) {
+        return required;
+    }
+    // Johtonian Sneasel is 215.png. Hisuian Sneasel is 215-h.png.
+    if (
+        leadingZerosNumber === "215" &&
+        (forme === "Hisuian" || forme === "hisui")
+    ) {
+        return "-h";
+    }
+    return "";
 };
 
 export interface GetPokemonImage {
     customImage?: string;
-    forme?: keyof typeof Forme;
+    forme?: Pokemon["forme"] | keyof typeof Forme;
     species?: string;
     name?: Game;
-    style?: State['style'];
+    style?: State["style"];
     shiny?: boolean;
     editor?: Editor;
     gender?: GenderElementProps;
-    egg?: Pokemon['egg'];
+    egg?: Pokemon["egg"];
 }
-
 
 export async function getPokemonImage({
     customImage,
@@ -120,18 +216,22 @@ export async function getPokemonImage({
     gender,
     egg,
 }: GetPokemonImage): Promise<string> {
-    const regularNumber = speciesToNumber((species as Species) || 'Ditto');
-    const leadingZerosNumber = (speciesToNumber((species as Species) || 'Ditto') || 0)
+    const regularNumber = speciesToNumber((species as Species) || "Ditto");
+    const leadingZerosNumber = (
+        speciesToNumber((species as Species) || "Ditto") || 0
+    )
         .toString()
-        .padStart(3, '0');
+        .padStart(3, "0");
 
     if (customImage) {
         const images = await getImages();
-        const selectedImage = images.find(img => img.name === customImage)?.image;
+        const selectedImage = images.find(
+            (img) => img.name === customImage,
+        )?.image;
         if (selectedImage) {
             return `url(${selectedImage})`;
         }
-        if (customImage.startsWith('http')) {
+        if (customImage.startsWith("http")) {
             return await wrapImageInCORS(customImage);
         }
         return `url(${customImage})`;
@@ -142,32 +242,30 @@ export async function getPokemonImage({
     }
 
     if (egg) {
-        return 'url(img/egg.jpg)';
+        return "url(img/egg.jpg)";
     }
 
     if (
         style?.spritesMode &&
-        (name === 'Black' ||
-            name === 'Emerald' ||
-            name === 'Ruby' ||
-            name === 'Sapphire' ||
-            name === 'White' ||
-            name === 'Black 2' ||
-            name === 'White 2' ||
-            name === 'X' ||
-            name === 'Y' ||
-            name === 'OmegaRuby' ||
-            name === 'AlphaSapphire' ||
-            name === 'Sun' ||
-            name === 'Moon' ||
-            name === 'Ultra Sun' ||
-            name === 'Ultra Moon' ||
-            name === 'Sword' ||
-            name === 'Shield' ||
-            name === 'Let\'s Go Eevee' ||
-            name === 'Let\'s Go Pikachu' ||
-            name === 'Colosseum' ||
-            name === 'XD Gale of Darkness')
+        (name === "Black" ||
+            name === "Emerald" ||
+            name === "Ruby" ||
+            name === "Sapphire" ||
+            name === "White" ||
+            name === "Black 2" ||
+            name === "White 2" ||
+            name === "X" ||
+            name === "Y" ||
+            name === "OmegaRuby" ||
+            name === "AlphaSapphire" ||
+            name === "Sun" ||
+            name === "Moon" ||
+            name === "Ultra Sun" ||
+            name === "Ultra Moon" ||
+            name === "Let's Go Eevee" ||
+            name === "Let's Go Pikachu" ||
+            name === "Colosseum" ||
+            name === "XD Gale of Darkness")
     ) {
         if (!shiny) {
             const url = `https://www.serebii.net/${getGameName(
@@ -184,7 +282,7 @@ export async function getPokemonImage({
         }
     }
 
-    if (style?.spritesMode && (name === 'Scarlet' || name === 'Violet')) {
+    if (style?.spritesMode && (name === "Scarlet" || name === "Violet")) {
         if (!shiny) {
             const url = `https://serebii.net/scarletviolet/pokemon/new/${leadingZerosNumber}.png`;
 
@@ -196,7 +294,19 @@ export async function getPokemonImage({
         }
     }
 
-    if (style?.spritesMode && (name === 'LeafGreen' || name === 'FireRed')) {
+    if (style?.spritesMode && (name === "Diamond" || name === "Pearl" || name === "Platinum" || name === "HeartGold" || name === "SoulSilver")) {
+        if (!shiny) {
+            const url = `https://www.serebii.net/pokearth/sprites/dp/${leadingZerosNumber}.png`;
+
+            return await wrapImageInCORS(url);
+        } else {
+            const url = `https://www.serebii.net/Shiny/DP/${leadingZerosNumber}.png`;
+
+            return await wrapImageInCORS(url);
+        }
+    }
+
+    if (style?.spritesMode && (name === "LeafGreen" || name === "FireRed")) {
         if (!shiny) {
             const url = `https://img.pokemondb.net/sprites/firered-leafgreen/normal/${normalizeSpeciesName(
                 species as Species,
@@ -212,22 +322,43 @@ export async function getPokemonImage({
         }
     }
 
+    if (style?.spritesMode && (name === "Sword" || name === "Shield")) {
+        if (!shiny) {
+            const url = `https://www.serebii.net/${getGameName(
+                name,
+            )}/pokemon/${leadingZerosNumber}${getForme(forme)}.png`;
+
+            return await wrapImageInCORS(url);
+        }
+        const url = `https://www.serebii.net/Shiny/SWSH/${leadingZerosNumber}.png`;
+        return await wrapImageInCORS(url);
+    }
+
     if (style?.spritesMode) {
+        const pokearthDir = getPokearthSpriteDir(name);
+        if (pokearthDir && !shiny) {
+            const url = `https://www.serebii.net/pokearth/sprites/${pokearthDir}/${leadingZerosNumber}.png`;
+
+            return await wrapImageInCORS(url);
+        }
+
+        const formeSuffix =
+            name === "Legends: Arceus" && !shiny
+                ? legendsArceusSpriteSuffix(forme, leadingZerosNumber)
+                : "";
         const url = shiny
             ? `https://www.serebii.net/Shiny/${getGameNameSerebii(
-                name as Game,
-            )}/${leadingZerosNumber}.png`
-            : `https://www.serebii.net/pokearth/sprites/${getGameName(
-                name as Game,
-            )}/${leadingZerosNumber}.png`;
+                  name as Game,
+              )}/${leadingZerosNumber}.png`
+            : `https://www.serebii.net/${getGameName(name as Game)}/pokemon/${leadingZerosNumber}${formeSuffix}.png`;
 
         return await wrapImageInCORS(url);
     }
 
-    if (style?.teamImages === 'sugimori') {
+    if (style?.teamImages === "sugimori") {
         if (
             [521, 592, 593, 668, 678].includes(regularNumber || 0) &&
-            (gender === 'f' || gender === 'Female')
+            (gender === "f" || gender === "Female")
         ) {
             return `url(img/sugimori/female/${regularNumber}${getIconFormeSuffix(
                 forme as keyof typeof Forme,
@@ -238,47 +369,57 @@ export async function getPokemonImage({
         )}.png)`;
     }
 
-    if (style?.teamImages === 'dream world') {
+    if (style?.teamImages === "dream world") {
         return `url(img/dw/${regularNumber || 1}.svg)`;
     }
 
-    const handleMimeJr = (s?: string) => (s === 'Mime Jr.' ? 'mime-jr' : s);
+    const handleMimeJr = (s?: string) => (s === "Mime Jr." ? "mime-jr" : s);
 
-    if (style?.teamImages === 'shuffle') {
-        return `url(img/shuffle/${(handleMimeJr(species) || 'Ditto')
+    if (style?.teamImages === "shuffle") {
+        return `url(img/shuffle/${(handleMimeJr(species) || "Ditto")
             .trim()
-            .replace(/\'/g, '')
-            .replace(/\s/g, '-')
-            .replace(/\./g, '-')
+            .replace(/\'/g, "")
+            .replace(/\s/g, "-")
+            .replace(/\./g, "-")
             .toLocaleLowerCase()}${getIconFormeSuffix(forme as keyof typeof Forme)}.png)`;
     }
 
-    if (style?.teamImages === 'tcg') {
+    if (style?.teamImages === "tcg") {
         return `url(img/tcg/${(
             handleTcgTransforms(
-                addForme((species || '').replace(/\s/g, '').replace(/'/g, ''), forme),
+                addForme(
+                    (species || "").replace(/\s/g, "").replace(/'/g, ""),
+                    forme as keyof typeof Forme,
+                ),
                 gender,
-            ) || 'missingno'
+            ) || "missingno"
         ).toLowerCase()}.jpg)`;
     }
     // TEMPORARY STOPGAPS & Edge Cases & Special favors
-    if (species === 'Dugtrio' && forme === 'Alolan' && shiny) {
-        return 'url(img/alolan-dugtrio-shiny.jpg)';
+    if (species === "Dugtrio" && forme === "Alolan" && shiny) {
+        return "url(img/alolan-dugtrio-shiny.jpg)";
     }
-    if (species === 'Gyarados' && shiny) {
-        return 'url(img/gyarados-shiny.jpg)';
+    if (species === "Gyarados" && shiny) {
+        return "url(img/gyarados-shiny.jpg)";
     }
-    if (species === 'Indeedee' && gender === 'Male') {
-        return 'url(img/indeedee-m.jpg)';
+    if (species === "Indeedee" && gender === "Male") {
+        return "url(img/indeedee-m.jpg)";
     }
-    if (species === 'Basculegion' && gender === 'Female') {
-        return 'url(img/basculegion-f.jpg)';
+    if (species === "Basculegion" && gender === "Female") {
+        return "url(img/basculegion-f.jpg)";
     }
 
     return `url(img/${(
-        addForme((species || '').trim().replace(/\s/g, '-').replace(/'/g, '').replace(/:/g, '-'), forme) ||
-        'missingno'
+        addForme(
+            (species || "")
+                .trim()
+                .replace(/\s/g, "-")
+                .replace(/'/g, "")
+                .replace(/:/g, "-"),
+            forme as keyof typeof Forme,
+        ) || "missingno"
     ).toLowerCase()}.jpg)`;
 }
 
-export const stripURLCSS = (str) => str.replace(/url\(/g, '').replace(/\)/g, '');
+export const stripURLCSS = (str) =>
+    str.replace(/url\(/g, "").replace(/\)/g, "");

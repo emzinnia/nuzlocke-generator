@@ -13,5 +13,5 @@ Happy linting! 💖
 */
 {
     "typescript.tsdk": "node_modules/typescript/lib",
-    "html.autoClosingTags": false,
+    "html.autoClosingTags": false
 }

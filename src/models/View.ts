@@ -9,6 +9,7 @@ export interface DialogView {
     rulesEditor?: false;
     importView?: false;
     exportView?: false;
+    typeMatchups?: false;
 }
 
 export type DialogViewType = keyof DialogView;

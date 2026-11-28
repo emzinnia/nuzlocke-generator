@@ -1,3 +1,3 @@
 export const dragAndDrop = Object.freeze({
-    ICON: 'ICON',
+    ICON: "ICON",
 });

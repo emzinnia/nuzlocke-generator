@@ -1,0 +1,1029 @@
+import * as React from "react";
+import { connect, useStore } from "store/reactZustand";
+import {
+    Button,
+    ButtonGroup,
+    Dialog,
+    Callout,
+    TextArea,
+    Intent,
+    Switch,
+    Classes,
+    HTMLSelect,
+} from "@blueprintjs/core";
+import { PokemonIcon } from "components/Pokemon/PokemonIcon";
+import { ErrorBoundary, HotkeyIndicator } from "components/Common/Shared";
+import { v4 as uuid } from "uuid";
+import { persistor } from "store";
+import { newNuzlocke, replaceState, updateNuzlocke } from "actions";
+import { Badge, Game, Pokemon, Trainer } from "models";
+import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
+import { State } from "state";
+import {
+    gameOfOriginToColor,
+    GameSaveFormat,
+    getBadges,
+    Styles,
+    Game as GameName,
+} from "utils";
+import { DeleteAlert } from "./DeleteAlert";
+import { AdvancedImportOptions } from "./AdvancedImportOptions";
+import { isEmpty } from "utils/isEmpty";
+import { showToast } from "components/Common/Shared/appToaster";
+import {
+    parseShowdownFormat,
+    isValidShowdownFormat,
+} from "utils/parseShowdownFormat";
+import { Generation, getGameGeneration } from "utils/getters/getGameGeneration";
+import { getNextPokemonPosition } from "utils/generateEmptyPokemon";
+// @TODO: fix codegen imports
+// import codegen from 'codegen.macro';
+import { BoxMappings } from "parsers/utils/boxMappings";
+import SaveFileWorker from "parsers/worker?worker";
+import { cx } from "emotion";
+import { StatusDropZone } from "./StatusDropZone";
+import {
+    formatNuzlockeSaveData,
+    serializeNuzlockeJson,
+    serializeNuzlockeSaveData,
+} from "utils/nuzlockeJson";
+import { syncCurrentNuzlocke } from "./syncCurrentNuzlocke";
+import { getCheckpointsForSaveImport } from "./importCheckpoints";
+
+export interface DataEditorProps {
+    state: State;
+    getState: () => State;
+    replaceState: replaceState;
+    newNuzlocke: newNuzlocke;
+    updateNuzlocke: updateNuzlocke;
+}
+
+export interface DataEditorState {
+    isOpen: boolean;
+    isClearAllDataOpen: boolean;
+    isShowdownOpen: boolean;
+    mode: "import" | "export";
+    data: string;
+    showdownData: string;
+    showdownGeneration: Generation;
+    href: string;
+    overrideImport: boolean;
+}
+
+const isValidJSON = (data: string): boolean => {
+    try {
+        const parsed: unknown = JSON.parse(data);
+        return parsed !== null && typeof parsed === "object" && !Array.isArray(parsed);
+    } catch {
+        return false;
+    }
+};
+
+// This is to handle very weird/rare edge cases where data
+// can be parsed, but then in turn has to be "double-parsed"
+const handleExceptions = (data: State | Record<string, unknown>) => {
+    let updated: Partial<State> = {};
+
+    if (typeof (data as State).pokemon === "string") {
+        showToast({
+            message: "Issue with data detected. Attempting to fix...",
+            intent: Intent.DANGER,
+        });
+        for (const prop in data) {
+            try {
+                updated = {
+                    ...updated,
+                    [prop]: JSON.parse((data as Record<string, string>)[prop]),
+                };
+            } catch {
+                console.log(`Failed to parse on ${prop}`);
+            }
+        }
+    }
+
+    return isEmpty(updated) ? data : updated;
+};
+
+type SaveWorkerSuccess = {
+    pokemon: Pokemon[];
+    isYellow?: boolean;
+    trainer: Trainer;
+    detectedGame?: Game;
+    detectedSaveFormat?: GameSaveFormat;
+};
+
+type SaveWorkerFailure = {
+    error: string;
+};
+
+type SaveWorkerMessage = SaveWorkerSuccess | SaveWorkerFailure;
+
+const getImportedBadgeName = (badge: unknown) => {
+    if (typeof badge === "string") return badge;
+    if (badge && typeof badge === "object" && "name" in badge) {
+        const name = (badge as { name?: unknown }).name;
+        return typeof name === "string" ? name : undefined;
+    }
+
+    return undefined;
+};
+
+const getOrdinalBadgeIndex = (name?: string) => {
+    const match = name?.match(/^Badge\s+(\d+)$/i);
+    if (!match) return undefined;
+
+    const index = Number.parseInt(match[1], 10) - 1;
+    return Number.isInteger(index) && index >= 0 ? index : undefined;
+};
+
+export const normalizeImportedBadges = (
+    badges: unknown[] | undefined,
+    gameName: GameName,
+): Badge[] => {
+    const gameBadges = getBadges(gameName);
+    if (!badges?.length) return [];
+
+    return badges.reduce<Badge[]>((normalized, badge) => {
+        const name = getImportedBadgeName(badge);
+        const ordinalIndex = getOrdinalBadgeIndex(name);
+        const matchedBadge =
+            ordinalIndex !== undefined
+                ? gameBadges[ordinalIndex]
+                : gameBadges.find((gameBadge) => gameBadge.name === name);
+
+        if (matchedBadge) {
+            normalized.push(matchedBadge);
+        } else if (
+            badge &&
+            typeof badge === "object" &&
+            "name" in badge &&
+            "image" in badge
+        ) {
+            normalized.push(badge as Badge);
+        }
+
+        return normalized;
+    }, []);
+};
+
+const ensurePokemonCheckpoints = (pokemon: Pokemon[]) =>
+    pokemon.map((poke) => ({
+        ...poke,
+        checkpoints: poke.checkpoints ?? [],
+    }));
+
+export interface SaveGameSettingsDialogProps {
+    onMergeDataChange: () => void;
+    mergeDataMode: boolean;
+    boxes: State["box"];
+    selectedGame: GameSaveFormat;
+    boxMappings: BoxMappings;
+    setBoxMappings: ({ key, status }: { key: number; status: string }) => void;
+    isDarkMode: boolean;
+}
+
+export function SaveGameSettingsDialog({
+    onMergeDataChange,
+    mergeDataMode,
+    boxes,
+    boxMappings,
+    setBoxMappings,
+    isDarkMode,
+}: SaveGameSettingsDialogProps) {
+    // Group boxMappings by status
+    const boxesByStatus = React.useMemo(() => {
+        const grouped: Record<string, typeof boxMappings> = {};
+        
+        // Initialize with all available statuses from app boxes
+        for (const box of boxes) {
+            grouped[box.name] = [];
+        }
+        
+        // Assign each save file box to its status
+        for (const mapping of boxMappings) {
+            if (!grouped[mapping.status]) {
+                grouped[mapping.status] = [];
+            }
+            grouped[mapping.status].push(mapping);
+        }
+        
+        return grouped;
+    }, [boxes, boxMappings]);
+
+    // Get ordered list of statuses (from app boxes)
+    const statusOrder = React.useMemo(() => {
+        return boxes.map((box) => box.name);
+    }, [boxes]);
+
+    const handleDrop = React.useCallback(
+        (boxKey: number, newStatus: string) => {
+            setBoxMappings({ key: boxKey, status: newStatus });
+        },
+        [setBoxMappings]
+    );
+
+    return (
+        <div className={cx(Classes.DIALOG_BODY, "has-nice-scrollbars")}>
+            <Switch
+                labelElement={
+                    <>
+                        <strong>Merge Data?</strong>
+                        <p className={Classes.TEXT_MUTED}>
+                            Merges your current data with that of the save file,
+                            using an ID match algorithm. Disabling this will
+                            overwrite your current data with that from the save
+                            file. NOTE: this method of determining IDs is based
+                            off IVs in Gen I &amp; II.
+                        </p>
+                    </>
+                }
+                checked={mergeDataMode}
+                onChange={onMergeDataChange}
+            />
+
+            <p className={Classes.TEXT_MUTED} style={{ marginBottom: "1rem" }}>
+                Drag and drop the save file boxes to assign them to different statuses.
+            </p>
+
+            <div
+                style={{
+                    maxHeight: "50vh",
+                    overflow: "auto",
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+                className="has-nice-scrollbars"
+            >
+                {statusOrder.map((status) => (
+                    <StatusDropZone
+                        key={status}
+                        statusName={status}
+                        boxes={boxesByStatus[status] || []}
+                        isDarkMode={isDarkMode}
+                        showPartyBox={status === "Team"}
+                        onDrop={handleDrop}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+}
+
+export class DataEditorBase extends React.Component<
+    DataEditorProps,
+    DataEditorState
+> {
+    public textarea: HTMLTextAreaElement | null;
+    public nuzlockeJsonFileInput: HTMLInputElement | null;
+    public advancedImportRef = React.createRef<import("./AdvancedImportOptions").AdvancedImportOptionsHandle>();
+
+    public constructor(props: DataEditorProps) {
+        super(props);
+        const gameGeneration = getGameGeneration(props.state.game.name);
+        this.state = {
+            isOpen: false,
+            isClearAllDataOpen: false,
+            isShowdownOpen: false,
+            mode: "export",
+            data: "",
+            showdownData: "",
+            showdownGeneration: gameGeneration,
+            href: "",
+            overrideImport: true,
+        };
+    }
+
+    private uploadJSON = (e) => {
+        if (isValidJSON(e.target.value)) {
+            this.setState({ data: e.target.value });
+        } else {
+            showToast({
+                message: "Failed to parse invalid JSON",
+                intent: Intent.DANGER,
+            });
+        }
+    };
+
+    private uploadNuzlockeJsonFile = () => {
+        const file = this.nuzlockeJsonFileInput?.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+
+        reader.readAsText(file, "utf-8");
+        reader.addEventListener("load", (event) => {
+            const fileContents = event?.target?.result;
+            if (typeof fileContents !== "string" || !isValidJSON(fileContents)) {
+                showToast({
+                    message: "Failed to parse invalid JSON",
+                    intent: Intent.DANGER,
+                });
+                return;
+            }
+            this.setState({ data: fileContents });
+        });
+    };
+
+    private confirmImport = () => {
+        const override = this.state.overrideImport;
+        if (!isValidJSON(this.state.data)) {
+            showToast({
+                message: "Failed to parse invalid JSON",
+                intent: Intent.DANGER,
+            });
+            return;
+        }
+        const data = handleExceptions(JSON.parse(this.state.data));
+        const nuz = this.props.state;
+        // Omit auxiliary slices when the import does not include them so
+        // REPLACE_STATE reducers keep the current run's values instead of
+        // wiping custom types/moves/stats/areas (and hotkeys) to defaults.
+        const nextState: Partial<State> = {
+            ...(override ? data : nuz),
+        };
+        if (Array.isArray(data.customMoveMap)) {
+            nextState.customMoveMap = data.customMoveMap;
+        } else {
+            delete nextState.customMoveMap;
+        }
+        syncCurrentNuzlocke(nuz, this.props.updateNuzlocke);
+        this.props.replaceState(nextState);
+        this.props.newNuzlocke(
+            serializeNuzlockeSaveData(this.props.getState()),
+            { isCopy: false },
+        );
+        this.writeAllData();
+        this.setState({ isOpen: false });
+    };
+
+    private importState = () => {
+        this.setState({ mode: "import" });
+        this.setState({ isOpen: true });
+    };
+
+    private exportState = (state) => {
+        this.setState({
+            mode: "export",
+        });
+        this.setState({ isOpen: true });
+        this.setState({
+            href: `data:text/plain;charset=utf-8,${encodeURIComponent(
+                serializeNuzlockeJson(state),
+            )}`,
+        });
+    };
+
+    private renderTeam(data: string) {
+        let d: { pokemon?: Pokemon[] };
+        try {
+            d = handleExceptions(JSON.parse(data)) as { pokemon?: Pokemon[] };
+        } catch {
+            d = {};
+        }
+
+        if (d.pokemon) {
+            return (
+                <div
+                    className="team-icons"
+                    style={{
+                        background: "rgba(0, 0, 0, 0.1)",
+                        borderRadius: ".25rem",
+                        margin: ".25rem",
+                        marginTop: ".5rem",
+                        display: "flex",
+                        justifyContent: "center",
+                    }}
+                >
+                    {d?.pokemon
+                        ?.filter((p) => p.status === "Team")
+                        ?.map((p) => {
+                            return <PokemonIcon key={p.id} {...p} />;
+                        })}
+                </div>
+            );
+        } else {
+            return null;
+        }
+    }
+
+    private static determineGame({
+        isYellow,
+        selectedGame,
+    }: {
+        isYellow?: boolean;
+        selectedGame?: GameSaveFormat;
+    }): Game {
+        if (isYellow) return { name: "Yellow", customName: "" };
+        if (selectedGame === "GS") return { name: "Gold", customName: "" };
+        if (selectedGame === "Crystal")
+            return { name: "Crystal", customName: "" };
+        if (selectedGame === "RS") return { name: "Ruby", customName: "" };
+        if (selectedGame === "FRLG") return { name: "FireRed", customName: "" };
+        if (selectedGame === "Emerald")
+            return { name: "Emerald", customName: "" };
+        return { name: "Red", customName: "" };
+    }
+
+    private static pokeMerge = (
+        pokemonListA: Pokemon[],
+        pokemonListB: Pokemon[],
+    ) => {
+        return pokemonListB.map((poke) => {
+            const id = poke.id;
+            const aListPoke = pokemonListA.find((p) => p.id === id);
+            if (aListPoke) {
+                return {
+                    ...aListPoke,
+                    ...poke,
+                };
+            } else {
+                return poke;
+            }
+        });
+    };
+
+    private handleFileSelect = (
+        file: File,
+        settings: import("./AdvancedImportOptions").AdvancedImportSettings
+    ) => {
+        const t0 = performance.now();
+        const worker = new SaveFileWorker();
+        const reader = new FileReader();
+        const { replaceState, state } = this.props;
+        const { selectedGame, boxMappings, mergeDataMode } = settings;
+
+        console.log(file, reader, settings, worker);
+
+        reader.readAsArrayBuffer(file);
+
+        reader.addEventListener("load", async function () {
+            const save = new Uint8Array(this.result as ArrayBuffer);
+
+            worker.onmessage = (e: MessageEvent<SaveWorkerMessage>) => {
+                const result = e.data;
+                if ("error" in result) {
+                    showToast({
+                        message: `Failed to parse save file. ${result.error}`,
+                        intent: Intent.DANGER,
+                    });
+                    console.error(result.error);
+                    worker.terminate();
+                    return;
+                }
+
+                const mergedPokemon = mergeDataMode
+                    ? DataEditorBase.pokeMerge(
+                          state.pokemon,
+                          result.pokemon as Pokemon[],
+                      )
+                    : result.pokemon;
+                const game =
+                    result.detectedGame ??
+                    DataEditorBase.determineGame({
+                        isYellow: result.isYellow,
+                        selectedGame,
+                    });
+                const gameName = game.name as GameName;
+                const checkpoints = getCheckpointsForSaveImport(
+                    state.checkpoints,
+                    state.game.name,
+                    gameName,
+                );
+                const bgColor = gameOfOriginToColor(game.name as GameName);
+                const data = {
+                    game,
+                    pokemon: ensurePokemonCheckpoints(mergedPokemon),
+                    checkpoints,
+                    trainer: {
+                        ...result.trainer,
+                        badges: normalizeImportedBadges(
+                            result.trainer.badges as unknown[] | undefined,
+                            gameName,
+                        ),
+                    },
+                };
+                console.log("data", data);
+                const nextStyle: Styles = bgColor
+                    ? {
+                          ...state.style,
+                          bgColor,
+                      }
+                    : state.style;
+
+                // Back-compat for older saves that may have used `style.backgroundColor`.
+                // `Styles` doesn't include it, but we can preserve/overwrite it if present.
+                type LegacyStyle = Styles & { backgroundColor?: string };
+                if (bgColor && "backgroundColor" in (state.style as LegacyStyle)) {
+                    (nextStyle as LegacyStyle).backgroundColor = bgColor;
+                }
+
+                const newState = { ...state, ...data, style: nextStyle };
+                replaceState(newState);
+                if (result.detectedGame) {
+                    showToast({
+                        message: `Detected game: ${result.detectedGame.name}`,
+                        intent: Intent.PRIMARY,
+                    });
+                }
+                worker.terminate();
+            };
+
+            worker.onmessageerror = (err) => {
+                showToast({
+                    message: `Failed to parse save file. ${err}`,
+                    intent: Intent.DANGER,
+                });
+                console.error(err);
+                worker.terminate();
+            };
+
+            worker.onerror = (err) => {
+                showToast({
+                    message: `Failed to parse save file. ${err.message}`,
+                    intent: Intent.DANGER,
+                });
+                console.error(err);
+                worker.terminate();
+            };
+
+            worker.postMessage({
+                selectedGame,
+                save,
+                boxMappings,
+                fileName: file.name,
+            });
+
+            const t1 = performance.now();
+            console.info(
+                `Call: ${t1 - t0} ms on ${selectedGame} save file type`,
+            );
+        });
+    };
+
+    private clearAllData = () => {
+        persistor.purge();
+        window.location.reload();
+    };
+
+    private writeAllData = () => {
+        Promise.resolve(persistor.flush())
+            .then(() => {
+                showToast({
+                    message: "Saved",
+                    intent: Intent.SUCCESS,
+                });
+            })
+            .catch((err) => {
+                console.error("Save failed", err);
+                showToast({
+                    message: "Save failed",
+                    intent: Intent.DANGER,
+                });
+            });
+    };
+
+    private toggleClearingData = () =>
+        this.setState({ isClearAllDataOpen: !this.state.isClearAllDataOpen });
+
+    private openShowdownImport = () => {
+        const gameGeneration = getGameGeneration(this.props.state.game.name);
+        this.setState({ 
+            isShowdownOpen: true, 
+            showdownData: "",
+            showdownGeneration: gameGeneration,
+        });
+    };
+
+    private closeShowdownImport = () => {
+        this.setState({ isShowdownOpen: false, showdownData: "" });
+    };
+
+    private handleShowdownDataChange = (
+        e: React.ChangeEvent<HTMLTextAreaElement>,
+    ) => {
+        this.setState({ showdownData: e.target.value });
+    };
+
+    private handleShowdownGenerationChange = (
+        e: React.ChangeEvent<HTMLSelectElement>,
+    ) => {
+        this.setState({ showdownGeneration: parseInt(e.target.value, 10) as Generation });
+    };
+
+    private isEmptyPokemonSlot = (pokemon?: Pokemon | null): boolean => {
+        if (!pokemon) return false;
+
+        const speciesValue = pokemon.species?.trim();
+        const isSpeciesEmpty =
+            !speciesValue || speciesValue.toLowerCase() === "none";
+
+        const hasNoNickname = !pokemon.nickname || pokemon.nickname.trim() === "";
+        const hasNoItem = !pokemon.item;
+        const hasNoMoves = !pokemon.moves || pokemon.moves.length === 0;
+        const hasNoAbility = !pokemon.ability;
+        const hasNoCustomizations =
+            !pokemon.customImage && !pokemon.customIcon && !pokemon.notes;
+
+        return (
+            isSpeciesEmpty &&
+            hasNoNickname &&
+            hasNoItem &&
+            hasNoMoves &&
+            hasNoAbility &&
+            hasNoCustomizations
+        );
+    };
+
+    private confirmShowdownImport = () => {
+        const { showdownData, showdownGeneration } = this.state;
+        const { state, replaceState } = this.props;
+
+        if (!isValidShowdownFormat(showdownData)) {
+            showToast({
+                message: "Invalid Showdown format. Please check your input.",
+                intent: Intent.DANGER,
+            });
+            return;
+        }
+
+        const hasSingleEmptySlot =
+            state.pokemon.length === 1 &&
+            this.isEmptyPokemonSlot(state.pokemon[0]);
+
+        const existingPokemon = hasSingleEmptySlot ? [] : state.pokemon;
+        // Use max(position)+1 — array length collides after deletions leave gaps.
+        const startPosition = getNextPokemonPosition(existingPokemon);
+        const parsedPokemon = parseShowdownFormat(showdownData, {
+            startPosition,
+            generation: showdownGeneration,
+        });
+
+        if (parsedPokemon.length === 0) {
+            showToast({
+                message: "No Pokemon found in the input.",
+                intent: Intent.WARNING,
+            });
+            return;
+        }
+
+        // Overflow past 6 Team members into Boxed (same rule as generateEmptyPokemon).
+        let teamCount = existingPokemon.filter(
+            (poke) => poke.status === "Team",
+        ).length;
+        const newPokemon = parsedPokemon.map((poke) => {
+            const status = teamCount >= 6 ? "Boxed" : "Team";
+            if (status === "Team") {
+                teamCount += 1;
+            }
+            return { ...poke, status };
+        });
+
+        // Merge new Pokemon with existing
+        const mergedPokemon = [...existingPokemon, ...newPokemon];
+        const newState = { ...state, pokemon: mergedPokemon };
+        replaceState(newState);
+
+        showToast({
+            message: `Imported ${newPokemon.length} Pokemon from Showdown format!`,
+            intent: Intent.SUCCESS,
+        });
+
+        this.closeShowdownImport();
+        this.writeAllData();
+    };
+
+    private getShowdownPreview() {
+        const { showdownData } = this.state;
+        if (!showdownData.trim()) return null;
+
+        if (!isValidShowdownFormat(showdownData)) {
+            return (
+                <Callout intent={Intent.WARNING} style={{ marginTop: "0.5rem" }}>
+                    This doesn&apos;t appear to be valid Showdown format.
+                </Callout>
+            );
+        }
+
+        const pokemon = parseShowdownFormat(showdownData);
+        if (pokemon.length === 0) return null;
+
+        return (
+            <div
+                style={{
+                    background: "rgba(0, 0, 0, 0.1)",
+                    borderRadius: ".25rem",
+                    margin: ".25rem",
+                    marginTop: ".5rem",
+                    padding: ".5rem",
+                }}
+            >
+                <div style={{ marginBottom: "0.5rem", fontWeight: 500 }}>
+                    Preview: {pokemon.length} Pokemon found
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
+                    {pokemon.map((p) => (
+                        <PokemonIcon key={p.id} {...p} />
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    public render() {
+        return (
+            <BaseEditor icon="database" name="Data">
+                <DeleteAlert
+                    onConfirm={this.clearAllData}
+                    isOpen={this.state.isClearAllDataOpen}
+                    onCancel={this.toggleClearingData}
+                />
+                <Dialog
+                    isOpen={this.state.isOpen}
+                    onClose={() => this.setState({ isOpen: false })}
+                    title={
+                        this.state.mode === "export"
+                            ? "Exported Nuzlocke Save"
+                            : "Import Nuzlocke Save"
+                    }
+                    className={
+                        this.props.state.style.editorDarkMode
+                            ? Classes.DARK
+                            : ""
+                    }
+                    icon="floppy-disk"
+                >
+                    {this.state.mode === "export" ? (
+                        <>
+                            <Callout>
+                                Copy this and paste it somewhere safe!
+                            </Callout>
+                            <div
+                                style={{ height: "40vh", overflow: "auto" }}
+                                className={cx(
+                                    Classes.DIALOG_BODY,
+                                    "has-nice-scrollbars",
+                                )}
+                            >
+                                <span
+                                    suppressContentEditableWarning={true}
+                                    contentEditable={true}
+                                >
+                                    {formatNuzlockeSaveData(this.props.state)}
+                                </span>
+                            </div>
+                            <div className={Classes.DIALOG_FOOTER}>
+                                <a
+                                    href={this.state.href}
+                                    download={`nuzlocke_${
+                                        this.props?.state?.trainer?.title
+                                            ?.toLowerCase()
+                                            .replace(/\s/g, "-") ||
+                                        this.props?.state?.game?.name
+                                            ?.toLowerCase()
+                                            .replace(/\s/g, "-") ||
+                                        ""
+                                    }_${uuid().slice(0, 4)}.json`}
+                                >
+                                    <Button
+                                        icon={"download"}
+                                        intent={Intent.PRIMARY}
+                                    >
+                                        Download
+                                    </Button>
+                                </a>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div
+                                className={cx(
+                                    Classes.DIALOG_BODY,
+                                    "has-nice-scrollbars",
+                                )}
+                            >
+                                <TextArea
+                                    className={cx(
+                                        "custom-css-input",
+                                        Classes.FILL,
+                                    )}
+                                    onChange={this.uploadJSON}
+                                    placeholder="Paste nuzlocke.json contents here, or use the file uploader"
+                                    value={this.state.data}
+                                    large={true}
+                                />
+                                <ErrorBoundary>
+                                    {this.renderTeam(this.state.data)}
+                                </ErrorBoundary>
+                            </div>
+                            <div className={Classes.DIALOG_FOOTER}>
+                                {/*<Checkbox
+                                    checked={this.state.overrideImport}
+                                    label='Overwrite current save data (will otherwise merge into nuzlocke saves)'
+                                    onChange={e => this.setState({ overrideImport: e.currentTarget.checked })}
+                                />*/}
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                    }}
+                                >
+                                    <input
+                                        style={{ padding: ".25rem" }}
+                                        className={Classes.FILE_INPUT}
+                                        ref={(ref) =>
+                                            (this.nuzlockeJsonFileInput = ref)
+                                        }
+                                        onChange={this.uploadNuzlockeJsonFile}
+                                        type="file"
+                                        id="jsonFile"
+                                        name="jsonFile"
+                                        accept=".json"
+                                    />
+                                    <Button
+                                        icon="tick"
+                                        intent={
+                                            this.state.data === ""
+                                                ? Intent.NONE
+                                                : Intent.SUCCESS
+                                        }
+                                        onClick={this.confirmImport}
+                                        disabled={
+                                            this.state.data === ""
+                                                ? true
+                                                : false
+                                        }
+                                        text="Confirm"
+                                        style={{
+                                            marginLeft: "auto",
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </Dialog>
+
+                <Dialog
+                    isOpen={this.state.isShowdownOpen}
+                    onClose={this.closeShowdownImport}
+                    title="Import from Showdown"
+                    className={
+                        this.props.state.style.editorDarkMode
+                            ? Classes.DARK
+                            : ""
+                    }
+                    icon="import"
+                >
+                    <div
+                        className={cx(
+                            Classes.DIALOG_BODY,
+                            "has-nice-scrollbars",
+                        )}
+                    >
+                        <Callout intent={Intent.PRIMARY} style={{ marginBottom: "0.5rem" }}>
+                            Paste your Pokemon Showdown format text below. Each Pokemon
+                            will be added to your Team.
+                        </Callout>
+                        <div style={{ marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            <span>Generation:</span>
+                            <HTMLSelect
+                                value={this.state.showdownGeneration}
+                                onChange={this.handleShowdownGenerationChange}
+                            >
+                                <option value={Generation.Gen1}>Gen 1 (RBY)</option>
+                                <option value={Generation.Gen2}>Gen 2 (GSC)</option>
+                                <option value={Generation.Gen3}>Gen 3 (RSE/FRLG)</option>
+                                <option value={Generation.Gen4}>Gen 4 (DPPt/HGSS)</option>
+                                <option value={Generation.Gen5}>Gen 5 (BW/B2W2)</option>
+                                <option value={Generation.Gen6}>Gen 6 (XY/ORAS)</option>
+                                <option value={Generation.Gen7}>Gen 7 (SM/USUM)</option>
+                                <option value={Generation.Gen8}>Gen 8 (SwSh/BDSP/LA)</option>
+                                <option value={Generation.Gen9}>Gen 9 (SV/ZA)</option>
+                            </HTMLSelect>
+                        </div>
+                        <TextArea
+                            className={cx("custom-css-input", Classes.FILL)}
+                            onChange={this.handleShowdownDataChange}
+                            placeholder={`Example format:\n\nPikachu @ Light Ball\nAbility: Static\nTera Type: Electric\nNaive Nature\n- Thunderbolt\n- Volt Tackle\n- Iron Tail\n- Quick Attack`}
+                            value={this.state.showdownData}
+                            large={true}
+                            rows={12}
+                            style={{ fontFamily: "monospace", fontSize: "0.85rem" }}
+                        />
+                        <ErrorBoundary>
+                            {this.getShowdownPreview()}
+                        </ErrorBoundary>
+                    </div>
+                    <div className={Classes.DIALOG_FOOTER}>
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                gap: "0.5rem",
+                            }}
+                        >
+                            <Button onClick={this.closeShowdownImport}>
+                                Cancel
+                            </Button>
+                            <Button
+                                icon="tick"
+                                intent={
+                                    this.state.showdownData.trim() === ""
+                                        ? Intent.NONE
+                                        : Intent.SUCCESS
+                                }
+                                onClick={this.confirmShowdownImport}
+                                disabled={this.state.showdownData.trim() === ""}
+                            >
+                                Import Pokemon
+                            </Button>
+                        </div>
+                    </div>
+                </Dialog>
+
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.25rem", margin: "0.25rem" }}>
+                    <ButtonGroup>
+                        <Button
+                            data-testid="import-data-button"
+                            onClick={() => this.importState()}
+                            icon="import"
+                            intent={Intent.PRIMARY}
+                        >
+                            Import Data{" "}
+                            <HotkeyIndicator
+                                hotkey="i"
+                                showModifier={false}
+                                style={{ marginLeft: "0.35rem" }}
+                            />
+                        </Button>
+                        <Button
+                            data-testid="export-data-button"
+                            onClick={() => this.exportState(this.props.state)}
+                            icon="export"
+                        >
+                            Export Data{" "}
+                            <HotkeyIndicator
+                                hotkey="e"
+                                showModifier={false}
+                                style={{ marginLeft: "0.35rem" }}
+                            />
+                        </Button>
+                        <Button
+                            icon="folder-open"
+                            data-testid="import-save-file-button"
+                            onClick={() => this.advancedImportRef.current?.openFileDialog()}
+                        >
+                            Import Save{" "}
+                            <HotkeyIndicator
+                                hotkey="o"
+                                showModifier={false}
+                                style={{ marginLeft: "0.35rem" }}
+                            />
+                        </Button>
+                    </ButtonGroup>
+
+                    <ButtonGroup>
+                        <Button
+                            intent={Intent.SUCCESS}
+                            onClick={this.writeAllData}
+                            icon="floppy-disk"
+                        >
+                            Force Save{" "}
+                            <HotkeyIndicator
+                                hotkey="s"
+                                showModifier={false}
+                                style={{ marginLeft: "0.35rem" }}
+                            />
+                        </Button>
+                        <Button
+                            icon="trash"
+                            onClick={this.toggleClearingData}
+                            intent={Intent.DANGER}
+                        >
+                            Clear All Data
+                        </Button>
+                    </ButtonGroup>
+                </div>
+
+                <AdvancedImportOptions
+                    ref={this.advancedImportRef}
+                    boxes={this.props.state.box}
+                    isDarkMode={this.props.state.style.editorDarkMode ?? false}
+                    onFileSelect={this.handleFileSelect}
+                    onShowdownImport={this.openShowdownImport}
+                />
+            </BaseEditor>
+        );
+    }
+}
+
+const ConnectedDataEditor = connect((state: State) => ({ state }), {
+    replaceState,
+    newNuzlocke,
+    updateNuzlocke,
+})(DataEditorBase);
+
+export function DataEditor() {
+    const { getState } = useStore();
+    return <ConnectedDataEditor getState={getState} />;
+}

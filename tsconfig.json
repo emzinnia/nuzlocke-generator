@@ -1,40 +1,27 @@
 {
-  "compilerOptions": {
-      "target": "es6",
-      "module": "esnext",
-      "moduleResolution": "node",
-      "declaration": false,
-      "noImplicitAny": false,
-      "removeComments": true,
-      "strictNullChecks": true,
-      "noImplicitReturns": true,
-      "strictFunctionTypes": true,
-      "noLib": false,
-      "jsx": "react",
-      "experimentalDecorators": true,
-      "allowSyntheticDefaultImports": false,
-      "esModuleInterop": true,
-      "resolveJsonModule": true,
-      "allowJs": true,
-      "lib": [
-        "dom",
-        "dom.iterable",
-        "ES2017",
-        "ES2018",
-        "ES2019",
-        "ES2020",
-      ],
-      "typeRoots": [
-        "./node_modules/@types"
-      ],
-      "baseUrl": "./src"
+    "compilerOptions": {
+        "target": "es6",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "strictNullChecks": true,
+        "noImplicitReturns": true,
+        "strictFunctionTypes": true,
+        "skipLibCheck": true,
+        "noLib": false,
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "allowJs": true,
+        "lib": ["dom", "dom.iterable", "ES2017", "ES2018", "ES2019", "ES2020"],
+        "typeRoots": ["./node_modules/@types"],
+        "baseUrl": "./src"
     },
-    "include": [
-        "./src"
-    ],
-    "exclude": [
-      "node_modules",
-      "./node_modules/@types",
-    ],
+    "include": ["./src"],
+    "exclude": ["node_modules", "./node_modules/@types"],
     "compileOnSave": false
 }

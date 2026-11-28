@@ -1,1 +1,1 @@
-export const accentedE = '\xE9';
+export const accentedE = "\xE9";

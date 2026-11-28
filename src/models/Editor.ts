@@ -3,5 +3,4 @@ export interface Editor {
     temtemMode?: boolean;
     monsterType?: string;
     showResultInMobile?: boolean;
-    editorHistoryDisabled?: boolean;
 }

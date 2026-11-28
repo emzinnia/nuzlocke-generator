@@ -1,20 +1,20 @@
 language: node_js
 
 node_js:
-  - 16
+    - 22
 
 # if using Ubuntu 16 need this library
 # https://github.com/cypress-io/cypress-documentation/pull/1647
 addons:
-  apt:
-    packages:
-    - libgconf-2-4
+    apt:
+        packages:
+            - libgconf-2-4
 
 cache:
-  # cache both npm modules and Cypress binary
-  directories:
-    - ~/.npm
-    - ~/.cache
+    # cache both npm modules and Cypress binary
+    directories:
+        - ~/.npm
+        - ~/.cache
 
 script:
     #   ## print all Travis environment variables for debugging
@@ -26,4 +26,4 @@ script:
     - npm test
 
 after_success:
-  - node node_modules/.bin/jest --coverage --config jest-config.json && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
+    - npx vitest run --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage

@@ -3,16 +3,19 @@ import {
     DELETE_CUSTOM_MOVE,
     Action,
     REPLACE_STATE,
+    SYNC_STATE_FROM_HISTORY,
     VERSION_1116,
-} from 'actions';
-import { v4 as uuid } from 'uuid';
-import { State } from 'state';
+} from "actions";
+import { v4 as uuid } from "uuid";
+import { State } from "state";
 
 const initialState = [];
 
 export function customMoveMap(
-    state: State['customMoveMap'] = initialState,
-    action: Action<EDIT_CUSTOM_MOVE_MAP | DELETE_CUSTOM_MOVE | REPLACE_STATE | VERSION_1116>,
+    state: State["customMoveMap"] = initialState,
+    action: Action<
+        EDIT_CUSTOM_MOVE_MAP | DELETE_CUSTOM_MOVE | REPLACE_STATE | SYNC_STATE_FROM_HISTORY | VERSION_1116
+    >,
 ) {
     switch (action.type) {
         case EDIT_CUSTOM_MOVE_MAP:
@@ -34,7 +37,13 @@ export function customMoveMap(
         case DELETE_CUSTOM_MOVE:
             return state.filter((move) => move.id !== action.id);
         case REPLACE_STATE:
-            return action.replaceWith.customMoveMap || [];
+            return Array.isArray(action.replaceWith?.customMoveMap)
+                ? action.replaceWith.customMoveMap
+                : state;
+        case SYNC_STATE_FROM_HISTORY:
+            return Array.isArray(action.syncWith?.customMoveMap)
+                ? action.syncWith.customMoveMap
+                : state;
         case VERSION_1116:
             return [];
         default:

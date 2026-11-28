@@ -1,18 +1,20 @@
-import { Action, EDIT_GAME, REPLACE_STATE } from '../actions';
-import { Game } from 'models';
+import { Action, EDIT_GAME, REPLACE_STATE, SYNC_STATE_FROM_HISTORY } from "../actions";
+import { Game } from "models";
 
 export function game(
     state: Game = {
-        name: 'None',
-        customName: '',
+        name: "None",
+        customName: "",
     },
-    action: Action<EDIT_GAME | REPLACE_STATE>,
+    action: Action<EDIT_GAME | REPLACE_STATE | SYNC_STATE_FROM_HISTORY>,
 ) {
     switch (action.type) {
         case EDIT_GAME:
             return { ...state, ...action.edit };
         case REPLACE_STATE:
-            return action.replaceWith.game;
+            return action.replaceWith?.game ?? state;
+        case SYNC_STATE_FROM_HISTORY:
+            return action.syncWith?.game ?? state;
         default:
             return state;
     }

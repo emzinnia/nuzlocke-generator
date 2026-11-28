@@ -1,36 +1,36 @@
-import { State } from 'state';
+import { State } from "state";
 
 export enum Types {
-    Grass = 'Grass',
-    Fire = 'Fire',
-    Water = 'Water',
-    Electric = 'Electric',
-    Rock = 'Rock',
-    Ground = 'Ground',
-    Steel = 'Steel',
-    Flying = 'Flying',
-    Poison = 'Poison',
-    Psychic = 'Psychic',
-    Fighting = 'Fighting',
-    Bug = 'Bug',
-    Fairy = 'Fairy',
-    Normal = 'Normal',
-    Ice = 'Ice',
-    Dragon = 'Dragon',
-    Dark = 'Dark',
-    Ghost = 'Ghost',
+    Grass = "Grass",
+    Fire = "Fire",
+    Water = "Water",
+    Electric = "Electric",
+    Rock = "Rock",
+    Ground = "Ground",
+    Steel = "Steel",
+    Flying = "Flying",
+    Poison = "Poison",
+    Psychic = "Psychic",
+    Fighting = "Fighting",
+    Bug = "Bug",
+    Fairy = "Fairy",
+    Normal = "Normal",
+    Ice = "Ice",
+    Dragon = "Dragon",
+    Dark = "Dark",
+    Ghost = "Ghost",
 
-    Shadow = 'Shadow',
+    Shadow = "Shadow",
 
-    Neutral = 'Neutral',
-    Crystal = 'Crystal',
-    Digital = 'Digital',
-    Earth = 'Earth',
-    Melee = 'Melee',
-    Mental = 'Mental',
-    Toxic = 'Toxic',
-    Wind = 'Wind',
-    Nature = 'Nature',
+    Neutral = "Neutral",
+    Crystal = "Crystal",
+    Digital = "Digital",
+    Earth = "Earth",
+    Melee = "Melee",
+    Mental = "Mental",
+    Toxic = "Toxic",
+    Wind = "Wind",
+    Nature = "Nature",
 }
 
 export type TemtemTypes =
@@ -58,11 +58,11 @@ export const isTemTemType = (type: Types) => {
 };
 
 export const getListOfTypes = (
-    customTypes: State['customTypes'],
+    customTypes: State["customTypes"],
     includeTemTemTypes: boolean = true,
 ) =>
     [
-        'None',
+        "None",
         Types.Bug,
         Types.Crystal,
         Types.Dark,

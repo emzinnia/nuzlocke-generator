@@ -1,9 +1,16 @@
-import { Action, ADD_STAT, EDIT_STAT, DELETE_STAT, REPLACE_STATE } from 'actions';
-import { v4 as uuid } from 'uuid';
+import {
+    Action,
+    ADD_STAT,
+    EDIT_STAT,
+    DELETE_STAT,
+    REPLACE_STATE,
+    SYNC_STATE_FROM_HISTORY,
+} from "actions";
+import { v4 as uuid } from "uuid";
 
 export function stats(
-    initState = [{ id: 'a-1', key: '', value: '' }],
-    action: Action<ADD_STAT | EDIT_STAT | DELETE_STAT | REPLACE_STATE>,
+    initState = [{ id: "a-1", key: "", value: "" }],
+    action: Action<ADD_STAT | EDIT_STAT | DELETE_STAT | REPLACE_STATE | SYNC_STATE_FROM_HISTORY>,
 ) {
     switch (action.type) {
         case ADD_STAT:
@@ -26,7 +33,13 @@ export function stats(
                 },
             ];
         case REPLACE_STATE:
-            return action.replaceWith.stats || [];
+            return Array.isArray(action.replaceWith?.stats)
+                ? action.replaceWith.stats
+                : initState;
+        case SYNC_STATE_FROM_HISTORY:
+            return Array.isArray(action.syncWith?.stats)
+                ? action.syncWith.stats
+                : initState;
         default:
             return initState;
     }

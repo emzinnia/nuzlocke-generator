@@ -11,22 +11,25 @@ import {
     reorderCheckpoints,
     resetCheckpoints,
     REPLACE_STATE,
+    SYNC_STATE_FROM_HISTORY,
     replaceState,
-} from 'actions';
-import { Badge } from 'models';
-import { getBadges, Game } from 'utils';
+    syncStateFromHistory,
+} from "actions";
+import { Badge } from "models";
+import { getBadges, Game } from "utils";
 
 export type Checkpoints = Badge[];
 
 export function checkpoints(
-    state: Checkpoints = getBadges('None'),
+    state: Checkpoints = getBadges("None"),
     action: ReturnType<
-    | addCustomCheckpoint
-    | editCheckpoint
-    | deleteCheckpoint
-    | resetCheckpoints
-    | reorderCheckpoints
-    | replaceState
+        | addCustomCheckpoint
+        | editCheckpoint
+        | deleteCheckpoint
+        | resetCheckpoints
+        | reorderCheckpoints
+        | replaceState
+        | syncStateFromHistory
     >,
 ) {
     switch (action.type) {
@@ -38,14 +41,29 @@ export function checkpoints(
         case ADD_CUSTOM_CHECKPOINT:
             return [...state, action.checkpoint];
         case REPLACE_STATE:
-            return action.replaceWith.checkpoints;
-        case EDIT_CHECKPOINT:
+            return action.replaceWith.checkpoints ?? state;
+        case SYNC_STATE_FROM_HISTORY:
+            return action.syncWith.checkpoints ?? state;
+        case EDIT_CHECKPOINT: {
+            const checkpointIndex = state
+                .map((n) => n.name)
+                .indexOf(action.name);
+            const checkpoint = state[checkpointIndex];
+            if (checkpointIndex < 0 || !checkpoint) {
+                return state;
+            }
+
             const newState = state.slice();
-            newState.splice(state.map((n) => n.name).indexOf(action.name as string), 1, {
-                ...state.find((c) => c.name === action.name),
-                ...(action.edits as any),
-            });
+            newState.splice(
+                checkpointIndex,
+                1,
+                {
+                    ...checkpoint,
+                    ...action.edits,
+                },
+            );
             return newState;
+        }
         case DELETE_CHECKPOINT:
             return state.filter((c) => c.name !== action.name);
         default:

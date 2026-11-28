@@ -29,15 +29,15 @@ import {
     SEE_RELEASE,
     selectPokemon,
     SELECT_POKEMON,
-} from '..';
-import { Pokemon } from 'models';
+} from "..";
+import { Pokemon } from "models";
 
-describe('actions', () => {
-    test('#addPokemon', () => {
+describe("actions", () => {
+    test("#addPokemon", () => {
         const pokemon: Pokemon = {
-            id: '0',
-            species: 'Testmon',
-            nickname: 'This is a test',
+            id: "0",
+            species: "Testmon",
+            nickname: "This is a test",
         };
         expect(addPokemon(pokemon)).toEqual({
             type: ADD_POKEMON,
@@ -45,7 +45,7 @@ describe('actions', () => {
         });
     });
 
-    test('#changeEditorSize', () => {
+    test("#changeEditorSize", () => {
         const mode = true;
         expect(changeEditorSize(mode)).toEqual({
             type: CHANGE_EDITOR_SIZE,
@@ -53,30 +53,30 @@ describe('actions', () => {
         });
     });
 
-    test('#deletePokemon', () => {
-        const id = '001';
+    test("#deletePokemon", () => {
+        const id = "001";
         expect(deletePokemon(id)).toEqual({
             type: DELETE_POKEMON,
             id,
         });
     });
 
-    test('#deleteNuzlocke', () => {
-        const tid = '001';
+    test("#deleteNuzlocke", () => {
+        const tid = "001";
         expect(deleteNuzlocke(tid)).toEqual({
             type: DELETE_NUZLOCKE,
             id: tid,
         });
     });
 
-    describe('rules', () => {
-        test('#addRule', () => {
+    describe("rules", () => {
+        test("#addRule", () => {
             expect(addRule()).toEqual({
                 type: ADD_RULE,
             });
         });
 
-        test('#deleteRule', () => {
+        test("#deleteRule", () => {
             const target = 1;
             expect(deleteRule(target)).toEqual({
                 type: DELETE_RULE,
@@ -84,7 +84,7 @@ describe('actions', () => {
             });
         });
 
-        test('#restRules', () => {
+        test("#restRules", () => {
             expect(resetRules()).toEqual({ type: RESET_RULES });
         });
     });

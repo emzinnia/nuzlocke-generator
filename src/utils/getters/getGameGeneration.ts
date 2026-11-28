@@ -1,5 +1,4 @@
-import { listOfGames } from 'utils';
-import { Game } from 'utils';
+import { Game } from "../data/listOfGames";
 
 export enum Generation {
     Gen1 = 1,
@@ -14,31 +13,43 @@ export enum Generation {
 }
 
 export const getGameGeneration = (game: Game): Generation => {
-    const Gen1: Game[] = ['Red', 'Blue', 'Yellow', 'Green'];
-    const Gen2: Game[] = ['Gold', 'Silver', 'Crystal'];
+    const Gen1: Game[] = ["Red", "Blue", "Yellow", "Green"];
+    const Gen2: Game[] = ["Gold", "Silver", "Crystal"];
     const Gen3: Game[] = [
-        'Ruby',
-        'Sapphire',
-        'Emerald',
-        'FireRed',
-        'LeafGreen',
-        'Colosseum',
-        'XD Gale of Darkness',
+        "Ruby",
+        "Sapphire",
+        "Emerald",
+        "FireRed",
+        "LeafGreen",
+        "Colosseum",
+        "XD Gale of Darkness",
     ];
-    const Gen4: Game[] = ['Diamond', 'Pearl', 'Platinum', 'HeartGold', 'SoulSilver'];
-    const Gen5: Game[] = ['Black', 'Black 2', 'White', 'White 2'];
-    const Gen6: Game[] = ['X', 'Y', 'OmegaRuby', 'AlphaSapphire'];
+    const Gen4: Game[] = [
+        "Diamond",
+        "Pearl",
+        "Platinum",
+        "HeartGold",
+        "SoulSilver",
+    ];
+    const Gen5: Game[] = ["Black", "Black 2", "White", "White 2"];
+    const Gen6: Game[] = ["X", "Y", "OmegaRuby", "AlphaSapphire"];
     const Gen7: Game[] = [
-        'None',
-        'Sun',
-        'Moon',
-        'Ultra Moon',
-        'Ultra Sun',
-        'Let\'s Go Eevee',
-        'Let\'s Go Pikachu',
+        "None",
+        "Sun",
+        "Moon",
+        "Ultra Moon",
+        "Ultra Sun",
+        "Let's Go Eevee",
+        "Let's Go Pikachu",
     ];
-    const Gen8: Game[] = ['Sword', 'Shield', 'Brilliant Diamond', 'Shining Pearl', 'Legends: Arceus'];
-    const Gen9: Game[] = ['Scarlet', 'Violet', 'Legends: Z-A'];
+    const Gen8: Game[] = [
+        "Sword",
+        "Shield",
+        "Brilliant Diamond",
+        "Shining Pearl",
+        "Legends: Arceus",
+    ];
+    const Gen9: Game[] = ["Scarlet", "Violet", "Legends: Z-A"];
 
     if (Gen1.includes(game)) return Generation.Gen1;
     if (Gen2.includes(game)) return Generation.Gen2;

@@ -1,6 +1,6 @@
-import { Game, locations } from 'utils';
-import { getGameRegion, Region } from './getGameRegion';
-import { Generation, getGameGeneration } from './getGameGeneration';
+import { Game, locations } from "utils";
+import { getGameRegion, Region } from "./getGameRegion";
+import { Generation, getGameGeneration } from "./getGameGeneration";
 
 export function getEncounterMap(game: Game) {
     const region = getGameRegion(game);
@@ -50,7 +50,11 @@ export function getEncounterMap(game: Game) {
         return locations.Paldea;
     }
 
-    return ['This game does not have location info.'];
+    if (region === Region.LumioseCity) {
+        return locations.LumioseCity;
+    }
+
+    return ["This game does not have location info."];
 
     // return {
     //     areas: [

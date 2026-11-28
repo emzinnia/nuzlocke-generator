@@ -6,27 +6,35 @@
  * Provide `options` to indicate whether `func` should be invoked on the
  * leading and/or trailing edge of the `wait` timeout.
  *
- * @param {Function} func The function to debounce.
+ * @param func The function to debounce.
  * @param {number} wait The number of milliseconds to delay.
  * @param {Object} [options] The options object.
  * @param {boolean} [options.leading=false] Specify invoking on the leading edge of the timeout.
  * @param {boolean} [options.trailing=true] Specify invoking on the trailing edge of the timeout.
  * @param {boolean} [options.maxWait] The maximum time `func` is allowed to be delayed before it's invoked.
- * @returns {Function} Returns the new debounced function.
+ * @returns Returns the new debounced function.
  */
-export function debounce<T extends (...args: any[]) => any>(
+type Debounced<T extends (this: unknown, ...args: never[]) => unknown> = ((
+    this: ThisParameterType<T>,
+    ...args: Parameters<T>
+) => ReturnType<T> | undefined) & {
+    cancel: () => void;
+    flush: () => ReturnType<T> | undefined;
+};
+
+export function debounce<T extends (this: unknown, ...args: never[]) => unknown>(
     func: T,
     wait: number = 0,
     options: {
         leading?: boolean;
         trailing?: boolean;
         maxWait?: number;
-    } = {}
-): T & { cancel: () => void; flush: () => void } {
-    let lastArgs: any[] | undefined;
-    let lastThis: any;
+    } = {},
+): Debounced<T> {
+    let lastArgs: Parameters<T> | undefined;
+    let lastThis: ThisParameterType<T> | undefined;
     let maxWait: number | undefined;
-    let result: any;
+    let result: ReturnType<T> | undefined;
     let timerId: ReturnType<typeof setTimeout> | undefined;
     let lastCallTime: number | undefined;
     let lastInvokeTime = 0;
@@ -35,7 +43,7 @@ export function debounce<T extends (...args: any[]) => any>(
     let trailing = true;
 
     // Normalize options
-    if (typeof options !== 'object') {
+    if (typeof options !== "object") {
         options = {};
     }
     if (options.leading !== undefined) {
@@ -50,18 +58,18 @@ export function debounce<T extends (...args: any[]) => any>(
     }
 
     // Helper functions
-    function invokeFunc(time: number): any {
+    function invokeFunc(time: number): ReturnType<T> {
         const args = lastArgs;
         const thisArg = lastThis;
 
         lastArgs = undefined;
         lastThis = undefined;
         lastInvokeTime = time;
-        result = func.apply(thisArg, args!);
+        result = func.apply(thisArg, args!) as ReturnType<T>;
         return result;
     }
 
-    function leadingEdge(time: number): any {
+    function leadingEdge(time: number): ReturnType<T> | undefined {
         // Reset any `maxWait` timer
         lastInvokeTime = time;
         // Start the timer for the trailing edge
@@ -98,13 +106,14 @@ export function debounce<T extends (...args: any[]) => any>(
     function timerExpired(): void {
         const time = Date.now();
         if (shouldInvoke(time)) {
-            return trailingEdge(time);
+            trailingEdge(time);
+            return;
         }
         // Restart the timer
         timerId = setTimeout(timerExpired, remainingWait(time));
     }
 
-    function trailingEdge(time: number): any {
+    function trailingEdge(time: number): ReturnType<T> | undefined {
         timerId = undefined;
 
         // Only invoke if we have `lastArgs` which means `func` has been
@@ -128,15 +137,19 @@ export function debounce<T extends (...args: any[]) => any>(
         timerId = undefined;
     }
 
-    function flush(): any {
+    function flush(): ReturnType<T> | undefined {
         return timerId === undefined ? result : trailingEdge(Date.now());
     }
 
-    function debounced(this: any, ...args: any[]): any {
+    function debounced(
+        this: ThisParameterType<T>,
+        ...args: Parameters<T>
+    ): ReturnType<T> | undefined {
         const time = Date.now();
         const isInvoking = shouldInvoke(time);
 
         lastArgs = args;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         lastThis = this;
         lastCallTime = time;
 
@@ -160,6 +173,5 @@ export function debounce<T extends (...args: any[]) => any>(
     debounced.cancel = cancel;
     debounced.flush = flush;
 
-    return debounced as T & { cancel: () => void; flush: () => void };
+    return debounced as Debounced<T>;
 }
-

@@ -3,23 +3,20 @@ import {
     Action,
     TOGGLE_TEMTEM_MODE,
     TOGGLE_MOBILE_RESULT_VIEW,
-    SET_EDITOR_HISTORY_ENABLED,
-} from 'actions';
-import { Editor } from 'models';
+} from "actions";
+import { Editor } from "models";
 
 export function editor(
     state: Editor = {
         minimized: false,
         temtemMode: false,
         showResultInMobile: false,
-        monsterType: 'Pokémon',
-        editorHistoryDisabled: true,
+        monsterType: "Pokémon",
     },
     action: Action<
-    | CHANGE_EDITOR_SIZE
-    | TOGGLE_TEMTEM_MODE
-    | TOGGLE_MOBILE_RESULT_VIEW
-    | SET_EDITOR_HISTORY_ENABLED
+        | CHANGE_EDITOR_SIZE
+        | TOGGLE_TEMTEM_MODE
+        | TOGGLE_MOBILE_RESULT_VIEW
     >,
 ) {
     switch (action.type) {
@@ -31,17 +28,12 @@ export function editor(
             return {
                 ...state,
                 temtemMode: !state.temtemMode,
-                monsterType: !state.temtemMode ? 'TemTem' : 'Pokémon',
+                monsterType: !state.temtemMode ? "TemTem" : "Pokémon",
             };
         case TOGGLE_MOBILE_RESULT_VIEW:
             return {
                 ...state,
                 showResultInMobile: !state.showResultInMobile,
-            };
-        case SET_EDITOR_HISTORY_ENABLED:
-            return {
-                ...state,
-                editorHistoryDisabled: action.enabled,
             };
         default:
             return state;

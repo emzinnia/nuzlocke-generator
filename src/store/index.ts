@@ -1,105 +1,134 @@
-import { applyMiddleware, createStore, Middleware } from 'redux';
-import { createLogger } from 'redux-logger';
+import type { AnyAction, Middleware, Reducer } from "redux";
+import { createLogger } from "redux-logger";
 // @TODO: figure out this deprecation
-import createHistory from 'history/createBrowserHistory';
-import { persistCombineReducers, persistStore, createMigrate, MigrationManifest } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
-import { version } from 'package';
-import { reducers } from '../reducers';
-import { State } from 'state';
+import { createBrowserHistory } from "history";
+import { useStore } from "zustand";
+import { appReducers } from "../reducers";
+import { State } from "state";
+import { historyMiddleware } from "../middleware/historyMiddleware";
+import { setEditorDarkModePreference } from "utils";
+import {
+    getBrowserStorage,
+    purgePersistedState,
+    readPersistedState,
+    writePersistedState,
+} from "./persistence";
+import { reportPersistFailure } from "./persistFailure";
+import {
+    createReduxCompatibleZustandStore,
+    ReduxCompatibleZustandStore,
+} from "./zustandReduxStore";
 
-const migrations = {
-    '0.0.6-beta': (state) => {
-        return {
-            ...state,
-            box: undefined,
-        };
-    },
-    '0.0.11-beta': (state) => {
-        return {
-            ...state,
-            trainer: {
-                ...state.trainer,
-                badges: [],
-            },
-        };
-    },
-    '1.1.0': (state) => ({
-        ...state,
-        customMoveMap: [],
-    }),
-    '1.1.1': (state) => ({
-        ...state,
-        customMoveMap: [],
-    }),
-    '1.1.2': (state) => ({
-        ...state,
-        customMoveMap: [],
-    }),
-    '1.1.3': (state) => ({
-        ...state,
-        customMoveMap: [],
-    }),
-    '1.1.4': (state) => ({
-        ...state,
-        customMoveMap: [],
-    }),
-    '1.6.0': (state: State) => ({
-        ...state,
-        // in 1.6.0, we allowed boxes to be reorganized with drag & drop
-        // The problem was that a long standing data inaccuracy existed in the reducer
-        // whereby the position of Champs & Dead were the same
-        // While this actually isn't that dramatic (it doesn't break the app)
-        // It's better to be safe than sorry, so this changes the position of Champs
-        // Assuming there is only 1 champs with the default length
-        box: state.box.map((box, index) => {
-            return {
-                ...box,
-                position: index,
-                id: index,
-            };
-        }),
-    }),
-    '1.7.1': (state: State) => ({
-        ...state,
-        style: {
-            ...state.style,
-            statsOptions: {
-                ...state.style.statsOptions,
-                averageLevelDetailed: false,
-            },
-        },
-    }),
-    '1.15.1': (state: State) => ({
-        ...state,
-        excludedAreas: [],
-    }),
-    '1.16.0': (state: State) => ({
-        ...state,
-        customAreas: [],
-    }),
+const REHYDRATE_ACTION = "persist/REHYDRATE";
+
+export const history = createBrowserHistory();
+
+export const createDefaultState = (): State =>
+    appReducers(
+        undefined,
+        { type: "@@zustand/INIT" } as AnyAction,
+    ) as unknown as State;
+
+export const createMiddlewares = (enableLogger: boolean): Middleware[] => {
+    const middlewares: Middleware[] = [historyMiddleware];
+
+    if (enableLogger) {
+        const loggerMiddleware = createLogger();
+        middlewares.push(loggerMiddleware as Middleware);
+    }
+
+    return middlewares;
 };
 
-const config = {
-    key: 'root',
-    blacklist: ['router', 'editorHistory'],
-    storage,
-    version,
-    migrations: createMigrate(migrations as unknown as MigrationManifest, { debug: true }),
-};
-
-export const history = createHistory();
-
-export const persistReducers = persistCombineReducers(config, reducers as any);
-
-export const middlewares: Middleware[] = [];
-
-if (import.meta.env.PROD) {
-} else {
-    const loggerMiddleware = createLogger();
-    middlewares.push(loggerMiddleware as any);
+export interface Persistor {
+    flush: () => Promise<void>;
+    purge: () => Promise<void>;
 }
 
-export const store = createStore(persistReducers, applyMiddleware(...middlewares));
+interface CreatePersistorOptions {
+    storage?: Storage;
+    store: ReduxCompatibleZustandStore;
+}
 
-export const persistor = persistStore(store, undefined);
+const createPersistor = ({
+    storage,
+    store,
+}: CreatePersistorOptions): Persistor => ({
+    flush: () =>
+        Promise.resolve().then(() => {
+            const wrote = writePersistedState(store.getState(), storage);
+            if (!wrote) {
+                throw new Error("Failed to persist state to localStorage");
+            }
+        }),
+    purge: () =>
+        Promise.resolve().then(() => {
+            purgePersistedState(storage);
+        }),
+});
+
+export interface CreateNuzlockeStoreOptions {
+    enableLogger?: boolean;
+    storage?: Storage;
+}
+
+export const createNuzlockeStore = ({
+    enableLogger = !import.meta.env.PROD && import.meta.env.MODE !== "test",
+    storage = getBrowserStorage(),
+}: CreateNuzlockeStoreOptions = {}) => {
+    const initialState = {
+        ...createDefaultState(),
+        ...readPersistedState(storage),
+    } as State;
+    const store = createReduxCompatibleZustandStore({
+        initialState,
+        middlewares: createMiddlewares(enableLogger),
+        reducer: appReducers as unknown as Reducer<State, AnyAction>,
+    });
+    const persistor = createPersistor({ storage, store });
+
+    const unsubscribePersistence = store.subscribe(() => {
+        // Auto-persist must catch Storage failures (e.g. QuotaExceededError).
+        // Without this, `void flush()` becomes an unhandled rejection and
+        // later reloads silently restore the last successful snapshot.
+        void persistor.flush().catch((error) => {
+            reportPersistFailure(error);
+        });
+    });
+
+    store.dispatch({ type: REHYDRATE_ACTION } as AnyAction);
+
+    return {
+        persistor,
+        store,
+        unsubscribePersistence,
+        zustandStore: store.zustandStore,
+    };
+};
+
+const nuzlockeStore = createNuzlockeStore();
+
+export const store = nuzlockeStore.store;
+export const persistor = nuzlockeStore.persistor;
+export const zustandStore = nuzlockeStore.zustandStore;
+
+export const useNuzlockeStore = <T>(
+    selector: (state: State) => T,
+) => useStore(zustandStore, selector);
+
+let lastEditorDarkMode = store.getState().style?.editorDarkMode;
+if (typeof lastEditorDarkMode === "boolean") {
+    setEditorDarkModePreference(lastEditorDarkMode);
+}
+
+store.subscribe(() => {
+    const currentEditorDarkMode = store.getState().style?.editorDarkMode;
+    if (
+        typeof currentEditorDarkMode !== "boolean" ||
+        currentEditorDarkMode === lastEditorDarkMode
+    ) {
+        return;
+    }
+    lastEditorDarkMode = currentEditorDarkMode;
+    setEditorDarkModePreference(currentEditorDarkMode);
+});

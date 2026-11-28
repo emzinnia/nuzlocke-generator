@@ -1,4 +1,4 @@
-import { noop } from './noop';
+import { noop } from "./noop";
 
 export class DeepSet<T> {
     private set: T[];
@@ -6,8 +6,7 @@ export class DeepSet<T> {
 
     public constructor(arr: T[] = [], key?: keyof T) {
         this.set = arr;
-        // @ts-ignore
-        this.key = key || 'name';
+        this.key = key || ("name" as keyof T);
     }
 
     public add(item: T, key = this.key) {
@@ -22,7 +21,6 @@ export class DeepSet<T> {
     public overwrite(item: T, edits: Partial<T>, key = this.key) {
         const foundItem = this.set.find((i) => i[key] === item[key]);
         if (foundItem) {
-            // @ts-ignore
             const newItem = { ...foundItem, ...edits };
             this.set.splice(this.set.indexOf(foundItem), 1, newItem);
             return new DeepSet(this.set);
@@ -46,7 +44,7 @@ export class DeepSet<T> {
         return this.set;
     }
 
-    public static cheapCompare(o: any, i: any) {
+    public static cheapCompare(o: unknown, i: unknown) {
         return JSON.stringify(o) === JSON.stringify(i);
     }
 }

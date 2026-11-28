@@ -1,99 +1,101 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[` 1`] = `
-Array [
-  Object {
-    "Bulbasaur": Array [],
+exports[`getAdditionalFormes > matches snapshot for all species 1`] = `
+[
+  {
+    "Bulbasaur": [],
   },
-  Object {
-    "Ivysaur": Array [],
+  {
+    "Ivysaur": [],
   },
-  Object {
-    "Venusaur": Array [
+  {
+    "Venusaur": [
       "Mega",
+      "Gigantamax",
     ],
   },
-  Object {
-    "Charmander": Array [],
+  {
+    "Charmander": [],
   },
-  Object {
-    "Charmeleon": Array [],
+  {
+    "Charmeleon": [],
   },
-  Object {
-    "Charizard": Array [
+  {
+    "Charizard": [
       "Mega-X",
       "Mega-Y",
       "Gigantamax",
     ],
   },
-  Object {
-    "Squirtle": Array [],
+  {
+    "Squirtle": [],
   },
-  Object {
-    "Wartortle": Array [],
+  {
+    "Wartortle": [],
   },
-  Object {
-    "Blastoise": Array [
+  {
+    "Blastoise": [
       "Mega",
-    ],
-  },
-  Object {
-    "Caterpie": Array [],
-  },
-  Object {
-    "Metapod": Array [],
-  },
-  Object {
-    "Butterfree": Array [
       "Gigantamax",
     ],
   },
-  Object {
-    "Weedle": Array [],
+  {
+    "Caterpie": [],
   },
-  Object {
-    "Kakuna": Array [],
+  {
+    "Metapod": [],
   },
-  Object {
-    "Beedrill": Array [
+  {
+    "Butterfree": [
+      "Gigantamax",
+    ],
+  },
+  {
+    "Weedle": [],
+  },
+  {
+    "Kakuna": [],
+  },
+  {
+    "Beedrill": [
       "Mega",
     ],
   },
-  Object {
-    "Pidgey": Array [],
+  {
+    "Pidgey": [],
   },
-  Object {
-    "Pidgeotto": Array [],
+  {
+    "Pidgeotto": [],
   },
-  Object {
-    "Pidgeot": Array [
+  {
+    "Pidgeot": [
       "Mega",
     ],
   },
-  Object {
-    "Rattata": Array [
+  {
+    "Rattata": [
       "Alolan",
     ],
   },
-  Object {
-    "Raticate": Array [
+  {
+    "Raticate": [
       "Alolan",
     ],
   },
-  Object {
-    "Spearow": Array [],
+  {
+    "Spearow": [],
   },
-  Object {
-    "Fearow": Array [],
+  {
+    "Fearow": [],
   },
-  Object {
-    "Ekans": Array [],
+  {
+    "Ekans": [],
   },
-  Object {
-    "Arbok": Array [],
+  {
+    "Arbok": [],
   },
-  Object {
-    "Pikachu": Array [
+  {
+    "Pikachu": [
       "Rock Star",
       "Belle",
       "Pop Star",
@@ -109,629 +111,648 @@ Array [
       "Gigantamax",
     ],
   },
-  Object {
-    "Raichu": Array [
+  {
+    "Raichu": [
       "Alolan",
     ],
   },
-  Object {
-    "Sandshrew": Array [
+  {
+    "Sandshrew": [
       "Alolan",
     ],
   },
-  Object {
-    "Sandslash": Array [
+  {
+    "Sandslash": [
       "Alolan",
     ],
   },
-  Object {
-    "Nidoran♀": Array [],
+  {
+    "Nidoran♀": [],
   },
-  Object {
-    "Nidorina": Array [],
+  {
+    "Nidorina": [],
   },
-  Object {
-    "Nidoqueen": Array [],
+  {
+    "Nidoqueen": [],
   },
-  Object {
-    "Nidoran♂": Array [],
+  {
+    "Nidoran♂": [],
   },
-  Object {
-    "Nidorino": Array [],
+  {
+    "Nidorino": [],
   },
-  Object {
-    "Nidoking": Array [],
+  {
+    "Nidoking": [],
   },
-  Object {
-    "Clefairy": Array [],
+  {
+    "Clefairy": [],
   },
-  Object {
-    "Clefable": Array [],
+  {
+    "Clefable": [
+      "Mega",
+    ],
   },
-  Object {
-    "Vulpix": Array [
+  {
+    "Vulpix": [
       "Alolan",
     ],
   },
-  Object {
-    "Ninetales": Array [
+  {
+    "Ninetales": [
       "Alolan",
     ],
   },
-  Object {
-    "Jigglypuff": Array [],
+  {
+    "Jigglypuff": [],
   },
-  Object {
-    "Wigglytuff": Array [],
+  {
+    "Wigglytuff": [],
   },
-  Object {
-    "Zubat": Array [],
+  {
+    "Zubat": [],
   },
-  Object {
-    "Golbat": Array [],
+  {
+    "Golbat": [],
   },
-  Object {
-    "Oddish": Array [],
+  {
+    "Oddish": [],
   },
-  Object {
-    "Gloom": Array [],
+  {
+    "Gloom": [],
   },
-  Object {
-    "Vileplume": Array [],
+  {
+    "Vileplume": [],
   },
-  Object {
-    "Paras": Array [],
+  {
+    "Paras": [],
   },
-  Object {
-    "Parasect": Array [],
+  {
+    "Parasect": [],
   },
-  Object {
-    "Venonat": Array [],
+  {
+    "Venonat": [],
   },
-  Object {
-    "Venomoth": Array [],
+  {
+    "Venomoth": [],
   },
-  Object {
-    "Diglett": Array [
+  {
+    "Diglett": [
       "Alolan",
     ],
   },
-  Object {
-    "Dugtrio": Array [
+  {
+    "Dugtrio": [
       "Alolan",
     ],
   },
-  Object {
-    "Meowth": Array [
+  {
+    "Meowth": [
       "Alolan",
       "Galarian",
+      "Gigantamax",
     ],
   },
-  Object {
-    "Persian": Array [
+  {
+    "Persian": [
       "Alolan",
     ],
   },
-  Object {
-    "Psyduck": Array [],
+  {
+    "Psyduck": [],
   },
-  Object {
-    "Golduck": Array [],
+  {
+    "Golduck": [],
   },
-  Object {
-    "Mankey": Array [],
+  {
+    "Mankey": [],
   },
-  Object {
-    "Primeape": Array [],
+  {
+    "Primeape": [],
   },
-  Object {
-    "Growlithe": Array [
+  {
+    "Growlithe": [
       "Hisuian",
     ],
   },
-  Object {
-    "Arcanine": Array [],
-  },
-  Object {
-    "Poliwag": Array [],
-  },
-  Object {
-    "Poliwhirl": Array [],
-  },
-  Object {
-    "Poliwrath": Array [],
-  },
-  Object {
-    "Abra": Array [],
-  },
-  Object {
-    "Kadabra": Array [],
-  },
-  Object {
-    "Alakazam": Array [
-      "Mega",
-    ],
-  },
-  Object {
-    "Machop": Array [],
-  },
-  Object {
-    "Machoke": Array [],
-  },
-  Object {
-    "Machamp": Array [
-      "Gigantamax",
-    ],
-  },
-  Object {
-    "Bellsprout": Array [],
-  },
-  Object {
-    "Weepinbell": Array [],
-  },
-  Object {
-    "Victreebel": Array [],
-  },
-  Object {
-    "Tentacool": Array [],
-  },
-  Object {
-    "Tentacruel": Array [],
-  },
-  Object {
-    "Geodude": Array [
-      "Alolan",
-    ],
-  },
-  Object {
-    "Graveler": Array [
-      "Alolan",
-    ],
-  },
-  Object {
-    "Golem": Array [
-      "Alolan",
-    ],
-  },
-  Object {
-    "Ponyta": Array [
-      "Galarian",
-    ],
-  },
-  Object {
-    "Rapidash": Array [
-      "Galarian",
-    ],
-  },
-  Object {
-    "Slowpoke": Array [
-      "Galarian",
-    ],
-  },
-  Object {
-    "Slowbro": Array [
-      "Galarian",
-      "Mega",
-    ],
-  },
-  Object {
-    "Magnemite": Array [],
-  },
-  Object {
-    "Magneton": Array [],
-  },
-  Object {
-    "Farfetch'd": Array [
-      "Galarian",
-    ],
-  },
-  Object {
-    "Doduo": Array [],
-  },
-  Object {
-    "Dodrio": Array [],
-  },
-  Object {
-    "Seel": Array [],
-  },
-  Object {
-    "Dewgong": Array [],
-  },
-  Object {
-    "Grimer": Array [
-      "Alolan",
-    ],
-  },
-  Object {
-    "Muk": Array [
-      "Alolan",
-    ],
-  },
-  Object {
-    "Shellder": Array [],
-  },
-  Object {
-    "Cloyster": Array [],
-  },
-  Object {
-    "Gastly": Array [],
-  },
-  Object {
-    "Haunter": Array [],
-  },
-  Object {
-    "Gengar": Array [
-      "Mega",
-      "Gigantamax",
-    ],
-  },
-  Object {
-    "Onix": Array [],
-  },
-  Object {
-    "Drowzee": Array [],
-  },
-  Object {
-    "Hypno": Array [],
-  },
-  Object {
-    "Krabby": Array [],
-  },
-  Object {
-    "Kingler": Array [
-      "Gigantamax",
-    ],
-  },
-  Object {
-    "Voltorb": Array [
+  {
+    "Arcanine": [
       "Hisuian",
     ],
   },
-  Object {
-    "Electrode": Array [],
+  {
+    "Poliwag": [],
   },
-  Object {
-    "Exeggcute": Array [],
+  {
+    "Poliwhirl": [],
   },
-  Object {
-    "Exeggutor": Array [
-      "Alolan",
-    ],
+  {
+    "Poliwrath": [],
   },
-  Object {
-    "Cubone": Array [],
+  {
+    "Abra": [],
   },
-  Object {
-    "Marowak": Array [
-      "Alolan",
-    ],
+  {
+    "Kadabra": [],
   },
-  Object {
-    "Hitmonlee": Array [],
-  },
-  Object {
-    "Hitmonchan": Array [],
-  },
-  Object {
-    "Lickitung": Array [],
-  },
-  Object {
-    "Koffing": Array [],
-  },
-  Object {
-    "Weezing": Array [
-      "Galarian",
-    ],
-  },
-  Object {
-    "Rhyhorn": Array [],
-  },
-  Object {
-    "Rhydon": Array [],
-  },
-  Object {
-    "Chansey": Array [],
-  },
-  Object {
-    "Tangela": Array [],
-  },
-  Object {
-    "Kangaskhan": Array [
+  {
+    "Alakazam": [
       "Mega",
     ],
   },
-  Object {
-    "Horsea": Array [],
+  {
+    "Machop": [],
   },
-  Object {
-    "Seadra": Array [],
+  {
+    "Machoke": [],
   },
-  Object {
-    "Goldeen": Array [],
-  },
-  Object {
-    "Seaking": Array [],
-  },
-  Object {
-    "Staryu": Array [],
-  },
-  Object {
-    "Starmie": Array [],
-  },
-  Object {
-    "Mr. Mime": Array [
-      "Galarian",
+  {
+    "Machamp": [
+      "Gigantamax",
     ],
   },
-  Object {
-    "Scyther": Array [],
+  {
+    "Bellsprout": [],
   },
-  Object {
-    "Jynx": Array [],
+  {
+    "Weepinbell": [],
   },
-  Object {
-    "Electabuzz": Array [],
-  },
-  Object {
-    "Magmar": Array [],
-  },
-  Object {
-    "Pinsir": Array [
+  {
+    "Victreebel": [
       "Mega",
     ],
   },
-  Object {
-    "Tauros": Array [
+  {
+    "Tentacool": [],
+  },
+  {
+    "Tentacruel": [],
+  },
+  {
+    "Geodude": [
+      "Alolan",
+    ],
+  },
+  {
+    "Graveler": [
+      "Alolan",
+    ],
+  },
+  {
+    "Golem": [
+      "Alolan",
+    ],
+  },
+  {
+    "Ponyta": [
+      "Galarian",
+    ],
+  },
+  {
+    "Rapidash": [
+      "Galarian",
+    ],
+  },
+  {
+    "Slowpoke": [
+      "Galarian",
+    ],
+  },
+  {
+    "Slowbro": [
+      "Galarian",
+      "Mega",
+    ],
+  },
+  {
+    "Magnemite": [],
+  },
+  {
+    "Magneton": [],
+  },
+  {
+    "Farfetch'd": [
+      "Galarian",
+    ],
+  },
+  {
+    "Doduo": [],
+  },
+  {
+    "Dodrio": [],
+  },
+  {
+    "Seel": [],
+  },
+  {
+    "Dewgong": [],
+  },
+  {
+    "Grimer": [
+      "Alolan",
+    ],
+  },
+  {
+    "Muk": [
+      "Alolan",
+    ],
+  },
+  {
+    "Shellder": [],
+  },
+  {
+    "Cloyster": [],
+  },
+  {
+    "Gastly": [],
+  },
+  {
+    "Haunter": [],
+  },
+  {
+    "Gengar": [
+      "Mega",
+      "Gigantamax",
+    ],
+  },
+  {
+    "Onix": [],
+  },
+  {
+    "Drowzee": [],
+  },
+  {
+    "Hypno": [],
+  },
+  {
+    "Krabby": [],
+  },
+  {
+    "Kingler": [
+      "Gigantamax",
+    ],
+  },
+  {
+    "Voltorb": [
+      "Hisuian",
+    ],
+  },
+  {
+    "Electrode": [
+      "Hisuian",
+    ],
+  },
+  {
+    "Exeggcute": [],
+  },
+  {
+    "Exeggutor": [
+      "Alolan",
+    ],
+  },
+  {
+    "Cubone": [],
+  },
+  {
+    "Marowak": [
+      "Alolan",
+    ],
+  },
+  {
+    "Hitmonlee": [],
+  },
+  {
+    "Hitmonchan": [],
+  },
+  {
+    "Lickitung": [],
+  },
+  {
+    "Koffing": [],
+  },
+  {
+    "Weezing": [
+      "Galarian",
+    ],
+  },
+  {
+    "Rhyhorn": [],
+  },
+  {
+    "Rhydon": [],
+  },
+  {
+    "Chansey": [],
+  },
+  {
+    "Tangela": [],
+  },
+  {
+    "Kangaskhan": [
+      "Mega",
+    ],
+  },
+  {
+    "Horsea": [],
+  },
+  {
+    "Seadra": [],
+  },
+  {
+    "Goldeen": [],
+  },
+  {
+    "Seaking": [],
+  },
+  {
+    "Staryu": [],
+  },
+  {
+    "Starmie": [
+      "Mega",
+    ],
+  },
+  {
+    "Mr. Mime": [
+      "Galarian",
+    ],
+  },
+  {
+    "Scyther": [],
+  },
+  {
+    "Jynx": [],
+  },
+  {
+    "Electabuzz": [],
+  },
+  {
+    "Magmar": [],
+  },
+  {
+    "Pinsir": [
+      "Mega",
+    ],
+  },
+  {
+    "Tauros": [
       "Paldean",
       "Paldean-Aqua",
       "Paldean-Blaze",
     ],
   },
-  Object {
-    "Magikarp": Array [],
+  {
+    "Magikarp": [],
   },
-  Object {
-    "Gyarados": Array [
+  {
+    "Gyarados": [
       "Mega",
     ],
   },
-  Object {
-    "Lapras": Array [
+  {
+    "Lapras": [
       "Gigantamax",
     ],
   },
-  Object {
-    "Ditto": Array [],
+  {
+    "Ditto": [],
   },
-  Object {
-    "Eevee": Array [
+  {
+    "Eevee": [
       "Gigantamax",
     ],
   },
-  Object {
-    "Vaporeon": Array [],
+  {
+    "Vaporeon": [],
   },
-  Object {
-    "Jolteon": Array [],
+  {
+    "Jolteon": [],
   },
-  Object {
-    "Flareon": Array [],
+  {
+    "Flareon": [],
   },
-  Object {
-    "Porygon": Array [],
+  {
+    "Porygon": [],
   },
-  Object {
-    "Omanyte": Array [],
+  {
+    "Omanyte": [],
   },
-  Object {
-    "Omastar": Array [],
+  {
+    "Omastar": [],
   },
-  Object {
-    "Kabuto": Array [],
+  {
+    "Kabuto": [],
   },
-  Object {
-    "Kabutops": Array [],
+  {
+    "Kabutops": [],
   },
-  Object {
-    "Aerodactyl": Array [
+  {
+    "Aerodactyl": [
       "Mega",
     ],
   },
-  Object {
-    "Snorlax": Array [
+  {
+    "Snorlax": [
       "Gigantamax",
     ],
   },
-  Object {
-    "Articuno": Array [
+  {
+    "Articuno": [
       "Galarian",
     ],
   },
-  Object {
-    "Zapdos": Array [
+  {
+    "Zapdos": [
       "Galarian",
     ],
   },
-  Object {
-    "Moltres": Array [
+  {
+    "Moltres": [
       "Galarian",
     ],
   },
-  Object {
-    "Dratini": Array [],
+  {
+    "Dratini": [],
   },
-  Object {
-    "Dragonair": Array [],
+  {
+    "Dragonair": [],
   },
-  Object {
-    "Dragonite": Array [],
+  {
+    "Dragonite": [
+      "Mega",
+    ],
   },
-  Object {
-    "Mewtwo": Array [
+  {
+    "Mewtwo": [
       "Mega-X",
       "Mega-Y",
     ],
   },
-  Object {
-    "Mew": Array [],
+  {
+    "Mew": [],
   },
-  Object {
-    "Chikorita": Array [],
+  {
+    "Chikorita": [],
   },
-  Object {
-    "Bayleef": Array [],
+  {
+    "Bayleef": [],
   },
-  Object {
-    "Meganium": Array [],
-  },
-  Object {
-    "Cyndaquil": Array [],
-  },
-  Object {
-    "Quilava": Array [],
-  },
-  Object {
-    "Typhlosion": Array [],
-  },
-  Object {
-    "Totodile": Array [],
-  },
-  Object {
-    "Croconaw": Array [],
-  },
-  Object {
-    "Feraligatr": Array [],
-  },
-  Object {
-    "Sentret": Array [],
-  },
-  Object {
-    "Furret": Array [],
-  },
-  Object {
-    "Hoothoot": Array [],
-  },
-  Object {
-    "Noctowl": Array [],
-  },
-  Object {
-    "Ledyba": Array [],
-  },
-  Object {
-    "Ledian": Array [],
-  },
-  Object {
-    "Spinarak": Array [],
-  },
-  Object {
-    "Ariados": Array [],
-  },
-  Object {
-    "Crobat": Array [],
-  },
-  Object {
-    "Chinchou": Array [],
-  },
-  Object {
-    "Lanturn": Array [],
-  },
-  Object {
-    "Pichu": Array [
-      "Spiky-eared",
-    ],
-  },
-  Object {
-    "Cleffa": Array [],
-  },
-  Object {
-    "Igglybuff": Array [],
-  },
-  Object {
-    "Togepi": Array [],
-  },
-  Object {
-    "Togetic": Array [],
-  },
-  Object {
-    "Natu": Array [],
-  },
-  Object {
-    "Xatu": Array [],
-  },
-  Object {
-    "Mareep": Array [],
-  },
-  Object {
-    "Flaaffy": Array [],
-  },
-  Object {
-    "Ampharos": Array [
+  {
+    "Meganium": [
       "Mega",
     ],
   },
-  Object {
-    "Bellossom": Array [],
+  {
+    "Cyndaquil": [],
   },
-  Object {
-    "Marill": Array [],
+  {
+    "Quilava": [],
   },
-  Object {
-    "Azumarill": Array [],
+  {
+    "Typhlosion": [
+      "Hisuian",
+    ],
   },
-  Object {
-    "Sudowoodo": Array [],
+  {
+    "Totodile": [],
   },
-  Object {
-    "Politoed": Array [],
+  {
+    "Croconaw": [],
   },
-  Object {
-    "Hoppip": Array [],
+  {
+    "Feraligatr": [
+      "Mega",
+    ],
   },
-  Object {
-    "Skiploom": Array [],
+  {
+    "Sentret": [],
   },
-  Object {
-    "Jumpluff": Array [],
+  {
+    "Furret": [],
   },
-  Object {
-    "Aipom": Array [],
+  {
+    "Hoothoot": [],
   },
-  Object {
-    "Sunkern": Array [],
+  {
+    "Noctowl": [],
   },
-  Object {
-    "Sunflora": Array [],
+  {
+    "Ledyba": [],
   },
-  Object {
-    "Yanma": Array [],
+  {
+    "Ledian": [],
   },
-  Object {
-    "Wooper": Array [
+  {
+    "Spinarak": [],
+  },
+  {
+    "Ariados": [],
+  },
+  {
+    "Crobat": [],
+  },
+  {
+    "Chinchou": [],
+  },
+  {
+    "Lanturn": [],
+  },
+  {
+    "Pichu": [
+      "Spiky-eared",
+    ],
+  },
+  {
+    "Cleffa": [],
+  },
+  {
+    "Igglybuff": [],
+  },
+  {
+    "Togepi": [],
+  },
+  {
+    "Togetic": [],
+  },
+  {
+    "Natu": [],
+  },
+  {
+    "Xatu": [],
+  },
+  {
+    "Mareep": [],
+  },
+  {
+    "Flaaffy": [],
+  },
+  {
+    "Ampharos": [
+      "Mega",
+    ],
+  },
+  {
+    "Bellossom": [],
+  },
+  {
+    "Marill": [],
+  },
+  {
+    "Azumarill": [],
+  },
+  {
+    "Sudowoodo": [],
+  },
+  {
+    "Politoed": [],
+  },
+  {
+    "Hoppip": [],
+  },
+  {
+    "Skiploom": [],
+  },
+  {
+    "Jumpluff": [],
+  },
+  {
+    "Aipom": [],
+  },
+  {
+    "Sunkern": [],
+  },
+  {
+    "Sunflora": [],
+  },
+  {
+    "Yanma": [],
+  },
+  {
+    "Wooper": [
       "Paldean",
     ],
   },
-  Object {
-    "Quagsire": Array [],
+  {
+    "Quagsire": [],
   },
-  Object {
-    "Espeon": Array [],
+  {
+    "Espeon": [],
   },
-  Object {
-    "Umbreon": Array [],
+  {
+    "Umbreon": [],
   },
-  Object {
-    "Murkrow": Array [],
+  {
+    "Murkrow": [],
   },
-  Object {
-    "Slowking": Array [
+  {
+    "Slowking": [
       "Galarian",
     ],
   },
-  Object {
-    "Misdreavus": Array [],
+  {
+    "Misdreavus": [],
   },
-  Object {
-    "Unown": Array [
+  {
+    "Unown": [
       "A",
       "B",
       "C",
@@ -762,935 +783,943 @@ Array [
       "?",
     ],
   },
-  Object {
-    "Wobbuffet": Array [],
+  {
+    "Wobbuffet": [],
   },
-  Object {
-    "Girafarig": Array [],
+  {
+    "Girafarig": [],
   },
-  Object {
-    "Pineco": Array [],
+  {
+    "Pineco": [],
   },
-  Object {
-    "Forretress": Array [],
+  {
+    "Forretress": [],
   },
-  Object {
-    "Dunsparce": Array [],
+  {
+    "Dunsparce": [],
   },
-  Object {
-    "Gligar": Array [],
+  {
+    "Gligar": [],
   },
-  Object {
-    "Steelix": Array [
+  {
+    "Steelix": [
       "Mega",
     ],
   },
-  Object {
-    "Snubbull": Array [],
+  {
+    "Snubbull": [],
   },
-  Object {
-    "Granbull": Array [],
+  {
+    "Granbull": [],
   },
-  Object {
-    "Qwilfish": Array [
+  {
+    "Qwilfish": [
       "Hisuian",
     ],
   },
-  Object {
-    "Scizor": Array [
+  {
+    "Scizor": [
       "Mega",
     ],
   },
-  Object {
-    "Shuckle": Array [],
+  {
+    "Shuckle": [],
   },
-  Object {
-    "Heracross": Array [
+  {
+    "Heracross": [
       "Mega",
     ],
   },
-  Object {
-    "Sneasel": Array [
+  {
+    "Sneasel": [
       "Hisuian",
     ],
   },
-  Object {
-    "Teddiursa": Array [],
+  {
+    "Teddiursa": [],
   },
-  Object {
-    "Ursaring": Array [],
+  {
+    "Ursaring": [],
   },
-  Object {
-    "Slugma": Array [],
+  {
+    "Slugma": [],
   },
-  Object {
-    "Magcargo": Array [],
+  {
+    "Magcargo": [],
   },
-  Object {
-    "Swinub": Array [],
+  {
+    "Swinub": [],
   },
-  Object {
-    "Piloswine": Array [],
+  {
+    "Piloswine": [],
   },
-  Object {
-    "Corsola": Array [
+  {
+    "Corsola": [
       "Galarian",
     ],
   },
-  Object {
-    "Remoraid": Array [],
+  {
+    "Remoraid": [],
   },
-  Object {
-    "Octillery": Array [],
+  {
+    "Octillery": [],
   },
-  Object {
-    "Delibird": Array [],
+  {
+    "Delibird": [],
   },
-  Object {
-    "Mantine": Array [],
+  {
+    "Mantine": [],
   },
-  Object {
-    "Skarmory": Array [],
-  },
-  Object {
-    "Houndour": Array [],
-  },
-  Object {
-    "Houndoom": Array [
+  {
+    "Skarmory": [
       "Mega",
     ],
   },
-  Object {
-    "Kingdra": Array [],
+  {
+    "Houndour": [],
   },
-  Object {
-    "Phanpy": Array [],
-  },
-  Object {
-    "Donphan": Array [],
-  },
-  Object {
-    "Porygon2": Array [],
-  },
-  Object {
-    "Stantler": Array [],
-  },
-  Object {
-    "Smeargle": Array [],
-  },
-  Object {
-    "Tyrogue": Array [],
-  },
-  Object {
-    "Hitmontop": Array [],
-  },
-  Object {
-    "Smoochum": Array [],
-  },
-  Object {
-    "Elekid": Array [],
-  },
-  Object {
-    "Magby": Array [],
-  },
-  Object {
-    "Miltank": Array [],
-  },
-  Object {
-    "Blissey": Array [],
-  },
-  Object {
-    "Raikou": Array [],
-  },
-  Object {
-    "Entei": Array [],
-  },
-  Object {
-    "Suicune": Array [],
-  },
-  Object {
-    "Larvitar": Array [],
-  },
-  Object {
-    "Pupitar": Array [],
-  },
-  Object {
-    "Tyranitar": Array [
+  {
+    "Houndoom": [
       "Mega",
     ],
   },
-  Object {
-    "Lugia": Array [],
+  {
+    "Kingdra": [],
   },
-  Object {
-    "Ho-Oh": Array [],
+  {
+    "Phanpy": [],
   },
-  Object {
-    "Celebi": Array [],
+  {
+    "Donphan": [],
   },
-  Object {
-    "Treecko": Array [],
+  {
+    "Porygon2": [],
   },
-  Object {
-    "Grovyle": Array [],
+  {
+    "Stantler": [],
   },
-  Object {
-    "Sceptile": Array [
+  {
+    "Smeargle": [],
+  },
+  {
+    "Tyrogue": [],
+  },
+  {
+    "Hitmontop": [],
+  },
+  {
+    "Smoochum": [],
+  },
+  {
+    "Elekid": [],
+  },
+  {
+    "Magby": [],
+  },
+  {
+    "Miltank": [],
+  },
+  {
+    "Blissey": [],
+  },
+  {
+    "Raikou": [],
+  },
+  {
+    "Entei": [],
+  },
+  {
+    "Suicune": [],
+  },
+  {
+    "Larvitar": [],
+  },
+  {
+    "Pupitar": [],
+  },
+  {
+    "Tyranitar": [
       "Mega",
     ],
   },
-  Object {
-    "Torchic": Array [],
+  {
+    "Lugia": [],
   },
-  Object {
-    "Combusken": Array [],
+  {
+    "Ho-Oh": [],
   },
-  Object {
-    "Blaziken": Array [
+  {
+    "Celebi": [],
+  },
+  {
+    "Treecko": [],
+  },
+  {
+    "Grovyle": [],
+  },
+  {
+    "Sceptile": [
       "Mega",
     ],
   },
-  Object {
-    "Mudkip": Array [],
+  {
+    "Torchic": [],
   },
-  Object {
-    "Marshtomp": Array [],
+  {
+    "Combusken": [],
   },
-  Object {
-    "Swampert": Array [
+  {
+    "Blaziken": [
       "Mega",
     ],
   },
-  Object {
-    "Poochyena": Array [],
+  {
+    "Mudkip": [],
   },
-  Object {
-    "Mightyena": Array [],
+  {
+    "Marshtomp": [],
   },
-  Object {
-    "Zigzagoon": Array [
+  {
+    "Swampert": [
+      "Mega",
+    ],
+  },
+  {
+    "Poochyena": [],
+  },
+  {
+    "Mightyena": [],
+  },
+  {
+    "Zigzagoon": [
       "Galarian",
     ],
   },
-  Object {
-    "Linoone": Array [
+  {
+    "Linoone": [
       "Galarian",
     ],
   },
-  Object {
-    "Wurmple": Array [],
+  {
+    "Wurmple": [],
   },
-  Object {
-    "Silcoon": Array [],
+  {
+    "Silcoon": [],
   },
-  Object {
-    "Beautifly": Array [],
+  {
+    "Beautifly": [],
   },
-  Object {
-    "Cascoon": Array [],
+  {
+    "Cascoon": [],
   },
-  Object {
-    "Dustox": Array [],
+  {
+    "Dustox": [],
   },
-  Object {
-    "Lotad": Array [],
+  {
+    "Lotad": [],
   },
-  Object {
-    "Lombre": Array [],
+  {
+    "Lombre": [],
   },
-  Object {
-    "Ludicolo": Array [],
+  {
+    "Ludicolo": [],
   },
-  Object {
-    "Seedot": Array [],
+  {
+    "Seedot": [],
   },
-  Object {
-    "Nuzleaf": Array [],
+  {
+    "Nuzleaf": [],
   },
-  Object {
-    "Shiftry": Array [],
+  {
+    "Shiftry": [],
   },
-  Object {
-    "Taillow": Array [],
+  {
+    "Taillow": [],
   },
-  Object {
-    "Swellow": Array [],
+  {
+    "Swellow": [],
   },
-  Object {
-    "Wingull": Array [],
+  {
+    "Wingull": [],
   },
-  Object {
-    "Pelipper": Array [],
+  {
+    "Pelipper": [],
   },
-  Object {
-    "Ralts": Array [],
+  {
+    "Ralts": [],
   },
-  Object {
-    "Kirlia": Array [],
+  {
+    "Kirlia": [],
   },
-  Object {
-    "Gardevoir": Array [
+  {
+    "Gardevoir": [
       "Mega",
     ],
   },
-  Object {
-    "Surskit": Array [],
+  {
+    "Surskit": [],
   },
-  Object {
-    "Masquerain": Array [],
+  {
+    "Masquerain": [],
   },
-  Object {
-    "Shroomish": Array [],
+  {
+    "Shroomish": [],
   },
-  Object {
-    "Breloom": Array [],
+  {
+    "Breloom": [],
   },
-  Object {
-    "Slakoth": Array [],
+  {
+    "Slakoth": [],
   },
-  Object {
-    "Vigoroth": Array [],
+  {
+    "Vigoroth": [],
   },
-  Object {
-    "Slaking": Array [],
+  {
+    "Slaking": [],
   },
-  Object {
-    "Nincada": Array [],
+  {
+    "Nincada": [],
   },
-  Object {
-    "Ninjask": Array [],
+  {
+    "Ninjask": [],
   },
-  Object {
-    "Shedinja": Array [],
+  {
+    "Shedinja": [],
   },
-  Object {
-    "Whismur": Array [],
+  {
+    "Whismur": [],
   },
-  Object {
-    "Loudred": Array [],
+  {
+    "Loudred": [],
   },
-  Object {
-    "Exploud": Array [],
+  {
+    "Exploud": [],
   },
-  Object {
-    "Makuhita": Array [],
+  {
+    "Makuhita": [],
   },
-  Object {
-    "Hariyama": Array [],
+  {
+    "Hariyama": [],
   },
-  Object {
-    "Azurill": Array [],
+  {
+    "Azurill": [],
   },
-  Object {
-    "Nosepass": Array [],
+  {
+    "Nosepass": [],
   },
-  Object {
-    "Skitty": Array [],
+  {
+    "Skitty": [],
   },
-  Object {
-    "Delcatty": Array [],
+  {
+    "Delcatty": [],
   },
-  Object {
-    "Sableye": Array [
+  {
+    "Sableye": [
       "Mega",
     ],
   },
-  Object {
-    "Mawile": Array [
+  {
+    "Mawile": [
       "Mega",
     ],
   },
-  Object {
-    "Aron": Array [],
+  {
+    "Aron": [],
   },
-  Object {
-    "Lairon": Array [],
+  {
+    "Lairon": [],
   },
-  Object {
-    "Aggron": Array [
+  {
+    "Aggron": [
       "Mega",
     ],
   },
-  Object {
-    "Meditite": Array [],
+  {
+    "Meditite": [],
   },
-  Object {
-    "Medicham": Array [
+  {
+    "Medicham": [
       "Mega",
     ],
   },
-  Object {
-    "Electrike": Array [],
+  {
+    "Electrike": [],
   },
-  Object {
-    "Manectric": Array [
+  {
+    "Manectric": [
       "Mega",
     ],
   },
-  Object {
-    "Plusle": Array [],
+  {
+    "Plusle": [],
   },
-  Object {
-    "Minun": Array [],
+  {
+    "Minun": [],
   },
-  Object {
-    "Volbeat": Array [],
+  {
+    "Volbeat": [],
   },
-  Object {
-    "Illumise": Array [],
+  {
+    "Illumise": [],
   },
-  Object {
-    "Roselia": Array [],
+  {
+    "Roselia": [],
   },
-  Object {
-    "Gulpin": Array [],
+  {
+    "Gulpin": [],
   },
-  Object {
-    "Swalot": Array [],
+  {
+    "Swalot": [],
   },
-  Object {
-    "Carvanha": Array [],
+  {
+    "Carvanha": [],
   },
-  Object {
-    "Sharpedo": Array [
+  {
+    "Sharpedo": [
       "Mega",
     ],
   },
-  Object {
-    "Wailmer": Array [],
+  {
+    "Wailmer": [],
   },
-  Object {
-    "Wailord": Array [],
+  {
+    "Wailord": [],
   },
-  Object {
-    "Numel": Array [],
+  {
+    "Numel": [],
   },
-  Object {
-    "Camerupt": Array [
+  {
+    "Camerupt": [
       "Mega",
     ],
   },
-  Object {
-    "Torkoal": Array [],
+  {
+    "Torkoal": [],
   },
-  Object {
-    "Spoink": Array [],
+  {
+    "Spoink": [],
   },
-  Object {
-    "Grumpig": Array [],
+  {
+    "Grumpig": [],
   },
-  Object {
-    "Spinda": Array [],
+  {
+    "Spinda": [],
   },
-  Object {
-    "Trapinch": Array [],
+  {
+    "Trapinch": [],
   },
-  Object {
-    "Vibrava": Array [],
+  {
+    "Vibrava": [],
   },
-  Object {
-    "Flygon": Array [],
+  {
+    "Flygon": [],
   },
-  Object {
-    "Cacnea": Array [],
+  {
+    "Cacnea": [],
   },
-  Object {
-    "Cacturne": Array [],
+  {
+    "Cacturne": [],
   },
-  Object {
-    "Swablu": Array [],
+  {
+    "Swablu": [],
   },
-  Object {
-    "Altaria": Array [
+  {
+    "Altaria": [
       "Mega",
     ],
   },
-  Object {
-    "Zangoose": Array [],
+  {
+    "Zangoose": [],
   },
-  Object {
-    "Seviper": Array [],
+  {
+    "Seviper": [],
   },
-  Object {
-    "Lunatone": Array [],
+  {
+    "Lunatone": [],
   },
-  Object {
-    "Solrock": Array [],
+  {
+    "Solrock": [],
   },
-  Object {
-    "Barboach": Array [],
+  {
+    "Barboach": [],
   },
-  Object {
-    "Whiscash": Array [],
+  {
+    "Whiscash": [],
   },
-  Object {
-    "Corphish": Array [],
+  {
+    "Corphish": [],
   },
-  Object {
-    "Crawdaunt": Array [],
+  {
+    "Crawdaunt": [],
   },
-  Object {
-    "Baltoy": Array [],
+  {
+    "Baltoy": [],
   },
-  Object {
-    "Claydol": Array [],
+  {
+    "Claydol": [],
   },
-  Object {
-    "Lileep": Array [],
+  {
+    "Lileep": [],
   },
-  Object {
-    "Cradily": Array [],
+  {
+    "Cradily": [],
   },
-  Object {
-    "Anorith": Array [],
+  {
+    "Anorith": [],
   },
-  Object {
-    "Armaldo": Array [],
+  {
+    "Armaldo": [],
   },
-  Object {
-    "Feebas": Array [],
+  {
+    "Feebas": [],
   },
-  Object {
-    "Milotic": Array [],
+  {
+    "Milotic": [],
   },
-  Object {
-    "Castform": Array [
+  {
+    "Castform": [
       "Sunny",
       "Rainy",
       "Snowy",
     ],
   },
-  Object {
-    "Kecleon": Array [],
+  {
+    "Kecleon": [],
   },
-  Object {
-    "Shuppet": Array [],
+  {
+    "Shuppet": [],
   },
-  Object {
-    "Banette": Array [
+  {
+    "Banette": [
       "Mega",
     ],
   },
-  Object {
-    "Duskull": Array [],
+  {
+    "Duskull": [],
   },
-  Object {
-    "Dusclops": Array [],
+  {
+    "Dusclops": [],
   },
-  Object {
-    "Tropius": Array [],
+  {
+    "Tropius": [],
   },
-  Object {
-    "Chimecho": Array [],
-  },
-  Object {
-    "Absol": Array [
+  {
+    "Chimecho": [
       "Mega",
     ],
   },
-  Object {
-    "Wynaut": Array [],
-  },
-  Object {
-    "Snorunt": Array [],
-  },
-  Object {
-    "Glalie": Array [
+  {
+    "Absol": [
       "Mega",
     ],
   },
-  Object {
-    "Spheal": Array [],
+  {
+    "Wynaut": [],
   },
-  Object {
-    "Sealeo": Array [],
+  {
+    "Snorunt": [],
   },
-  Object {
-    "Walrein": Array [],
-  },
-  Object {
-    "Clamperl": Array [],
-  },
-  Object {
-    "Huntail": Array [],
-  },
-  Object {
-    "Gorebyss": Array [],
-  },
-  Object {
-    "Relicanth": Array [],
-  },
-  Object {
-    "Luvdisc": Array [],
-  },
-  Object {
-    "Bagon": Array [],
-  },
-  Object {
-    "Shelgon": Array [],
-  },
-  Object {
-    "Salamence": Array [
+  {
+    "Glalie": [
       "Mega",
     ],
   },
-  Object {
-    "Beldum": Array [],
+  {
+    "Spheal": [],
   },
-  Object {
-    "Metang": Array [],
+  {
+    "Sealeo": [],
   },
-  Object {
-    "Metagross": Array [
+  {
+    "Walrein": [],
+  },
+  {
+    "Clamperl": [],
+  },
+  {
+    "Huntail": [],
+  },
+  {
+    "Gorebyss": [],
+  },
+  {
+    "Relicanth": [],
+  },
+  {
+    "Luvdisc": [],
+  },
+  {
+    "Bagon": [],
+  },
+  {
+    "Shelgon": [],
+  },
+  {
+    "Salamence": [
       "Mega",
     ],
   },
-  Object {
-    "Regirock": Array [],
+  {
+    "Beldum": [],
   },
-  Object {
-    "Regice": Array [],
+  {
+    "Metang": [],
   },
-  Object {
-    "Registeel": Array [],
-  },
-  Object {
-    "Latias": Array [
+  {
+    "Metagross": [
       "Mega",
     ],
   },
-  Object {
-    "Latios": Array [
+  {
+    "Regirock": [],
+  },
+  {
+    "Regice": [],
+  },
+  {
+    "Registeel": [],
+  },
+  {
+    "Latias": [
       "Mega",
     ],
   },
-  Object {
-    "Kyogre": Array [
+  {
+    "Latios": [
+      "Mega",
+    ],
+  },
+  {
+    "Kyogre": [
       "Primal",
     ],
   },
-  Object {
-    "Groudon": Array [
+  {
+    "Groudon": [
       "Primal",
     ],
   },
-  Object {
-    "Rayquaza": Array [
+  {
+    "Rayquaza": [
       "Mega",
     ],
   },
-  Object {
-    "Jirachi": Array [],
+  {
+    "Jirachi": [],
   },
-  Object {
-    "Deoxys": Array [
+  {
+    "Deoxys": [
       "Attack",
       "Defense",
       "Speed",
     ],
   },
-  Object {
-    "Turtwig": Array [],
+  {
+    "Turtwig": [],
   },
-  Object {
-    "Grotle": Array [],
+  {
+    "Grotle": [],
   },
-  Object {
-    "Torterra": Array [],
+  {
+    "Torterra": [],
   },
-  Object {
-    "Chimchar": Array [],
+  {
+    "Chimchar": [],
   },
-  Object {
-    "Monferno": Array [],
+  {
+    "Monferno": [],
   },
-  Object {
-    "Infernape": Array [],
+  {
+    "Infernape": [],
   },
-  Object {
-    "Piplup": Array [],
+  {
+    "Piplup": [],
   },
-  Object {
-    "Prinplup": Array [],
+  {
+    "Prinplup": [],
   },
-  Object {
-    "Empoleon": Array [],
+  {
+    "Empoleon": [],
   },
-  Object {
-    "Starly": Array [],
+  {
+    "Starly": [],
   },
-  Object {
-    "Staravia": Array [],
+  {
+    "Staravia": [],
   },
-  Object {
-    "Staraptor": Array [],
+  {
+    "Staraptor": [
+      "Mega",
+    ],
   },
-  Object {
-    "Bidoof": Array [],
+  {
+    "Bidoof": [],
   },
-  Object {
-    "Bibarel": Array [],
+  {
+    "Bibarel": [],
   },
-  Object {
-    "Kricketot": Array [],
+  {
+    "Kricketot": [],
   },
-  Object {
-    "Kricketune": Array [],
+  {
+    "Kricketune": [],
   },
-  Object {
-    "Shinx": Array [],
+  {
+    "Shinx": [],
   },
-  Object {
-    "Luxio": Array [],
+  {
+    "Luxio": [],
   },
-  Object {
-    "Luxray": Array [],
+  {
+    "Luxray": [],
   },
-  Object {
-    "Budew": Array [],
+  {
+    "Budew": [],
   },
-  Object {
-    "Roserade": Array [],
+  {
+    "Roserade": [],
   },
-  Object {
-    "Cranidos": Array [],
+  {
+    "Cranidos": [],
   },
-  Object {
-    "Rampardos": Array [],
+  {
+    "Rampardos": [],
   },
-  Object {
-    "Shieldon": Array [],
+  {
+    "Shieldon": [],
   },
-  Object {
-    "Bastiodon": Array [],
+  {
+    "Bastiodon": [],
   },
-  Object {
-    "Burmy": Array [
+  {
+    "Burmy": [
       "Plant",
       "Sandy",
       "Trash",
     ],
   },
-  Object {
-    "Wormadam": Array [
+  {
+    "Wormadam": [
       "Plant",
       "Sandy",
       "Trash",
     ],
   },
-  Object {
-    "Mothim": Array [],
+  {
+    "Mothim": [],
   },
-  Object {
-    "Combee": Array [],
+  {
+    "Combee": [],
   },
-  Object {
-    "Vespiquen": Array [],
+  {
+    "Vespiquen": [],
   },
-  Object {
-    "Pachirisu": Array [],
+  {
+    "Pachirisu": [],
   },
-  Object {
-    "Buizel": Array [],
+  {
+    "Buizel": [],
   },
-  Object {
-    "Floatzel": Array [],
+  {
+    "Floatzel": [],
   },
-  Object {
-    "Cherubi": Array [],
+  {
+    "Cherubi": [],
   },
-  Object {
-    "Cherrim": Array [],
+  {
+    "Cherrim": [],
   },
-  Object {
-    "Shellos": Array [
+  {
+    "Shellos": [
       "West Sea",
       "East Sea",
     ],
   },
-  Object {
-    "Gastrodon": Array [
+  {
+    "Gastrodon": [
       "West Sea",
       "East Sea",
     ],
   },
-  Object {
-    "Ambipom": Array [],
+  {
+    "Ambipom": [],
   },
-  Object {
-    "Drifloon": Array [],
+  {
+    "Drifloon": [],
   },
-  Object {
-    "Drifblim": Array [],
+  {
+    "Drifblim": [],
   },
-  Object {
-    "Buneary": Array [],
+  {
+    "Buneary": [],
   },
-  Object {
-    "Lopunny": Array [
+  {
+    "Lopunny": [
       "Mega",
     ],
   },
-  Object {
-    "Mismagius": Array [],
+  {
+    "Mismagius": [],
   },
-  Object {
-    "Honchkrow": Array [],
+  {
+    "Honchkrow": [],
   },
-  Object {
-    "Glameow": Array [],
+  {
+    "Glameow": [],
   },
-  Object {
-    "Purugly": Array [],
+  {
+    "Purugly": [],
   },
-  Object {
-    "Chingling": Array [],
+  {
+    "Chingling": [],
   },
-  Object {
-    "Stunky": Array [],
+  {
+    "Stunky": [],
   },
-  Object {
-    "Skuntank": Array [],
+  {
+    "Skuntank": [],
   },
-  Object {
-    "Bronzor": Array [],
+  {
+    "Bronzor": [],
   },
-  Object {
-    "Bronzong": Array [],
+  {
+    "Bronzong": [],
   },
-  Object {
-    "Bonsly": Array [],
+  {
+    "Bonsly": [],
   },
-  Object {
-    "Mime Jr.": Array [],
+  {
+    "Mime Jr.": [],
   },
-  Object {
-    "Happiny": Array [],
+  {
+    "Happiny": [],
   },
-  Object {
-    "Chatot": Array [],
+  {
+    "Chatot": [],
   },
-  Object {
-    "Spiritomb": Array [],
+  {
+    "Spiritomb": [],
   },
-  Object {
-    "Gible": Array [],
+  {
+    "Gible": [],
   },
-  Object {
-    "Gabite": Array [],
+  {
+    "Gabite": [],
   },
-  Object {
-    "Garchomp": Array [
+  {
+    "Garchomp": [
       "Mega",
     ],
   },
-  Object {
-    "Munchlax": Array [],
+  {
+    "Munchlax": [],
   },
-  Object {
-    "Riolu": Array [],
+  {
+    "Riolu": [],
   },
-  Object {
-    "Lucario": Array [
+  {
+    "Lucario": [
       "Mega",
     ],
   },
-  Object {
-    "Hippopotas": Array [],
+  {
+    "Hippopotas": [],
   },
-  Object {
-    "Hippowdon": Array [],
+  {
+    "Hippowdon": [],
   },
-  Object {
-    "Skorupi": Array [],
+  {
+    "Skorupi": [],
   },
-  Object {
-    "Drapion": Array [],
+  {
+    "Drapion": [],
   },
-  Object {
-    "Croagunk": Array [],
+  {
+    "Croagunk": [],
   },
-  Object {
-    "Toxicroak": Array [],
+  {
+    "Toxicroak": [],
   },
-  Object {
-    "Carnivine": Array [],
+  {
+    "Carnivine": [],
   },
-  Object {
-    "Finneon": Array [],
+  {
+    "Finneon": [],
   },
-  Object {
-    "Lumineon": Array [],
+  {
+    "Lumineon": [],
   },
-  Object {
-    "Mantyke": Array [],
+  {
+    "Mantyke": [],
   },
-  Object {
-    "Snover": Array [],
+  {
+    "Snover": [],
   },
-  Object {
-    "Abomasnow": Array [
+  {
+    "Abomasnow": [
       "Mega",
     ],
   },
-  Object {
-    "Weavile": Array [],
+  {
+    "Weavile": [],
   },
-  Object {
-    "Magnezone": Array [],
+  {
+    "Magnezone": [],
   },
-  Object {
-    "Lickilicky": Array [],
+  {
+    "Lickilicky": [],
   },
-  Object {
-    "Rhyperior": Array [],
+  {
+    "Rhyperior": [],
   },
-  Object {
-    "Tangrowth": Array [],
+  {
+    "Tangrowth": [],
   },
-  Object {
-    "Electivire": Array [],
+  {
+    "Electivire": [],
   },
-  Object {
-    "Magmortar": Array [],
+  {
+    "Magmortar": [],
   },
-  Object {
-    "Togekiss": Array [],
+  {
+    "Togekiss": [],
   },
-  Object {
-    "Yanmega": Array [],
+  {
+    "Yanmega": [],
   },
-  Object {
-    "Leafeon": Array [],
+  {
+    "Leafeon": [],
   },
-  Object {
-    "Glaceon": Array [],
+  {
+    "Glaceon": [],
   },
-  Object {
-    "Gliscor": Array [],
+  {
+    "Gliscor": [],
   },
-  Object {
-    "Mamoswine": Array [],
+  {
+    "Mamoswine": [],
   },
-  Object {
-    "Porygon-Z": Array [],
+  {
+    "Porygon-Z": [],
   },
-  Object {
-    "Gallade": Array [
+  {
+    "Gallade": [
       "Mega",
     ],
   },
-  Object {
-    "Probopass": Array [],
+  {
+    "Probopass": [],
   },
-  Object {
-    "Dusknoir": Array [],
+  {
+    "Dusknoir": [],
   },
-  Object {
-    "Froslass": Array [],
+  {
+    "Froslass": [
+      "Mega",
+    ],
   },
-  Object {
-    "Rotom": Array [
+  {
+    "Rotom": [
       "Heat",
       "Wash",
       "Frost",
@@ -1698,637 +1727,661 @@ Array [
       "Mow",
     ],
   },
-  Object {
-    "Uxie": Array [],
+  {
+    "Uxie": [],
   },
-  Object {
-    "Mesprit": Array [],
+  {
+    "Mesprit": [],
   },
-  Object {
-    "Azelf": Array [],
+  {
+    "Azelf": [],
   },
-  Object {
-    "Dialga": Array [],
+  {
+    "Dialga": [],
   },
-  Object {
-    "Palkia": Array [],
+  {
+    "Palkia": [],
   },
-  Object {
-    "Heatran": Array [],
+  {
+    "Heatran": [
+      "Mega",
+    ],
   },
-  Object {
-    "Regigigas": Array [],
+  {
+    "Regigigas": [],
   },
-  Object {
-    "Giratina": Array [
+  {
+    "Giratina": [
       "Altered",
       "Origin",
     ],
   },
-  Object {
-    "Cresselia": Array [],
+  {
+    "Cresselia": [],
   },
-  Object {
-    "Phione": Array [],
+  {
+    "Phione": [],
   },
-  Object {
-    "Manaphy": Array [],
+  {
+    "Manaphy": [],
   },
-  Object {
-    "Darkrai": Array [],
+  {
+    "Darkrai": [],
   },
-  Object {
-    "Shaymin": Array [
+  {
+    "Shaymin": [
       "Land",
       "Sky",
     ],
   },
-  Object {
-    "Arceus": Array [],
+  {
+    "Arceus": [],
   },
-  Object {
-    "Victini": Array [],
+  {
+    "Victini": [],
   },
-  Object {
-    "Snivy": Array [],
+  {
+    "Snivy": [],
   },
-  Object {
-    "Servine": Array [],
+  {
+    "Servine": [],
   },
-  Object {
-    "Serperior": Array [],
+  {
+    "Serperior": [],
   },
-  Object {
-    "Tepig": Array [],
+  {
+    "Tepig": [],
   },
-  Object {
-    "Pignite": Array [],
+  {
+    "Pignite": [],
   },
-  Object {
-    "Emboar": Array [],
-  },
-  Object {
-    "Oshawott": Array [],
-  },
-  Object {
-    "Dewott": Array [],
-  },
-  Object {
-    "Samurott": Array [],
-  },
-  Object {
-    "Patrat": Array [],
-  },
-  Object {
-    "Watchog": Array [],
-  },
-  Object {
-    "Lillipup": Array [],
-  },
-  Object {
-    "Herdier": Array [],
-  },
-  Object {
-    "Stoutland": Array [],
-  },
-  Object {
-    "Purrloin": Array [],
-  },
-  Object {
-    "Liepard": Array [],
-  },
-  Object {
-    "Pansage": Array [],
-  },
-  Object {
-    "Simisage": Array [],
-  },
-  Object {
-    "Pansear": Array [],
-  },
-  Object {
-    "Simisear": Array [],
-  },
-  Object {
-    "Panpour": Array [],
-  },
-  Object {
-    "Simipour": Array [],
-  },
-  Object {
-    "Munna": Array [],
-  },
-  Object {
-    "Musharna": Array [],
-  },
-  Object {
-    "Pidove": Array [],
-  },
-  Object {
-    "Tranquill": Array [],
-  },
-  Object {
-    "Unfezant": Array [],
-  },
-  Object {
-    "Blitzle": Array [],
-  },
-  Object {
-    "Zebstrika": Array [],
-  },
-  Object {
-    "Roggenrola": Array [],
-  },
-  Object {
-    "Boldore": Array [],
-  },
-  Object {
-    "Gigalith": Array [],
-  },
-  Object {
-    "Woobat": Array [],
-  },
-  Object {
-    "Swoobat": Array [],
-  },
-  Object {
-    "Drilbur": Array [],
-  },
-  Object {
-    "Excadrill": Array [],
-  },
-  Object {
-    "Audino": Array [
+  {
+    "Emboar": [
       "Mega",
     ],
   },
-  Object {
-    "Timburr": Array [],
+  {
+    "Oshawott": [],
   },
-  Object {
-    "Gurdurr": Array [],
+  {
+    "Dewott": [],
   },
-  Object {
-    "Conkeldurr": Array [],
-  },
-  Object {
-    "Tympole": Array [],
-  },
-  Object {
-    "Palpitoad": Array [],
-  },
-  Object {
-    "Seismitoad": Array [],
-  },
-  Object {
-    "Throh": Array [],
-  },
-  Object {
-    "Sawk": Array [],
-  },
-  Object {
-    "Sewaddle": Array [],
-  },
-  Object {
-    "Swadloon": Array [],
-  },
-  Object {
-    "Leavanny": Array [],
-  },
-  Object {
-    "Venipede": Array [],
-  },
-  Object {
-    "Whirlipede": Array [],
-  },
-  Object {
-    "Scolipede": Array [],
-  },
-  Object {
-    "Cottonee": Array [],
-  },
-  Object {
-    "Whimsicott": Array [],
-  },
-  Object {
-    "Petilil": Array [],
-  },
-  Object {
-    "Lilligant": Array [
+  {
+    "Samurott": [
       "Hisuian",
     ],
   },
-  Object {
-    "Basculin": Array [
+  {
+    "Patrat": [],
+  },
+  {
+    "Watchog": [],
+  },
+  {
+    "Lillipup": [],
+  },
+  {
+    "Herdier": [],
+  },
+  {
+    "Stoutland": [],
+  },
+  {
+    "Purrloin": [],
+  },
+  {
+    "Liepard": [],
+  },
+  {
+    "Pansage": [],
+  },
+  {
+    "Simisage": [],
+  },
+  {
+    "Pansear": [],
+  },
+  {
+    "Simisear": [],
+  },
+  {
+    "Panpour": [],
+  },
+  {
+    "Simipour": [],
+  },
+  {
+    "Munna": [],
+  },
+  {
+    "Musharna": [],
+  },
+  {
+    "Pidove": [],
+  },
+  {
+    "Tranquill": [],
+  },
+  {
+    "Unfezant": [],
+  },
+  {
+    "Blitzle": [],
+  },
+  {
+    "Zebstrika": [],
+  },
+  {
+    "Roggenrola": [],
+  },
+  {
+    "Boldore": [],
+  },
+  {
+    "Gigalith": [],
+  },
+  {
+    "Woobat": [],
+  },
+  {
+    "Swoobat": [],
+  },
+  {
+    "Drilbur": [],
+  },
+  {
+    "Excadrill": [
+      "Mega",
+    ],
+  },
+  {
+    "Audino": [
+      "Mega",
+    ],
+  },
+  {
+    "Timburr": [],
+  },
+  {
+    "Gurdurr": [],
+  },
+  {
+    "Conkeldurr": [],
+  },
+  {
+    "Tympole": [],
+  },
+  {
+    "Palpitoad": [],
+  },
+  {
+    "Seismitoad": [],
+  },
+  {
+    "Throh": [],
+  },
+  {
+    "Sawk": [],
+  },
+  {
+    "Sewaddle": [],
+  },
+  {
+    "Swadloon": [],
+  },
+  {
+    "Leavanny": [],
+  },
+  {
+    "Venipede": [],
+  },
+  {
+    "Whirlipede": [],
+  },
+  {
+    "Scolipede": [
+      "Mega",
+    ],
+  },
+  {
+    "Cottonee": [],
+  },
+  {
+    "Whimsicott": [],
+  },
+  {
+    "Petilil": [],
+  },
+  {
+    "Lilligant": [
+      "Hisuian",
+    ],
+  },
+  {
+    "Basculin": [
       "Red-Striped",
       "Blue-Striped",
       "White-Striped",
     ],
   },
-  Object {
-    "Sandile": Array [],
+  {
+    "Sandile": [],
   },
-  Object {
-    "Krokorok": Array [],
+  {
+    "Krokorok": [],
   },
-  Object {
-    "Krookodile": Array [],
+  {
+    "Krookodile": [],
   },
-  Object {
-    "Darumaka": Array [
+  {
+    "Darumaka": [
       "Galarian",
     ],
   },
-  Object {
-    "Darmanitan": Array [
+  {
+    "Darmanitan": [
       "Galarian",
     ],
   },
-  Object {
-    "Maractus": Array [],
+  {
+    "Maractus": [],
   },
-  Object {
-    "Dwebble": Array [],
+  {
+    "Dwebble": [],
   },
-  Object {
-    "Crustle": Array [],
+  {
+    "Crustle": [],
   },
-  Object {
-    "Scraggy": Array [],
+  {
+    "Scraggy": [],
   },
-  Object {
-    "Scrafty": Array [],
+  {
+    "Scrafty": [
+      "Mega",
+    ],
   },
-  Object {
-    "Sigilyph": Array [],
+  {
+    "Sigilyph": [],
   },
-  Object {
-    "Yamask": Array [
+  {
+    "Yamask": [
       "Galarian",
     ],
   },
-  Object {
-    "Cofagrigus": Array [],
+  {
+    "Cofagrigus": [],
   },
-  Object {
-    "Tirtouga": Array [],
+  {
+    "Tirtouga": [],
   },
-  Object {
-    "Carracosta": Array [],
+  {
+    "Carracosta": [],
   },
-  Object {
-    "Archen": Array [],
+  {
+    "Archen": [],
   },
-  Object {
-    "Archeops": Array [],
+  {
+    "Archeops": [],
   },
-  Object {
-    "Trubbish": Array [],
+  {
+    "Trubbish": [],
   },
-  Object {
-    "Garbodor": Array [
+  {
+    "Garbodor": [
       "Gigantamax",
     ],
   },
-  Object {
-    "Zorua": Array [
+  {
+    "Zorua": [
       "Hisuian",
     ],
   },
-  Object {
-    "Zoroark": Array [
+  {
+    "Zoroark": [
       "Hisuian",
     ],
   },
-  Object {
-    "Minccino": Array [],
+  {
+    "Minccino": [],
   },
-  Object {
-    "Cinccino": Array [],
+  {
+    "Cinccino": [],
   },
-  Object {
-    "Gothita": Array [],
+  {
+    "Gothita": [],
   },
-  Object {
-    "Gothorita": Array [],
+  {
+    "Gothorita": [],
   },
-  Object {
-    "Gothitelle": Array [],
+  {
+    "Gothitelle": [],
   },
-  Object {
-    "Solosis": Array [],
+  {
+    "Solosis": [],
   },
-  Object {
-    "Duosion": Array [],
+  {
+    "Duosion": [],
   },
-  Object {
-    "Reuniclus": Array [],
+  {
+    "Reuniclus": [],
   },
-  Object {
-    "Ducklett": Array [],
+  {
+    "Ducklett": [],
   },
-  Object {
-    "Swanna": Array [],
+  {
+    "Swanna": [],
   },
-  Object {
-    "Vanillite": Array [],
+  {
+    "Vanillite": [],
   },
-  Object {
-    "Vanillish": Array [],
+  {
+    "Vanillish": [],
   },
-  Object {
-    "Vanilluxe": Array [],
+  {
+    "Vanilluxe": [],
   },
-  Object {
-    "Deerling": Array [
+  {
+    "Deerling": [
       "Spring",
       "Summer",
       "Autumn",
       "Winter",
     ],
   },
-  Object {
-    "Sawsbuck": Array [
+  {
+    "Sawsbuck": [
       "Spring",
       "Summer",
       "Autumn",
       "Winter",
     ],
   },
-  Object {
-    "Emolga": Array [],
+  {
+    "Emolga": [],
   },
-  Object {
-    "Karrablast": Array [],
+  {
+    "Karrablast": [],
   },
-  Object {
-    "Escavalier": Array [],
+  {
+    "Escavalier": [],
   },
-  Object {
-    "Foongus": Array [],
+  {
+    "Foongus": [],
   },
-  Object {
-    "Amoonguss": Array [],
+  {
+    "Amoonguss": [],
   },
-  Object {
-    "Frillish": Array [],
+  {
+    "Frillish": [],
   },
-  Object {
-    "Jellicent": Array [],
+  {
+    "Jellicent": [],
   },
-  Object {
-    "Alomomola": Array [],
+  {
+    "Alomomola": [],
   },
-  Object {
-    "Joltik": Array [],
+  {
+    "Joltik": [],
   },
-  Object {
-    "Galvantula": Array [],
+  {
+    "Galvantula": [],
   },
-  Object {
-    "Ferroseed": Array [],
+  {
+    "Ferroseed": [],
   },
-  Object {
-    "Ferrothorn": Array [],
+  {
+    "Ferrothorn": [],
   },
-  Object {
-    "Klink": Array [],
+  {
+    "Klink": [],
   },
-  Object {
-    "Klang": Array [],
+  {
+    "Klang": [],
   },
-  Object {
-    "Klinklang": Array [],
+  {
+    "Klinklang": [],
   },
-  Object {
-    "Tynamo": Array [],
+  {
+    "Tynamo": [],
   },
-  Object {
-    "Eelektrik": Array [],
+  {
+    "Eelektrik": [],
   },
-  Object {
-    "Eelektross": Array [],
+  {
+    "Eelektross": [
+      "Mega",
+    ],
   },
-  Object {
-    "Elgyem": Array [],
+  {
+    "Elgyem": [],
   },
-  Object {
-    "Beheeyem": Array [],
+  {
+    "Beheeyem": [],
   },
-  Object {
-    "Litwick": Array [],
+  {
+    "Litwick": [],
   },
-  Object {
-    "Lampent": Array [],
+  {
+    "Lampent": [],
   },
-  Object {
-    "Chandelure": Array [],
+  {
+    "Chandelure": [
+      "Mega",
+    ],
   },
-  Object {
-    "Axew": Array [],
+  {
+    "Axew": [],
   },
-  Object {
-    "Fraxure": Array [],
+  {
+    "Fraxure": [],
   },
-  Object {
-    "Haxorus": Array [],
+  {
+    "Haxorus": [],
   },
-  Object {
-    "Cubchoo": Array [],
+  {
+    "Cubchoo": [],
   },
-  Object {
-    "Beartic": Array [],
+  {
+    "Beartic": [],
   },
-  Object {
-    "Cryogonal": Array [],
+  {
+    "Cryogonal": [],
   },
-  Object {
-    "Shelmet": Array [],
+  {
+    "Shelmet": [],
   },
-  Object {
-    "Accelgor": Array [],
+  {
+    "Accelgor": [],
   },
-  Object {
-    "Stunfisk": Array [
+  {
+    "Stunfisk": [
       "Galarian",
     ],
   },
-  Object {
-    "Mienfoo": Array [],
+  {
+    "Mienfoo": [],
   },
-  Object {
-    "Mienshao": Array [],
+  {
+    "Mienshao": [],
   },
-  Object {
-    "Druddigon": Array [],
+  {
+    "Druddigon": [],
   },
-  Object {
-    "Golett": Array [],
+  {
+    "Golett": [],
   },
-  Object {
-    "Golurk": Array [],
+  {
+    "Golurk": [
+      "Mega",
+    ],
   },
-  Object {
-    "Pawniard": Array [],
+  {
+    "Pawniard": [],
   },
-  Object {
-    "Bisharp": Array [],
+  {
+    "Bisharp": [],
   },
-  Object {
-    "Bouffalant": Array [],
+  {
+    "Bouffalant": [],
   },
-  Object {
-    "Rufflet": Array [],
+  {
+    "Rufflet": [],
   },
-  Object {
-    "Braviary": Array [
+  {
+    "Braviary": [
       "Hisuian",
     ],
   },
-  Object {
-    "Vullaby": Array [],
+  {
+    "Vullaby": [],
   },
-  Object {
-    "Mandibuzz": Array [],
+  {
+    "Mandibuzz": [],
   },
-  Object {
-    "Heatmor": Array [],
+  {
+    "Heatmor": [],
   },
-  Object {
-    "Durant": Array [],
+  {
+    "Durant": [],
   },
-  Object {
-    "Deino": Array [],
+  {
+    "Deino": [],
   },
-  Object {
-    "Zweilous": Array [],
+  {
+    "Zweilous": [],
   },
-  Object {
-    "Hydreigon": Array [],
+  {
+    "Hydreigon": [],
   },
-  Object {
-    "Larvesta": Array [],
+  {
+    "Larvesta": [],
   },
-  Object {
-    "Volcarona": Array [],
+  {
+    "Volcarona": [],
   },
-  Object {
-    "Cobalion": Array [],
+  {
+    "Cobalion": [],
   },
-  Object {
-    "Terrakion": Array [],
+  {
+    "Terrakion": [],
   },
-  Object {
-    "Virizion": Array [],
+  {
+    "Virizion": [],
   },
-  Object {
-    "Tornadus": Array [
+  {
+    "Tornadus": [
       "Incarnate",
       "Therian",
     ],
   },
-  Object {
-    "Thundurus": Array [
+  {
+    "Thundurus": [
       "Incarnate",
       "Therian",
     ],
   },
-  Object {
-    "Reshiram": Array [],
+  {
+    "Reshiram": [],
   },
-  Object {
-    "Zekrom": Array [],
+  {
+    "Zekrom": [],
   },
-  Object {
-    "Landorus": Array [
+  {
+    "Landorus": [
       "Incarnate",
       "Therian",
     ],
   },
-  Object {
-    "Kyurem": Array [
+  {
+    "Kyurem": [
       "White",
       "Black",
     ],
   },
-  Object {
-    "Keldeo": Array [
+  {
+    "Keldeo": [
       "Resolute",
     ],
   },
-  Object {
-    "Meloetta": Array [
+  {
+    "Meloetta": [
       "Aria",
       "Pirouette",
     ],
   },
-  Object {
-    "Genesect": Array [
+  {
+    "Genesect": [
       "Shock Drive",
       "Burn Drive",
       "Chill Drive",
       "Douse Drive",
     ],
   },
-  Object {
-    "Chespin": Array [],
+  {
+    "Chespin": [],
   },
-  Object {
-    "Quilladin": Array [],
+  {
+    "Quilladin": [],
   },
-  Object {
-    "Chesnaught": Array [],
+  {
+    "Chesnaught": [],
   },
-  Object {
-    "Fennekin": Array [],
+  {
+    "Fennekin": [],
   },
-  Object {
-    "Braixen": Array [],
+  {
+    "Braixen": [],
   },
-  Object {
-    "Delphox": Array [],
+  {
+    "Delphox": [
+      "Mega",
+    ],
   },
-  Object {
-    "Froakie": Array [],
+  {
+    "Froakie": [],
   },
-  Object {
-    "Frogadier": Array [],
+  {
+    "Frogadier": [],
   },
-  Object {
-    "Greninja": Array [],
+  {
+    "Greninja": [
+      "Mega",
+    ],
   },
-  Object {
-    "Bunnelby": Array [],
+  {
+    "Bunnelby": [],
   },
-  Object {
-    "Diggersby": Array [],
+  {
+    "Diggersby": [],
   },
-  Object {
-    "Fletchling": Array [],
+  {
+    "Fletchling": [],
   },
-  Object {
-    "Fletchinder": Array [],
+  {
+    "Fletchinder": [],
   },
-  Object {
-    "Talonflame": Array [],
+  {
+    "Talonflame": [],
   },
-  Object {
-    "Scatterbug": Array [],
+  {
+    "Scatterbug": [],
   },
-  Object {
-    "Spewpa": Array [],
+  {
+    "Spewpa": [],
   },
-  Object {
-    "Vivillon": Array [],
+  {
+    "Vivillon": [],
   },
-  Object {
-    "Litleo": Array [],
+  {
+    "Litleo": [],
   },
-  Object {
-    "Pyroar": Array [],
+  {
+    "Pyroar": [
+      "Mega",
+    ],
   },
-  Object {
-    "Flabébé": Array [
+  {
+    "Flabébé": [
       "Red",
       "Yellow",
       "Orange",
@@ -2336,8 +2389,18 @@ Array [
       "White",
     ],
   },
-  Object {
-    "Floette": Array [
+  {
+    "Floette": [
+      "Red",
+      "Yellow",
+      "Orange",
+      "Blue",
+      "White",
+      "Eternal Flower",
+    ],
+  },
+  {
+    "Florges": [
       "Red",
       "Yellow",
       "Orange",
@@ -2345,29 +2408,20 @@ Array [
       "White",
     ],
   },
-  Object {
-    "Florges": Array [
-      "Red",
-      "Yellow",
-      "Orange",
-      "Blue",
-      "White",
-    ],
+  {
+    "Skiddo": [],
   },
-  Object {
-    "Skiddo": Array [],
+  {
+    "Gogoat": [],
   },
-  Object {
-    "Gogoat": Array [],
+  {
+    "Pancham": [],
   },
-  Object {
-    "Pancham": Array [],
+  {
+    "Pangoro": [],
   },
-  Object {
-    "Pangoro": Array [],
-  },
-  Object {
-    "Furfrou": Array [
+  {
+    "Furfrou": [
       "Heart",
       "Diamond",
       "Star",
@@ -2379,636 +2433,664 @@ Array [
       "Debutante",
     ],
   },
-  Object {
-    "Espurr": Array [],
+  {
+    "Espurr": [],
   },
-  Object {
-    "Meowstic": Array [],
+  {
+    "Meowstic": [
+      "Mega",
+    ],
   },
-  Object {
-    "Honedge": Array [],
+  {
+    "Honedge": [],
   },
-  Object {
-    "Doublade": Array [],
+  {
+    "Doublade": [],
   },
-  Object {
-    "Aegislash": Array [],
+  {
+    "Aegislash": [],
   },
-  Object {
-    "Spritzee": Array [],
+  {
+    "Spritzee": [],
   },
-  Object {
-    "Aromatisse": Array [],
+  {
+    "Aromatisse": [],
   },
-  Object {
-    "Swirlix": Array [],
+  {
+    "Swirlix": [],
   },
-  Object {
-    "Slurpuff": Array [],
+  {
+    "Slurpuff": [],
   },
-  Object {
-    "Inkay": Array [],
+  {
+    "Inkay": [],
   },
-  Object {
-    "Malamar": Array [],
+  {
+    "Malamar": [
+      "Mega",
+    ],
   },
-  Object {
-    "Binacle": Array [],
+  {
+    "Binacle": [],
   },
-  Object {
-    "Barbaracle": Array [],
+  {
+    "Barbaracle": [
+      "Mega",
+    ],
   },
-  Object {
-    "Skrelp": Array [],
+  {
+    "Skrelp": [],
   },
-  Object {
-    "Dragalge": Array [],
+  {
+    "Dragalge": [],
   },
-  Object {
-    "Clauncher": Array [],
+  {
+    "Clauncher": [],
   },
-  Object {
-    "Clawitzer": Array [],
+  {
+    "Clawitzer": [],
   },
-  Object {
-    "Helioptile": Array [],
+  {
+    "Helioptile": [],
   },
-  Object {
-    "Heliolisk": Array [],
+  {
+    "Heliolisk": [],
   },
-  Object {
-    "Tyrunt": Array [],
+  {
+    "Tyrunt": [],
   },
-  Object {
-    "Tyrantrum": Array [],
+  {
+    "Tyrantrum": [],
   },
-  Object {
-    "Amaura": Array [],
+  {
+    "Amaura": [],
   },
-  Object {
-    "Aurorus": Array [],
+  {
+    "Aurorus": [],
   },
-  Object {
-    "Sylveon": Array [],
+  {
+    "Sylveon": [],
   },
-  Object {
-    "Hawlucha": Array [],
+  {
+    "Hawlucha": [
+      "Mega",
+    ],
   },
-  Object {
-    "Dedenne": Array [],
+  {
+    "Dedenne": [],
   },
-  Object {
-    "Carbink": Array [],
+  {
+    "Carbink": [],
   },
-  Object {
-    "Goomy": Array [],
+  {
+    "Goomy": [],
   },
-  Object {
-    "Sliggoo": Array [],
-  },
-  Object {
-    "Goodra": Array [
+  {
+    "Sliggoo": [
       "Hisuian",
     ],
   },
-  Object {
-    "Klefki": Array [],
-  },
-  Object {
-    "Phantump": Array [],
-  },
-  Object {
-    "Trevenant": Array [],
-  },
-  Object {
-    "Pumpkaboo": Array [],
-  },
-  Object {
-    "Gourgeist": Array [],
-  },
-  Object {
-    "Bergmite": Array [],
-  },
-  Object {
-    "Avalugg": Array [
+  {
+    "Goodra": [
       "Hisuian",
     ],
   },
-  Object {
-    "Noibat": Array [],
+  {
+    "Klefki": [],
   },
-  Object {
-    "Noivern": Array [],
+  {
+    "Phantump": [],
   },
-  Object {
-    "Xerneas": Array [],
+  {
+    "Trevenant": [],
   },
-  Object {
-    "Yveltal": Array [],
+  {
+    "Pumpkaboo": [],
   },
-  Object {
-    "Zygarde": Array [
+  {
+    "Gourgeist": [],
+  },
+  {
+    "Bergmite": [],
+  },
+  {
+    "Avalugg": [
+      "Hisuian",
+    ],
+  },
+  {
+    "Noibat": [],
+  },
+  {
+    "Noivern": [],
+  },
+  {
+    "Xerneas": [],
+  },
+  {
+    "Yveltal": [],
+  },
+  {
+    "Zygarde": [
       "10%",
       "Complete",
     ],
   },
-  Object {
-    "Diancie": Array [
+  {
+    "Diancie": [
       "Mega",
     ],
   },
-  Object {
-    "Hoopa": Array [
+  {
+    "Hoopa": [
       "Confined",
       "Unbound",
     ],
   },
-  Object {
-    "Volcanion": Array [],
+  {
+    "Volcanion": [],
   },
-  Object {
-    "Rowlet": Array [],
+  {
+    "Rowlet": [],
   },
-  Object {
-    "Dartrix": Array [],
+  {
+    "Dartrix": [],
   },
-  Object {
-    "Decidueye": Array [],
+  {
+    "Decidueye": [
+      "Hisuian",
+    ],
   },
-  Object {
-    "Litten": Array [],
+  {
+    "Litten": [],
   },
-  Object {
-    "Torracat": Array [],
+  {
+    "Torracat": [],
   },
-  Object {
-    "Incineroar": Array [],
+  {
+    "Incineroar": [],
   },
-  Object {
-    "Popplio": Array [],
+  {
+    "Popplio": [],
   },
-  Object {
-    "Brionne": Array [],
+  {
+    "Brionne": [],
   },
-  Object {
-    "Primarina": Array [],
+  {
+    "Primarina": [],
   },
-  Object {
-    "Pikipek": Array [],
+  {
+    "Pikipek": [],
   },
-  Object {
-    "Trumbeak": Array [],
+  {
+    "Trumbeak": [],
   },
-  Object {
-    "Toucannon": Array [],
+  {
+    "Toucannon": [],
   },
-  Object {
-    "Yungoos": Array [],
+  {
+    "Yungoos": [],
   },
-  Object {
-    "Gumshoos": Array [],
+  {
+    "Gumshoos": [],
   },
-  Object {
-    "Grubbin": Array [],
+  {
+    "Grubbin": [],
   },
-  Object {
-    "Charjabug": Array [],
+  {
+    "Charjabug": [],
   },
-  Object {
-    "Vikavolt": Array [],
+  {
+    "Vikavolt": [],
   },
-  Object {
-    "Crabrawler": Array [],
+  {
+    "Crabrawler": [],
   },
-  Object {
-    "Crabominable": Array [],
+  {
+    "Crabominable": [
+      "Mega",
+    ],
   },
-  Object {
-    "Oricorio": Array [
+  {
+    "Oricorio": [
       "Baile",
       "Pom-Pom",
       "Pa'u",
       "Sensu",
     ],
   },
-  Object {
-    "Cutiefly": Array [],
+  {
+    "Cutiefly": [],
   },
-  Object {
-    "Ribombee": Array [],
+  {
+    "Ribombee": [],
   },
-  Object {
-    "Rockruff": Array [],
+  {
+    "Rockruff": [],
   },
-  Object {
-    "Lycanroc": Array [
+  {
+    "Lycanroc": [
       "Midday",
       "Midnight",
       "Dusk",
     ],
   },
-  Object {
-    "Wishiwashi": Array [
+  {
+    "Wishiwashi": [
       "Solo",
       "School",
     ],
   },
-  Object {
-    "Mareanie": Array [],
+  {
+    "Mareanie": [],
   },
-  Object {
-    "Toxapex": Array [],
+  {
+    "Toxapex": [],
   },
-  Object {
-    "Mudbray": Array [],
+  {
+    "Mudbray": [],
   },
-  Object {
-    "Mudsdale": Array [],
+  {
+    "Mudsdale": [],
   },
-  Object {
-    "Dewpider": Array [],
+  {
+    "Dewpider": [],
   },
-  Object {
-    "Araquanid": Array [],
+  {
+    "Araquanid": [],
   },
-  Object {
-    "Fomantis": Array [],
+  {
+    "Fomantis": [],
   },
-  Object {
-    "Lurantis": Array [],
+  {
+    "Lurantis": [],
   },
-  Object {
-    "Morelull": Array [],
+  {
+    "Morelull": [],
   },
-  Object {
-    "Shiinotic": Array [],
+  {
+    "Shiinotic": [],
   },
-  Object {
-    "Salandit": Array [],
+  {
+    "Salandit": [],
   },
-  Object {
-    "Salazzle": Array [],
+  {
+    "Salazzle": [],
   },
-  Object {
-    "Stufful": Array [],
+  {
+    "Stufful": [],
   },
-  Object {
-    "Bewear": Array [],
+  {
+    "Bewear": [],
   },
-  Object {
-    "Bounsweet": Array [],
+  {
+    "Bounsweet": [],
   },
-  Object {
-    "Steenee": Array [],
+  {
+    "Steenee": [],
   },
-  Object {
-    "Tsareena": Array [],
+  {
+    "Tsareena": [],
   },
-  Object {
-    "Comfey": Array [],
+  {
+    "Comfey": [],
   },
-  Object {
-    "Oranguru": Array [],
+  {
+    "Oranguru": [],
   },
-  Object {
-    "Passimian": Array [],
+  {
+    "Passimian": [],
   },
-  Object {
-    "Wimpod": Array [],
+  {
+    "Wimpod": [],
   },
-  Object {
-    "Golisopod": Array [],
+  {
+    "Golisopod": [
+      "Mega",
+    ],
   },
-  Object {
-    "Sandygast": Array [],
+  {
+    "Sandygast": [],
   },
-  Object {
-    "Palossand": Array [],
+  {
+    "Palossand": [],
   },
-  Object {
-    "Pyukumuku": Array [],
+  {
+    "Pyukumuku": [],
   },
-  Object {
-    "Type: Null": Array [],
+  {
+    "Type: Null": [],
   },
-  Object {
-    "Silvally": Array [],
+  {
+    "Silvally": [],
   },
-  Object {
-    "Minior": Array [],
+  {
+    "Minior": [],
   },
-  Object {
-    "Komala": Array [],
+  {
+    "Komala": [],
   },
-  Object {
-    "Turtonator": Array [],
+  {
+    "Turtonator": [],
   },
-  Object {
-    "Togedemaru": Array [],
+  {
+    "Togedemaru": [],
   },
-  Object {
-    "Mimikyu": Array [],
+  {
+    "Mimikyu": [],
   },
-  Object {
-    "Bruxish": Array [],
+  {
+    "Bruxish": [],
   },
-  Object {
-    "Drampa": Array [],
+  {
+    "Drampa": [
+      "Mega",
+    ],
   },
-  Object {
-    "Dhelmise": Array [],
+  {
+    "Dhelmise": [],
   },
-  Object {
-    "Jangmo-o": Array [],
+  {
+    "Jangmo-o": [],
   },
-  Object {
-    "Hakamo-o": Array [],
+  {
+    "Hakamo-o": [],
   },
-  Object {
-    "Kommo-o": Array [],
+  {
+    "Kommo-o": [],
   },
-  Object {
-    "Tapu Koko": Array [],
+  {
+    "Tapu Koko": [],
   },
-  Object {
-    "Tapu Lele": Array [],
+  {
+    "Tapu Lele": [],
   },
-  Object {
-    "Tapu Bulu": Array [],
+  {
+    "Tapu Bulu": [],
   },
-  Object {
-    "Tapu Fini": Array [],
+  {
+    "Tapu Fini": [],
   },
-  Object {
-    "Cosmog": Array [],
+  {
+    "Cosmog": [],
   },
-  Object {
-    "Cosmoem": Array [],
+  {
+    "Cosmoem": [],
   },
-  Object {
-    "Solgaleo": Array [],
+  {
+    "Solgaleo": [],
   },
-  Object {
-    "Lunala": Array [],
+  {
+    "Lunala": [],
   },
-  Object {
-    "Nihilego": Array [],
+  {
+    "Nihilego": [],
   },
-  Object {
-    "Buzzwole": Array [],
+  {
+    "Buzzwole": [],
   },
-  Object {
-    "Pheromosa": Array [],
+  {
+    "Pheromosa": [],
   },
-  Object {
-    "Xurkitree": Array [],
+  {
+    "Xurkitree": [],
   },
-  Object {
-    "Celesteela": Array [],
+  {
+    "Celesteela": [],
   },
-  Object {
-    "Kartana": Array [],
+  {
+    "Kartana": [],
   },
-  Object {
-    "Guzzlord": Array [],
+  {
+    "Guzzlord": [],
   },
-  Object {
-    "Necrozma": Array [
+  {
+    "Necrozma": [
       "Dusk Mane",
       "Dawn Wings",
       "Ultra",
     ],
   },
-  Object {
-    "Magearna": Array [],
+  {
+    "Magearna": [
+      "Mega",
+    ],
   },
-  Object {
-    "Marshadow": Array [],
+  {
+    "Marshadow": [],
   },
-  Object {
-    "Poipole": Array [],
+  {
+    "Poipole": [],
   },
-  Object {
-    "Naganadel": Array [],
+  {
+    "Naganadel": [],
   },
-  Object {
-    "Stakataka": Array [],
+  {
+    "Stakataka": [],
   },
-  Object {
-    "Blacephalon": Array [],
+  {
+    "Blacephalon": [],
   },
-  Object {
-    "Zeraora": Array [],
+  {
+    "Zeraora": [],
   },
-  Object {
-    "Meltan": Array [],
+  {
+    "Meltan": [],
   },
-  Object {
-    "Melmetal": Array [
+  {
+    "Melmetal": [
       "Gigantamax",
     ],
   },
-  Object {
-    "Grookey": Array [],
+  {
+    "Grookey": [],
   },
-  Object {
-    "Thwackey": Array [],
+  {
+    "Thwackey": [],
   },
-  Object {
-    "Rillaboom": Array [],
-  },
-  Object {
-    "Scorbunny": Array [],
-  },
-  Object {
-    "Raboot": Array [],
-  },
-  Object {
-    "Cinderace": Array [],
-  },
-  Object {
-    "Sobble": Array [],
-  },
-  Object {
-    "Drizzile": Array [],
-  },
-  Object {
-    "Inteleon": Array [],
-  },
-  Object {
-    "Skwovet": Array [],
-  },
-  Object {
-    "Greedent": Array [],
-  },
-  Object {
-    "Rookidee": Array [],
-  },
-  Object {
-    "Corvisquire": Array [],
-  },
-  Object {
-    "Corviknight": Array [],
-  },
-  Object {
-    "Blipbug": Array [],
-  },
-  Object {
-    "Dottler": Array [],
-  },
-  Object {
-    "Orbeetle": Array [
+  {
+    "Rillaboom": [
       "Gigantamax",
     ],
   },
-  Object {
-    "Nickit": Array [],
+  {
+    "Scorbunny": [],
   },
-  Object {
-    "Thievul": Array [],
+  {
+    "Raboot": [],
   },
-  Object {
-    "Gossifleur": Array [],
-  },
-  Object {
-    "Eldegoss": Array [],
-  },
-  Object {
-    "Wooloo": Array [],
-  },
-  Object {
-    "Dubwool": Array [],
-  },
-  Object {
-    "Chewtle": Array [],
-  },
-  Object {
-    "Drednaw": Array [
+  {
+    "Cinderace": [
       "Gigantamax",
     ],
   },
-  Object {
-    "Yamper": Array [],
+  {
+    "Sobble": [],
   },
-  Object {
-    "Boltund": Array [],
+  {
+    "Drizzile": [],
   },
-  Object {
-    "Rolycoly": Array [],
-  },
-  Object {
-    "Carkol": Array [],
-  },
-  Object {
-    "Coalossal": Array [
+  {
+    "Inteleon": [
       "Gigantamax",
     ],
   },
-  Object {
-    "Applin": Array [],
+  {
+    "Skwovet": [],
   },
-  Object {
-    "Flapple": Array [
+  {
+    "Greedent": [],
+  },
+  {
+    "Rookidee": [],
+  },
+  {
+    "Corvisquire": [],
+  },
+  {
+    "Corviknight": [
       "Gigantamax",
     ],
   },
-  Object {
-    "Appletun": Array [
+  {
+    "Blipbug": [],
+  },
+  {
+    "Dottler": [],
+  },
+  {
+    "Orbeetle": [
       "Gigantamax",
     ],
   },
-  Object {
-    "Silicobra": Array [],
+  {
+    "Nickit": [],
   },
-  Object {
-    "Sandaconda": Array [
+  {
+    "Thievul": [],
+  },
+  {
+    "Gossifleur": [],
+  },
+  {
+    "Eldegoss": [],
+  },
+  {
+    "Wooloo": [],
+  },
+  {
+    "Dubwool": [],
+  },
+  {
+    "Chewtle": [],
+  },
+  {
+    "Drednaw": [
       "Gigantamax",
     ],
   },
-  Object {
-    "Cramorant": Array [],
+  {
+    "Yamper": [],
   },
-  Object {
-    "Arrokuda": Array [],
+  {
+    "Boltund": [],
   },
-  Object {
-    "Barraskewda": Array [],
+  {
+    "Rolycoly": [],
   },
-  Object {
-    "Toxel": Array [],
+  {
+    "Carkol": [],
   },
-  Object {
-    "Toxtricity": Array [
+  {
+    "Coalossal": [
+      "Gigantamax",
+    ],
+  },
+  {
+    "Applin": [],
+  },
+  {
+    "Flapple": [
+      "Gigantamax",
+    ],
+  },
+  {
+    "Appletun": [
+      "Gigantamax",
+    ],
+  },
+  {
+    "Silicobra": [],
+  },
+  {
+    "Sandaconda": [
+      "Gigantamax",
+    ],
+  },
+  {
+    "Cramorant": [],
+  },
+  {
+    "Arrokuda": [],
+  },
+  {
+    "Barraskewda": [],
+  },
+  {
+    "Toxel": [],
+  },
+  {
+    "Toxtricity": [
       "Amped-Up",
       "Lowkey",
       "Gigantamax",
     ],
   },
-  Object {
-    "Sizzlipede": Array [],
+  {
+    "Sizzlipede": [],
   },
-  Object {
-    "Centiskorch": Array [
+  {
+    "Centiskorch": [
       "Gigantamax",
     ],
   },
-  Object {
-    "Clobbopus": Array [],
+  {
+    "Clobbopus": [],
   },
-  Object {
-    "Grapploct": Array [],
+  {
+    "Grapploct": [],
   },
-  Object {
-    "Sinistea": Array [],
+  {
+    "Sinistea": [],
   },
-  Object {
-    "Polteageist": Array [],
+  {
+    "Polteageist": [],
   },
-  Object {
-    "Hatenna": Array [],
+  {
+    "Hatenna": [],
   },
-  Object {
-    "Hattrem": Array [],
+  {
+    "Hattrem": [],
   },
-  Object {
-    "Hatterene": Array [
+  {
+    "Hatterene": [
       "Gigantamax",
     ],
   },
-  Object {
-    "Impidimp": Array [],
+  {
+    "Impidimp": [],
   },
-  Object {
-    "Morgrem": Array [],
+  {
+    "Morgrem": [],
   },
-  Object {
-    "Grimmsnarl": Array [
+  {
+    "Grimmsnarl": [
       "Gigantamax",
     ],
   },
-  Object {
-    "Obstagoon": Array [],
+  {
+    "Obstagoon": [],
   },
-  Object {
-    "Perrserker": Array [],
+  {
+    "Perrserker": [],
   },
-  Object {
-    "Cursola": Array [],
+  {
+    "Cursola": [],
   },
-  Object {
-    "Sirfetch'd": Array [],
+  {
+    "Sirfetch'd": [],
   },
-  Object {
-    "Mr. Rime": Array [],
+  {
+    "Mr. Rime": [],
   },
-  Object {
-    "Runerigus": Array [],
+  {
+    "Runerigus": [],
   },
-  Object {
-    "Milcery": Array [],
+  {
+    "Milcery": [],
   },
-  Object {
-    "Alcremie": Array [
+  {
+    "Alcremie": [
       "Vanilla Cream",
       "Matcha Cream",
       "Ruby Cream",
@@ -3018,501 +3100,514 @@ Array [
       "Ruby Swirl",
       "Caramel Swirl",
       "Rainbow Swirl",
-    ],
-  },
-  Object {
-    "Falinks": Array [],
-  },
-  Object {
-    "Pincurchin": Array [],
-  },
-  Object {
-    "Snom": Array [],
-  },
-  Object {
-    "Frosmoth": Array [],
-  },
-  Object {
-    "Stonjourner": Array [],
-  },
-  Object {
-    "Eiscue": Array [],
-  },
-  Object {
-    "Indeedee": Array [],
-  },
-  Object {
-    "Morpeko": Array [],
-  },
-  Object {
-    "Cufant": Array [],
-  },
-  Object {
-    "Copperajah": Array [
       "Gigantamax",
     ],
   },
-  Object {
-    "Dracozolt": Array [],
+  {
+    "Falinks": [
+      "Mega",
+    ],
   },
-  Object {
-    "Arctozolt": Array [],
+  {
+    "Pincurchin": [],
   },
-  Object {
-    "Dracovish": Array [],
+  {
+    "Snom": [],
   },
-  Object {
-    "Arctovish": Array [],
+  {
+    "Frosmoth": [],
   },
-  Object {
-    "Duraludon": Array [],
+  {
+    "Stonjourner": [],
   },
-  Object {
-    "Dreepy": Array [],
+  {
+    "Eiscue": [],
   },
-  Object {
-    "Drakloak": Array [],
+  {
+    "Indeedee": [],
   },
-  Object {
-    "Dragapult": Array [],
+  {
+    "Morpeko": [],
   },
-  Object {
-    "Zacian": Array [],
+  {
+    "Cufant": [],
   },
-  Object {
-    "Zamazenta": Array [],
+  {
+    "Copperajah": [
+      "Gigantamax",
+    ],
   },
-  Object {
-    "Eternatus": Array [],
+  {
+    "Dracozolt": [],
   },
-  Object {
-    "Kubfu": Array [],
+  {
+    "Arctozolt": [],
   },
-  Object {
-    "Urshifu": Array [
+  {
+    "Dracovish": [],
+  },
+  {
+    "Arctovish": [],
+  },
+  {
+    "Duraludon": [
+      "Gigantamax",
+    ],
+  },
+  {
+    "Dreepy": [],
+  },
+  {
+    "Drakloak": [],
+  },
+  {
+    "Dragapult": [],
+  },
+  {
+    "Zacian": [],
+  },
+  {
+    "Zamazenta": [],
+  },
+  {
+    "Eternatus": [],
+  },
+  {
+    "Kubfu": [],
+  },
+  {
+    "Urshifu": [
       "Single Strike",
       "Rapid Strike",
       "Single Strike Gigantamax",
       "Rapid Strike Gigantamax",
     ],
   },
-  Object {
-    "Zarude": Array [],
+  {
+    "Zarude": [],
   },
-  Object {
-    "Regieleki": Array [],
+  {
+    "Regieleki": [],
   },
-  Object {
-    "Regidrago": Array [],
+  {
+    "Regidrago": [],
   },
-  Object {
-    "Glastrier": Array [],
+  {
+    "Glastrier": [],
   },
-  Object {
-    "Spectrier": Array [],
+  {
+    "Spectrier": [],
   },
-  Object {
-    "Calyrex": Array [
+  {
+    "Calyrex": [
       "Ice Rider",
       "Shadow Rider",
     ],
   },
-  Object {
-    "Wyrdeer": Array [],
+  {
+    "Wyrdeer": [],
   },
-  Object {
-    "Kleavor": Array [],
+  {
+    "Kleavor": [],
   },
-  Object {
-    "Ursaluna": Array [],
+  {
+    "Ursaluna": [],
   },
-  Object {
-    "Basculegion": Array [],
+  {
+    "Basculegion": [],
   },
-  Object {
-    "Sneasler": Array [],
+  {
+    "Sneasler": [],
   },
-  Object {
-    "Overqwil": Array [],
+  {
+    "Overqwil": [],
   },
-  Object {
-    "Enamorus": Array [
+  {
+    "Enamorus": [
       "Incarnate",
       "Therian",
     ],
   },
-  Object {
-    "Sprigatito": Array [],
+  {
+    "Sprigatito": [],
   },
-  Object {
-    "Floragato": Array [],
+  {
+    "Floragato": [],
   },
-  Object {
-    "Meowscarada": Array [],
+  {
+    "Meowscarada": [],
   },
-  Object {
-    "Fuecoco": Array [],
+  {
+    "Fuecoco": [],
   },
-  Object {
-    "Crocalor": Array [],
+  {
+    "Crocalor": [],
   },
-  Object {
-    "Skeledirge": Array [],
+  {
+    "Skeledirge": [],
   },
-  Object {
-    "Quaxly": Array [],
+  {
+    "Quaxly": [],
   },
-  Object {
-    "Quaxwell": Array [],
+  {
+    "Quaxwell": [],
   },
-  Object {
-    "Quaquaval": Array [],
+  {
+    "Quaquaval": [],
   },
-  Object {
-    "Lechonk": Array [],
+  {
+    "Lechonk": [],
   },
-  Object {
-    "Oinkologne": Array [],
+  {
+    "Oinkologne": [],
   },
-  Object {
-    "Tarountula": Array [],
+  {
+    "Tarountula": [],
   },
-  Object {
-    "Spidops": Array [],
+  {
+    "Spidops": [],
   },
-  Object {
-    "Nymble": Array [],
+  {
+    "Nymble": [],
   },
-  Object {
-    "Lokix": Array [],
+  {
+    "Lokix": [],
   },
-  Object {
-    "Pawmi": Array [],
+  {
+    "Pawmi": [],
   },
-  Object {
-    "Pawmo": Array [],
+  {
+    "Pawmo": [],
   },
-  Object {
-    "Pawmot": Array [],
+  {
+    "Pawmot": [],
   },
-  Object {
-    "Tandemaus": Array [],
+  {
+    "Tandemaus": [],
   },
-  Object {
-    "Maushold": Array [
+  {
+    "Maushold": [
       "Family of Four",
     ],
   },
-  Object {
-    "Fidough": Array [],
+  {
+    "Fidough": [],
   },
-  Object {
-    "Dachsbun": Array [],
+  {
+    "Dachsbun": [],
   },
-  Object {
-    "Smoliv": Array [],
+  {
+    "Smoliv": [],
   },
-  Object {
-    "Dolliv": Array [],
+  {
+    "Dolliv": [],
   },
-  Object {
-    "Arboliva": Array [],
+  {
+    "Arboliva": [],
   },
-  Object {
-    "Squawkabilly": Array [],
+  {
+    "Squawkabilly": [],
   },
-  Object {
-    "Nacli": Array [],
+  {
+    "Nacli": [],
   },
-  Object {
-    "Naclstack": Array [],
+  {
+    "Naclstack": [],
   },
-  Object {
-    "Garganacl": Array [],
+  {
+    "Garganacl": [],
   },
-  Object {
-    "Charcadet": Array [],
+  {
+    "Charcadet": [],
   },
-  Object {
-    "Armarouge": Array [],
+  {
+    "Armarouge": [],
   },
-  Object {
-    "Ceruledge": Array [],
+  {
+    "Ceruledge": [],
   },
-  Object {
-    "Tadbulb": Array [],
+  {
+    "Tadbulb": [],
   },
-  Object {
-    "Bellibolt": Array [],
+  {
+    "Bellibolt": [],
   },
-  Object {
-    "Wattrel": Array [],
+  {
+    "Wattrel": [],
   },
-  Object {
-    "Kilowattrel": Array [],
+  {
+    "Kilowattrel": [],
   },
-  Object {
-    "Maschiff": Array [],
+  {
+    "Maschiff": [],
   },
-  Object {
-    "Mabosstiff": Array [],
+  {
+    "Mabosstiff": [],
   },
-  Object {
-    "Shroodle": Array [],
+  {
+    "Shroodle": [],
   },
-  Object {
-    "Grafaiai": Array [],
+  {
+    "Grafaiai": [],
   },
-  Object {
-    "Bramblin": Array [],
+  {
+    "Bramblin": [],
   },
-  Object {
-    "Brambleghast": Array [],
+  {
+    "Brambleghast": [],
   },
-  Object {
-    "Toedscool": Array [],
+  {
+    "Toedscool": [],
   },
-  Object {
-    "Toedscruel": Array [],
+  {
+    "Toedscruel": [],
   },
-  Object {
-    "Klawf": Array [],
+  {
+    "Klawf": [],
   },
-  Object {
-    "Capsakid": Array [],
+  {
+    "Capsakid": [],
   },
-  Object {
-    "Scovillain": Array [],
+  {
+    "Scovillain": [
+      "Mega",
+    ],
   },
-  Object {
-    "Rellor": Array [],
+  {
+    "Rellor": [],
   },
-  Object {
-    "Rabsca": Array [],
+  {
+    "Rabsca": [],
   },
-  Object {
-    "Flittle": Array [],
+  {
+    "Flittle": [],
   },
-  Object {
-    "Espathra": Array [],
+  {
+    "Espathra": [],
   },
-  Object {
-    "Tinkatink": Array [],
+  {
+    "Tinkatink": [],
   },
-  Object {
-    "Tinkatuff": Array [],
+  {
+    "Tinkatuff": [],
   },
-  Object {
-    "Tinkaton": Array [],
+  {
+    "Tinkaton": [],
   },
-  Object {
-    "Wiglett": Array [],
+  {
+    "Wiglett": [],
   },
-  Object {
-    "Wugtrio": Array [],
+  {
+    "Wugtrio": [],
   },
-  Object {
-    "Bombirdier": Array [],
+  {
+    "Bombirdier": [],
   },
-  Object {
-    "Finizen": Array [],
+  {
+    "Finizen": [],
   },
-  Object {
-    "Palafin": Array [],
+  {
+    "Palafin": [],
   },
-  Object {
-    "Varoom": Array [],
+  {
+    "Varoom": [],
   },
-  Object {
-    "Revavroom": Array [],
+  {
+    "Revavroom": [],
   },
-  Object {
-    "Cyclizar": Array [],
+  {
+    "Cyclizar": [],
   },
-  Object {
-    "Orthworm": Array [],
+  {
+    "Orthworm": [],
   },
-  Object {
-    "Glimmet": Array [],
+  {
+    "Glimmet": [],
   },
-  Object {
-    "Glimmora": Array [],
+  {
+    "Glimmora": [
+      "Mega",
+    ],
   },
-  Object {
-    "Greavard": Array [],
+  {
+    "Greavard": [],
   },
-  Object {
-    "Houndstone": Array [],
+  {
+    "Houndstone": [],
   },
-  Object {
-    "Flamigo": Array [],
+  {
+    "Flamigo": [],
   },
-  Object {
-    "Cetoddle": Array [],
+  {
+    "Cetoddle": [],
   },
-  Object {
-    "Cetitan": Array [],
+  {
+    "Cetitan": [],
   },
-  Object {
-    "Veluza": Array [],
+  {
+    "Veluza": [],
   },
-  Object {
-    "Dondozo": Array [],
+  {
+    "Dondozo": [],
   },
-  Object {
-    "Tatsugiri": Array [],
+  {
+    "Tatsugiri": [
+      "Mega",
+    ],
   },
-  Object {
-    "Annihilape": Array [],
+  {
+    "Annihilape": [],
   },
-  Object {
-    "Clodsire": Array [],
+  {
+    "Clodsire": [],
   },
-  Object {
-    "Farigiraf": Array [],
+  {
+    "Farigiraf": [],
   },
-  Object {
-    "Dudunsparce": Array [
+  {
+    "Dudunsparce": [
       "Three Segment",
     ],
   },
-  Object {
-    "Kingambit": Array [],
+  {
+    "Kingambit": [],
   },
-  Object {
-    "Great Tusk": Array [],
+  {
+    "Great Tusk": [],
   },
-  Object {
-    "Scream Tail": Array [],
+  {
+    "Scream Tail": [],
   },
-  Object {
-    "Brute Bonnet": Array [],
+  {
+    "Brute Bonnet": [],
   },
-  Object {
-    "Flutter Mane": Array [],
+  {
+    "Flutter Mane": [],
   },
-  Object {
-    "Slither Wing": Array [],
+  {
+    "Slither Wing": [],
   },
-  Object {
-    "Sandy Shocks": Array [],
+  {
+    "Sandy Shocks": [],
   },
-  Object {
-    "Iron Treads": Array [],
+  {
+    "Iron Treads": [],
   },
-  Object {
-    "Iron Bundle": Array [],
+  {
+    "Iron Bundle": [],
   },
-  Object {
-    "Iron Hands": Array [],
+  {
+    "Iron Hands": [],
   },
-  Object {
-    "Iron Jugulis": Array [],
+  {
+    "Iron Jugulis": [],
   },
-  Object {
-    "Iron Moth": Array [],
+  {
+    "Iron Moth": [],
   },
-  Object {
-    "Iron Thorns": Array [],
+  {
+    "Iron Thorns": [],
   },
-  Object {
-    "Frigibax": Array [],
+  {
+    "Frigibax": [],
   },
-  Object {
-    "Arctibax": Array [],
+  {
+    "Arctibax": [],
   },
-  Object {
-    "Baxcalibur": Array [],
+  {
+    "Baxcalibur": [
+      "Mega",
+    ],
   },
-  Object {
-    "Gimmighoul": Array [
+  {
+    "Gimmighoul": [
       "Roaming",
     ],
   },
-  Object {
-    "Gholdengo": Array [],
+  {
+    "Gholdengo": [],
   },
-  Object {
-    "Wo-Chien": Array [],
+  {
+    "Wo-Chien": [],
   },
-  Object {
-    "Chien-Pao": Array [],
+  {
+    "Chien-Pao": [],
   },
-  Object {
-    "Ting-Lu": Array [],
+  {
+    "Ting-Lu": [],
   },
-  Object {
-    "Chi-Yu": Array [],
+  {
+    "Chi-Yu": [],
   },
-  Object {
-    "Roaring Moon": Array [],
+  {
+    "Roaring Moon": [],
   },
-  Object {
-    "Iron Valiant": Array [],
+  {
+    "Iron Valiant": [],
   },
-  Object {
-    "Koraidon": Array [],
+  {
+    "Koraidon": [],
   },
-  Object {
-    "Miraidon": Array [],
+  {
+    "Miraidon": [],
   },
-  Object {
-    "Walking Wake": Array [],
+  {
+    "Walking Wake": [],
   },
-  Object {
-    "Iron Leaves": Array [],
+  {
+    "Iron Leaves": [],
   },
-  Object {
-    "Dipplin": Array [],
+  {
+    "Dipplin": [],
   },
-  Object {
-    "Poltchageist": Array [],
+  {
+    "Poltchageist": [],
   },
-  Object {
-    "Sinistcha": Array [],
+  {
+    "Sinistcha": [],
   },
-  Object {
-    "Okidogi": Array [],
+  {
+    "Okidogi": [],
   },
-  Object {
-    "Munkidori": Array [],
+  {
+    "Munkidori": [],
   },
-  Object {
-    "Fezandipiti": Array [],
+  {
+    "Fezandipiti": [],
   },
-  Object {
-    "Ogerpon": Array [
+  {
+    "Ogerpon": [
       "Teal Mask",
       "Wellspring",
       "Heartflame",
       "Cornerstone",
     ],
   },
-  Object {
-    "Archaludon": Array [],
+  {
+    "Archaludon": [],
   },
-  Object {
-    "Hydrapple": Array [],
+  {
+    "Hydrapple": [],
   },
-  Object {
-    "Gouging Fire": Array [],
+  {
+    "Gouging Fire": [],
   },
-  Object {
-    "Raging Bolt": Array [],
+  {
+    "Raging Bolt": [],
   },
-  Object {
-    "Iron Boulder": Array [],
+  {
+    "Iron Boulder": [],
   },
-  Object {
-    "Iron Crown": Array [],
+  {
+    "Iron Crown": [],
   },
-  Object {
-    "Terapagos": Array [
+  {
+    "Terapagos": [
       "Terastal",
     ],
   },
-  Object {
-    "Pecharunt": Array [],
+  {
+    "Pecharunt": [],
   },
 ]
 `;

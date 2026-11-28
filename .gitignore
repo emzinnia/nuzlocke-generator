@@ -56,3 +56,8 @@ imageCheck.js
 *.env.*
 
 lighthouse/
+
+# Playwright
+e2e/screenshots/
+playwright-report/
+test-results/

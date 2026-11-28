@@ -1,19 +1,22 @@
-import * as React from 'react';
-import { injectGlobal } from 'emotion';
+import * as React from "react";
+import { injectGlobal } from "emotion";
+import { createRoot } from "react-dom/client";
+import { Analytics } from "@vercel/analytics/react";
 
-
-import '@blueprintjs/icons/lib/css/blueprint-icons.css';
-import '@blueprintjs/core/lib/css/blueprint.css';
-import '@blueprintjs/table/lib/css/table.css';
+import "@blueprintjs/icons/lib/css/blueprint-icons.css";
+import "@blueprintjs/core/lib/css/blueprint.css";
+import "@blueprintjs/table/lib/css/table.css";
+import "@blueprintjs/select/lib/css/blueprint-select.css";
 // import 'tailwindcss/dist/base.min.css';
 // import 'tailwindcss/dist/components.min.css';
 // import 'tailwindcss/dist/utilities.min.css';
-import 'normalize.css/normalize.css';
+import "normalize.css/normalize.css";
 
-import { isLocal } from 'utils';
-import { ErrorBoundary } from 'components';
+import { isLocal } from "utils";
+import { ErrorBoundary } from "components";
+import { AppToasterHost } from "components/Common/Shared/appToaster";
 
-(window as any).global = window;
+(window as unknown as Window & { global: Window }).global = window;
 
 // @TODO: add back Buffer/Path
 // // @ts-ignore
@@ -22,14 +25,13 @@ import { ErrorBoundary } from 'components';
 // window.path = window.path || require('path').path;
 
 async function getRollbar() {
-    // @ts-expect-error
-    const {default: Rollbar} = await import('rollbar');
+    const { default: Rollbar } = await import("rollbar");
 
     const rollbarConfig = new Rollbar({
-        accessToken: '357eab6297524e6facb1c48b0403d869',
+        accessToken: "357eab6297524e6facb1c48b0403d869",
         captureUncaught: true,
         payload: {
-            environment: 'production',
+            environment: "production",
         },
         autoInstrument: {
             network: false,
@@ -43,12 +45,12 @@ async function getRollbar() {
         enabled: isLocal() ? false : true,
     });
 
-    Rollbar.init(rollbarConfig as any);
+    Rollbar.init(rollbarConfig as unknown as Parameters<typeof Rollbar.init>[0]);
 }
 
-getRollbar().then(res => res);
+getRollbar().then((res) => res);
 
-injectGlobal`
+void injectGlobal`
     *,
     *::before,
     *::after {
@@ -89,47 +91,44 @@ injectGlobal`
     .full-width { width: 100%; }
 `;
 
-const mountNode = document.getElementById('app');
+const mountNode = document.getElementById("app");
 
 async function createRender() {
-    const { render } = await import('react-dom');
-    const { Provider } = await import('react-redux');
+    const { Provider } = await import("store/reactZustand");
 
-    const { DndProvider  } = await import('react-dnd');
-    const { HTML5Backend  } = await import('react-dnd-html5-backend');
-    const { PersistGate } = await import('redux-persist/es/integration/react');
-    const { store, persistor } = await import('./store');
-    // @TODO: add back check for tests mode
-    const isTest = false;
+    const { DndProvider } = await import("react-dnd");
+    const { HTML5Backend } = await import("react-dnd-html5-backend");
+    const { store } = await import("./store");
 
     const App = React.lazy(() =>
-        import('components/App').then((res) => ({ default: res.App })),
+        import("components/Layout/App").then((res) => ({ default: res.App })),
     );
 
-    render(
-        <Provider store={store}>
-            {isTest? (
-                <PersistGate loading={<div>Loading...</div>} onBeforeLift={null} persistor={persistor}>
-                    <DndProvider  backend={HTML5Backend}>
-                        <ErrorBoundary>
-                            <React.Suspense fallback={'Loading App...'}>
-                                <App />
-                            </React.Suspense>
-                        </ErrorBoundary>
-                    </DndProvider>
-                </PersistGate>
-            ) : (
-                <DndProvider  backend={HTML5Backend}>
-                    <ErrorBoundary>
-                        <React.Suspense fallback={'Loading App...'}>
-                            <App />
-                        </React.Suspense>
-                    </ErrorBoundary>
-                </DndProvider>
-            )}
-        </Provider>,
-        mountNode,
+    const ReduxProvider = Provider;
+
+    if (!mountNode) {
+        throw new Error("Failed to locate app mount node");
+    }
+
+    const root = createRoot(mountNode);
+
+    root.render(
+        <ReduxProvider store={store}>
+            <AppToasterHost />
+            <DndProvider backend={HTML5Backend}>
+                <ErrorBoundary>
+                    <React.Suspense fallback={"Loading App..."}>
+                        <App />
+                    </React.Suspense>
+                </ErrorBoundary>
+            </DndProvider>
+            <Analytics />
+        </ReduxProvider>,
     );
 }
 
-createRender().then(res => res);
+createRender().catch((err) => {
+    console.error("Failed to create render:", err);
+    document.body.innerHTML = `<div style="color: red; padding: 20px;"><h1>Failed to start app</h1><pre>${err.message}\n${err.stack}</pre></div>`;
+});
+getRollbar().catch((err) => console.error("Failed to init Rollbar:", err));

@@ -1,4 +1,4 @@
-import { TeamImagesType } from 'utils';
+import { TeamImagesType } from "utils";
 
 export interface Box {
     id: number;

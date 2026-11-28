@@ -1,0 +1,853 @@
+.crystal .pokemon-container {
+    margin: 2px;
+    padding: 0;
+    width: 11rem;
+    height: 19rem;
+}
+.crystal .pokemon-info {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    height: auto;
+    left: 0;
+    margin-left: 0;
+    padding: 0;
+    z-index: 100;
+    height: 9rem;
+    margin-left: 4px;
+}
+.crystal .pokemon-nickname {
+    display: block;
+}
+.crystal .pokemon-image {
+    height: 10rem;
+    width: 10rem;
+}
+.crystal .square,
+.crystal .bubble {
+    height: 11rem;
+    width: 11rem;
+}
+.default-light h3 {
+    color: #111;
+}
+.default-light .result-notes {
+    color: #111;
+}
+.default-light .ng-container {
+    background-color: #eee;
+}
+.default-light .pokemon-container {
+    background: transparent;
+}
+.default-light .pokemon-info {
+    background: #ddd;
+    color: #222;
+    filter: none;
+    -webkit-filter: none;
+}
+.default-light .boxed-pokemon-container {
+    background: #ddd;
+    border: 1px solid #ccc;
+    color: #333;
+}
+.default-light .dead-pokemon-container {
+    background: #ddd;
+    border-color: transparent;
+}
+.default-light .dead-pokemon-info,
+.default-light .pokemon-d-nickname,
+.default-light .pokemon-levels,
+.default-light .pokemon-causeofdeath {
+    color: #222;
+}
+.default-light .trainer-container {
+    color: #000;
+    border-bottom: transparent;
+}
+.default-light .boxed-pokemon-info {
+    border-left-color: #9a9a9a;
+}
+.default-light .gender-color-female {
+    color: #f35e5e;
+}
+.default-light .gender-color-male {
+    color: #5e9df3;
+}
+.default-light .rules-container {
+    color: #333;
+}
+.compact-crystal .pokemon-image {
+    filter: drop-shadow(0 0 4px #000);
+}
+.compact-crystal .pokemon-info {
+    width: 8rem;
+    padding: 0;
+    margin: 0;
+    background: transparent !important;
+    min-height: 4rem;
+}
+.compact-crystal .pokemon-nickname {
+    display: block;
+    font-size: 1rem;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+.compact-crystal .pokemon-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.compact-crystal .pokemon-info span {
+    margin: 0;
+    margin-right: 2px;
+}
+.cards .pokemon-info {
+    color: #fff;
+    width: 100%;
+    min-height: 0;
+    background: rgba(0, 0, 0, 0.4);
+    margin: 0 !important;
+    padding: 0;
+    overflow: visible;
+    margin-left: 0;
+    z-index: 10;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    border-radius: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+}
+.cards .boxed-pokemon-container {
+    background: rgba(0, 0, 0, 0.4);
+    border: unset;
+    width: auto;
+}
+.cards .boxed-pokemon-info {
+    border: unset;
+}
+.cards .pokemon-container {
+    background: #222;
+    margin: 0.5rem;
+    width: 15rem;
+    display: flex;
+    height: 15rem;
+    flex-direction: column;
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+.cards .pokemon-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 15rem;
+    height: 15rem;
+}
+.cards .pokemon-image-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.cards .round {
+    margin: 6px auto;
+}
+.cards .pokemon-main-info {
+    position: absolute;
+    bottom: 13rem;
+}
+.cards .dead-pokemon-container {
+    background: rgba(0, 0, 0, 0.3);
+    border: none;
+    width: 10rem;
+    height: 10rem;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    margin: 0.25rem 0.5rem;
+}
+.cards .dead-pokemon-picture.sprites-mode {
+    background-size: auto;
+    background-repeat: no-repeat;
+}
+.cards .dead-pokemon-picture {
+    width: 10rem;
+    height: 10rem;
+}
+.cards .dead-pokemon-info {
+    position: absolute;
+    bottom: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+    margin: 0;
+    width: 100%;
+}
+.cards .move {
+    font-size: 0.7rem;
+}
+.generations.result {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+}
+.generations.vertical-trainer .pokemon-image-wrapper {
+    position: absolute;
+    left: -160px;
+}
+.generations.vertical-trainer .team-container {
+    padding-left: 30% !important;
+}
+.generations.vertical-trainer .dead-container,
+.generations.vertical-trainer .boxed-container,
+.generations.vertical-trainer .champs-container {
+    width: 100%;
+    height: auto;
+    margin: unset;
+    position: relative;
+    top: unset;
+    left: unset;
+    bottom: unset;
+    right: unset;
+    margin: 0.25rem;
+    padding-left: 0% !important;
+}
+.generations.vertical-trainer .statuses-wrapper {
+    margin-top: 1rem;
+    margin-left: 16%;
+    display: inline-flex;
+    width: 46%;
+    vertical-align: top;
+    flex-direction: column;
+}
+.generations .ng-container {
+    position: relative;
+}
+.generations li {
+    background: rgba(0, 0, 0, 0.2);
+    list-style-type: none;
+    border-radius: 0.25rem;
+    padding: 0.25rem;
+    margin: 0.25rem;
+    display: inline-block;
+}
+.generations .team-container {
+    width: 550px;
+    justify-content: flex-start;
+    display: inline-block;
+    margin-left: 4px;
+}
+.generations .pokemon-container {
+    padding: 0;
+    margin: 2px 0;
+}
+.generations .pokemon-info {
+    border-radius: 0;
+    background-size: 322px 10px;
+    background-image:
+        linear-gradient(to right, #2d2d2d 1px, transparent 1px),
+        linear-gradient(to bottom, #2d2d2d 1px, transparent 1px);
+}
+.generations .pokemon-image-wrapper {
+    width: 10rem;
+    -webkit-clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+    clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+}
+.generations .pokemon-image {
+    -webkit-clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+    clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+    width: 9.5rem;
+}
+.generations .boxed-container {
+    display: inline-block;
+    background: #333;
+    border-radius: 0.25rem;
+    vertical-align: top;
+    background-size: 10px 10px;
+    background-image:
+        linear-gradient(to right, #2d2d2d 1px, transparent 1px),
+        linear-gradient(to bottom, #2d2d2d 1px, transparent 1px);
+}
+.generations .move {
+    -webkit-clip-path: polygon(9% 0, 100% 1%, 100% 100%, 8% 100%, 0% 50%);
+    clip-path: polygon(9% 0, 100% 1%, 100% 100%, 8% 100%, 0% 50%);
+    border-radius: 0;
+}
+.generations .boxed-pokemon-container {
+    width: auto;
+    background: transparent !important;
+    border: none;
+    margin: 0;
+}
+.generations .boxed-pokemon-info {
+    border: none;
+}
+.generations .dead-container {
+    display: inline-block;
+    vertical-align: top;
+    background-color: #333;
+    background-size: 10px 10px;
+    background-image:
+        linear-gradient(to right, #2d2d2d 1px, transparent 1px),
+        linear-gradient(to bottom, #2d2d2d 1px, transparent 1px);
+    border-radius: 0.25rem;
+}
+.generations .dead-pokemon-container {
+    width: 14rem;
+    height: 3rem;
+}
+.generations .pokemon-causeofdeath {
+    font-size: 0.7rem;
+}
+.generations .champs-container {
+    border-radius: 0.25rem;
+    background-color: #333;
+    background-size: 10px 10px;
+    background-image:
+        linear-gradient(to right, #2d2d2d 1px, transparent 1px),
+        linear-gradient(to bottom, #2d2d2d 1px, transparent 1px);
+    display: inline-block;
+}
+.generations .rules-container {
+    position: absolute;
+    min-height: 200px;
+    width: 975px;
+    bottom: 0px;
+    right: 0;
+}
+.generations .stats-container {
+    position: absolute;
+    width: 500px;
+    bottom: 0px;
+    left: 0;
+}
+.generations .boxed-container,
+.generations .team-container,
+.generations .dead-container,
+.generations .champs-container {
+    margin: 0.5rem !important;
+}
+.hexagon,
+.hexagons .trainer-wrapper img:nth-of-type(1),
+.hexagons .pokemon-image-wrapper,
+.hexagons .pokemon-image-wrapper::after,
+.hexagons .pokemon-image,
+.hexagons .champs-pokemon {
+    -webkit-clip-path: polygon(
+        50% 0%,
+        100% 25%,
+        100% 75%,
+        50% 100%,
+        0% 75%,
+        0% 25%
+    );
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+.hexagons.team-size-6 .pokemon-container:nth-of-type(5),
+.hexagons.team-size-6 .pokemon-container:nth-of-type(6) {
+    transform: translate(-124px, -62px);
+}
+.hexagons.team-size-6 .pokemon-container:nth-of-type(4) {
+    transform: translate(-124px, 186px);
+}
+.hexagons.team-size-5 .pokemon-container:nth-of-type(4) {
+    transform: translate(-372px, 186px);
+}
+.hexagons.team-size-5 .pokemon-container:nth-of-type(5) {
+    transform: translate(-248px, -62px);
+}
+.hexagons.team-size-4 .team-container,
+.hexagons.team-size-3 .team-container,
+.hexagons.team-size-2 .team-container,
+.hexagons.team-size-1 .team-container {
+    margin-left: 0;
+}
+.hexagons .team-container {
+    margin-left: 8rem;
+    margin-top: 0.5rem;
+}
+.hexagons .trainer-wrapper img:nth-of-type(1) {
+    border-radius: 0;
+}
+.hexagons .pokemon-container {
+    padding: 0;
+}
+.hexagons .pokemon-image-wrapper {
+    background: transparent;
+    border-radius: 0 !important;
+    height: 15.5rem;
+    width: 15.5rem;
+}
+.hexagons .pokemon-image-wrapper::after {
+    content: "";
+    height: 15rem;
+    width: 15rem;
+    position: absolute;
+    display: block;
+    top: 0.25rem;
+    z-index: 10;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.75),
+        transparent,
+        rgba(0, 0, 0, 0.7)
+    );
+}
+.hexagons .pokemon-image {
+    height: 15rem;
+    width: 15rem;
+}
+.hexagons .pokemon-nature,
+.hexagons .pokemon-ability {
+    display: inline-block;
+    margin-left: 0.25rem;
+    margin-bottom: 2rem;
+}
+.hexagons .pokemon-info {
+    background: transparent;
+    color: #fff;
+    position: absolute;
+    top: 4rem;
+    left: 0;
+    z-index: 10;
+    text-align: center;
+    width: 15.5rem;
+    margin: 0;
+    padding: 0;
+    height: 8rem;
+}
+.hexagons .pokemon-info-inner {
+    padding: 0;
+}
+.hexagons .pokemon-moves {
+    margin-top: 1rem;
+    display: flex;
+    position: absolute;
+    bottom: 0.25rem;
+    opacity: 0.6;
+    left: 0.25rem;
+    width: calc(100% - 0.5rem);
+}
+.hexagons .move {
+    border-radius: 0;
+    margin: 0;
+}
+.hexagons .boxed-container,
+.hexagons .champs-container,
+.hexagons .dead-container {
+    display: inline-block;
+    width: 33%;
+    vertical-align: top;
+}
+.hexagons .boxed-pokemon-container {
+    background: #333;
+    width: 48%;
+    border: none;
+}
+.hexagons .boxed-pokemon-info {
+    border: none;
+}
+.hexagons .dead-pokemon-container {
+    height: auto;
+    width: 100%;
+    border: none;
+    -webkit-clip-path: polygon(
+        95% 0,
+        100% 50%,
+        95% 100%,
+        5% 100%,
+        0% 50%,
+        5% 0
+    );
+    clip-path: polygon(95% 0, 100% 50%, 95% 100%, 5% 100%, 0% 50%, 5% 0);
+}
+.hexagons .dead-pokemon-info {
+    margin: 0;
+    width: 100%;
+}
+.hexagons .trainer-image {
+    border: none;
+}
+.hexagons .champs-pokemon:nth-of-type(n + 8),
+.hexagons .champs-pokemon:nth-of-type(n + 22),
+.hexagons .champs-pokemon:nth-of-type(n + 36),
+.hexagons .champs-pokemon:nth-of-type(n + 50),
+.hexagons .champs-pokemon:nth-of-type(n + 64),
+.hexagons .champs-pokemon:nth-of-type(n + 78),
+.hexagons .champs-pokemon:nth-of-type(n + 92),
+.hexagons .champs-pokemon:nth-of-type(n + 106) {
+    left: 24px;
+    top: -12px;
+    position: relative;
+}
+.hexagons .champs-pokemon:nth-of-type(n + 15),
+.hexagons .champs-pokemon:nth-of-type(n + 29),
+.hexagons .champs-pokemon:nth-of-type(n + 43),
+.hexagons .champs-pokemon:nth-of-type(n + 57),
+.hexagons .champs-pokemon:nth-of-type(n + 71),
+.hexagons .champs-pokemon:nth-of-type(n + 85) {
+    left: 0;
+    top: -23px;
+}
+.compact .ng-container {
+    border-width: 0 !important;
+}
+.compact .team-container {
+    display: flex;
+}
+.compact .pokemon-container {
+    padding: 0;
+    width: calc(100% / 3);
+    display: flex;
+}
+.compact .pokemon-info {
+    margin: 0;
+    padding: 0.5rem;
+    font-size: 90%;
+    border-radius: 0;
+    filter: none;
+    width: 100%;
+}
+.compact .move {
+    border: 1px solid rgba(0, 0, 0, 0.33);
+}
+.compact .pokemon-gender {
+    margin: 0;
+}
+.compact .pokemon-moves.vertical {
+    width: 25%;
+}
+.compact .rules-container ol {
+    display: flex;
+    flex-wrap: wrap;
+}
+.compact .rules-container li {
+    list-style-type: none;
+    margin: 0.25rem;
+}
+.compact .boxed-container,
+.compact .dead-container {
+    margin-top: 0;
+}
+.compact .boxed-pokemon-container {
+    margin: 0;
+    border-radius: 0;
+    border: none;
+}
+.compact .boxed-container-inner {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: 0;
+}
+.compact .dead-pokemon-container {
+    margin-bottom: 0;
+    width: 20%;
+    margin: 0;
+}
+.compact h3 {
+    margin: 0;
+    padding: 0.25rem;
+    background: rgba(0, 0, 0, 0.1);
+}
+.compact .pokemon-info-inner {
+    margin: unset;
+    margin-left: -0.25rem;
+}
+.compact-with-icons .ng-container {
+    border-width: 0 !important;
+}
+.compact-with-icons .team-container {
+    display: flex;
+}
+.compact-with-icons .pokemon-container {
+    padding: 0;
+    display: flex;
+}
+.compact-with-icons .pokemon-info {
+    margin: 0;
+    padding: 0.5rem;
+    font-size: 90%;
+    border-radius: 0;
+    filter: none;
+    width: 100%;
+}
+.compact-with-icons .move {
+    border: 1px solid rgba(0, 0, 0, 0.33);
+}
+.compact-with-icons .pokemon-gender {
+    margin: 0;
+}
+.compact-with-icons .pokemon-moves.vertical {
+    width: 25%;
+}
+.compact-with-icons .rules-container ol {
+    display: flex;
+    flex-wrap: wrap;
+}
+.compact-with-icons .rules-container li {
+    list-style-type: none;
+    margin: 0.25rem;
+}
+.compact-with-icons .boxed-container,
+.compact-with-icons .dead-container {
+    margin-top: 0;
+}
+.compact-with-icons .boxed-pokemon-container {
+    margin: 0;
+    border-radius: 0;
+    border: none;
+}
+.compact-with-icons .boxed-container-inner {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: 0;
+}
+.compact-with-icons .dead-pokemon-container {
+    margin-bottom: 0;
+    width: 20%;
+    margin: 0;
+}
+.compact-with-icons h3 {
+    margin: 0;
+    padding: 0.25rem;
+    background: rgba(0, 0, 0, 0.1);
+}
+.compact-with-icons .pokemon-info-inner {
+    margin: unset;
+    margin-left: -0.25rem;
+}
+.compact-with-icons .rules-container li {
+    list-style-type: none;
+    margin-left: 8px;
+    font-size: 120%;
+}
+.compact-with-icons .trainer-container,
+.compact-with-icons .column {
+    font-size: 120%;
+}
+.compact-with-icons .rules-container ol {
+    display: inline-block;
+    /* padding-right: 8rem; */
+}
+.compact-with-icons .stats {
+    font-size: 120%;
+}
+.compact-with-icons .boxed-pokemon-container,
+.compact-with-icons .dead-pokemon-container {
+    border: 0;
+}
+.compact-with-icons .pokemon-container .pokemon-icon-main {
+    position: absolute;
+    z-index: 11;
+    left: 3rem;
+    top: 0;
+    background: #383840;
+    image-rendering: pixelated;
+    border-radius: 0 0 0.25rem 0.25rem;
+    width: auto;
+}
+.compact-with-icons .pokemon-container {
+    margin: 0.25rem;
+    border-radius: 0.25rem;
+}
+.compact-with-icons .pokemon-image-wrapper {
+    height: 9.75rem;
+}
+.compact-with-icons .pokemon-image {
+    margin-top: 1.5rem;
+    margin-left: 0.25rem;
+    border-radius: 0.25rem;
+}
+.compact-with-icons .backsprite-montage {
+    margin-bottom: -0.75rem !important;
+}
+.compact-with-icons .move {
+    border: none;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+    border-radius: 0.25rem;
+}
+.compact-with-icons .pokemon-moves.vertical {
+    height: 100%;
+    margin-right: 0.25rem;
+}
+.compact-with-icons .pokemon-mvp-label {
+    background: rgba(56, 56, 64, 0.8);
+    border-radius: 0;
+    color: #fff;
+    letter-spacing: 2px;
+    top: 7rem;
+    left: calc(2.5rem - 1px);
+    height: 1.5rem;
+    font-size: 80%;
+    border: none;
+    width: calc(3.5rem + 1px);
+}
+.compact-with-icons .pokemon-mvp-label img {
+    height: 0.75rem !important;
+}
+.compact-with-icons .boxed-pokemon-container {
+}
+.compact-with-icons .boxed-pokemon-info {
+    border: none;
+}
+/* scope this to the result */
+.result .compact-with-icons .dead-pokemon-container {
+    width: calc(100% / 6);
+}
+.compact-with-icons .pokemon-container {
+    width: calc(98% / 3);
+}
+.compact-with-icons .champs-container .pokemon-icon {
+    width: 44px;
+}
+.compact-with-icons .pokemon-item,
+.compact-with-icons .pokemon-pokeball {
+    height: 1.5rem;
+    bottom: 1.25rem;
+    width: 2rem;
+    background: rgba(56, 56, 64, 0.8) !important;
+    filter: none;
+    padding: 0.25rem;
+}
+.compact-with-icons .pokemon-item {
+    left: 8px;
+}
+.compact-with-icons .badge-wrapper {
+    width: 400px;
+}
+.compact-with-icons .badge-wrapper img {
+    height: 2rem !important;
+}
+.compact-with-icons
+    .dead-pokemon-container
+    div:nth-of-type(2)
+    div:nth-of-type(1) {
+    vertical-align: top;
+    margin-top: -0.75rem;
+}
+.compact-with-icons .boxed-container-inner {
+    margin: 0 !important;
+}
+.compact-with-icons .trainer-image {
+    border: 0;
+    width: auto;
+    border-radius: 0;
+    height: auto;
+}
+/* .blank *:not(:where(.trainer-checkpoint,.badge-wrapper)) {
+  all: unset;
+} */
+/* .blank .pokemon-image-wrapper, */
+.blank .pokemon-image {
+    display: block;
+    height: 5rem;
+    width: 5rem;
+}
+
+.blank style {
+    display: none;
+}
+
+.generations-classic .ng-container {
+    position: relative;
+}
+.generations-classic li {
+    background: rgba(0, 0, 0, 0.2);
+    list-style-type: none;
+    border-radius: 0.25rem;
+    padding: 0.25rem;
+    margin: 0.25rem;
+    display: inline-block;
+}
+.generations-classic .team-container {
+    width: 36%;
+    justify-content: flex-start;
+    display: inline-block;
+    margin-left: 4px;
+}
+.generations-classic .pokemon-container {
+    padding: 0;
+    margin: 2px 0;
+}
+.generations-classic .pokemon-info {
+    border-radius: 0;
+    background-size: 322px 10px;
+    background-image:
+        linear-gradient(to right, #2d2d2d 1px, transparent 1px),
+        linear-gradient(to bottom, #2d2d2d 1px, transparent 1px);
+}
+.generations-classic .pokemon-image-wrapper {
+    width: 10rem;
+    -webkit-clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+    clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+}
+.generations-classic .pokemon-image {
+    -webkit-clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+    clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+    width: 9.5rem;
+}
+.generations-classic .boxed-container {
+    width: 200px;
+    height: 420px;
+    display: inline-block;
+    background: #333;
+    border-radius: 0.25rem;
+    vertical-align: top;
+    background-size: 10px 10px;
+    background-image:
+        linear-gradient(to right, #2d2d2d 1px, transparent 1px),
+        linear-gradient(to bottom, #2d2d2d 1px, transparent 1px);
+}
+.generations-classic .move {
+    -webkit-clip-path: polygon(9% 0, 100% 1%, 100% 100%, 8% 100%, 0% 50%);
+    clip-path: polygon(9% 0, 100% 1%, 100% 100%, 8% 100%, 0% 50%);
+    border-radius: 0;
+}
+.generations-classic .boxed-pokemon-container {
+    width: auto;
+    background: transparent;
+    border: none;
+    margin: 0;
+}
+.generations-classic .boxed-pokemon-info {
+    display: none;
+}
+.generations-classic .dead-container {
+    width: 710px;
+    display: inline-block;
+    vertical-align: top;
+    background-color: #333;
+    background-size: 10px 10px;
+    background-image:
+        linear-gradient(to right, #2d2d2d 1px, transparent 1px),
+        linear-gradient(to bottom, #2d2d2d 1px, transparent 1px);
+    margin-left: 7px;
+    border-radius: 0.25rem;
+    height: 420px;
+}
+.generations-classic .dead-pokemon-container {
+    width: 14rem;
+    height: 3rem;
+}
+.generations-classic .pokemon-causeofdeath {
+    font-size: 0.7rem;
+}
+.generations-classic .champs-container {
+    border-radius: 0.25rem;
+    width: 916px;
+    height: 212px;
+    position: absolute;
+    bottom: 148px;
+    right: 14px;
+    background-color: #333;
+    background-size: 10px 10px;
+    background-image:
+        linear-gradient(to right, #2d2d2d 1px, transparent 1px),
+        linear-gradient(to bottom, #2d2d2d 1px, transparent 1px);
+    padding: 0.25rem;
+}
+.generations-classic .rules-container {
+    position: absolute;
+    height: 200px;
+    width: 975px;
+    bottom: -50px;
+    right: 0;
+}

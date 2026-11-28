@@ -1,8 +1,11 @@
-export function splitUp(arr, n) {
+export function splitUp<T extends { length: number; slice(start: number, end?: number): T }>(
+    arr: T,
+    n: number,
+): T[] {
     const rest = arr.length % n; // how much to divide
     let restUsed = rest; // to keep track of the division over the elements
     const partLength = Math.floor(arr.length / n);
-    const result: any[] = [];
+    const result: T[] = [];
 
     for (let i = 0; i < arr.length; i += partLength) {
         let end = partLength + i,

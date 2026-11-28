@@ -1,4 +1,4 @@
-import { feature } from 'utils/feature';
+import { feature } from "utils/feature";
 
 export interface HotkeyList {
     key: string;
@@ -10,72 +10,148 @@ export interface HotkeyList {
 
 export const betaHotkeys: HotkeyList[] = [
     {
-        key: 'm',
-        comment: 'Toggle editor',
-        onKeyUp: 'toggleEditor',
-    },
-    {
-        key: 'I',
-        label: 'shift+i',
-        comment: 'Toggle image uploader',
-        onKeyUp: 'toggleImageUploader',
+        key: "I",
+        label: "shift+i",
+        comment: "Toggle image uploader",
+        onKeyUp: "toggleImageUploader",
     },
 ];
 
 export const listOfHotkeys: HotkeyList[] = [
     {
-        key: 'ctrl+z',
-        comment: 'Undo',
+        key: "ctrl+z",
+        comment: "Undo",
     },
     {
-        key: 'ctrl+y',
-        comment: 'Redo',
+        key: "ctrl+y",
+        comment: "Redo",
     },
     {
-        key: 'j',
-        comment: 'Previous Pok\xE9mon',
-        onKeyUp: 'previousPokemon',
+        key: "h",
+        comment: "Toggle History Timeline",
+        onKeyUp: "toggleHistoryTimeline",
     },
     {
-        key: 'k',
-        comment: 'Next Pok\xE9mon',
-        onKeyUp: 'nextPokemon',
+        key: "j",
+        comment: "Previous Pok\xE9mon",
+        onKeyUp: "previousPokemon",
     },
     {
-        key: 'n',
-        comment: 'Add new Pok\xE9mon',
-        onKeyUp: 'addPokemon',
+        key: "k",
+        comment: "Next Pok\xE9mon",
+        onKeyUp: "nextPokemon",
     },
     {
-        key: 's',
-        comment: 'Manual Save',
-        onKeyUp: 'manualSave',
+        key: "J",
+        label: "shift+j",
+        comment: "Move Pok\xE9mon Left",
+        onKeyUp: "movePokemonLeft",
     },
     {
-        key: 'backspace',
-        comment: 'Delete Pok\xE9mon',
-        onKeyUp: 'deletePokemon',
+        key: "K",
+        label: "shift+k",
+        comment: "Move Pok\xE9mon Right",
+        onKeyUp: "movePokemonRight",
     },
     {
-        key: 'N',
-        label: 'shift+n',
-        comment: 'Create New Nuzlocke',
-        onKeyUp: 'newNuzlocke',
+        key: "u",
+        comment: "Move Pok\xE9mon Up (Previous Status)",
+        onKeyUp: "movePokemonStatusUp",
     },
     {
-        label: 'shift+scroll',
-        key: 'shift+scroll',
-        comment: 'Scroll image result',
+        key: "d",
+        comment: "Move Pok\xE9mon Down (Next Status)",
+        onKeyUp: "movePokemonStatusDown",
     },
     {
-        label: 'double-click',
-        key: 'double-click',
-        comment: 'Reset image result dimensions',
+        key: "M",
+        label: "shift+m",
+        comment: "Toggle editor",
+        onKeyUp: "toggleEditor",
     },
     {
-        label: 'drag',
-        key: 'drag',
-        comment: 'Pan image result',
+        key: "n",
+        comment: "Add new Pok\xE9mon",
+        onKeyUp: "addPokemon",
+    },
+    {
+        key: "t",
+        comment: "Toggle Type Matchups",
+        onKeyUp: "toggleTypeMatchups",
+    },
+    {
+        key: "m",
+        comment: "Toggle Mass Editor",
+        onKeyUp: "toggleMassEditor",
+    },
+    {
+        key: "i",
+        comment: "Import data",
+        onKeyUp: "importData",
+    },
+    {
+        key: "e",
+        comment: "Export data",
+        onKeyUp: "exportData",
+    },
+    {
+        key: "o",
+        comment: "Import save file",
+        onKeyUp: "importSaveFile",
+    },
+    {
+        key: "D",
+        label: "shift+d",
+        comment: "Download image",
+        onKeyUp: "downloadImage",
+    },
+    {
+        key: "L",
+        label: "shift+l",
+        comment: "Toggle dark mode",
+        onKeyUp: "toggleDarkMode",
+    },
+    {
+        key: "s",
+        comment: "Manual Save",
+        onKeyUp: "manualSave",
+    },
+    {
+        key: "Backspace",
+        comment: "Delete Pok\xE9mon",
+        onKeyUp: "deletePokemon",
+    },
+    {
+        key: "/",
+        comment: "Focus Pokémon search",
+        onKeyUp: "focusPokemonSearch",
+    },
+    {
+        key: "N",
+        label: "shift+n",
+        comment: "Create New Nuzlocke",
+        onKeyUp: "newNuzlocke",
+    },
+    {
+        key: "V",
+        label: "shift+v",
+        comment: "Toggle release notes",
+        onKeyUp: "toggleReleaseDialog",
+    },
+    {
+        label: "shift+scroll",
+        key: "shift+scroll",
+        comment: "Scroll image result",
+    },
+    {
+        label: "double-click",
+        key: "double-click",
+        comment: "Reset image result dimensions",
+    },
+    {
+        label: "drag",
+        key: "drag",
+        comment: "Pan image result",
     },
     ...(feature.newHotkeys ? betaHotkeys : []),
 ];

@@ -11,8 +11,11 @@ export function isEqual(value, other) {
     }
 
     // Check if either value is null or not an object
-    if (value == null || other == null ||
-        (typeof value !== 'object' && typeof other !== 'object')) {
+    if (
+        value == null ||
+        other == null ||
+        (typeof value !== "object" && typeof other !== "object")
+    ) {
         // Handle NaN case (NaN is the only value that is not equal to itself)
         return value !== value && other !== other;
     }
@@ -92,8 +95,10 @@ export function isEqual(value, other) {
 
     // Check if all keys from value exist in other and have equal values
     for (const key of valueKeys) {
-        if (!Object.prototype.hasOwnProperty.call(other, key) ||
-            !isEqual(value[key], other[key])) {
+        if (
+            !Object.prototype.hasOwnProperty.call(other, key) ||
+            !isEqual(value[key], other[key])
+        ) {
             return false;
         }
     }

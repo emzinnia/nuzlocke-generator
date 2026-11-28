@@ -1,5 +1,7 @@
 export type onClick = (
-    e?: React.SyntheticEvent<MouseEvent> | React.SyntheticEvent<HTMLButtonElement>,
+    e?:
+        | React.SyntheticEvent<MouseEvent>
+        | React.SyntheticEvent<HTMLButtonElement>,
 ) => void;
 
 export type Concrete<Type> = {

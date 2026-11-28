@@ -1,15 +1,31 @@
-import { Forme } from 'utils';
+import { Forme, normalizeFormeKey } from "../Forme";
 
-export const getIconFormeSuffix = (forme: keyof typeof Forme) => {
-    if (forme == null) return '';
-    if (forme === 'Normal') return '';
-    if (forme === 'Spring') return '';
-    if (['Heat', 'Frost', 'Fan', 'Wash', 'Mow', 'Summer', 'Winter', 'Autumn'].includes(forme))
-        return `-${forme.toLowerCase()}`;
-    if (forme === '10%') return '-10-percent';
-    if (forme === 'Complete') return '-complete';
-    if (forme === '!') return '-exclamation';
-    if (forme === '?') return '-question';
-    if (Forme[forme]) return `-${Forme[forme]}`;
-    return '';
+export const getIconFormeSuffix = (
+    forme?: keyof typeof Forme | Forme | string,
+) => {
+    const normalizedForme = normalizeFormeKey(forme) ?? forme;
+
+    if (normalizedForme == null) return "";
+    if (normalizedForme === "Normal") return "";
+    if (normalizedForme === "Spring") return "";
+    if (
+        [
+            "Heat",
+            "Frost",
+            "Fan",
+            "Wash",
+            "Mow",
+            "Summer",
+            "Winter",
+            "Autumn",
+        ].includes(normalizedForme)
+    )
+        return `-${normalizedForme.toLowerCase()}`;
+    if (normalizedForme === "10%") return "-10-percent";
+    if (normalizedForme === "Complete") return "-complete";
+    if (normalizedForme === "!") return "-exclamation";
+    if (normalizedForme === "?") return "-question";
+    if (normalizedForme === "EternalFlower") return "-eternal";
+    if (Forme[normalizedForme]) return `-${Forme[normalizedForme]}`;
+    return "";
 };

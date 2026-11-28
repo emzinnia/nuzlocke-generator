@@ -24,6 +24,7 @@
 - [x] Arboliva
 - [x] Arcanine
 - [x] Arceus
+- [x] Archaludon
 - [x] Archen
 - [x] Archeops
 - [ ] Arctibax
@@ -208,6 +209,7 @@
 - [x] Diancie
 - [x] Diggersby
 - [x] Diglett
+- [x] Dipplin
 - [x] Ditto
 - [x] Dodrio
 - [x] Doduo
@@ -284,6 +286,7 @@
 - [x] Feraligatr
 - [x] Ferroseed
 - [x] Ferrothorn
+- [ ] Fezandipiti
 - [x] Fidough
 - [x] Finizen
 - [x] Finneon
@@ -357,6 +360,7 @@
 - [x] Gothita
 - [x] Gothitelle
 - [x] Gothorita
+- [x] Gouging Fire
 - [x] Gourgeist
 - [ ] Grafaiai
 - [x] Granbull
@@ -412,6 +416,7 @@
 - [x] Houndour
 - [x] Houndstone
 - [x] Huntail
+- [x] Hydrapple
 - [x] Hydreigon
 - [x] Hypno
 ## I
@@ -423,9 +428,12 @@
 - [x] Infernape
 - [x] Inkay
 - [x] Inteleon
+- [ ] Iron Boulder
 - [x] Iron Bundle
+- [ ] Iron Crown
 - [x] Iron Hands
 - [ ] Iron Jugulis
+- [x] Iron Leaves
 - [x] Iron Moth
 - [ ] Iron Thorns
 - [ ] Iron Treads
@@ -590,6 +598,7 @@
 - [x] Mudsdale
 - [x] Muk
 - [x] Munchlax
+- [ ] Munkidori
 - [x] Munna
 - [x] Murkrow
 - [x] Musharna
@@ -621,7 +630,9 @@
 - [x] Obstagoon
 - [x] Octillery
 - [x] Oddish
+- [x] Ogerpon
 - [x] Oinkologne
+- [ ] Okidogi
 - [x] Omanyte
 - [x] Omastar
 - [x] Onix
@@ -650,6 +661,7 @@
 - [x] Pawmo
 - [x] Pawmot
 - [x] Pawniard
+- [x] Pecharunt
 - [x] Pelipper
 - [x] Perrserker
 - [x] Persian
@@ -677,6 +689,7 @@
 - [x] Poliwag
 - [x] Poliwhirl
 - [x] Poliwrath
+- [ ] Poltchageist
 - [x] Polteageist
 - [x] Ponyta
 - [x] Poochyena
@@ -706,6 +719,7 @@
 ## R
 - [x] Raboot
 - [ ] Rabsca
+- [x] Raging Bolt
 - [x] Raichu
 - [x] Raikou
 - [x] Ralts
@@ -800,6 +814,7 @@
 - [x] Simipour
 - [x] Simisage
 - [x] Simisear
+- [ ] Sinistcha
 - [x] Sinistea
 - [x] Sirfetch'd
 - [x] Sizzlipede
@@ -885,10 +900,10 @@
 - [x] Tandemaus
 - [x] Tangela
 - [x] Tangrowth
-- [ ] Tapu Bulu
-- [ ] Tapu Fini
+- [x] Tapu Bulu
+- [x] Tapu Fini
 - [x] Tapu Koko
-- [ ] Tapu Lele
+- [x] Tapu Lele
 - [x] Tarountula
 - [x] Tatsugiri
 - [x] Tauros
@@ -896,6 +911,7 @@
 - [x] Tentacool
 - [x] Tentacruel
 - [x] Tepig
+- [x] Terapagos
 - [x] Terrakion
 - [x] Thievul
 - [x] Throh
@@ -979,6 +995,7 @@
 ## W
 - [x] Wailmer
 - [x] Wailord
+- [x] Walking Wake
 - [x] Walrein
 - [x] Wartortle
 - [x] Watchog

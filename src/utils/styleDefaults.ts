@@ -1,13 +1,20 @@
-export type RadiusType = 'round' | 'square';
-export type OrientationType = 'vertical' | 'horizontal';
-export type TeamImagesType = 'standard' | 'sugimori' | 'dream world' | 'shuffle' | 'tcg';
-export type IconRenderingType = 'pixelated' | 'auto';
-export type RulesLocation = 'inside trainer section' | 'bottom' | 'top';
-export type ItemStyle = 'outer glow' | 'round' | 'square' | 'text';
+export type RadiusType = "round" | "square";
+export type OrientationType = "vertical" | "horizontal";
+export type TeamImagesType =
+    | "standard"
+    | "sugimori"
+    | "dream world"
+    | "shuffle"
+    | "tcg";
+export type IconRenderingType = "pixelated" | "auto";
+export type RulesLocation = "inside trainer section" | "bottom" | "top";
+export type ItemStyle = "outer glow" | "round" | "square" | "text";
 
 export interface StatsOptions {
     averageLevel: boolean;
     averageLevelDetailed: boolean;
+    levelCap: boolean;
+    levelCapValue: string;
     mostCommonKillers: boolean;
     mostCommonTypes: boolean;
     shiniesCaught: boolean;
@@ -32,6 +39,7 @@ export interface Styles {
     minimalBoxedLayout: boolean;
     minimalTeamLayout: boolean;
     minimalDeadLayout: boolean;
+    sortDeadPokemonByDeathTimestamp: boolean;
     minimalChampsLayout: boolean;
     movesPosition: OrientationType;
     oldMetLocationFormat: boolean;
@@ -62,40 +70,42 @@ export interface Styles {
     linkedPokemonText: string;
     customTeamHTML: string;
     zoomLevel: number;
+    useAbilityMatchups: boolean;
 }
 
 export const styleDefaults: Styles = {
-    accentColor: '#111111',
-    backgroundImage: '',
-    bgColor: '#383840',
-    customCSS: '',
+    accentColor: "#111111",
+    backgroundImage: "",
+    bgColor: "#383840",
+    customCSS: "",
     displayBadges: true,
     displayRules: false,
     editorDarkMode: false,
-    font: 'Open Sans',
+    font: "Open Sans",
     iconsNextToTeamPokemon: false,
-    imageStyle: 'round',
-    itemStyle: 'outer glow',
-    pokeballStyle: 'outer glow',
-    iconRendering: 'auto',
+    imageStyle: "round",
+    itemStyle: "outer glow",
+    pokeballStyle: "outer glow",
+    iconRendering: "auto",
     grayScaleDeadPokemon: false,
     minimalBoxedLayout: false,
     minimalTeamLayout: false,
     minimalDeadLayout: false,
+    sortDeadPokemonByDeathTimestamp: false,
     minimalChampsLayout: true,
-    movesPosition: 'horizontal' as OrientationType,
+    movesPosition: "horizontal" as OrientationType,
     oldMetLocationFormat: false,
-    resultHeight: '900',
-    resultWidth: '1200',
+    resultHeight: "900",
+    resultWidth: "1200",
     scaleSprites: false,
     showPokemonMoves: true,
     spritesMode: false,
-    teamImages: 'standard',
+    teamImages: "standard",
     teamPokemonBorder: true,
-    template: 'Default Dark',
+    template: "Default Dark",
     tileBackground: false,
-    topHeaderColor: '#333333',
-    trainerSectionOrientation: 'horizonal' as OrientationType,
+    topHeaderColor: "#333333",
+    trainerSectionOrientation: "horizonal" as OrientationType,
     useSpritesForChampsPokemon: false,
     boxedPokemonPerLine: 6,
     displayGameOriginForBoxedAndDead: false,
@@ -104,19 +114,22 @@ export const styleDefaults: Styles = {
     useAutoHeight: true,
     usePokemonGBAFont: false,
     displayItemAsText: false,
-    displayRulesLocation: 'bottom' as RulesLocation,
-    trainerWidth: '20%',
-    trainerHeight: '100%',
+    displayRulesLocation: "bottom" as RulesLocation,
+    trainerWidth: "20%",
+    trainerHeight: "100%",
     trainerAuto: true,
     displayStats: false,
-    linkedPokemonText: 'Linked To',
+    linkedPokemonText: "Linked To",
     statsOptions: {
         averageLevel: false,
         averageLevelDetailed: false,
+        levelCap: false,
+        levelCapValue: "",
         mostCommonKillers: false,
         mostCommonTypes: false,
         shiniesCaught: false,
     },
-    customTeamHTML: '',
+    customTeamHTML: "",
     zoomLevel: 1,
+    useAbilityMatchups: false,
 };

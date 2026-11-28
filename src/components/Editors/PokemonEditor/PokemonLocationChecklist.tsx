@@ -1,0 +1,381 @@
+import * as React from "react";
+import { Game, Pokemon, Boxes } from "models";
+import { Game as GameName, getEncounterMap, listOfGames } from "utils";
+import { State } from "state";
+import { PokemonIcon } from "components/Pokemon/PokemonIcon/PokemonIcon";
+import {
+    Callout,
+    Classes,
+    HTMLSelect,
+    Icon,
+    Intent,
+    TextArea,
+    Tooltip,
+} from "@blueprintjs/core";
+import { cx } from "emotion";
+import { useDispatch } from "store/reactZustand";
+import { updateExcludedAreas, updateCustomAreas } from "actions";
+
+export type LocationChecklistSort = "map-order" | "alphabetical";
+
+export const sortEncounterAreas = (
+    areas: string[],
+    sortMode: LocationChecklistSort,
+) => {
+    if (sortMode === "alphabetical") {
+        return [...areas].sort((left, right) =>
+            left.localeCompare(right, undefined, { numeric: true }),
+        );
+    }
+
+    return areas;
+};
+
+const normalizeEncounterArea = (area?: string) =>
+    area?.trim().toLocaleLowerCase() ?? "";
+
+const pokemonMatchesChecklistGame = (
+    poke: Pokemon,
+    currentGame: GameName,
+    runGame: GameName,
+) => {
+    if (currentGame === "None") return true;
+    if (poke.gameOfOrigin === currentGame) return true;
+
+    const legacyCurrentRunOrigin =
+        !poke.gameOfOrigin || poke.gameOfOrigin === "None";
+    return currentGame === runGame && legacyCurrentRunOrigin;
+};
+
+const EncounterMap = ({
+    encounterMap,
+    style,
+    pokemon,
+    currentGame,
+    excludeGifts,
+    locationLookup,
+    displayHideArea,
+    onClickHideArea,
+}) => {
+    return encounterMap.map((area) => {
+        if (area === "") return null;
+        const found = locationLookup?.get(area.trim().toLocaleLowerCase());
+        return (
+            <div
+                key={area.toString()}
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    margin: "2px",
+                    borderBottom: `1px solid ${style?.editorDarkMode ? "#333" : "#efefef"}`,
+                }}
+            >
+                <LocationIcon
+                    area={area}
+                    pokemon={pokemon}
+                    currentGame={currentGame}
+                    excludeGifts={excludeGifts}
+                    poke={found}
+                />
+                <div style={{ marginLeft: "4px" }}>{area}</div>
+                {displayHideArea && (
+                    <div
+                        role="menuitem"
+                        tabIndex={0}
+                        onKeyDown={onClickHideArea(area)}
+                        onClick={onClickHideArea(area)}
+                        style={{ marginLeft: "auto", cursor: "pointer" }}
+                    >
+                        <Tooltip content={`Hide ${area}`}>
+                            <Icon icon="cross" />
+                        </Tooltip>
+                    </div>
+                )}
+            </div>
+        );
+    });
+};
+
+const LocationIcon = ({
+    area,
+    currentGame,
+    excludeGifts,
+    pokemon,
+    poke,
+}: {
+    area: string;
+    currentGame: GameName;
+    excludeGifts: boolean;
+    pokemon: Pokemon[];
+    poke?: Pokemon;
+}) => {
+    if (poke && !poke.hidden && (!poke.gift || !excludeGifts)) {
+        return (
+            <>
+                <Icon icon="tick" />
+                <PokemonIcon style={{ pointerEvents: "none" }} {...poke} />
+            </>
+        );
+    }
+    if (poke && poke.hidden) {
+        return (
+            <>
+                <Icon icon="cross" />
+                <PokemonIcon style={{ pointerEvents: "none" }} {...poke} />
+            </>
+        );
+    }
+    return null;
+};
+
+export const PokemonLocationChecklist = ({
+    pokemon,
+    game,
+    style,
+    boxes,
+    excludedAreas,
+    customAreas,
+}: {
+    pokemon: Pokemon[];
+    game: Game;
+    style: State["style"];
+    boxes: Boxes;
+    excludedAreas: string[];
+    customAreas: string[];
+}) => {
+    const calcTotals = (
+        boxes,
+        pokemon,
+        encounterMap,
+        currentGame: GameName,
+        runGame: GameName,
+    ) => {
+        const encounterTotal = encounterMap.length || 1;
+        const encounterSet = new Set(encounterMap.map(normalizeEncounterArea));
+
+        // Count pokemon per status in a single pass (avoid boxes × pokemon nested loop)
+        const counts = new Map<string, number>();
+        for (const poke of pokemon) {
+            if (!poke || poke.hidden) continue;
+            if (!pokemonMatchesChecklistGame(poke, currentGame, runGame))
+                continue;
+            if (!encounterSet.has(normalizeEncounterArea(poke.met))) continue;
+
+            const key = poke.status ?? "";
+            counts.set(key, (counts.get(key) ?? 0) + 1);
+        }
+
+        return boxes.map((box) => {
+            const total = counts.get(box.name) ?? 0;
+            const percentage = `${((total / encounterTotal) * 100).toFixed(1)}%`;
+            return { key: box.name, percentage };
+        });
+    };
+
+    const [excludeGifts, setExcludeGifts] = React.useState(false);
+    const [currentGame, setCurrentGame] = React.useState<GameName>(game.name);
+    const [sortMode, setSortMode] =
+        React.useState<LocationChecklistSort>("map-order");
+    const dispatch = useDispatch();
+    React.useEffect(() => {
+        setCurrentGame(game.name);
+    }, [game.name]);
+    const locationLookup = React.useMemo(() => {
+        const map = new Map<string, Pokemon>();
+        for (const poke of pokemon) {
+            const met = poke?.met?.trim();
+            if (!met) continue;
+            if (!pokemonMatchesChecklistGame(poke, currentGame, game.name))
+                continue;
+            const key = normalizeEncounterArea(met);
+            if (!map.has(key)) map.set(key, poke);
+        }
+        return map;
+    }, [pokemon, currentGame, game.name]);
+    const encounterMap = React.useMemo(
+        () =>
+            getEncounterMap(game.name)
+                .concat(customAreas)
+                .filter((area) => !excludedAreas.includes(area)),
+        [game.name, excludedAreas, customAreas],
+    );
+    const sortedEncounterMap = React.useMemo(
+        () => sortEncounterAreas(encounterMap, sortMode),
+        [encounterMap, sortMode],
+    );
+    const totals = React.useMemo(
+        () => calcTotals(boxes, pokemon, encounterMap, currentGame, game.name),
+        [boxes, pokemon, encounterMap, currentGame, game.name],
+    );
+    const hideArea = (area: string) => () =>
+        dispatch(updateExcludedAreas([...excludedAreas, area]));
+
+    const updateExcludedAreasFromText = (event) => {
+        const value = event.currentTarget.value;
+        const areas = value.split("\n");
+        dispatch(updateExcludedAreas(areas));
+    };
+
+    const updateCustomAreasFromText = (event) => {
+        const value = event.currentTarget.value;
+        const areas = value.split("\n");
+        dispatch(updateCustomAreas(areas));
+    };
+
+    const colors = [
+        "#0e1d6b",
+        "#468189",
+        "#77ACA2",
+        "#9DBEBB",
+        "#F4E9CD",
+        "#0DAB76",
+        "#139A43",
+        "#D4AFB9",
+        "#9CADCE",
+    ];
+
+    const buildTotals = (
+        percentages: { key: string; percentage: string }[],
+    ) => {
+        return (
+            <Tooltip
+                content={
+                    <>
+                        {percentages.map((percentage, idx) => (
+                            <div key={percentage.key}>
+                                <div
+                                    style={{
+                                        display: "inline-block",
+                                        width: "0.5rem",
+                                        height: "0.5rem",
+                                        borderRadius: "50%",
+                                        background: colors[idx],
+                                        marginRight: "0.25rem",
+                                    }}
+                                ></div>
+                                {percentage.key}: {percentage.percentage}
+                            </div>
+                        ))}
+                    </>
+                }
+            >
+                <div
+                    style={{
+                        height: "1rem",
+                        width: "25rem",
+                        background: style?.editorDarkMode ? "#333" : "#eee",
+                        borderRadius: ".25rem",
+                        border: "1px solid #ccc",
+                        overflow: "hidden",
+                    }}
+                >
+                    {percentages.map((percentage, idx) => {
+                        return (
+                            <div
+                                key={percentage.key}
+                                style={{
+                                    width: percentage.percentage,
+                                    height: "1rem",
+                                    background: colors[idx],
+                                    display: "inline-block",
+                                }}
+                            ></div>
+                        );
+                    })}
+                </div>
+            </Tooltip>
+        );
+    };
+
+    return (
+        <div>
+            <div className={"flex items-center justify-between"}>
+                <label
+                    className={cx(Classes.CONTROL, Classes.CHECKBOX)}
+                    style={{ margin: ".25rem 0" }}
+                >
+                    <input
+                        type="checkbox"
+                        checked={excludeGifts}
+                        onChange={(e) => setExcludeGifts(e?.target.checked)}
+                    />
+                    <span className={Classes.CONTROL_INDICATOR}></span>
+                    <span className={Classes.LABEL}>Exclude Gifts</span>
+                </label>
+                <label
+                    className={cx(Classes.CONTROL)}
+                    style={{ margin: ".25rem 0" }}
+                >
+                    <span className={Classes.LABEL}>Filter by Game</span>
+                    <HTMLSelect
+                        value={currentGame}
+                        style={{ marginLeft: "0.25rem" }}
+                        onChange={(e) =>
+                            setCurrentGame(e?.target.value as GameName)
+                        }
+                    >
+                        {listOfGames.map((game) => (
+                            <option key={game}>{game}</option>
+                        ))}
+                    </HTMLSelect>
+                </label>
+                <label
+                    className={cx(Classes.CONTROL)}
+                    style={{ margin: ".25rem 0" }}
+                >
+                    <span className={Classes.LABEL}>Sort</span>
+                    <HTMLSelect
+                        value={sortMode}
+                        style={{ marginLeft: "0.25rem" }}
+                        onChange={(e) =>
+                            setSortMode(
+                                e?.target.value as LocationChecklistSort,
+                            )
+                        }
+                    >
+                        <option value="map-order">Map Order</option>
+                        <option value="alphabetical">Alphabetical</option>
+                    </HTMLSelect>
+                </label>
+            </div>
+            <div className="flex" style={{ justifyContent: "center" }}>
+                {buildTotals(totals)}
+            </div>
+            <EncounterMap
+                encounterMap={sortedEncounterMap}
+                pokemon={pokemon}
+                style={style}
+                currentGame={currentGame}
+                excludeGifts={excludeGifts}
+                locationLookup={locationLookup}
+                displayHideArea={true}
+                onClickHideArea={hideArea}
+            />
+            <div style={{ padding: "0.25rem" }}>
+                <div>Excluded Areas</div>
+                <TextArea
+                    fill
+                    name="excludedAreas"
+                    onChange={updateExcludedAreasFromText}
+                    value={excludedAreas.join("\n")}
+                />
+                <div>Custom Areas</div>
+                <TextArea
+                    fill
+                    name="customAreas"
+                    onChange={updateCustomAreasFromText}
+                    value={customAreas.join("\n")}
+                />
+            </div>
+            <Callout
+                intent={Intent.WARNING}
+                style={{ fontSize: "80%", marginTop: "0.5rem" }}
+            >
+                Tip: Pokémon with the &quot;hidden&quot; attribute are a great
+                option for including Pokemon that got away on a certain route!
+            </Callout>
+        </div>
+    );
+};
+
+export default PokemonLocationChecklist;

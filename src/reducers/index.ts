@@ -1,24 +1,26 @@
-import { combineReducers } from 'redux';
+import { combineReducers } from "redux";
 
-import { nuzlockes } from './nuzlocke';
-import { pokemon } from './pokemon';
-import { box } from './box';
-import { confirmation } from './confirmation';
-import { selectedId } from './selectedId';
-import { game } from './game';
-import { trainer } from './trainer';
-import { history } from './history';
-import { style } from './style';
-import { sawRelease } from './sawRelease';
-import { editor } from './editor';
-import { rules } from './rules';
-import { checkpoints } from './checkpoints';
-import { customMoveMap } from './customMoveMap';
-import { stats } from './stats';
-import { customTypes } from './customTypes';
-import { editorHistory } from './editorHistory';
-import { excludedAreas, customAreas } from './areas';
-import { view } from './view';
+import { nuzlockes } from "./nuzlocke";
+import { pokemon } from "./pokemon";
+import { box } from "./box";
+import { confirmation } from "./confirmation";
+import { selectedId } from "./selectedId";
+import { game } from "./game";
+import { trainer } from "./trainer";
+import { history } from "./history";
+import { style } from "./style";
+import { sawRelease } from "./sawRelease";
+import { editor } from "./editor";
+import { rules } from "./rules";
+import { checkpoints } from "./checkpoints";
+import { customMoveMap } from "./customMoveMap";
+import { stats } from "./stats";
+import { customTypes } from "./customTypes";
+import { editorHistory } from "./editorHistory";
+import { excludedAreas, customAreas } from "./areas";
+import { view } from "./view";
+import { hotkeys } from "./hotkeys";
+import { saveUploadSettings } from "./saveUploadSettings";
 
 export const reducers = {
     box,
@@ -30,9 +32,11 @@ export const reducers = {
     editorHistory,
     excludedAreas,
     game,
+    hotkeys,
     nuzlockes,
     pokemon,
     editor,
+    saveUploadSettings,
     selectedId,
     sawRelease,
     trainer,

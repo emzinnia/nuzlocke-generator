@@ -1,18 +1,29 @@
-import { EDIT_RULE, ADD_RULE, DELETE_RULE, RESET_RULES, Action, REPLACE_STATE } from 'actions';
+import {
+    EDIT_RULE,
+    ADD_RULE,
+    DELETE_RULE,
+    RESET_RULES,
+    SET_RULES,
+    Action,
+    REPLACE_STATE,
+    SYNC_STATE_FROM_HISTORY,
+} from "actions";
 
 const initialState = [
-    'Each Pokémon that faints is considered dead and must be released or permaboxed',
-    'You can only catch the first Pokemon you encounter in an area',
-    'All Pokémon must be nicknamed',
+    "Each Pokémon that faints is considered dead and must be released or permaboxed",
+    "You can only catch the first Pokemon you encounter in an area",
+    "All Pokémon must be nicknamed",
 ];
 
 export function rules(
     state: string[] = initialState,
-    action: Action<EDIT_RULE | ADD_RULE | DELETE_RULE | RESET_RULES | REPLACE_STATE>,
+    action: Action<
+        EDIT_RULE | ADD_RULE | DELETE_RULE | RESET_RULES | SET_RULES | REPLACE_STATE | SYNC_STATE_FROM_HISTORY
+    >,
 ) {
     switch (action.type) {
         case ADD_RULE:
-            return [...state, ''];
+            return [...state, ""];
         case EDIT_RULE:
             return state.map((rule, index) => {
                 if (index !== action.target) {
@@ -21,11 +32,20 @@ export function rules(
                 return action.rule;
             });
         case DELETE_RULE:
-            return state.filter((_, index) => index + 1 !== action.target);
+            // Targets are 0-based indexes from RulesEditor (same as EDIT_RULE).
+            return state.filter((_, index) => index !== action.target);
         case REPLACE_STATE:
-            return action.replaceWith.rules;
+            return Array.isArray(action.replaceWith?.rules)
+                ? action.replaceWith.rules
+                : state;
+        case SYNC_STATE_FROM_HISTORY:
+            return Array.isArray(action.syncWith?.rules)
+                ? action.syncWith.rules
+                : state;
         case RESET_RULES:
             return initialState;
+        case SET_RULES:
+            return [...action.rules];
         default:
             return state;
     }

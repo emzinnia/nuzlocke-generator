@@ -1,0 +1,241 @@
+import * as React from "react";
+import { BaseEditor } from "components/Editors/BaseEditor/BaseEditor";
+import { connect } from "store/reactZustand";
+import { State } from "state";
+import { Checkbox, Switch, Button, Intent, Classes } from "@blueprintjs/core";
+import { editStyle, addStat, deleteStat, editStat } from "actions";
+import { cx } from "emotion";
+import { ErrorBoundary } from "components";
+
+export interface StatsEditorProps {
+    pokemon: State["pokemon"];
+    style: State["style"];
+    stats: State["stats"];
+    editStyle: editStyle;
+    addStat: addStat;
+    editStat: editStat;
+    deleteStat: deleteStat;
+}
+
+const sortById = (a: State["stats"][number], b: State["stats"][number]) => {
+    if ((a.id ?? "") > (b.id ?? "")) return 1;
+    if ((b.id ?? "") > (a.id ?? "")) return -1;
+    return 0;
+};
+
+export class StatsEditorBase extends React.Component<StatsEditorProps> {
+    private onDisplayStatsChange = (e: React.FormEvent<HTMLInputElement>) => {
+        this.props.editStyle({
+            [e.currentTarget.name]: e.currentTarget.checked,
+        });
+    };
+
+    private onStatsOptionChange = (e: React.FormEvent<HTMLInputElement>) => {
+        const stats = this.props.style?.statsOptions;
+        this.props.editStyle({
+            statsOptions: {
+                ...stats,
+                [e.currentTarget.name]: e.currentTarget.checked,
+            },
+        });
+    };
+
+    private onStatsOptionValueChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+        const stats = this.props.style?.statsOptions;
+        this.props.editStyle({
+            statsOptions: {
+                ...stats,
+                [e.currentTarget.name]: e.currentTarget.value,
+            },
+        });
+    };
+
+    private onChange =
+        (stat: State["stats"][number], use: "key" | "value") =>
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            const { editStat } = this.props;
+            //if (!stat?.id || !stat?.key || !stat?.value) return;
+            if (use === "key") {
+                if (stat?.id) {
+                    editStat(stat.id, e.target.value, stat.value ?? "");
+                }
+            } else {
+                if (stat?.id) {
+                    editStat(stat.id, stat.key ?? "", e.target.value);
+                }
+            }
+        };
+
+    public render() {
+        const { style, editStyle } = this.props;
+        const { addStat, deleteStat } = this.props;
+        const stats = style?.statsOptions;
+
+        return (
+            <BaseEditor icon="chart" name="Stats">
+                <ErrorBoundary>
+                    <div>
+                        <Checkbox
+                            checked={style.displayStats}
+                            name="displayStats"
+                            label="Display Stats"
+                            onChange={this.onDisplayStatsChange}
+                        />
+                    </div>
+                    <ul
+                        style={{
+                            listStyleType: "none",
+                            padding: 0,
+                            marginLeft: "1rem",
+                            opacity: style.displayStats ? 1 : 0.3,
+                        }}
+                    >
+                        <li>
+                            <Switch
+                                checked={stats?.averageLevel}
+                                name="averageLevel"
+                                label="Average Level"
+                                onChange={this.onStatsOptionChange}
+                            />
+                        </li>
+
+                        <li>
+                            {/* @NOTE: introduced in 1.7.1 */}
+                            <Switch
+                                checked={stats?.averageLevelDetailed}
+                                name="averageLevelDetailed"
+                                label="Average Level (Detailed)"
+                                onChange={this.onStatsOptionChange}
+                            />
+                        </li>
+
+                        <li
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                            }}
+                        >
+                            <Switch
+                                checked={stats?.levelCap}
+                                name="levelCap"
+                                label="Level Cap"
+                                onChange={this.onStatsOptionChange}
+                            />
+                            <input
+                                aria-label="Level Cap Value"
+                                className={cx(Classes.INPUT, "small-input")}
+                                disabled={!stats?.levelCap}
+                                min="1"
+                                name="levelCapValue"
+                                onChange={this.onStatsOptionValueChange}
+                                placeholder="cap"
+                                style={{
+                                    marginBottom: "10px",
+                                    marginLeft: "8px",
+                                    opacity: stats?.levelCap ? 1 : 0.3,
+                                    width: "5rem",
+                                }}
+                                type="number"
+                                value={stats?.levelCapValue ?? ""}
+                            />
+                        </li>
+
+                        <li>
+                            <Switch
+                                checked={stats?.mostCommonKillers}
+                                name="mostCommonKillers"
+                                label="Most Common Killers"
+                                onChange={this.onStatsOptionChange}
+                            />
+                        </li>
+
+                        <li>
+                            <Switch
+                                checked={stats?.mostCommonTypes}
+                                name="mostCommonTypes"
+                                label="Most Common Types"
+                                onChange={this.onStatsOptionChange}
+                            />
+                        </li>
+
+                        <li>
+                            <Switch
+                                checked={stats?.shiniesCaught}
+                                name="shiniesCaught"
+                                label="Shinies Caught"
+                                onChange={this.onStatsOptionChange}
+                            />
+                        </li>
+
+                        {this.props.stats?.sort(sortById).map((stat) => (
+                            <li
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                }}
+                                className={Classes.INPUT_GROUP}
+                                key={stat.id}
+                            >
+                                <input
+                                    onChange={this.onChange(stat, "key")}
+                                    style={{ margin: "4px" }}
+                                    className={Classes.INPUT}
+                                    type="text"
+                                    placeholder="custom label"
+                                    value={stat.key}
+                                />
+                                <input
+                                    onChange={this.onChange(stat, "value")}
+                                    style={{ margin: "4px" }}
+                                    className={Classes.INPUT}
+                                    type="text"
+                                    placeholder="custom value"
+                                    value={stat.value}
+                                />
+                                <Button
+                                    icon="trash"
+                                    intent={Intent.DANGER}
+                                    style={{ margin: "6px", fontSize: "80%" }}
+                                    className={cx(
+                                        Classes.MINIMAL,
+                                        Classes.BUTTON,
+                                    )}
+                                    onClick={() =>
+                                        stat?.id && deleteStat(stat?.id)
+                                    }
+                                />
+                            </li>
+                        ))}
+
+                        <li>
+                            <Button
+                                icon="plus"
+                                style={{ margin: "4px", fontSize: "80%" }}
+                                onClick={() => addStat({ key: "", value: "" })}
+                                intent={Intent.SUCCESS}
+                            >
+                                Add Custom Stat
+                            </Button>
+                        </li>
+                    </ul>
+                </ErrorBoundary>
+            </BaseEditor>
+        );
+    }
+}
+
+export const StatsEditor = connect(
+    (state: State) => ({
+        pokemon: state.pokemon,
+        style: state.style,
+        stats: state.stats,
+    }),
+    {
+        editStyle,
+        addStat,
+        deleteStat,
+        editStat,
+    },
+)(StatsEditorBase);

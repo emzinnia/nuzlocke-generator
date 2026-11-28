@@ -1,9 +1,9 @@
-import { Styles } from 'utils';
-import { Theme } from './Theme';
+import { Styles } from "utils";
+import { Theme } from "./Theme";
 
 export class DefaultDarkTheme implements Theme {
-    public name = 'Default Dark';
-    public disablesStyles: Partial<keyof Styles>[] = ['backgroundImage'];
+    public name = "Default Dark";
+    public disablesStyles: Partial<keyof Styles>[] = ["backgroundImage"];
     public createStyles(options) {
         return {
             ChampsPokemon: {},
@@ -11,7 +11,7 @@ export class DefaultDarkTheme implements Theme {
     }
 
     public onThemeInit(editStyle) {
-        editStyle({ backgroundImage: '' });
+        editStyle({ backgroundImage: "" });
     }
 
     public onThemePreview() {}

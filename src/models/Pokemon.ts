@@ -1,6 +1,6 @@
-import { GenderElementProps } from 'components/Shared';
-import { Checkpoints } from 'reducers/checkpoints';
-import { Types, Game, Forme } from 'utils';
+import { GenderElementProps } from "components/Common/Shared";
+import { Checkpoints } from "reducers/checkpoints";
+import { Types, Game, Forme } from "utils";
 
 export interface Pokemon {
     id: string;
@@ -15,7 +15,7 @@ export interface Pokemon {
     ability?: string;
     moves?: string[];
     causeOfDeath?: string;
-    deathTimestamp?: string;
+    deathTimestamp?: string | number;
     forme?: Forme;
     item?: string;
     types?: [Types, Types];
@@ -35,7 +35,7 @@ export interface Pokemon {
     extraData?: object;
     pokeball?: string;
     notes?: string;
-    linkedTo?: Pokemon['id'] | null;
+    linkedTo?: Pokemon["id"] | null;
     checkpoints?: Checkpoints;
     gift?: boolean;
     /* @deprecated */
@@ -45,39 +45,39 @@ export interface Pokemon {
 
 // We export a non-type version when we need all the keys easily
 export const PokemonKeys: Pokemon = {
-    id: '',
-    species: '',
-    nickname: '',
-    status: '',
+    id: "",
+    species: "",
+    nickname: "",
+    status: "",
     level: 0,
-    gender: 'f',
-    met: '',
+    gender: "f",
+    met: "",
     metLevel: 0,
-    nature: '',
-    ability: '',
+    nature: "",
+    ability: "",
     moves: [],
-    causeOfDeath: '',
+    causeOfDeath: "",
     deathTimestamp: undefined,
-    forme: 'Normal' as Forme,
-    item: '',
+    forme: "Normal" as Forme,
+    item: "",
     types: [Types.Normal, Types.Normal],
     teraType: Types.Normal,
-    customImage: '',
-    customIcon: '',
-    customItemImage: '',
+    customImage: "",
+    customIcon: "",
+    customItemImage: "",
     shiny: false,
     champion: false,
     badges: [],
-    num: '',
+    num: "",
     position: 0,
-    wonderTradedFor: '',
+    wonderTradedFor: "",
     mvp: false,
-    gameOfOrigin: 'Red',
+    gameOfOrigin: "Red",
     egg: false,
     hidden: false,
     extraData: {},
-    pokeball: 'None',
-    notes: '',
+    pokeball: "None",
+    notes: "",
     checkpoints: [],
     gift: false,
     linkedTo: null,

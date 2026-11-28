@@ -1,0 +1,349 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { Buffer } from "buffer";
+
+type WorkerSelf = {
+    postMessage: (data: unknown) => void;
+    onmessage?: (evt: { data: unknown }) => Promise<void> | void;
+    onmessageerror?: (err: unknown) => void;
+};
+
+const loadSav = (name: string) =>
+    Buffer.from(readFileSync(join(process.cwd(), "src", "parsers", name)));
+
+const withDesmumeFooter = (save: Buffer) =>
+    Buffer.concat([
+        save,
+        Buffer.from("|-DESMUME SAVE-|\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"),
+    ]);
+
+type PostMessageMock = ReturnType<typeof vi.fn>;
+type WorkerResult = {
+    error?: string;
+    detectedGame?: { name: string };
+    detectedSaveFormat?: string;
+    trainer?: { name?: string; money?: string };
+    pokemon?: { species?: string; status?: string }[];
+};
+
+describe("parsers worker", () => {
+    beforeEach(async () => {
+        vi.resetModules();
+        const mockSelf: WorkerSelf = {
+            postMessage: vi.fn(),
+            onmessage: undefined,
+            onmessageerror: undefined,
+        };
+        (globalThis as unknown as { self: WorkerSelf }).self = mockSelf;
+        await import("../worker");
+    });
+
+    it("detects Emerald from emerald.sav", async () => {
+        const save = loadSav("emerald.sav");
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: { save, selectedGame: "Auto", boxMappings: [], fileName: "emerald.sav" },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.detectedGame?.name).toBe("Emerald");
+        expect(call.detectedSaveFormat).toBe("Emerald");
+    });
+
+    it("detects Emerald from emerald2.sav", async () => {
+        const save = loadSav("emerald2.sav");
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: {
+                save,
+                selectedGame: "Auto",
+                boxMappings: [],
+                fileName: "emerald2.sav",
+            },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.detectedGame?.name).toBe("Emerald");
+        expect(call.detectedSaveFormat).toBe("Emerald");
+    });
+
+    it("detects FireRed from firered.sav", async () => {
+        const save = loadSav("firered.sav");
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: { save, selectedGame: "Auto", boxMappings: [], fileName: "firered.sav" },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.detectedGame?.name).toBe("FireRed");
+        expect(call.detectedSaveFormat).toBe("FRLG");
+    });
+
+    it.each([
+        {
+            fixture: "emerald.sav",
+            fileName: "FRIDAY.sav",
+            team: ["Salamence", "Magcargo", "Smeargle"],
+        },
+        {
+            fixture: "firered.sav",
+            fileName: "sparkle.sav",
+            team: [
+                "Charizard",
+                "Venusaur",
+                "Blastoise",
+                "Nidoking",
+                "Pidgeot",
+                "Pikachu",
+            ],
+        },
+    ])(
+        "ignores incidental Gen 3 abbreviation substrings in $fileName",
+        async ({ fixture, fileName, team }) => {
+            const save = loadSav(fixture);
+            const selfRef = globalThis.self as unknown as WorkerSelf;
+
+            await selfRef.onmessage?.({
+                data: { save, selectedGame: "Auto", boxMappings: [], fileName },
+            });
+            const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+            const importedTeam = call.pokemon?.filter((p) => p.status === "Team") ?? [];
+
+            expect(importedTeam.map((p) => p.species)).toEqual(team);
+        },
+    );
+
+    it("detects Diamond from diamond.sav", async () => {
+        const save = loadSav("diamond.sav");
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: { save, selectedGame: "Auto", boxMappings: [], fileName: "diamond.sav" },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        const team = call.pokemon?.filter((p) => p.status === "Team") ?? [];
+        expect(call.detectedGame?.name).toBe("Diamond");
+        expect(call.detectedSaveFormat).toBe("DP");
+        expect(team.map((p) => p.species)).toEqual([
+            "Gengar",
+            "Lapras",
+            "Dragonite",
+            "Rayquaza",
+            "Bibarel",
+            "Darkrai",
+        ]);
+    });
+
+    it.each(["attempt.sav", "boss.sav", "DS save.sav"])(
+        "ignores incidental Gen 4 abbreviation substrings in %s",
+        async (fileName) => {
+            const save = loadSav("diamond.sav");
+            const selfRef = globalThis.self as unknown as WorkerSelf;
+            await selfRef.onmessage?.({
+                data: { save, selectedGame: "Auto", boxMappings: [], fileName },
+            });
+            const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+            expect(call.detectedGame?.name).toBe("Diamond");
+            expect(call.detectedSaveFormat).toBe("DP");
+        },
+    );
+
+    it.each(["my-white-nuzlocke.sav", "blackout-platinum.sav"])(
+        "prefers structurally detected Gen 4 saves over Gen 5 filename hints in %s",
+        async (fileName) => {
+            const save = loadSav("diamond.sav");
+            const selfRef = globalThis.self as unknown as WorkerSelf;
+            await selfRef.onmessage?.({
+                data: { save, selectedGame: "Auto", boxMappings: [], fileName },
+            });
+            const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+            expect(call.error).toBeUndefined();
+            expect(call.detectedGame?.name).toBe("Diamond");
+            expect(call.detectedSaveFormat).toBe("DP");
+        },
+    );
+
+    it("posts parser errors instead of throwing from the worker", async () => {
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await expect(
+            selfRef.onmessage?.({
+                data: {
+                    save: new Uint8Array(0x80000),
+                    selectedGame: "BW",
+                    boxMappings: [],
+                    fileName: "not-a-save.sav",
+                },
+            }),
+        ).resolves.toBeUndefined();
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.error).toContain("Unable to validate BW save data");
+    });
+
+    it("detects HeartGold from heartgold.sav", async () => {
+        const save = loadSav("heartgold.sav");
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: { save, selectedGame: "Auto", boxMappings: [], fileName: "heartgold.sav" },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        const team = call.pokemon?.filter((p) => p.status === "Team") ?? [];
+        expect(call.detectedGame?.name).toBe("HeartGold");
+        expect(call.detectedSaveFormat).toBe("HGSS");
+        expect(team.map((p) => p.species)).toEqual([
+            "Typhlosion",
+            "Dragonite",
+            "Gyarados",
+            "Scizor",
+            "Lucario",
+            "Sceptile",
+        ]);
+    });
+
+    it("labels Pearl filenames as Pearl while using the DP parser", async () => {
+        const save = loadSav("diamond.sav");
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: { save, selectedGame: "Auto", boxMappings: [], fileName: "pearl.sav" },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.detectedGame?.name).toBe("Pearl");
+        expect(call.detectedSaveFormat).toBe("DP");
+    });
+
+    it("detects Platinum from a Platinum save fixture", async () => {
+        const save = loadSav("fixtures/gen4/projectpokemon-base-platinum-boy.sav");
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: {
+                save,
+                selectedGame: "Auto",
+                boxMappings: [],
+                fileName: "pokemon-platinum.sav",
+            },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.detectedGame?.name).toBe("Platinum");
+        expect(call.detectedSaveFormat).toBe("Platinum");
+        expect(call.trainer?.name).toBe("Platinu");
+        expect(call.trainer?.money).toBe("3000");
+    });
+
+    it("labels SoulSilver filenames as SoulSilver while using the HGSS parser", async () => {
+        const save = loadSav("heartgold.sav");
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: { save, selectedGame: "Auto", boxMappings: [], fileName: "soulsilver.sav" },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+        expect(call.detectedGame?.name).toBe("SoulSilver");
+        expect(call.detectedSaveFormat).toBe("HGSS");
+    });
+
+    it.each([
+        [
+            "fixtures/gen5/projectpokemon-base-black-boy.sav",
+            "pokemon-black.sav",
+            "Black",
+            "BW",
+            "Black",
+        ],
+        [
+            "fixtures/gen5/projectpokemon-base-white-boy.sav",
+            "pokemon-white.sav",
+            "White",
+            "BW",
+            "White",
+        ],
+        [
+            "fixtures/gen5/projectpokemon-base-black-2-boy.sav",
+            "pokemon-black-2.sav",
+            "Black 2",
+            "B2W2",
+            "Black",
+        ],
+        [
+            "fixtures/gen5/projectpokemon-base-white-2-boy.sav",
+            "pokemon-white-2.sav",
+            "White 2",
+            "B2W2",
+            "White",
+        ],
+    ])(
+        "detects %s as %s",
+        async (fixture, fileName, gameName, saveFormat, trainerName) => {
+            const save = loadSav(fixture);
+            const selfRef = globalThis.self as unknown as WorkerSelf;
+            await selfRef.onmessage?.({
+                data: { save, selectedGame: "Auto", boxMappings: [], fileName },
+            });
+            const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(-1)?.[0] as WorkerResult;
+            expect(call.detectedGame?.name).toBe(gameName);
+            expect(call.detectedSaveFormat).toBe(saveFormat);
+            expect(call.trainer?.name).toBe(trainerName);
+            expect(call.trainer?.money).toBe("3000");
+            expect(call.pokemon).toEqual([]);
+        },
+    );
+
+    it("detects padded Gen 5 DeSmuME dumps as Gen 5 instead of Gen 4", async () => {
+        const raw = loadSav("black.sav");
+        const save = withDesmumeFooter(raw);
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+
+        await selfRef.onmessage?.({
+            data: {
+                save: raw,
+                selectedGame: "Auto",
+                boxMappings: [],
+                fileName: "black.sav",
+            },
+        });
+        const rawCall = (selfRef.postMessage as PostMessageMock).mock.calls.at(
+            -1,
+        )?.[0] as WorkerResult;
+
+        (selfRef.postMessage as PostMessageMock).mockClear();
+        await selfRef.onmessage?.({
+            data: {
+                save,
+                selectedGame: "Auto",
+                boxMappings: [],
+                fileName: "black.dsv",
+            },
+        });
+        const paddedCall = (selfRef.postMessage as PostMessageMock).mock.calls.at(
+            -1,
+        )?.[0] as WorkerResult;
+
+        expect(rawCall.detectedGame?.name).toBe("Black");
+        expect(rawCall.detectedSaveFormat).toBe("BW");
+        expect(paddedCall.detectedGame?.name).toBe("Black");
+        expect(paddedCall.detectedSaveFormat).toBe("BW");
+        expect(paddedCall.pokemon?.length).toBe(rawCall.pokemon?.length);
+        expect(paddedCall.trainer?.money).toBe(rawCall.trainer?.money);
+    });
+
+    it("keeps padded Gen 4 DeSmuME dumps on Gen 4 Auto routing", async () => {
+        const save = withDesmumeFooter(loadSav("diamond.sav"));
+        const selfRef = globalThis.self as unknown as WorkerSelf;
+        await selfRef.onmessage?.({
+            data: {
+                save,
+                selectedGame: "Auto",
+                boxMappings: [],
+                fileName: "diamond.dsv",
+            },
+        });
+        const call = (selfRef.postMessage as PostMessageMock).mock.calls.at(
+            -1,
+        )?.[0] as WorkerResult;
+        const team = call.pokemon?.filter((p) => p.status === "Team") ?? [];
+        expect(call.detectedGame?.name).toBe("Diamond");
+        expect(call.detectedSaveFormat).toBe("DP");
+        expect(team.map((p) => p.species)).toEqual([
+            "Gengar",
+            "Lapras",
+            "Dragonite",
+            "Rayquaza",
+            "Bibarel",
+            "Darkrai",
+        ]);
+    });
+});

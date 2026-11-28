@@ -1,4 +1,4 @@
-import { Theme } from './Theme';
+import { Theme } from "./Theme";
 
 export class ThemeManager {
     public currentTheme: Theme;
